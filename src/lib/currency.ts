@@ -38,7 +38,7 @@ export const formatPrice = (
   priceInILS: number,
   language: 'he' | 'en' | 'es'
 ): string => {
-  if (language === 'en') {
+  if (language !== 'he') {
     const usdPrice = convertToUSD(priceInILS);
     return `$${usdPrice}`;
   }
@@ -49,14 +49,14 @@ export const formatPrice = (
  * Get currency symbol based on language
  */
 export const getCurrencySymbol = (language: 'he' | 'en' | 'es'): string => {
-  return language === 'en' ? '$' : '₪';
+  return language !== 'he' ? '$' : '₪';
 };
 
 /**
  * Get currency code based on language
  */
 export const getCurrencyCode = (language: 'he' | 'en' | 'es'): string => {
-  return language === 'en' ? 'USD' : 'ILS';
+  return language !== 'he' ? 'USD' : 'ILS';
 };
 
 /**
