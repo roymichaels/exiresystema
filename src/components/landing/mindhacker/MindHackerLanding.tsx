@@ -59,19 +59,20 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
       type="button"
       onClick={onOpen}
       aria-label="פתח שיחה עם AION"
-      className="group fixed z-40 flex items-center gap-2.5 rounded-full border border-[hsl(var(--mh-line))] bg-black/55 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-black/75 hover:border-[hsl(var(--mh-sand))]"
+      className="group fixed z-40 flex items-center gap-2 rounded-full border border-[hsl(var(--mh-line)/0.7)] bg-black/40 px-3 py-1.5 backdrop-blur-md opacity-70 transition-all hover:opacity-100 hover:bg-black/60"
       style={{
         insetInlineStart: 'max(1rem, env(safe-area-inset-left))',
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
       }}
     >
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[hsl(var(--mh-sand))]" />
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-40" />
+        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))]" />
       </span>
-      <span dir="ltr" className="mh-eyebrow text-[0.65rem] text-[hsl(var(--mh-sand))]">
-        Chat with AION
+      <span dir="ltr" className="text-[0.55rem] tracking-[0.25em] text-[hsl(var(--mh-ink)/0.75)]">
+        chat with aion
       </span>
+
     </button>
   );
 }
@@ -80,16 +81,33 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
 
 function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-center px-6 py-5 md:py-7">
-      <img
-        src={exireSigil}
-        alt="Exire Systema"
-        className="h-72 w-72 md:h-80 md:w-80 object-contain opacity-95 mix-blend-screen"
-        style={{ filter: 'brightness(1.25) contrast(1.1) drop-shadow(0 0 14px rgba(180,150,255,0.4))' }}
-      />
+    <header className="absolute inset-x-0 top-0 z-30 flex flex-col items-center px-6 pt-6 md:pt-8">
+      <div className="relative h-24 w-24 md:h-28 md:w-28 overflow-hidden">
+        <img
+          src={exireSigil}
+          alt="Exire Systema"
+          className="absolute inset-x-0 top-0 h-[140%] w-full object-contain opacity-80 mix-blend-screen"
+          style={{
+            filter: 'brightness(1.05) contrast(0.95) saturate(0.8) drop-shadow(0 0 18px rgba(180,150,255,0.25))',
+            clipPath: 'inset(0 0 32% 0)',
+          }}
+        />
+      </div>
+      <p
+        dir="ltr"
+        className="mt-3 text-[0.6rem] md:text-[0.65rem] font-light text-[hsl(var(--mh-ink)/0.7)]"
+        style={{
+          fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
+          letterSpacing: '0.55em',
+          textIndent: '0.55em',
+        }}
+      >
+        EXIRE SYSTEMA
+      </p>
     </header>
   );
 }
+
 
 /* ─────────────── 1. Hero ─────────────── */
 
@@ -139,18 +157,27 @@ function Hero({ onStart }: { onStart: () => void }) {
         <AmbientBackdrop variant="hero" />
       </div>
 
-      {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-20">
-        <div className="max-w-xl text-start md:max-w-2xl">
-          <p className="mh-eyebrow mh-reveal mb-8">Exire Systema · פרק ראשון</p>
+      {/* Soft dark wash behind text for readability */}
+      <div
+        className="absolute inset-y-0 start-0 z-[5] w-full md:w-2/3 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(80% 60% at 30% 55%, hsl(var(--mh-bg) / 0.7) 0%, hsl(var(--mh-bg) / 0.35) 50%, transparent 80%)',
+        }}
+      />
 
-          <h1 className="mh-serif mh-reveal text-[2.4rem] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[5rem]">
+      {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pt-40 md:pt-44">
+        <div className="max-w-xl text-start md:max-w-2xl">
+          <p className="mh-eyebrow mh-reveal mb-10 md:mb-12">פרק ראשון</p>
+
+          <h1 className="mh-serif mh-reveal text-[2.4rem] leading-[1.1] sm:text-6xl md:text-7xl lg:text-[5rem]">
             התודעה שלך
             <br />
             <span className="text-[hsl(var(--mh-sand))]">לא נבנתה</span> על ידך
           </h1>
 
-          <p className="mh-reveal mt-8 max-w-md text-[0.95rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
+          <p className="mh-reveal mt-10 md:mt-12 max-w-md text-[0.95rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
             רוב האנשים חיים מתוך זהות, פחדים ואמונות
             <br />
             שהותקנו בהם מגיל אפס.
@@ -158,13 +185,14 @@ function Hero({ onStart }: { onStart: () => void }) {
             <span className="text-[hsl(var(--mh-sand))]">מעטים לומדים לכתוב את עצמם מחדש.</span>
           </p>
 
-          <div className="mh-reveal mt-12 flex flex-col gap-4 sm:flex-row sm:gap-5">
+          <div className="mh-reveal mt-14 md:mt-16 flex flex-col gap-4 sm:flex-row sm:gap-5">
             <button onClick={onStart} className="mh-cta-primary">
               התחל את השכתוב
             </button>
           </div>
         </div>
       </div>
+
 
       {/* scroll indicator */}
       <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 mh-reveal">
