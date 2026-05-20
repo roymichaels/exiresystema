@@ -1,15 +1,14 @@
 /**
- * AmbientBackdrop — cinematic dark canvas: deep void + breathing orb halo
- * + sacred geometry grid + drifting particles. Pure CSS/SVG, no WebGL.
+ * AmbientBackdrop — cinematic canvas: deep void + sacred geometry grid
+ * + drifting particles. Pure CSS/SVG, no WebGL. Inherits app theme tokens.
  */
 import { useEffect, useRef } from 'react';
 
 interface Props {
   variant?: 'hero' | 'section';
-  showOrb?: boolean;
 }
 
-export function AmbientBackdrop({ variant = 'section', showOrb = false }: Props) {
+export function AmbientBackdrop({ variant = 'section' }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -28,6 +27,11 @@ export function AmbientBackdrop({ variant = 'section', showOrb = false }: Props)
     };
     resize();
     window.addEventListener('resize', resize);
+
+    // Read foreground token at runtime so particles match the app theme.
+    const fg = getComputedStyle(document.documentElement)
+      .getPropertyValue('--foreground')
+      .trim() || '0 0% 100%';
 
     const COUNT = variant === 'hero' ? 38 : 18;
     const particles = Array.from({ length: COUNT }, () => ({
@@ -50,7 +54,7 @@ export function AmbientBackdrop({ variant = 'section', showOrb = false }: Props)
         }
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(40, 25%, 92%, ${p.a})`;
+        ctx.fillStyle = `hsla(${fg} / ${p.a})`;
         ctx.fill();
       });
       raf = requestAnimationFrame(tick);
@@ -88,33 +92,6 @@ export function AmbientBackdrop({ variant = 'section', showOrb = false }: Props)
           <circle cx="450" cy="330" r="220" stroke="hsl(var(--mh-sand))" strokeWidth="0.5" />
           <circle cx="450" cy="570" r="220" stroke="hsl(var(--mh-sand))" strokeWidth="0.5" />
         </svg>
-      )}
-
-      {/* Breathing orb halo */}
-      {showOrb && (
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mh-breathe"
-          style={{
-            width: 'min(78vmin, 720px)',
-            height: 'min(78vmin, 720px)',
-            background:
-              'radial-gradient(circle at 50% 50%, hsla(35, 28%, 72%, 0.22) 0%, hsla(28, 30%, 50%, 0.10) 28%, transparent 62%)',
-            filter: 'blur(8px)',
-          }}
-        />
-      )}
-      {showOrb && (
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{
-            width: 'min(24vmin, 220px)',
-            height: 'min(24vmin, 220px)',
-            background:
-              'radial-gradient(circle at 38% 38%, hsla(40, 30%, 92%, 0.95) 0%, hsla(28, 30%, 58%, 0.4) 35%, hsla(0,0%,2%,0.9) 78%)',
-            boxShadow:
-              '0 0 80px hsla(35, 28%, 70%, 0.18), inset 0 0 60px hsla(0,0%,0%,0.6)',
-          }}
-        />
       )}
 
       {/* Particle drift */}

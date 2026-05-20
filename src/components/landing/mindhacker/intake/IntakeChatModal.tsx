@@ -133,7 +133,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       style={{ background: 'hsl(var(--mh-bg) / 0.97)', backdropFilter: 'blur(24px)' }}
     >
       <div className="absolute inset-0 -z-10 opacity-40 pointer-events-none">
-        <AmbientBackdrop variant="hero" showOrb />
+        <AmbientBackdrop variant="hero" />
       </div>
 
       {/* Header */}

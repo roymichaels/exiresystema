@@ -1,71 +1,54 @@
-## אבחנה — למה זה לא עובד
+## Goals
 
-**1. "Load failed" (השגיאה האדומה במסך)**
-ה־edge function `intake-chat` **לא פרוס**. בדקתי ישירות מול הגייטוויי:
-```
-POST /functions/v1/intake-chat → 404 NOT_FOUND
-"Requested function was not found"
-```
-הקוד קיים ב־`supabase/functions/intake-chat/index.ts`, אבל הוא מעולם לא דופלוי. בנוסף, אין לו ערך ב־`supabase/config.toml` — לכן כש־`useChat` עושה POST, הוא חוזר עם 404 לפני שמתחילה שום בקשת AI. לכן גם אין שום לוג.
+1. Remove the breathing orb from the Mind Hacker homepage.
+2. Stop using the isolated `mh-*` palette and drive the landing from the app's existing semantic theme tokens (background/foreground/primary/aion-violet/aion-cyan) so it matches the rest of the app.
+3. Switch the `intake-chat` edge function from the Lovable AI Gateway to OpenRouter (the `OPENROUTER_API_KEY` secret is already configured).
 
-**2. למה יש צ׳אט/קומפוזר חדשים במקום AION**
-זה היה שיקול דעת שגוי שלי. בנינו פה stack מקביל:
-- `IntakeChatModal` במקום ה־shell של AION
-- AI Elements (`PromptInput`, `PromptInputTextarea`, `PromptInputSubmit`, `Shimmer`) במקום `AuroraChatInput` / `AuroraChatMessage` / `AuroraTypingIndicator` / `AuroraHoloOrb`
-- `useChat` ישיר מ־`@ai-sdk/react` במקום הצינור של AION
+## Changes
 
-הסיבה הטכנית: `AuroraChatArea` קשור ל־`useAuroraChat(conversationId)` שדורש משתמש מחובר ומסנכרן ל־`messages` בדאטה־בייס. הסריקה היא **אנונימית** (לפני login) ועם transport אחר (`intake-chat`), אז לא יכולתי לחבר אותה 1:1 ל־AuroraChatArea. אבל זו לא סיבה לבנות UI חדש — היה צריך לעטוף את אותם רכיבי המסך של AION סביב transport אחר. זה מה שאתקן.
+### 1. Remove the orb (frontend only)
+- `src/components/landing/mindhacker/MindHackerLanding.tsx`: drop `showOrb` from both `<AmbientBackdrop ... />` calls (hero + closing section).
+- `src/components/landing/mindhacker/intake/IntakeChatModal.tsx`: drop `showOrb` from the modal backdrop.
+- `src/components/landing/mindhacker/AmbientBackdrop.tsx`: delete the two orb halo blocks (lines ~93–118) and the `showOrb` prop entirely. Keep void radial, sacred geometry, particles, fog.
 
----
+### 2. Theme alignment
+Re-point the Mind Hacker palette to existing app tokens so the landing inherits the global theme instead of defining its own colors.
 
-## תכנית
+- `src/components/landing/mindhacker/theme.css`:
+  - Replace the hardcoded `--mh-bg / --mh-bg-2 / --mh-ink / --mh-sand / --mh-ember / --mh-line / --mh-mute` HSL values with references to existing app tokens:
+    - `--mh-bg`        → `var(--background)`
+    - `--mh-bg-2`      → `var(--card)` (or `--muted`)
+    - `--mh-ink`       → `var(--foreground)`
+    - `--mh-sand`      → `var(--aion-violet)` (accent)
+    - `--mh-ember`     → `var(--aion-cyan)` (secondary accent)
+    - `--mh-line`      → `var(--border)`
+    - `--mh-mute`      → `var(--muted-foreground)`
+  - Update `.mh-cta-primary` / `.mh-cta-ghost` to reference these (already do, no change beyond token swap).
+  - Particles in `AmbientBackdrop.tsx` currently use a hardcoded `hsla(40, 25%, 92%, …)` — switch to `hsl(var(--foreground) / a)`.
 
-### שלב 1 — להפעיל את הצ׳אט (סוגר את "Load failed")
-1. להוסיף ל־`supabase/config.toml`:
-   ```
-   [functions.intake-chat]
-   verify_jwt = false
-   ```
-   (כדי לאפשר גישה אנונימית מנחיתה).
-2. לעשות deploy של `intake-chat` ולוודא עם curl ש־POST מחזיר stream תקין.
-3. לבדוק שה־ENV הקיים מספיק: `LOVABLE_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `FOUNDER_NOTIFY_EMAIL`, `FOUNDER_WHATSAPP_NUMBER`. אם חסר משהו → לבקש secret לפני הפריסה.
+This keeps all section structure/typography intact; only the color source changes, so the landing visually inherits whatever theme the rest of the app uses (dark purple/aion).
 
-### שלב 2 — להשתמש ב־UI של AION (בלי קומפוזר חדש)
-לשכתב את `IntakeChatModal` כך שיהיה רק **shell קולנועי** + transport אנונימי, אבל **כל הרכיבים הויזואליים יהיו של AION**:
+### 3. Switch intake AI to OpenRouter
+- `supabase/functions/intake-chat/index.ts`:
+  - Replace the `createOpenAICompatible` config:
+    ```ts
+    const gateway = createOpenAICompatible({
+      name: 'openrouter',
+      baseURL: 'https://openrouter.ai/api/v1',
+      headers: {
+        Authorization: `Bearer ${Deno.env.get('OPENROUTER_API_KEY')!}`,
+        'HTTP-Referer': 'https://mindhacker.app',
+        'X-Title': 'Mind Hacker Intake',
+      },
+    });
+    ```
+  - Change the model from `google/gemini-3-flash-preview` to an OpenRouter model id — proposed default: `google/gemini-2.5-flash` (fast, cheap, supports tool calls). Easy to swap.
+  - Leave the Resend founder notify path unchanged (still uses `LOVABLE_API_KEY` via the connector gateway — that's not LLM traffic).
+- Redeploy the edge function.
 
-- בועות הודעות → `AuroraChatMessage`
-- אינדיקטור הקלדה → `AuroraTypingIndicator`
-- קומפוזר → `AuroraChatInput` (אותו טקסט־אריאה, אותם כפתורים — מיק, גלגול, slash, שליחה — שראית בצילום)
-- האורב המרכזי → `AuroraHoloOrb` (במקום הספירה החומה הנוכחית)
+### 4. Verification
+- `curl -X POST .../intake-chat` with a sample messages array → expect 200 + stream chunks (not 402).
+- Open the landing, confirm: no orb, colors match the rest of the app (dark purple aion theme rather than sandy/ember), CTA opens modal, modal scans through to `save_lead`, WhatsApp button appears.
 
-מה כן נשאר ייחודי ל־intake:
-- ה־transport: `DefaultChatTransport({ api: '…/intake-chat' })`
-- Stage A (ה־Hook עם "התחל את הסריקה")
-- Stage C (ה־reveal עם CTA לוואטסאפ אחרי `save_lead`)
-- הכותרת "AION · Consciousness Scan" + כפתור X
-
-תוצאה: זהה חזותית ל־AION, אבל ללא login וללא כתיבה ל־`messages`.
-
-### שלב 3 — להסיר תלות מיותרת
-- להוריד את השימוש ב־AI Elements מהמסך הזה (`PromptInput*`, `Shimmer`). הקבצים יישארו לעת עתה (כדי לא לשבור משהו אחר), אבל לא בשימוש בנתיב ה־intake.
-- לוודא שאין import שבור אחרי השינוי.
-
-### שלב 4 — אימות
-1. `curl` ל־`/intake-chat` עם payload של הודעה ראשונה → לקבל stream.
-2. לפתוח את המודאל מהלנדינג, ללחוץ "התחל" → לוודא שמופיעה הודעת AION עם בועה בסגנון AION ולא Load failed.
-3. לעבור את 5 השלבים עד `save_lead` → לבדוק ב־DB שנוצר רשומה ב־`leads` ושה־reveal עם CTA לוואטסאפ נפתח.
-
----
-
-## פרטים טכניים
-
-**קבצים שיתעדכנו:**
-- `supabase/config.toml` — בלוק function עבור `intake-chat`.
-- `src/components/landing/mindhacker/intake/IntakeChatModal.tsx` — החלפת ה־composer והבועות ברכיבי Aurora; הסרת import ל־AI Elements; הוספת `AuroraHoloOrb` כרקע מרכזי.
-
-**מה לא משתנה:**
-- `supabase/functions/intake-chat/index.ts` — הקוד עצמו תקין; רק פריסה + config.
-- טבלת `leads` והעמודות שנוספו.
-- חיווט ה־CTA ב־`MindHackerLanding.tsx`.
-
-**הנחה:** אתה רוצה שה־intake **לא** ידרוש login (CTA אנונימי מהלנדינג). אם אתה רוצה דווקא login לפני intake — תגיד ואשנה.
+## Open question
+You said "colors from the theme of the app" — I'm assuming you mean the global aion/purple dark theme used everywhere else (so the Mind Hacker landing stops looking like its own micro-brand). If you actually wanted to keep the sandy/ember vibe and only retune a couple of shades, tell me and I'll do that instead.

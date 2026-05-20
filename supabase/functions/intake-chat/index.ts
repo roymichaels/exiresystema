@@ -13,6 +13,7 @@ const corsHeaders = {
 };
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')!;
+const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
@@ -20,11 +21,12 @@ const FOUNDER_NOTIFY_EMAIL = Deno.env.get('FOUNDER_NOTIFY_EMAIL') ?? '';
 const FOUNDER_WHATSAPP_NUMBER = (Deno.env.get('FOUNDER_WHATSAPP_NUMBER') ?? '').replace(/\D/g, '');
 
 const gateway = createOpenAICompatible({
-  name: 'lovable',
-  baseURL: 'https://ai.gateway.lovable.dev/v1',
+  name: 'openrouter',
+  baseURL: 'https://openrouter.ai/api/v1',
   headers: {
-    'Lovable-API-Key': LOVABLE_API_KEY,
-    'X-Lovable-AIG-SDK': 'vercel-ai-sdk',
+    Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+    'HTTP-Referer': 'https://mindhacker.app',
+    'X-Title': 'Mind Hacker Intake',
   },
 });
 
@@ -261,7 +263,7 @@ Deno.serve(async (req) => {
 
   try {
     const result = streamText({
-      model: gateway('google/gemini-3-flash-preview'),
+      model: gateway('google/gemini-2.5-flash'),
       system: SYSTEM_PROMPT,
       messages: await convertToModelMessages(body.messages),
       tools,

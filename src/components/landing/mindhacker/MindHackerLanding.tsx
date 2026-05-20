@@ -56,7 +56,7 @@ function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }
   const ref = useReveal<HTMLDivElement>();
   return (
     <section ref={ref} className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden">
-      <AmbientBackdrop variant="hero" showOrb />
+      <AmbientBackdrop variant="hero" />
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <p className="mh-eyebrow mh-reveal mb-10">Exire Systema · פרק ראשון</p>
 
@@ -311,7 +311,7 @@ function FinalCTA({ onStart }: { onStart: () => void }) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <section ref={ref} className="relative isolate overflow-hidden py-40 md:py-56">
-      <AmbientBackdrop showOrb />
+      <AmbientBackdrop />
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <h2 className="mh-serif mh-reveal text-4xl leading-[1.2] sm:text-5xl md:text-7xl">
           או שתמשיך לחיות

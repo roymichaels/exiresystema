@@ -2,13 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&family=Heebo:wght@200;300;400;500;700&display=swap');
 
 .mindhacker-theme {
-  --mh-bg: 0 0% 4%;
-  --mh-bg-2: 0 0% 7%;
-  --mh-ink: 40 25% 92%;
-  --mh-sand: 35 18% 78%;
-  --mh-ember: 28 30% 62%;
-  --mh-line: 35 8% 22%;
-  --mh-mute: 35 6% 45%;
+  /* Pull from the global app theme so the landing matches the rest of the app. */
+  --mh-bg: var(--background);
+  --mh-bg-2: var(--card);
+  --mh-ink: var(--foreground);
+  --mh-sand: var(--aion-violet, var(--primary));
+  --mh-ember: var(--aion-cyan, var(--accent));
+  --mh-line: var(--border);
+  --mh-mute: var(--muted-foreground);
 
   background-color: hsl(var(--mh-bg));
   color: hsl(var(--mh-ink));
