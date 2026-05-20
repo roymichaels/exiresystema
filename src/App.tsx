@@ -438,7 +438,7 @@ const App = () => (
                                               </Routes>
                                               <PWAUpdatePrompt />
                                               <NotificationPermissionPrompt />
-                                              <CookieConsent />
+                                              
                                               <SubscriptionsModal />
                                               <WalletModal />
                                               <Suspense fallback={null}><ProfilePage /></Suspense>
