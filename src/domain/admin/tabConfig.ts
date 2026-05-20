@@ -14,8 +14,17 @@ import {
   FileText,
   Settings,
   Globe,
+  Briefcase,
 } from 'lucide-react';
 import type { AdminTabConfig } from './types';
+
+// ─── Lazy-loaded Coach Sub-Pages (admin === sole coach) ─────────────────────
+const CoachDashboardOverview = lazy(() => import('@/components/careers/coach/CoachDashboardOverview'));
+const CoachClientsTab        = lazy(() => import('@/components/careers/coach/CoachClientsTab'));
+const CoachLeadsTab          = lazy(() => import('@/components/careers/coach/CoachLeadsTab'));
+const CoachPlansTab          = lazy(() => import('@/components/careers/coach/CoachPlansTab'));
+const CoachMarketingTab      = lazy(() => import('@/components/careers/coach/CoachMarketingTab'));
+const CoachSettingsTab       = lazy(() => import('@/components/careers/coach/CoachSettingsTab'));
 
 // ─── Lazy-loaded Admin Sub-Pages ────────────────────────────────────────────
 
@@ -25,9 +34,7 @@ const Analytics         = lazy(() => import('@/pages/admin/Analytics'));
 const NotificationCenter = lazy(() => import('@/pages/admin/NotificationCenter'));
 const Users             = lazy(() => import('@/pages/admin/Users'));
 
-const Leads             = lazy(() => import('@/pages/admin/Leads'));
 const Businesses        = lazy(() => import('@/pages/admin/Businesses'));
-const AdminCoaches      = lazy(() => import('@/pages/admin/Coaches'));
 const AuroraInsights    = lazy(() => import('@/pages/admin/AuroraInsights'));
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
 const Newsletter        = lazy(() => import('@/pages/admin/Newsletter'));
@@ -67,14 +74,26 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     ],
   },
   {
+    id: 'coach',
+    labelHe: 'מאמן',
+    labelEn: 'Coach',
+    icon: Briefcase,
+    subTabs: [
+      { id: 'overview',   labelHe: 'סקירה',     labelEn: 'Overview',  component: CoachDashboardOverview },
+      { id: 'clients',    labelHe: 'מתאמנים',   labelEn: 'Clients',   component: CoachClientsTab },
+      { id: 'leads',      labelHe: 'לידים',     labelEn: 'Leads',     component: CoachLeadsTab },
+      { id: 'plans',      labelHe: 'תוכניות',   labelEn: 'Plans',     component: CoachPlansTab },
+      { id: 'marketing',  labelHe: 'שיווק',     labelEn: 'Marketing', component: CoachMarketingTab },
+      { id: 'profile',    labelHe: 'פרופיל',    labelEn: 'Profile',   component: CoachSettingsTab },
+    ],
+  },
+  {
     id: 'admin',
     labelHe: 'ניהול',
     labelEn: 'Admin',
     icon: Shield,
     subTabs: [
       { id: 'users', labelHe: 'משתמשים', labelEn: 'Users', component: Users },
-      { id: 'coaches', labelHe: 'מאמנים', labelEn: 'Coaches', component: AdminCoaches },
-      { id: 'leads', labelHe: 'לידים', labelEn: 'Leads', component: Leads },
       { id: 'businesses', labelHe: 'עסקים', labelEn: 'Businesses', component: Businesses },
       { id: 'aurora-insights', labelHe: 'תובנות', labelEn: 'Insights', component: AuroraInsights },
       { id: 'fm-bounties', labelHe: 'באונטי FM', labelEn: 'FM Bounties', component: AdminFMBounties },

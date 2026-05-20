@@ -48,7 +48,7 @@ export const LEGACY_TO_SURFACE: Record<string, { path: string; artifact?: string
   '/now':       { path: '/journey', artifact: 'missions' },
   '/plan':      { path: '/journey', artifact: 'plan' },
   '/community': { path: '/outer-world', artifact: 'community' },
-  '/coaches':   { path: '/outer-world', artifact: 'coaches' },
+  '/coaches':   { path: '/admin-hub', artifact: 'coach' },
   '/fm':        { path: '/outer-world', artifact: 'market' },
   '/messages':  { path: '/outer-world', artifact: 'messages' },
   '/learn':     { path: '/outer-world', artifact: 'learn' },
