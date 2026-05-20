@@ -169,7 +169,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       className="mindhacker-theme fixed inset-0 z-[100] flex flex-col"
       dir="rtl"
       lang="he"
-      style={{ background: 'hsl(var(--mh-bg) / 0.97)', backdropFilter: 'blur(24px)' }}
+      style={{ background: '#050207' }}
     >
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <ConsciousnessField intense={!started && !saveResult} />

@@ -33,8 +33,8 @@ export function ConsciousnessField({ intense = false }: Props) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const mobile = window.innerWidth < 640;
-    const baseCount = intense ? 44 : 28;
-    const COUNT = reduced ? 0 : mobile ? Math.round(baseCount * 0.5) : baseCount;
+    const baseCount = intense ? 90 : 55;
+    const COUNT = reduced ? 0 : mobile ? Math.round(baseCount * 0.6) : baseCount;
 
     const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
 
@@ -55,17 +55,18 @@ export function ConsciousnessField({ intense = false }: Props) {
 
     // Particles drift gently upward and sideways; a few "stars" stay nearly still.
     const particles = Array.from({ length: COUNT }, () => {
-      const r = Math.random() * 1.3 + 0.25;
+      const r = Math.random() * 1.6 + 0.35;
       return {
         x: Math.random() * w,
         y: Math.random() * h,
         r,
-        // Slow vertical drift; tiny horizontal sway via sine.
-        vy: Math.random() * 0.15 + 0.02,
-        sway: Math.random() * 0.35 + 0.05,
+        // Slow upward drift; tiny horizontal sway via sine.
+        vy: Math.random() * 0.22 + 0.05,
+        sway: Math.random() * 0.5 + 0.1,
         phase: Math.random() * Math.PI * 2,
-        // Faint sand-tinted glow; bigger particles = brighter.
-        a: Math.min(0.55, 0.12 + r * 0.18),
+        twinklePhase: Math.random() * Math.PI * 2,
+        // Brighter base + twinkle on top.
+        a: Math.min(0.85, 0.28 + r * 0.22),
       };
     });
 
@@ -78,16 +79,27 @@ export function ConsciousnessField({ intense = false }: Props) {
 
       for (const p of particles) {
         p.y -= p.vy * (dt / 16);
-        p.phase += 0.0025 * (dt / 16);
+        p.phase += 0.0028 * (dt / 16);
+        p.twinklePhase += 0.04 * (dt / 16);
         if (p.y < -4) {
           p.y = h + 4;
           p.x = Math.random() * w;
         }
-        const x = p.x + Math.sin(p.phase) * p.sway * 6;
-        // Warm sand-white tint to feel like consciousness motes, not snow.
+        const x = p.x + Math.sin(p.phase) * p.sway * 10;
+        const twinkle = 0.7 + 0.3 * Math.sin(p.twinklePhase);
+        // Warm sand-white glow with soft halo for the larger motes.
+        if (p.r > 1.2) {
+          const grd = ctx.createRadialGradient(x, p.y, 0, x, p.y, p.r * 4);
+          grd.addColorStop(0, `hsla(38, 60%, 92%, ${p.a * twinkle})`);
+          grd.addColorStop(1, 'hsla(285, 60%, 60%, 0)');
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(x, p.y, p.r * 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
         ctx.beginPath();
         ctx.arc(x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(38, 35%, 88%, ${p.a})`;
+        ctx.fillStyle = `hsla(38, 45%, 92%, ${p.a * twinkle})`;
         ctx.fill();
       }
 
@@ -110,14 +122,18 @@ export function ConsciousnessField({ intense = false }: Props) {
       {/* Scoped keyframes — keep the component self-contained. */}
       <style>{`
         @keyframes cf-breathe {
-          0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
-          50%      { opacity: 0.85; transform: translate(-50%, -50%) scale(1.06); }
+          0%, 100% { opacity: 0.6;  transform: translate(-50%, -50%) scale(1); }
+          50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.14); }
+        }
+        @keyframes cf-pulse {
+          0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.9); }
+          50%      { opacity: 0.75; transform: translate(-50%, -50%) scale(1.18); }
         }
         @keyframes cf-rotate-cw  { to { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes cf-rotate-ccw { to { transform: translate(-50%, -50%) rotate(-360deg); } }
         @keyframes cf-drift {
           0%, 100% { transform: translate3d(0, 0, 0); }
-          50%      { transform: translate3d(0, -1.2%, 0); }
+          50%      { transform: translate3d(0, -1.6%, 0); }
         }
         @media (prefers-reduced-motion: reduce) {
           .cf-anim { animation: none !important; }
@@ -129,30 +145,43 @@ export function ConsciousnessField({ intense = false }: Props) {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 80% 60% at 50% 45%, hsl(272 35% 10%) 0%, hsl(265 30% 6%) 45%, #050207 80%, #000 100%)',
+            'radial-gradient(ellipse 85% 65% at 50% 45%, hsl(272 45% 13%) 0%, hsl(265 38% 8%) 45%, #060309 80%, #000 100%)',
         }}
       />
 
-      {/* Secondary purple aura, drifting very slowly */}
+      {/* Secondary purple aura, drifting */}
       <div
         className="cf-anim absolute inset-0"
         style={{
           background:
-            'radial-gradient(circle at 18% 22%, hsla(282, 55%, 28%, 0.28) 0%, transparent 45%), radial-gradient(circle at 82% 78%, hsla(258, 60%, 22%, 0.22) 0%, transparent 50%)',
-          animation: 'cf-drift 24s ease-in-out infinite',
+            'radial-gradient(circle at 18% 22%, hsla(282, 65%, 38%, 0.42) 0%, transparent 50%), radial-gradient(circle at 82% 78%, hsla(258, 70%, 30%, 0.36) 0%, transparent 55%)',
+          animation: 'cf-drift 22s ease-in-out infinite',
         }}
       />
 
-      {/* 2. Soft breathing glow behind the text */}
+      {/* 2. Soft breathing glow behind the text — AION heartbeat */}
       <div
         className="cf-anim absolute left-1/2 top-1/2"
         style={{
-          width: 'min(72vmin, 720px)',
-          height: 'min(72vmin, 720px)',
+          width: 'min(82vmin, 820px)',
+          height: 'min(82vmin, 820px)',
           background:
-            'radial-gradient(circle, hsla(285, 70%, 55%, 0.18) 0%, hsla(270, 60%, 35%, 0.10) 35%, transparent 65%)',
-          filter: 'blur(8px)',
-          animation: 'cf-breathe 9s ease-in-out infinite',
+            'radial-gradient(circle, hsla(285, 80%, 62%, 0.42) 0%, hsla(270, 70%, 42%, 0.22) 35%, transparent 70%)',
+          filter: 'blur(10px)',
+          animation: 'cf-breathe 7s ease-in-out infinite',
+        }}
+      />
+
+      {/* 2b. Tight radial light pulse */}
+      <div
+        className="cf-anim absolute left-1/2 top-1/2"
+        style={{
+          width: 'min(40vmin, 420px)',
+          height: 'min(40vmin, 420px)',
+          background:
+            'radial-gradient(circle, hsla(38, 80%, 88%, 0.22) 0%, hsla(285, 80%, 62%, 0.12) 40%, transparent 70%)',
+          filter: 'blur(6px)',
+          animation: 'cf-pulse 4.5s ease-in-out infinite',
         }}
       />
 
@@ -160,85 +189,84 @@ export function ConsciousnessField({ intense = false }: Props) {
       <svg
         className="cf-anim absolute left-1/2 top-1/2"
         style={{
-          width: 'min(95vmin, 920px)',
-          height: 'min(95vmin, 920px)',
+          width: 'min(100vmin, 980px)',
+          height: 'min(100vmin, 980px)',
           transform: 'translate(-50%, -50%)',
-          animation: 'cf-rotate-cw 220s linear infinite',
-          opacity: 0.085,
+          animation: 'cf-rotate-cw 180s linear infinite',
+          opacity: 0.22,
         }}
         viewBox="0 0 800 800"
         fill="none"
       >
         <defs>
           <radialGradient id="cf-arc-fade" cx="50%" cy="50%" r="50%">
-            <stop offset="60%" stopColor="hsl(38, 40%, 80%)" stopOpacity="0" />
-            <stop offset="85%" stopColor="hsl(38, 40%, 80%)" stopOpacity="1" />
-            <stop offset="100%" stopColor="hsl(38, 40%, 80%)" stopOpacity="0" />
+            <stop offset="55%" stopColor="hsl(38, 50%, 85%)" stopOpacity="0" />
+            <stop offset="82%" stopColor="hsl(38, 50%, 85%)" stopOpacity="1" />
+            <stop offset="100%" stopColor="hsl(38, 50%, 85%)" stopOpacity="0" />
           </radialGradient>
           <mask id="cf-arc-mask">
             <rect width="800" height="800" fill="url(#cf-arc-fade)" />
           </mask>
         </defs>
-        <g mask="url(#cf-arc-mask)" stroke="hsl(38, 40%, 80%)" strokeWidth="0.5" fill="none">
+        <g mask="url(#cf-arc-mask)" stroke="hsl(38, 55%, 85%)" strokeWidth="0.8" fill="none">
           <circle cx="400" cy="400" r="240" />
           <circle cx="400" cy="400" r="320" />
           <circle cx="400" cy="400" r="380" />
-          {/* Vesica-style overlaps */}
           <circle cx="300" cy="400" r="220" />
           <circle cx="500" cy="400" r="220" />
+          <circle cx="400" cy="300" r="220" />
+          <circle cx="400" cy="500" r="220" />
         </g>
       </svg>
 
       <svg
         className="cf-anim absolute left-1/2 top-1/2"
         style={{
-          width: 'min(70vmin, 680px)',
-          height: 'min(70vmin, 680px)',
+          width: 'min(72vmin, 700px)',
+          height: 'min(72vmin, 700px)',
           transform: 'translate(-50%, -50%)',
-          animation: 'cf-rotate-ccw 340s linear infinite',
-          opacity: 0.06,
+          animation: 'cf-rotate-ccw 280s linear infinite',
+          opacity: 0.16,
         }}
         viewBox="0 0 600 600"
         fill="none"
       >
-        <g stroke="hsl(282, 55%, 70%)" strokeWidth="0.4" fill="none">
+        <g stroke="hsl(282, 70%, 78%)" strokeWidth="0.7" fill="none">
           <polygon points="300,80 520,440 80,440" />
           <polygon points="300,520 80,160 520,160" />
           <circle cx="300" cy="300" r="180" />
+          <circle cx="300" cy="300" r="110" />
         </g>
       </svg>
 
       {/* 4. Particle drift */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* 5. Film grain — uses existing .mh-grain if defined, plus an SVG fallback */}
+      {/* 5. Film grain */}
       <div
-        className="absolute inset-0 mh-grain opacity-[0.35] mix-blend-overlay"
+        className="absolute inset-0 mh-grain opacity-[0.5] mix-blend-overlay"
         style={{
           backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
           backgroundSize: '160px 160px',
         }}
       />
 
-      {/* 6a. Clean reading well — keep the center dim-but-clear */}
+      {/* 6a. Reading well — keep the center dim-but-clear */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 55% 38% at 50% 50%, hsla(265, 30%, 4%, 0.55) 0%, transparent 70%)',
+            'radial-gradient(ellipse 50% 34% at 50% 50%, hsla(265, 30%, 4%, 0.5) 0%, transparent 72%)',
         }}
       />
 
-      {/* 6b. Outer vignette */}
+      {/* 6b. Outer vignette — darker on all edges */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 90%, rgba(0,0,0,0.85) 100%)',
+            'radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.65) 85%, rgba(0,0,0,0.95) 100%)',
         }}
       />
     </div>
