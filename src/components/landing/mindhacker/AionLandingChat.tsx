@@ -10,14 +10,10 @@ import { DefaultChatTransport } from 'ai';
 import { X, ArrowUp } from 'lucide-react';
 import OrbView from '@/components/orb/v2/OrbView';
 import { HOLO_AION_PROFILE } from './holoAionProfile';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslation } from '@/i18n';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/aion-landing-chat`;
-
-const SUGGESTIONS = [
-  'מה זה Exire Systema?',
-  'מה ההבדל בין היפנוזה רגילה לעבודה שלך?',
-  'איך מתחילים?',
-];
 
 interface Props {
   open: boolean;
@@ -26,13 +22,17 @@ interface Props {
 }
 
 export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = (key: string) => getTranslation(language, `landing.chat.${key}`);
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: ENDPOINT,
         headers: { 'Content-Type': 'application/json' },
+        body: { language },
       }),
-    [],
+    [language],
   );
 
   const { messages, sendMessage, status, error } = useChat({ transport });
@@ -76,11 +76,11 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40" role="dialog" aria-modal="true" dir="rtl">
+    <div className="fixed inset-0 z-40" role="dialog" aria-modal="true" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Backdrop */}
       <button
         type="button"
-        aria-label="סגור"
+        aria-label={t('closeAria')}
         onClick={() => onOpenChange(false)}
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
       />
@@ -94,7 +94,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
         <header className="relative border-b border-[hsl(var(--mh-line))] px-5 pb-5 pt-6">
           <button
             type="button"
-            aria-label="סגור שיחה"
+            aria-label={t('closeAria')}
             onClick={() => onOpenChange(false)}
             className="absolute start-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-[hsl(var(--mh-mute))] transition-colors hover:bg-[hsl(var(--mh-bg-2))] hover:text-[hsl(var(--mh-ink))]"
           >
@@ -130,7 +130,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
                   <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
                   <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 </span>
-                כאן, מקשיב לך
+                {t('status')}
               </span>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
         {/* Messages */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6">
           {messages.length === 0 ? (
-            <EmptyState onPick={submit} />
+            <EmptyState onPick={submit} t={t} />
           ) : (
             <div className="space-y-6">
               {messages.map((m) => (
@@ -147,6 +147,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
                   key={m.id}
                   role={m.role}
                   text={extractText(m)}
+                  intakeLabel={t('intakeCta')}
                   onOpenIntake={() => {
                     onOpenChange(false);
                     onOpenIntake();
@@ -163,11 +164,11 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
                     className="mt-0.5 h-8 w-8 shrink-0"
                     ariaLabel=""
                   />
-                  <span className="mh-eyebrow text-[0.6rem] leading-7">AION חושב…</span>
+                  <span className="mh-eyebrow text-[0.6rem] leading-7">{t('thinking')}</span>
                 </div>
               )}
               {error && (
-                <p className="text-sm text-red-400/80">משהו נתקע. נסה שוב בעוד רגע.</p>
+                <p className="text-sm text-red-400/80">{t('errorRetry')}</p>
               )}
             </div>
           )}
@@ -185,8 +186,8 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
             <textarea
               ref={inputRef}
               rows={1}
-              dir="rtl"
-              placeholder="שאל את AION על המסע…"
+              dir={isRTL ? 'rtl' : 'ltr'}
+              placeholder={t('placeholder')}
               defaultValue=""
               onChange={(e) => {
                 formInputRef.current = e.target.value;
@@ -205,7 +206,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
             <button
               type="submit"
               disabled={status === 'streaming' || status === 'submitted'}
-              aria-label="שלח"
+              aria-label={t('sendAria')}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--mh-sand))] text-[hsl(var(--mh-bg))] transition-opacity disabled:opacity-40"
             >
               <ArrowUp className="h-4 w-4" />
@@ -219,17 +220,18 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
 
 /* ─────────────── Sub-components ─────────────── */
 
-function EmptyState({ onPick }: { onPick: (s: string) => void }) {
+function EmptyState({ onPick, t }: { onPick: (s: string) => void; t: (key: string) => string }) {
+  const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3')];
   return (
     <div className="flex h-full flex-col">
       <p className="mh-serif text-2xl leading-snug text-[hsl(var(--mh-ink))]">
-        אני כאן בשביל לענות.
+        {t('emptyTitle')}
       </p>
       <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--mh-mute))]">
-        תשאל אותי על השיטה, על Exire Systema, או על מה שעולה לך מהדף.
+        {t('emptySubtitle')}
       </p>
       <div className="mt-8 space-y-2">
-        {SUGGESTIONS.map((s) => (
+        {suggestions.map((s) => (
           <button
             key={s}
             type="button"
@@ -249,10 +251,12 @@ const INTAKE_TOKEN = '[[OPEN_INTAKE]]';
 function MessageRow({
   role,
   text,
+  intakeLabel,
   onOpenIntake,
 }: {
   role: string;
   text: string;
+  intakeLabel: string;
   onOpenIntake: () => void;
 }) {
   const hasIntake = text.includes(INTAKE_TOKEN);
@@ -284,7 +288,7 @@ function MessageRow({
         </div>
         {hasIntake && (
           <button type="button" onClick={onOpenIntake} className="mh-cta-primary">
-            התחל את השכתוב
+            {intakeLabel}
           </button>
         )}
       </div>

@@ -54,6 +54,8 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const messages: UIMessage[] = Array.isArray(body?.messages) ? body.messages : [];
+    const language: 'he' | 'en' | 'es' =
+      body?.language === 'en' || body?.language === 'es' ? body.language : 'he';
 
     if (messages.length === 0) {
       return new Response(JSON.stringify({ error: 'messages required' }), {
@@ -61,6 +63,13 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const languageDirective =
+      language === 'en'
+        ? '\n\n== LANGUAGE OVERRIDE ==\nRespond ONLY in English. Keep the same cinematic, soft, direct tone. Short paragraphs. No emojis. No heavy markdown. Translate all responses naturally to English.'
+        : language === 'es'
+        ? '\n\n== ANULACIÓN DE IDIOMA ==\nResponde SOLO en español. Mantén el mismo tono cinematográfico, suave y directo. Párrafos cortos. Sin emojis. Sin markdown pesado. Traduce todas las respuestas naturalmente al español.'
+        : '';
 
     const gateway = useOpenRouter
       ? createOpenAICompatible({
@@ -87,7 +96,7 @@ Deno.serve(async (req) => {
 
     const result = streamText({
       model: gateway(modelId),
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + languageDirective,
       messages: await convertToModelMessages(messages),
     });
 
