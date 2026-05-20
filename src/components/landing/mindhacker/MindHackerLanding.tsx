@@ -1,33 +1,35 @@
 /**
  * MindHackerLanding — full cinematic Hebrew homepage.
- * Primary CTAs trigger the big onboarding wizard via smartNavigate().
+ * Primary CTAs open the cinematic AION intake chat modal (no navigation, no login).
  */
-import { useSmartOnboarding } from '@/contexts/SmartOnboardingContext';
+import { useState } from 'react';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
+import IntakeChatModal from './intake/IntakeChatModal';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
 
 export default function MindHackerLanding() {
-  const { smartNavigate } = useSmartOnboarding();
   const { openAuthModal } = useAuthModal();
+  const [intakeOpen, setIntakeOpen] = useState(false);
 
-  const startWizard = () => smartNavigate();
+  const startIntake = () => setIntakeOpen(true);
   const openLogin = () => openAuthModal('login');
 
   return (
     <div className="mindhacker-theme min-h-screen" dir="rtl" lang="he">
       <TopBar onLogin={openLogin} />
       <main>
-        <Hero onStart={startWizard} onLogin={openLogin} />
+        <Hero onStart={startIntake} onLogin={openLogin} />
         <SystemSection />
         <WhatIDoSection />
         <MethodSection />
         <ContentSection />
-        <FinalCTA onStart={startWizard} />
+        <FinalCTA onStart={startIntake} />
       </main>
       <Footer />
+      <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
     </div>
   );
 }
