@@ -1,22 +1,56 @@
 /**
- * MindHackerLanding — full cinematic Hebrew homepage.
- * Primary CTAs open the cinematic AION intake chat modal (no navigation, no login).
+ * MindHackerLanding — cinematic Hebrew homepage.
+ * Optimized: AVIF/WebP via <Picture>, LQIP hero, lazy modals, paused background.
  */
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
-import IntakeChatModal from './intake/IntakeChatModal';
-import AionLandingChat from './AionLandingChat';
-import founderHero from '@/assets/founder-hero.jpg';
-import founderPortrait from '@/assets/founder-portrait.jpg';
-import topicConsciousness from '@/assets/topic-consciousness.jpg';
-import topicIdentity from '@/assets/topic-identity.jpg';
-import topicHypnosis from '@/assets/topic-hypnosis.jpg';
-import topicShadowWork from '@/assets/topic-shadow-work.jpg';
-import topicControlSystems from '@/assets/topic-control-systems.jpg';
-import topicSovereignty from '@/assets/topic-sovereignty.jpg';
-import exireSigil from '@/assets/exire-sigil.png';
+import Picture from './Picture';
+
+// Hero assets — AVIF + WebP + tiny JPG fallback
+import founderHeroAvif from '@/assets/founder-hero.avif';
+import founderHeroWebp from '@/assets/founder-hero.webp';
+import founderHeroJpg from '@/assets/founder-hero.jpg';
+
+import founderPortraitAvif from '@/assets/founder-portrait.avif';
+import founderPortraitWebp from '@/assets/founder-portrait.webp';
+import founderPortraitJpg from '@/assets/founder-portrait.jpg';
+
+import topicConsciousnessAvif from '@/assets/topic-consciousness.avif';
+import topicConsciousnessWebp from '@/assets/topic-consciousness.webp';
+import topicConsciousnessJpg from '@/assets/topic-consciousness.jpg';
+
+import topicIdentityAvif from '@/assets/topic-identity.avif';
+import topicIdentityWebp from '@/assets/topic-identity.webp';
+import topicIdentityJpg from '@/assets/topic-identity.jpg';
+
+import topicHypnosisAvif from '@/assets/topic-hypnosis.avif';
+import topicHypnosisWebp from '@/assets/topic-hypnosis.webp';
+import topicHypnosisJpg from '@/assets/topic-hypnosis.jpg';
+
+import topicShadowWorkAvif from '@/assets/topic-shadow-work.avif';
+import topicShadowWorkWebp from '@/assets/topic-shadow-work.webp';
+import topicShadowWorkJpg from '@/assets/topic-shadow-work.jpg';
+
+import topicControlSystemsAvif from '@/assets/topic-control-systems.avif';
+import topicControlSystemsWebp from '@/assets/topic-control-systems.webp';
+import topicControlSystemsJpg from '@/assets/topic-control-systems.jpg';
+
+import topicSovereigntyAvif from '@/assets/topic-sovereignty.avif';
+import topicSovereigntyWebp from '@/assets/topic-sovereignty.webp';
+import topicSovereigntyJpg from '@/assets/topic-sovereignty.jpg';
+
+import exireSigilAvif from '@/assets/exire-sigil.avif';
+import exireSigilWebp from '@/assets/exire-sigil.webp';
+
 import './theme.css';
+
+// Lazy: keep modal/chat off the critical path
+const IntakeChatModal = lazy(() => import('./intake/IntakeChatModal'));
+const AionLandingChat = lazy(() => import('./AionLandingChat'));
+
+const HERO_LQIP =
+  'data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAwBACdASoYAA4APxFysFCsJqSisAgBgCIJZwDKABbB2R10ASTKDZr8sAAA/iLu22/Sl3hWKsEzIQUYEUmesH7h4tyL9gMjnEIhYTyLq49v9kIBNCHDq5fJgAA=';
 
 const BRAND = 'EXIRE SYSTEMA';
 
@@ -40,12 +74,20 @@ export default function MindHackerLanding() {
       </main>
       <Footer />
       <AionFloatingWidget onOpen={openChat} hidden={intakeOpen || chatOpen} />
-      <AionLandingChat
-        open={chatOpen}
-        onOpenChange={setChatOpen}
-        onOpenIntake={startIntake}
-      />
-      <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
+      {(chatOpen || intakeOpen) && (
+        <Suspense fallback={null}>
+          {chatOpen && (
+            <AionLandingChat
+              open={chatOpen}
+              onOpenChange={setChatOpen}
+              onOpenIntake={startIntake}
+            />
+          )}
+          {intakeOpen && (
+            <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
+          )}
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -72,42 +114,34 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
       <span dir="ltr" className="text-[0.55rem] tracking-[0.25em] text-[hsl(var(--mh-ink)/0.75)]">
         chat with aion
       </span>
-
     </button>
   );
 }
 
-/* ─────────────── Top bar ─────────────── */
+/* ─────────────── Top bar (logo only) ─────────────── */
 
 function TopBar() {
   return (
     <header className="absolute inset-x-0 top-0 z-30 flex flex-col items-center px-6 pt-6 md:pt-8">
       <div className="relative h-24 w-24 md:h-28 md:w-28 overflow-hidden">
-        <img
-          src={exireSigil}
+        <Picture
+          avif={exireSigilAvif}
+          webp={exireSigilWebp}
+          fallback={exireSigilWebp}
           alt="Exire Systema"
-          className="absolute inset-x-0 top-0 h-[140%] w-full object-contain opacity-80 mix-blend-screen"
+          width={512}
+          height={512}
+          eager
+          imgClassName="absolute inset-x-0 top-0 h-[140%] w-full object-contain opacity-80 mix-blend-screen"
           style={{
             filter: 'brightness(1.05) contrast(0.95) saturate(0.8) drop-shadow(0 0 18px rgba(180,150,255,0.25))',
             clipPath: 'inset(0 0 32% 0)',
           }}
         />
       </div>
-      <p
-        dir="ltr"
-        className="mt-3 text-[0.6rem] md:text-[0.65rem] font-light text-[hsl(var(--mh-ink)/0.7)]"
-        style={{
-          fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
-          letterSpacing: '0.55em',
-          textIndent: '0.55em',
-        }}
-      >
-        EXIRE SYSTEMA
-      </p>
     </header>
   );
 }
-
 
 /* ─────────────── 1. Hero ─────────────── */
 
@@ -118,17 +152,22 @@ function Hero({ onStart }: { onStart: () => void }) {
       ref={ref}
       className="relative isolate flex min-h-[100svh] items-center overflow-hidden"
     >
-      {/* Cinematic photograph — full bleed, subject anchored to the right */}
-      <img
-        src={founderHero}
+      {/* LCP image */}
+      <Picture
+        avif={founderHeroAvif}
+        webp={founderHeroWebp}
+        fallback={founderHeroJpg}
         alt=""
-        aria-hidden
-        className="absolute inset-0 h-full w-full object-cover object-[85%_center] md:object-[75%_center]"
-        loading="eager"
-        decoding="async"
+        width={1600}
+        height={1067}
+        priority
+        eager
+        lqip={HERO_LQIP}
+        className="absolute inset-0 h-full w-full"
+        imgClassName="absolute inset-0 h-full w-full object-cover object-[85%_center] md:object-[75%_center]"
       />
 
-      {/* Cinematic grade — darkens edges, vignettes corners, preserves skin */}
+      {/* Cinematic grade */}
       <div
         className="absolute inset-0"
         style={{
@@ -136,7 +175,6 @@ function Hero({ onStart }: { onStart: () => void }) {
             'radial-gradient(120% 80% at 75% 50%, transparent 0%, hsl(var(--mh-bg) / 0.15) 45%, hsl(var(--mh-bg) / 0.75) 80%, hsl(var(--mh-bg)) 100%)',
         }}
       />
-      {/* Negative-space wash over the left so Hebrew typography breathes */}
       <div
         className="absolute inset-0"
         style={{
@@ -144,20 +182,13 @@ function Hero({ onStart }: { onStart: () => void }) {
             'linear-gradient(90deg, hsl(var(--mh-bg) / 0.92) 0%, hsl(var(--mh-bg) / 0.78) 30%, hsl(var(--mh-bg) / 0.35) 55%, transparent 80%)',
         }}
       />
-      {/* Bottom fade into next section */}
       <div
         className="absolute inset-x-0 bottom-0 h-48"
         style={{
-          background:
-            'linear-gradient(to bottom, transparent 0%, hsl(var(--mh-bg)) 100%)',
+          background: 'linear-gradient(to bottom, transparent 0%, hsl(var(--mh-bg)) 100%)',
         }}
       />
-      {/* Subtle rain/fog grain */}
-      <div className="absolute inset-0 opacity-40 pointer-events-none">
-        <AmbientBackdrop variant="hero" />
-      </div>
 
-      {/* Soft dark wash behind text for readability */}
       <div
         className="absolute inset-y-0 start-0 z-[5] w-full md:w-2/3 pointer-events-none"
         style={{
@@ -166,7 +197,6 @@ function Hero({ onStart }: { onStart: () => void }) {
         }}
       />
 
-      {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pt-40 md:pt-44">
         <div className="max-w-xl text-start md:max-w-2xl">
           <p className="mh-eyebrow mh-reveal mb-10 md:mb-12">פרק ראשון</p>
@@ -193,8 +223,6 @@ function Hero({ onStart }: { onStart: () => void }) {
         </div>
       </div>
 
-
-      {/* scroll indicator */}
       <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 mh-reveal">
         <div className="h-12 w-px bg-gradient-to-b from-transparent via-[hsl(var(--mh-mute))] to-transparent" />
       </div>
@@ -246,18 +274,18 @@ function WhatIDoSection() {
       <AmbientBackdrop />
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <div className="grid gap-16 md:grid-cols-2 md:gap-24 md:items-center">
-          {/* Cinematic portrait placeholder */}
           <div className="mh-reveal order-2 md:order-1">
             <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm bg-[hsl(var(--mh-bg-2))]">
-              <img
-                src={founderPortrait}
+              <Picture
+                avif={founderPortraitAvif}
+                webp={founderPortraitWebp}
+                fallback={founderPortraitJpg}
                 alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover"
-                loading="lazy"
-                decoding="async"
+                width={1200}
+                height={1600}
+                className="absolute inset-0 h-full w-full"
+                imgClassName="absolute inset-0 h-full w-full object-cover"
               />
-              {/* cinematic grade — deepen edges, preserve face */}
               <div
                 className="absolute inset-0"
                 style={{
@@ -265,7 +293,6 @@ function WhatIDoSection() {
                     'radial-gradient(110% 80% at 50% 40%, transparent 0%, hsl(var(--mh-bg) / 0.25) 55%, hsl(var(--mh-bg) / 0.75) 90%, hsl(var(--mh-bg)) 100%)',
                 }}
               />
-              {/* bottom fade into section */}
               <div
                 className="absolute inset-x-0 bottom-0 h-1/3"
                 style={{
@@ -298,7 +325,7 @@ function WhatIDoSection() {
   );
 }
 
-/* ─────────────── 4. Method — Exire Systema ─────────────── */
+/* ─────────────── 4. Method ─────────────── */
 
 const STEPS = [
   { n: 'I',   t: 'זיהוי התכנות',          d: 'מיפוי השכבות שעוצבו בך מבחוץ.' },
@@ -325,7 +352,6 @@ function MethodSection() {
         </div>
 
         <ol className="relative">
-          {/* vertical line */}
           <div
             className="absolute bottom-0 top-0 hidden w-px md:block"
             style={{
@@ -359,12 +385,12 @@ function MethodSection() {
 /* ─────────────── 5. Content ─────────────── */
 
 const TOPICS = [
-  { t: 'תודעה',           tag: 'I',   img: topicConsciousness },
-  { t: 'זהות',            tag: 'II',  img: topicIdentity },
-  { t: 'היפנוזה',         tag: 'III', img: topicHypnosis },
-  { t: 'Shadow Work',     tag: 'IV', img: topicShadowWork },
-  { t: 'מערכות שליטה',    tag: 'V',  img: topicControlSystems },
-  { t: 'ריבונות פנימית',  tag: 'VI', img: topicSovereignty },
+  { t: 'תודעה',           tag: 'I',   avif: topicConsciousnessAvif, webp: topicConsciousnessWebp, jpg: topicConsciousnessJpg },
+  { t: 'זהות',            tag: 'II',  avif: topicIdentityAvif, webp: topicIdentityWebp, jpg: topicIdentityJpg },
+  { t: 'היפנוזה',         tag: 'III', avif: topicHypnosisAvif, webp: topicHypnosisWebp, jpg: topicHypnosisJpg },
+  { t: 'Shadow Work',     tag: 'IV',  avif: topicShadowWorkAvif, webp: topicShadowWorkWebp, jpg: topicShadowWorkJpg },
+  { t: 'מערכות שליטה',    tag: 'V',   avif: topicControlSystemsAvif, webp: topicControlSystemsWebp, jpg: topicControlSystemsJpg },
+  { t: 'ריבונות פנימית',  tag: 'VI',  avif: topicSovereigntyAvif, webp: topicSovereigntyWebp, jpg: topicSovereigntyJpg },
 ];
 
 function ContentSection() {
@@ -386,16 +412,16 @@ function ContentSection() {
               key={topic.t}
               className="mh-reveal group relative aspect-square overflow-hidden bg-[hsl(var(--mh-bg))]"
             >
-              {topic.img && (
-                <img
-                  src={topic.img}
-                  alt={topic.t}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
-                  loading="lazy"
-                  decoding="async"
-                />
-              )}
-              {/* Cinematic bottom gradient for readability */}
+              <Picture
+                avif={topic.avif}
+                webp={topic.webp}
+                fallback={topic.jpg}
+                alt={topic.t}
+                width={900}
+                height={900}
+                className="absolute inset-0 h-full w-full"
+                imgClassName="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+              />
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
@@ -403,7 +429,6 @@ function ContentSection() {
                     'linear-gradient(to top, rgba(5,3,12,0.92) 0%, rgba(5,3,12,0.55) 35%, rgba(5,3,12,0.05) 65%, transparent 100%)',
                 }}
               />
-              {/* Caption */}
               <div className="absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-4 p-5 md:p-6">
                 <h3 className="mh-serif text-2xl text-[hsl(var(--mh-ink))] md:text-3xl">{topic.t}</h3>
                 <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-sand))]/80 md:text-lg">
@@ -453,10 +478,14 @@ function Footer() {
   return (
     <footer className="relative border-t border-[hsl(var(--mh-line))] py-12">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 text-center">
-        <img
-          src={exireSigil}
+        <Picture
+          avif={exireSigilAvif}
+          webp={exireSigilWebp}
+          fallback={exireSigilWebp}
           alt="Exire Systema"
-          className="h-12 w-12 object-contain opacity-70 mix-blend-screen"
+          width={96}
+          height={96}
+          imgClassName="h-12 w-12 object-contain opacity-70 mix-blend-screen"
           style={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
         />
         <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/80">
@@ -465,9 +494,6 @@ function Footer() {
         <p className="mh-eyebrow text-[0.6rem] text-[hsl(var(--mh-mute))]">
           תהליך אישי לבנייה מחדש של התודעה · כל הזכויות שמורות
         </p>
-        <span dir="ltr" className="mh-eyebrow text-[0.55rem] tracking-[0.5em] text-[hsl(var(--mh-sand))]/35">
-          built on aion
-        </span>
       </div>
     </footer>
   );
