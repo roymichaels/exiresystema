@@ -178,46 +178,81 @@ function AionFloatingWidget({ t, onOpen, hidden }: { t: T; onOpen: () => void; h
 
 function LangToggle({ t }: { t: T }) {
   const { language, setLanguage } = useLanguage();
-  const base =
-    'mh-eyebrow text-[0.6rem] tracking-[0.32em] transition-colors duration-300';
-  const active = 'text-[hsl(var(--mh-ink))]';
-  const idle = 'text-[hsl(var(--mh-mute)/0.7)] hover:text-[hsl(var(--mh-ink))]';
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  const langs: { code: 'he' | 'en' | 'es'; label: string }[] = [
+    { code: 'he', label: t('langToggle.he') },
+    { code: 'en', label: t('langToggle.en') },
+    { code: 'es', label: t('langToggle.es') },
+  ];
+  const current = langs.find((l) => l.code === language) ?? langs[0];
+
   return (
     <div
+      ref={ref}
       dir="ltr"
       aria-label={t('langToggle.aria')}
-      className="absolute top-6 z-40 flex items-center gap-2 rounded-full border border-[hsl(var(--mh-line)/0.6)] bg-black/30 px-3 py-1.5 backdrop-blur-md md:top-8"
+      className="absolute top-6 z-40 md:top-8"
       style={{ insetInlineEnd: 'max(1rem, env(safe-area-inset-right))' }}
     >
       <button
         type="button"
-        onClick={() => setLanguage('he')}
-        aria-pressed={language === 'he'}
-        className={`${base} ${language === 'he' ? active : idle}`}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="mh-eyebrow flex items-center gap-1.5 rounded-full border border-[hsl(var(--mh-line)/0.6)] bg-black/30 px-3 py-1.5 text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-ink))] backdrop-blur-md transition-colors duration-300 hover:border-[hsl(var(--mh-line))]"
       >
-        {t('langToggle.he')}
+        <span>{current.label}</span>
+        <svg
+          width="8"
+          height="8"
+          viewBox="0 0 8 8"
+          className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        >
+          <path d="M1 2.5L4 5.5L7 2.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
-      <span className="h-3 w-px bg-[hsl(var(--mh-line))]" />
-      <button
-        type="button"
-        onClick={() => setLanguage('en')}
-        aria-pressed={language === 'en'}
-        className={`${base} ${language === 'en' ? active : idle}`}
-      >
-        {t('langToggle.en')}
-      </button>
-      <span className="h-3 w-px bg-[hsl(var(--mh-line))]" />
-      <button
-        type="button"
-        onClick={() => setLanguage('es')}
-        aria-pressed={language === 'es'}
-        className={`${base} ${language === 'es' ? active : idle}`}
-      >
-        {t('langToggle.es')}
-      </button>
+      {open && (
+        <ul
+          role="listbox"
+          className="absolute end-0 mt-2 min-w-[5.5rem] overflow-hidden rounded-2xl border border-[hsl(var(--mh-line)/0.6)] bg-black/70 backdrop-blur-xl"
+        >
+          {langs.map((l) => (
+            <li key={l.code}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={language === l.code}
+                onClick={() => {
+                  setLanguage(l.code);
+                  setOpen(false);
+                }}
+                className={`mh-eyebrow block w-full px-4 py-2 text-start text-[0.6rem] tracking-[0.32em] transition-colors duration-200 ${
+                  language === l.code
+                    ? 'bg-[hsl(var(--mh-line)/0.25)] text-[hsl(var(--mh-ink))]'
+                    : 'text-[hsl(var(--mh-mute)/0.8)] hover:bg-[hsl(var(--mh-line)/0.15)] hover:text-[hsl(var(--mh-ink))]'
+                }`}
+              >
+                {l.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
+
 
 /* ─────────────── Top bar (logo only) ─────────────── */
 
