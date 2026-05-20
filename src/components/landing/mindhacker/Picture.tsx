@@ -1,7 +1,6 @@
 /**
  * Picture — lightweight <picture> wrapper.
- * Accepts AVIF + WebP sources (built-in modern fallback chain) plus a final <img>.
- * Always sets decoding=async and width/height to avoid CLS.
+ * AVIF + WebP sources with a final <img> fallback. Always async/lazy unless eager.
  */
 import { CSSProperties } from 'react';
 
@@ -10,9 +9,12 @@ interface Props {
   webp: string;
   fallback: string;
   alt: string;
+  /** styles/classes applied to the wrapping <picture> */
   className?: string;
+  /** styles/classes applied to the inner <img> */
   imgClassName?: string;
   style?: CSSProperties;
+  imgStyle?: CSSProperties;
   width: number;
   height: number;
   eager?: boolean;
@@ -23,9 +25,19 @@ interface Props {
 }
 
 export default function Picture({
-  avif, webp, fallback, alt, className, imgClassName, style,
+  avif, webp, fallback, alt, className, imgClassName, style, imgStyle,
   width, height, eager, sizes, lqip, priority,
 }: Props) {
+  const mergedImgStyle: CSSProperties = {
+    ...(lqip
+      ? {
+          backgroundImage: `url(${lqip})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }
+      : null),
+    ...imgStyle,
+  };
   return (
     <picture className={className} style={style}>
       <source srcSet={avif} type="image/avif" sizes={sizes} />
@@ -40,15 +52,7 @@ export default function Picture({
         // @ts-expect-error - fetchpriority is valid HTML but not in older React types
         fetchpriority={priority ? 'high' : undefined}
         className={imgClassName}
-        style={
-          lqip
-            ? {
-                backgroundImage: `url(${lqip})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }
-            : undefined
-        }
+        style={Object.keys(mergedImgStyle).length ? mergedImgStyle : undefined}
       />
     </picture>
   );
