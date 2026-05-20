@@ -11,7 +11,7 @@ import { X, ArrowUp } from 'lucide-react';
 import OrbView from '@/components/orb/v2/OrbView';
 import { HOLO_AION_PROFILE } from './holoAionProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getTranslation, type Language } from '@/i18n';
+import { getTranslation } from '@/i18n';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/aion-landing-chat`;
 
