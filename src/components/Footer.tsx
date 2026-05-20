@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Instagram, Send, Mail, Sparkles } from "lucide-react";
+import { Camera, Send, Mail, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import LeadCaptureDialog from "@/components/LeadCaptureDialog";
 import { useTranslation } from "@/hooks/useTranslation";

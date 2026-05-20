@@ -4,7 +4,7 @@
  * @data usePractitioner (by slug), offers, testimonials
  */
 import { useState, useMemo } from 'react';
-import { ArrowLeft, ArrowRight, Star, MapPin, CheckCircle, Languages, Calendar, MessageCircle, Globe, Instagram, Play, Package, MessageSquareText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Star, MapPin, CheckCircle, Languages, Calendar, MessageCircle, Globe, Camera, Play, Package, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -213,7 +213,7 @@ const CoachDetailView = ({ practitioner: basicPractitioner, onBack }: CoachDetai
         {basicPractitioner.instagram_url && (
           <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
             <a href={basicPractitioner.instagram_url} target="_blank" rel="noopener noreferrer">
-              <Instagram className="h-4 w-4" />
+              <Camera className="h-4 w-4" />
             </a>
           </Button>
         )}

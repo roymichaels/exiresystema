@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, CheckCircle, Calendar, MessageCircle,
-  Instagram, Globe, Star,
+  Camera, Globe, Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -128,7 +128,7 @@ const PractitionerProfileHeader = ({ practitioner, postsCount }: Props) => {
           {practitioner.instagram_url && (
             <Button size="sm" variant="outline" asChild>
               <a href={practitioner.instagram_url} target="_blank" rel="noopener noreferrer">
-                <Instagram className="h-4 w-4" />
+                <Camera className="h-4 w-4" />
               </a>
             </Button>
           )}

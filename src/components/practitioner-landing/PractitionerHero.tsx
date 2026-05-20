@@ -7,7 +7,7 @@ import {
   Calendar,
   MessageCircle,
   Globe,
-  Instagram,
+  Camera,
   ArrowLeft,
   ArrowRight,
   Sparkles,
@@ -173,7 +173,7 @@ const PractitionerHero = ({ practitioner }: PractitionerHeroProps) => {
               {practitioner.instagram_url && (
                 <Button size="lg" variant="ghost" asChild>
                   <a href={practitioner.instagram_url} target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-5 w-5" />
+                    <Camera className="h-5 w-5" />
                   </a>
                 </Button>
               )}
