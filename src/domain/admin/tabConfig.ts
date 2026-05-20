@@ -34,9 +34,7 @@ const Analytics         = lazy(() => import('@/pages/admin/Analytics'));
 const NotificationCenter = lazy(() => import('@/pages/admin/NotificationCenter'));
 const Users             = lazy(() => import('@/pages/admin/Users'));
 
-const Leads             = lazy(() => import('@/pages/admin/Leads'));
 const Businesses        = lazy(() => import('@/pages/admin/Businesses'));
-const AdminCoaches      = lazy(() => import('@/pages/admin/Coaches'));
 const AuroraInsights    = lazy(() => import('@/pages/admin/AuroraInsights'));
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
 const Newsletter        = lazy(() => import('@/pages/admin/Newsletter'));
