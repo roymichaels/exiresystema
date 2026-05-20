@@ -263,15 +263,25 @@ function MessageRow({
   }
 
   return (
-    <div className="space-y-3">
-      <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.85] text-[hsl(var(--mh-ink))]">
-        {cleaned}
+    <div className="flex items-start gap-3">
+      <OrbView
+        size={28}
+        state="idle"
+        tier="presence"
+        profile={HOLO_AION_PROFILE}
+        className="mt-1 h-7 w-7 shrink-0"
+        ariaLabel=""
+      />
+      <div className="flex-1 space-y-3">
+        <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.85] text-[hsl(var(--mh-ink))]">
+          {cleaned}
+        </div>
+        {hasIntake && (
+          <button type="button" onClick={onOpenIntake} className="mh-cta-primary">
+            התחל את השכתוב
+          </button>
+        )}
       </div>
-      {hasIntake && (
-        <button type="button" onClick={onOpenIntake} className="mh-cta-primary">
-          התחל את השכתוב
-        </button>
-      )}
     </div>
   );
 }
