@@ -436,6 +436,11 @@ function Footer() {
           Exire Systema · כל הזכויות שמורות
         </p>
       </div>
+      <div className="mx-auto mt-6 max-w-6xl px-6 text-center">
+        <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.42em] text-[hsl(var(--mh-sand))]/55">
+          ⌁ Powered by AION
+        </span>
+      </div>
     </footer>
   );
 }
