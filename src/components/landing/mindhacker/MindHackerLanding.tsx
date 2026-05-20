@@ -80,16 +80,33 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
 
 function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-center px-6 py-5 md:py-7">
-      <img
-        src={exireSigil}
-        alt="Exire Systema"
-        className="h-72 w-72 md:h-80 md:w-80 object-contain opacity-95 mix-blend-screen"
-        style={{ filter: 'brightness(1.25) contrast(1.1) drop-shadow(0 0 14px rgba(180,150,255,0.4))' }}
-      />
+    <header className="absolute inset-x-0 top-0 z-30 flex flex-col items-center px-6 pt-6 md:pt-8">
+      <div className="relative h-24 w-24 md:h-28 md:w-28 overflow-hidden">
+        <img
+          src={exireSigil}
+          alt="Exire Systema"
+          className="absolute inset-x-0 top-0 h-[140%] w-full object-contain opacity-80 mix-blend-screen"
+          style={{
+            filter: 'brightness(1.05) contrast(0.95) saturate(0.8) drop-shadow(0 0 18px rgba(180,150,255,0.25))',
+            clipPath: 'inset(0 0 32% 0)',
+          }}
+        />
+      </div>
+      <p
+        dir="ltr"
+        className="mt-3 text-[0.6rem] md:text-[0.65rem] font-light text-[hsl(var(--mh-ink)/0.7)]"
+        style={{
+          fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
+          letterSpacing: '0.55em',
+          textIndent: '0.55em',
+        }}
+      >
+        EXIRE SYSTEMA
+      </p>
     </header>
   );
 }
+
 
 /* ─────────────── 1. Hero ─────────────── */
 
