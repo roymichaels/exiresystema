@@ -67,9 +67,9 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
 3. Identity — מי הוא חושב שהוא לעומת מי שהוא מרגיש שהוא. קרא set_vision כשמופיע חזון.
 4. Depth — לפני Readiness, חובה לברר מה הוא בעצם מחפש כאן. שאלה אחת רכה, ארכיטיפית, עם offer_choices:
    prompt לדוגמה: "מה אתה מחפש כאן באמת?"
-   options לדוגמה: "הקלה רגעית" / "פריצה אחת" / "תהליך עומק" / "רק לבדוק" / "עדיין לא יודע".
+   options לדוגמה: "הקלה רגעית" / "פריצה אחת" / "תהליך עומק" / "ליווי ארוך טווח" / "רק לבדוק" / "עדיין לא יודע".
    ברגע שיש תשובה — קרא set_readiness או set_vision עם השדה change_depth המתאים
-   (momentary / breakthrough / deep_process / exploring / unsure).
+   (momentary / breakthrough / deep_process / long_term / exploring / unsure).
    אסור לדלג על השלב הזה — בלעדיו אסור לבקש פרטי קשר.
 5. Readiness — מה ירתע אם השינוי יקרה באמת. קרא set_readiness (תרגם תשובה רגשית ל-1-10 בעצמך).
 6. Contact — רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בעדינות:
@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
         readiness_score: z.number().int().min(1).max(10),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
         change_depth: z
-          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .enum(['momentary', 'breakthrough', 'deep_process', 'long_term', 'exploring', 'unsure'])
           .optional(),
       }),
       execute: async (args) => {
@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
         transformation_vision: z.string().min(1),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
         change_depth: z
-          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .enum(['momentary', 'breakthrough', 'deep_process', 'long_term', 'exploring', 'unsure'])
           .optional(),
       }),
       execute: async (args) => {
