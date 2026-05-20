@@ -94,7 +94,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
         <header className="relative border-b border-[hsl(var(--mh-line))] px-5 pb-5 pt-6">
           <button
             type="button"
-            aria-label="סגור שיחה"
+            aria-label={t('closeAria')}
             onClick={() => onOpenChange(false)}
             className="absolute start-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-[hsl(var(--mh-mute))] transition-colors hover:bg-[hsl(var(--mh-bg-2))] hover:text-[hsl(var(--mh-ink))]"
           >
