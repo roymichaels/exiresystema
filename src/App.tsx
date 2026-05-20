@@ -35,7 +35,7 @@ import FlowAuditProvider from "@/components/FlowAuditProvider";
 import { useUTMTracker } from "@/hooks/useUTMTracker";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { NotificationPermissionPrompt } from "@/components/NotificationPermissionPrompt";
-import CookieConsent from "@/components/CookieConsent";
+
 import SubscriptionsModal from "@/components/subscription/SubscriptionsModal";
 import { WalletModal } from "@/components/fm/WalletModal";
 import { StoryWorldProvider } from "@/contexts/StoryWorldContext";
