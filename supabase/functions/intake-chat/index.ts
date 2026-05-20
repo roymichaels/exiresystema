@@ -198,11 +198,15 @@ Deno.serve(async (req) => {
         desired_outcome: z.string().min(1),
         readiness_score: z.number().int().min(1).max(10),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
+        change_depth: z
+          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .optional(),
       }),
       execute: async (args) => {
         signals.desired_outcome = args.desired_outcome;
         signals.readiness_score = args.readiness_score;
         if (args.intent) signals.intent = args.intent;
+        if (args.change_depth) signals.change_depth = args.change_depth;
         return { ok: true };
       },
     }),
@@ -211,10 +215,14 @@ Deno.serve(async (req) => {
       inputSchema: z.object({
         transformation_vision: z.string().min(1),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
+        change_depth: z
+          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .optional(),
       }),
       execute: async (args) => {
         signals.transformation_vision = args.transformation_vision;
         if (args.intent) signals.intent = args.intent;
+        if (args.change_depth) signals.change_depth = args.change_depth;
         return { ok: true };
       },
     }),
