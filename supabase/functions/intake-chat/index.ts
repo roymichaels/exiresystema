@@ -154,6 +154,24 @@ Deno.serve(async (req) => {
   const signals: Record<string, unknown> = {};
 
   const tools = {
+    offer_choices: tool({
+      description:
+        'Render archetypal quick-reply chips for the user. Use this whenever you would otherwise list 1. 2. 3. options in text. Max 5 options, 2-4 words each.',
+      inputSchema: z.object({
+        prompt: z.string().min(1).max(200).optional(),
+        options: z.array(z.string().min(1).max(40)).min(2).max(5),
+        allow_freeform: z.boolean().default(true),
+      }),
+      execute: async (args) => args,
+    }),
+    reflect: tool({
+      description:
+        'Mirror back one short insight to the user before the next question. Use every 2-3 user turns. One sentence in Hebrew, no diagnosis.',
+      inputSchema: z.object({
+        insight: z.string().min(1).max(280),
+      }),
+      execute: async (args) => args,
+    }),
     set_pain_signal: tool({
       description: 'Persist the user pain signal once detected.',
       inputSchema: z.object({
