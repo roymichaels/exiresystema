@@ -9,6 +9,8 @@ import IntakeChatModal from './intake/IntakeChatModal';
 import founderHero from '@/assets/founder-hero.jpg';
 import founderPortrait from '@/assets/founder-portrait.jpg';
 import topicConsciousness from '@/assets/topic-consciousness.jpg';
+import topicIdentity from '@/assets/topic-identity.jpg';
+import topicHypnosis from '@/assets/topic-hypnosis.jpg';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
@@ -288,9 +290,9 @@ function MethodSection() {
 /* ─────────────── 5. Content ─────────────── */
 
 const TOPICS = [
-  { t: 'תודעה',           tag: 'I',  img: topicConsciousness },
-  { t: 'זהות',            tag: 'II' },
-  { t: 'היפנוזה',         tag: 'III' },
+  { t: 'תודעה',           tag: 'I',   img: topicConsciousness },
+  { t: 'זהות',            tag: 'II',  img: topicIdentity },
+  { t: 'היפנוזה',         tag: 'III', img: topicHypnosis },
   { t: 'Shadow Work',     tag: 'IV' },
   { t: 'מערכות שליטה',    tag: 'V' },
   { t: 'ריבונות פנימית',  tag: 'VI' },
