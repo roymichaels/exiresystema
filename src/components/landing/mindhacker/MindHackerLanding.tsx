@@ -68,11 +68,14 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
 
 function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center px-6 py-6 md:px-12">
+    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
       <div className="flex items-center gap-3">
         <span className="block h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
         <span className="mh-eyebrow">{BRAND}</span>
       </div>
+      <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-sand))]/60">
+        Powered by AION
+      </span>
     </header>
   );
 }
