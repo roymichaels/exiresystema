@@ -76,11 +76,11 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40" role="dialog" aria-modal="true" dir="rtl">
+    <div className="fixed inset-0 z-40" role="dialog" aria-modal="true" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Backdrop */}
       <button
         type="button"
-        aria-label="סגור"
+        aria-label={t('closeAria')}
         onClick={() => onOpenChange(false)}
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
       />
