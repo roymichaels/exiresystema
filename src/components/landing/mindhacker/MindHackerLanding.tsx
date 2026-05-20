@@ -484,10 +484,11 @@ function Footer() {
           fallback={exireSigilWebp}
           alt="Exire Systema"
           width={96}
-          height={96}
+          height={144}
           imgClassName="h-12 w-12 object-contain opacity-70 mix-blend-screen"
-          style={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
+          imgStyle={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
         />
+
         <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/80">
           {BRAND}
         </span>
