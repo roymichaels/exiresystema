@@ -18,6 +18,8 @@
     "fns:deploy": "supabase functions deploy"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^2.0.47",
+    "@ai-sdk/react": "^3.0.187",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -55,6 +57,7 @@
     "@types/dompurify": "^3.2.0",
     "@types/three": "^0.160.0",
     "@web3auth/modal": "^10.15.0",
+    "ai": "^6.0.185",
     "buffer": "^6.0.3",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
