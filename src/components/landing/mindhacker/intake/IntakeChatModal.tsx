@@ -171,8 +171,8 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       lang="he"
       style={{ background: 'hsl(var(--mh-bg) / 0.97)', backdropFilter: 'blur(24px)' }}
     >
-      <div className="absolute inset-0 -z-10 opacity-40 pointer-events-none">
-        <AmbientBackdrop variant="hero" />
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <ConsciousnessField intense={!started && !saveResult} />
       </div>
 
       {/* Header */}
