@@ -17,7 +17,7 @@ export const es: TranslationKeys = {
       invite: 'Comienza el diálogo',
       aria: 'Abrir chat de AION',
     },
-    langToggle: { aria: 'Cambiar idioma', he: 'HE', en: 'EN', es: 'ES' } as typeof en.landing.langToggle & { es: string },
+    langToggle: { aria: 'Cambiar idioma', he: 'HE', en: 'EN', es: 'ES' },
     hero: {
       eyebrow: 'Capítulo Uno',
       titleLine1: 'Tu consciencia',
