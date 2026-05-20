@@ -3,7 +3,7 @@
  * Optimized: AVIF/WebP via <Picture>, LQIP hero, lazy modals, paused background.
  * Localized via shared LanguageContext + getTranslation.
  */
-import { Suspense, lazy, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import Picture from './Picture';
