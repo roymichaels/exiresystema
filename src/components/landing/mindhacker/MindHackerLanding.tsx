@@ -7,6 +7,7 @@ import { Suspense, lazy, useState } from 'react';
 
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import Picture from './Picture';
+import OrbView from '@/components/orb/v2/OrbView';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation, type Language } from '@/i18n';
 
@@ -115,31 +116,30 @@ function AionFloatingWidget({ t, onOpen, hidden }: { t: T; onOpen: () => void; h
         minHeight: '52px',
       }}
     >
-      {/* Sigil mark with halo + presence pulse */}
-      <span className="relative flex h-9 w-9 items-center justify-center">
+      {/* Canonical AION orb with halo + presence pulse */}
+      <span className="relative flex h-10 w-10 items-center justify-center">
         <span
           aria-hidden
-          className="mh-breathe absolute inset-[-4px] rounded-full"
+          className="mh-breathe absolute inset-[-6px] rounded-full"
           style={{
             background:
               'radial-gradient(circle, hsl(var(--mh-sand) / 0.35) 0%, transparent 70%)',
           }}
         />
-        <Picture
-          avif={exireSigilAvif}
-          webp={exireSigilWebp}
-          fallback={exireSigilWebp}
-          alt=""
-          width={72}
-          height={72}
-          imgClassName="relative h-8 w-8 object-contain mix-blend-screen"
-          imgStyle={{ filter: 'brightness(1.15) drop-shadow(0 0 8px hsl(var(--mh-sand) / 0.5))' }}
+        <OrbView
+          size={40}
+          identity="aion"
+          state="idle"
+          tier="presence"
+          className="relative h-10 w-10"
+          ariaLabel=""
         />
         <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] shadow-[0_0_6px_hsl(var(--mh-sand))]" />
         </span>
       </span>
+
 
       {/* Label */}
       <span className="flex flex-col items-start leading-tight text-start">
