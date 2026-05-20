@@ -488,7 +488,7 @@ function MethodSection({ t }: { t: T }) {
 
 /* ─────────────── 5. Content ─────────────── */
 
-function ContentSection({ t }: { t: T }) {
+function ContentSection({ t, language }: { t: T; language: Language }) {
   const ref = useReveal<HTMLDivElement>();
   const topics = [
     { t: t('content.consciousness'), tag: 'I',   avif: topicConsciousnessAvif, webp: topicConsciousnessWebp, jpg: topicConsciousnessJpg },
@@ -498,6 +498,7 @@ function ContentSection({ t }: { t: T }) {
     { t: t('content.control'),       tag: 'V',   avif: topicControlSystemsAvif, webp: topicControlSystemsWebp, jpg: topicControlSystemsJpg },
     { t: t('content.sovereignty'),   tag: 'VI',  avif: topicSovereigntyAvif, webp: topicSovereigntyWebp, jpg: topicSovereigntyJpg },
   ];
+  const showOverlayLabel = language === 'en';
   return (
     <section ref={ref} className="relative overflow-hidden py-32 md:py-48">
       <AmbientBackdrop />
@@ -525,6 +526,20 @@ function ContentSection({ t }: { t: T }) {
                 className="absolute inset-0 h-full w-full"
                 imgClassName="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
               />
+              {showOverlayLabel && (
+                <>
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-2/5 bg-gradient-to-t from-black/85 via-black/55 to-transparent"
+                  />
+                  <h3
+                    dir="ltr"
+                    className="mh-serif absolute inset-x-0 bottom-12 z-10 px-6 text-center text-2xl leading-tight text-[hsl(var(--mh-sand))] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] md:bottom-14 md:text-3xl"
+                  >
+                    {topic.t}
+                  </h3>
+                </>
+              )}
               <span
                 dir="ltr"
                 className="mh-serif absolute bottom-5 z-10 text-base text-[hsl(var(--mh-sand))]/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] md:bottom-6 md:text-lg"
