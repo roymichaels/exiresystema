@@ -82,12 +82,15 @@ function TopBar() {
   return (
     <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
       <div className="flex items-center gap-3">
-        <span className="block h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
-        <span className="mh-eyebrow">{BRAND}</span>
+        <img
+          src={exireSigil}
+          alt=""
+          aria-hidden
+          className="h-7 w-7 object-contain opacity-90 mix-blend-screen"
+          style={{ filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 6px rgba(180,150,255,0.25))' }}
+        />
+        <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/85">{BRAND}</span>
       </div>
-      <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-sand))]/60">
-        Powered by AION
-      </span>
     </header>
   );
 }
