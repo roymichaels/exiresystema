@@ -3,27 +3,26 @@
  * Primary CTAs open the cinematic AION intake chat modal (no navigation, no login).
  */
 import { useState } from 'react';
-import { useAuthModal } from '@/contexts/AuthModalContext';
+
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import IntakeChatModal from './intake/IntakeChatModal';
 import founderHero from '@/assets/founder-hero.jpg';
 import founderPortrait from '@/assets/founder-portrait.jpg';
+import topicConsciousness from '@/assets/topic-consciousness.jpg';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
 
 export default function MindHackerLanding() {
-  const { openAuthModal } = useAuthModal();
   const [intakeOpen, setIntakeOpen] = useState(false);
 
   const startIntake = () => setIntakeOpen(true);
-  const openLogin = () => openAuthModal('login');
 
   return (
     <div className="mindhacker-theme min-h-screen" dir="rtl" lang="he">
-      <TopBar onLogin={openLogin} />
+      <TopBar />
       <main>
-        <Hero onStart={startIntake} onLogin={openLogin} />
+        <Hero onStart={startIntake} />
         <SystemSection />
         <WhatIDoSection />
         <MethodSection />
@@ -38,23 +37,20 @@ export default function MindHackerLanding() {
 
 /* ─────────────── Top bar ─────────────── */
 
-function TopBar({ onLogin }: { onLogin: () => void }) {
+function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
+    <header className="absolute inset-x-0 top-0 z-30 flex items-center px-6 py-6 md:px-12">
       <div className="flex items-center gap-3">
         <span className="block h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
         <span className="mh-eyebrow">{BRAND}</span>
       </div>
-      <button onClick={onLogin} className="mh-eyebrow hover:text-[hsl(var(--mh-ink))] transition-colors">
-        כניסה
-      </button>
     </header>
   );
 }
 
 /* ─────────────── 1. Hero ─────────────── */
 
-function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }) {
+function Hero({ onStart }: { onStart: () => void }) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <section
@@ -122,9 +118,6 @@ function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }
           <div className="mh-reveal mt-12 flex flex-col gap-4 sm:flex-row sm:gap-5">
             <button onClick={onStart} className="mh-cta-primary">
               התחל את השכתוב
-            </button>
-            <button onClick={onLogin} className="mh-cta-ghost">
-              כניסה למערכת
             </button>
           </div>
         </div>
@@ -295,7 +288,7 @@ function MethodSection() {
 /* ─────────────── 5. Content ─────────────── */
 
 const TOPICS = [
-  { t: 'תודעה',           tag: 'I' },
+  { t: 'תודעה',           tag: 'I',  img: topicConsciousness },
   { t: 'זהות',            tag: 'II' },
   { t: 'היפנוזה',         tag: 'III' },
   { t: 'Shadow Work',     tag: 'IV' },
@@ -322,13 +315,30 @@ function ContentSection() {
               key={topic.t}
               className="mh-reveal group relative aspect-[4/5] overflow-hidden bg-[hsl(var(--mh-bg))] transition-colors duration-700 hover:bg-[hsl(var(--mh-bg-2))]"
             >
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
-                }}
-              />
+              {topic.img ? (
+                <>
+                  <img
+                    src={topic.img}
+                    alt={topic.t}
+                    className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-1000 group-hover:opacity-90 group-hover:scale-105"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(to top, hsl(var(--mh-bg)) 0%, hsla(0,0%,0%,0.2) 50%, transparent 100%)',
+                    }}
+                  />
+                </>
+              ) : (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
+                  }}
+                />
+              )}
               <div className="absolute inset-0 flex flex-col justify-between p-8">
                 <span dir="ltr" className="mh-serif text-xl text-[hsl(var(--mh-sand))]">
                   {topic.tag}
