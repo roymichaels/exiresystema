@@ -294,9 +294,19 @@ Deno.serve(async (req) => {
   };
 
   try {
+    const language: 'he' | 'en' | 'es' =
+      (body as any)?.language === 'en' || (body as any)?.language === 'es'
+        ? (body as any).language
+        : 'he';
+    const languageDirective =
+      language === 'en'
+        ? '\n\n== LANGUAGE OVERRIDE ==\nRespond ONLY in English. Keep the same quiet, mirroring, archetypal tone. Short lines. Translate all reflections, choices, and questions to natural English. Apply this to every tool argument too (offer_choices.options, reflect.insight, pattern_diagnosis).'
+        : language === 'es'
+        ? '\n\n== ANULACIÓN DE IDIOMA ==\nResponde SOLO en español. Mantén el mismo tono silencioso, reflexivo y arquetípico. Líneas cortas. Traduce todas las reflexiones, opciones y preguntas al español natural. Aplica esto también a cada argumento de herramienta (offer_choices.options, reflect.insight, pattern_diagnosis).'
+        : '';
     const result = streamText({
       model: gateway('google/gemini-2.5-flash'),
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + languageDirective,
       messages: await convertToModelMessages(body.messages),
       tools,
       stopWhen: stepCountIs(50),
