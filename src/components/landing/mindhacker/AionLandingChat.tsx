@@ -130,7 +130,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
                   <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
                   <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 </span>
-                כאן, מקשיב לך
+                {t('status')}
               </span>
             </div>
           </div>
