@@ -427,19 +427,22 @@ function FinalCTA({ onStart }: { onStart: () => void }) {
 
 function Footer() {
   return (
-    <footer className="relative border-t border-[hsl(var(--mh-line))] py-10">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-center md:flex-row md:text-start">
-        <div className="flex items-center gap-3">
-          <span className="block h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))]" />
-          <span className="mh-eyebrow">{BRAND}</span>
-        </div>
-        <p className="mh-eyebrow text-[0.65rem]">
-          Exire Systema · כל הזכויות שמורות
+    <footer className="relative border-t border-[hsl(var(--mh-line))] py-12">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 text-center">
+        <img
+          src={exireSigil}
+          alt="Exire Systema"
+          className="h-12 w-12 object-contain opacity-70 mix-blend-screen"
+          style={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
+        />
+        <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/80">
+          {BRAND}
+        </span>
+        <p className="mh-eyebrow text-[0.6rem] text-[hsl(var(--mh-mute))]">
+          תהליך אישי לבנייה מחדש של התודעה · כל הזכויות שמורות
         </p>
-      </div>
-      <div className="mx-auto mt-6 max-w-6xl px-6 text-center">
-        <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.42em] text-[hsl(var(--mh-sand))]/55">
-          ⌁ Powered by AION
+        <span dir="ltr" className="mh-eyebrow text-[0.55rem] tracking-[0.5em] text-[hsl(var(--mh-sand))]/35">
+          built on aion
         </span>
       </div>
     </footer>
