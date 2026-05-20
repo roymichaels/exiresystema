@@ -613,15 +613,6 @@ export const he = {
       duplicated: "ההצעה שוכפלה בהצלחה",
     },
   },
-  landing: {
-    heroTitle: "שינוי תודעתי עמוק",
-    heroSubtitle: "שלושה מסלולים לשינוי אמיתי",
-    ctaButton: "התחל עכשיו",
-    learnMore: "למד עוד",
-    testimonials: "מה אנשים אומרים",
-    faq: "שאלות נפוצות",
-    contact: "צור קשר",
-  },
   hero: {
     hackerWord: "האקר",
     mainSubtitle: "אני מלווה אותך בתהליך עמוק — לא טיפול, לא פסיכולוגיה.",
