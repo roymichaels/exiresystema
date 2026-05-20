@@ -84,7 +84,7 @@ function TopBar() {
       <img
         src={exireSigil}
         alt="Exire Systema"
-        className="h-14 w-14 md:h-16 md:w-16 object-contain opacity-95 mix-blend-screen"
+        className="h-72 w-72 md:h-80 md:w-80 object-contain opacity-95 mix-blend-screen"
         style={{ filter: 'brightness(1.25) contrast(1.1) drop-shadow(0 0 14px rgba(180,150,255,0.4))' }}
       />
     </header>
