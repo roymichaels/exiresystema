@@ -32,8 +32,35 @@ export default function MindHackerLanding() {
         <FinalCTA onStart={startIntake} />
       </main>
       <Footer />
+      <AionFloatingWidget onOpen={startIntake} hidden={intakeOpen} />
       <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
     </div>
+  );
+}
+
+/* ─────────────── Floating AION chat widget ─────────────── */
+
+function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: boolean }) {
+  if (hidden) return null;
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label="פתח שיחה עם AION"
+      className="group fixed z-40 flex items-center gap-2.5 rounded-full border border-[hsl(var(--mh-line))] bg-black/55 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-black/75 hover:border-[hsl(var(--mh-sand))]"
+      style={{
+        insetInlineStart: 'max(1rem, env(safe-area-inset-left))',
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
+      }}
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[hsl(var(--mh-sand))]" />
+      </span>
+      <span dir="ltr" className="mh-eyebrow text-[0.65rem] text-[hsl(var(--mh-sand))]">
+        Chat with AION
+      </span>
+    </button>
   );
 }
 
@@ -41,11 +68,14 @@ export default function MindHackerLanding() {
 
 function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center px-6 py-6 md:px-12">
+    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
       <div className="flex items-center gap-3">
         <span className="block h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
         <span className="mh-eyebrow">{BRAND}</span>
       </div>
+      <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-sand))]/60">
+        Powered by AION
+      </span>
     </header>
   );
 }
@@ -405,6 +435,11 @@ function Footer() {
         <p className="mh-eyebrow text-[0.65rem]">
           Exire Systema · כל הזכויות שמורות
         </p>
+      </div>
+      <div className="mx-auto mt-6 max-w-6xl px-6 text-center">
+        <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.42em] text-[hsl(var(--mh-sand))]/55">
+          ⌁ Powered by AION
+        </span>
       </div>
     </footer>
   );

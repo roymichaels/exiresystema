@@ -1,53 +1,31 @@
-# איחוד פלטפורמת המאמן עם האדמין
+# הסרת באנר עוגיות + ווידג'ט AION + Powered by AION
 
-מאחר שהאתר הוא אפליקציה של מאמן אישי יחיד (האדמין הוא המאמן), אין צורך בשתי מערכות ניהול נפרדות. נאחד הכל תחת `AdminHub`.
+## 1. הסרת באנר העוגיות
+- מסירים את `<CookieConsent />` מ-`src/App.tsx` (שורה 441) ואת ה-import (שורה 38).
+- הקובץ `src/components/CookieConsent.tsx` יישאר על הדיסק אך לא ייטען (אפשר למחוק בהמשך).
 
-## מצב נוכחי
+## 2. "POWERED BY AION" branding
+- **Footer** (`MindHackerLanding.tsx`, שורות 397–410): מוסיפים שורה נפרדת זעירה ועדינה: `POWERED BY AION` ב-LTR, letter-spacing רחב, צבע `mh-sand` בעמעום ~60%.
+- **TopBar** (שורות 42–51): מוסיפים תג קטן בצד שמאל `· POWERED BY AION` באותו סגנון eyebrow זעיר, כך שבכל גלילה רואים את החתימה של AION כתשתית.
 
-- `/admin-hub` — מערכת אדמין מלאה (סקירה, ניהול, קמפיינים, תוכן, אתר, מערכת).
-- `/coaches` → `CareerHub` עם `careerPath="coach"` — מציג CoachHub עם טאבים: דאשבורד, מתאמנים, לידים, מוצרים, תוכן, תוכניות, שיווק, אנליטיקס, דפי נחיתה, הגדרות.
-- כפילות אמיתית: לידים, מוצרים, תוכן, דפי נחיתה, אנליטיקס, הגדרות — קיימים בשני המקומות.
+## 3. ווידג'ט צ'אט AION צף בעמוד הבית
+כפתור צף בפינה (bottom-start, מעל ה-safe area) שפותח את `IntakeChatModal` הקיים — שזה כבר ה-AION cinematic intake chat. כך לא ממציאים צ'אט שני; מאחדים את כל ה-CTAs לאותה שיחה.
 
-## מה לבנות
+מבנה הכפתור:
+- עיגול ~56px, רקע כהה זכוכיתי (`backdrop-blur`, `border` עדין `mh-line`), ללא צל בולט (לפי כללי העיצוב).
+- בתוך הכפתור: נקודת `mh-sand` פועמת + כיתוב "AION" זעיר ב-LTR.
+- ברירת מחדל מוצג רק מתחת ל-md (מובייל); ב-desktop גם נשאר אבל קטן יותר ובפינה.
+- onClick → `setIntakeOpen(true)` (אותה state שכבר קיימת ב-`MindHackerLanding`).
+- מסתתר בזמן שה-modal פתוח כדי לא להפריע.
 
-### 1. טאב חדש ב-AdminHub: "מאמן" (Coach)
-מוסיפים טאב עליון חדש ב-`src/domain/admin/tabConfig.ts` עם תתי-טאבים שמושכים את הקומפוננטות הקיימות מ-`@/components/careers/coach/*`:
-
-- סקירה (`CoachDashboardOverview`)
-- מתאמנים (`CoachClientsTab`)
-- לידים (`CoachLeadsTab`) — מחליף את `admin/Leads` הגנרי
-- תוכניות (`CoachPlansTab`)
-- שיווק (`CoachMarketingTab`)
-- הפרופיל הציבורי (`CoachSettingsTab`) — נהיה "פרופיל המאמן"
-
-הקומפוננטות כבר עצמאיות ועובדות מול ה-coach profile של המשתמש המחובר (האדמין).
-
-### 2. הסרת כפילויות מ-AdminHub
-- מוחקים את תת-הטאב `admin/leads` (גנרי) — מוחלף ב-coach/leads.
-- מוחקים את תת-הטאב `admin/coaches` (ניהול מאמנים מרובים) — לא רלוונטי.
-- משאירים `landing-pages` תחת `site` כי הוא מערכת-רחבה, ו-`CoachLandingPagesTab` נטמע בתוכו או נמחק (לבחירת המשתמש בשאלה למטה).
-
-### 3. ניתוב מחדש של `/coaches`
-- `/coaches` → redirect ל-`/admin-hub?tab=coach`.
-- `/coaches/:sub` → redirect ל-`/admin-hub?tab=coach&sub=:sub`.
-- `CoachHub.tsx`, `Coaches.tsx`, `CoachesLayoutWrapper` — נמחקים (או נשארים כ-thin redirect).
-- `CareerHub` נשאר עבור freelancer/creator/business אם רלוונטי, או נמחק לגמרי אם גם הם לא בשימוש.
-
-### 4. ניווט
-- מורידים כל קישור ל-`/coaches` מה-nav (אם קיים).
-- ה-tab החדש "מאמן" ב-AdminHub זמין לאדמין בלבד (כבר מוגן ע"י `AdminRoute`).
+הערה (כללי AION Presence): אופציה מועדפת היא לרנדר `CanonicalAionModel` כאורב ה-AION בתוך הכפתור. אם הקומפוננטה זמינה ולא יקרה ביצועית (קנבס WebGL נוסף בעמוד הבית), נשתמש בה; אחרת — נסתפק בנקודה פועמת + הטקסט "AION" (זה לא chrome, זה landing page, אז fallback מותר).
 
 ## קבצים מושפעים
 
 ```text
-src/domain/admin/tabConfig.ts     ← מוסיפים טאב "coach"
-src/App.tsx                        ← /coaches → redirect ל-/admin-hub
-src/pages/Coaches.tsx              ← נמחק / הופך ל-Navigate
-src/pages/CoachHub.tsx             ← נמחק
-src/components/careers/coach/CoachesLayoutWrapper.tsx  ← נמחק
-src/navigation/canonicalSurfaces.ts ← הסרת קישור מאמנים
+src/App.tsx                                              ← הסרת CookieConsent
+src/components/landing/mindhacker/MindHackerLanding.tsx  ← footer + topbar + floating widget
+src/components/landing/mindhacker/AionWidgetButton.tsx   ← קומפוננטה חדשה קטנה
 ```
 
-ה-DB, ה-RLS, וטבלאות `practitioner_*` נשארות כמו שהן — רק שכבת ה-UI מתאחדת.
-
-## שאלות לפני שמתחילים
+ללא שינויי DB, ללא שינויי תוכן בצ'אט עצמו (משתמש ב-intake הקיים).
