@@ -100,7 +100,7 @@ async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
         <p><strong>Pain:</strong> ${lead.pain_category ?? '—'} (${lead.pain_duration ?? '—'})</p>
         <p><strong>ניסה בעבר:</strong> ${Array.isArray(lead.prior_attempts) ? (lead.prior_attempts as string[]).join(', ') : '—'}</p>
         <p><strong>מחפש:</strong> ${lead.desired_outcome ?? '—'}</p>
-        <p><strong>Readiness:</strong> ${lead.readiness_score ?? '—'}/10 · <strong>Intent:</strong> ${lead.intent ?? '—'}</p>
+        <p><strong>Readiness:</strong> ${lead.readiness_score ?? '—'}/10 · <strong>Intent:</strong> ${lead.intent ?? '—'} · <strong>עומק שינוי:</strong> ${(lead.ai_analysis as any)?.change_depth ?? '—'}</p>
         <p><strong>חזון:</strong> ${lead.transformation_vision ?? '—'}</p>
         <hr/>
         <p><strong>אבחנה:</strong> ${(lead.ai_analysis as any)?.pattern_diagnosis ?? '—'}</p>
