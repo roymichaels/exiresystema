@@ -80,17 +80,13 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
 
 function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
-      <div className="flex items-center gap-3">
-        <img
-          src={exireSigil}
-          alt=""
-          aria-hidden
-          className="h-7 w-7 object-contain opacity-90 mix-blend-screen"
-          style={{ filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 6px rgba(180,150,255,0.25))' }}
-        />
-        <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/85">{BRAND}</span>
-      </div>
+    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-center px-6 py-5 md:py-7">
+      <img
+        src={exireSigil}
+        alt="Exire Systema"
+        className="h-14 w-14 md:h-16 md:w-16 object-contain opacity-95 mix-blend-screen"
+        style={{ filter: 'brightness(1.25) contrast(1.1) drop-shadow(0 0 14px rgba(180,150,255,0.4))' }}
+      />
     </header>
   );
 }
