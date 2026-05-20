@@ -300,10 +300,11 @@ Deno.serve(async (req) => {
         : 'he';
     const languageDirective =
       language === 'en'
-        ? '\n\n== LANGUAGE OVERRIDE ==\nRespond ONLY in English. Keep the same quiet, mirroring, archetypal tone. Short lines. Translate all reflections, choices, and questions to natural English. Apply this to every tool argument too (offer_choices.options, reflect.insight, pattern_diagnosis).'
+        ? '\n\n== LANGUAGE OVERRIDE (HIGHEST PRIORITY) ==\nIgnore any previous instruction to reply in Hebrew. Respond ONLY in English, regardless of the language of the user message. Keep the same quiet, mirroring, archetypal tone. Short lines. Translate every reflection, choice, and question to natural English. Apply this to every tool argument too (offer_choices.options, reflect.insight, pattern_diagnosis, ai_analysis).'
         : language === 'es'
-        ? '\n\n== ANULACIÓN DE IDIOMA ==\nResponde SOLO en español. Mantén el mismo tono silencioso, reflexivo y arquetípico. Líneas cortas. Traduce todas las reflexiones, opciones y preguntas al español natural. Aplica esto también a cada argumento de herramienta (offer_choices.options, reflect.insight, pattern_diagnosis).'
+        ? '\n\n== ANULACIÓN DE IDIOMA (MÁXIMA PRIORIDAD) ==\nIgnora cualquier instrucción previa de responder en hebreo. Responde SOLO en español, sin importar el idioma del mensaje del usuario. Mantén el mismo tono silencioso, reflexivo y arquetípico. Líneas cortas. Traduce todas las reflexiones, opciones y preguntas al español natural. Aplica esto también a cada argumento de herramienta (offer_choices.options, reflect.insight, pattern_diagnosis, ai_analysis).'
         : '';
+
     const result = streamText({
       model: gateway('google/gemini-2.5-flash'),
       system: SYSTEM_PROMPT + languageDirective,
