@@ -251,10 +251,12 @@ const INTAKE_TOKEN = '[[OPEN_INTAKE]]';
 function MessageRow({
   role,
   text,
+  intakeLabel,
   onOpenIntake,
 }: {
   role: string;
   text: string;
+  intakeLabel: string;
   onOpenIntake: () => void;
 }) {
   const hasIntake = text.includes(INTAKE_TOKEN);
@@ -286,7 +288,7 @@ function MessageRow({
         </div>
         {hasIntake && (
           <button type="button" onClick={onOpenIntake} className="mh-cta-primary">
-            התחל את השכתוב
+            {intakeLabel}
           </button>
         )}
       </div>
