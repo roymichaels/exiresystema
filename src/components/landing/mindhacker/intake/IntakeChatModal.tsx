@@ -10,6 +10,8 @@ import { X, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConsciousnessFieldGL as ConsciousnessField } from '../ConsciousnessFieldGL';
 import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslation } from '@/i18n';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/intake-chat`;
 
@@ -32,6 +34,9 @@ interface Props {
 }
 
 export default function IntakeChatModal({ open, onOpenChange }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = (key: string) => getTranslation(language, `landing.intake.${key}`);
+
   const [started, setStarted] = useState(false);
   const [input, setInput] = useState('');
   const [freeformOpen, setFreeformOpen] = useState(false);
@@ -39,9 +44,11 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({ api: ENDPOINT }),
-  });
+  const transport = useMemo(
+    () => new DefaultChatTransport({ api: ENDPOINT, body: { language } }),
+    [language],
+  );
+  const { messages, sendMessage, status, error } = useChat({ transport });
 
   // Auto-scroll
   useEffect(() => {
