@@ -206,6 +206,15 @@ function LangToggle({ t }: { t: T }) {
       >
         {t('langToggle.en')}
       </button>
+      <span className="h-3 w-px bg-[hsl(var(--mh-line))]" />
+      <button
+        type="button"
+        onClick={() => setLanguage('es')}
+        aria-pressed={language === 'es'}
+        className={`${base} ${language === 'es' ? active : idle}`}
+      >
+        {t('langToggle.es')}
+      </button>
     </div>
   );
 }
@@ -498,7 +507,7 @@ function ContentSection({ t, language }: { t: T; language: Language }) {
     { t: t('content.control'),       tag: 'V',   avif: topicControlSystemsAvif, webp: topicControlSystemsWebp, jpg: topicControlSystemsJpg },
     { t: t('content.sovereignty'),   tag: 'VI',  avif: topicSovereigntyAvif, webp: topicSovereigntyWebp, jpg: topicSovereigntyJpg },
   ];
-  const showOverlayLabel = language === 'en';
+  const showOverlayLabel = language !== 'he';
   return (
     <section ref={ref} className="relative overflow-hidden py-32 md:py-48">
       <AmbientBackdrop />

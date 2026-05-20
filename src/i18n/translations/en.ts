@@ -5310,7 +5310,7 @@ export const en: TranslationKeys = {
     landing: {
       header: { brand: 'EXIRE SYSTEMA' },
       widget: { chatLabel: 'chat with aion', brand: 'AION', invite: 'Begin the dialogue', aria: 'Open AION chat' },
-      langToggle: { aria: 'Change language', he: 'HE', en: 'EN' },
+      langToggle: { aria: 'Change language', he: 'HE', en: 'EN', es: 'ES' },
       hero: {
         eyebrow: 'Chapter One',
         titleLine1: 'Your consciousness',
