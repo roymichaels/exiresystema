@@ -1,0 +1,108 @@
+/* Mind Hacker cinematic theme — scoped tokens & fonts */
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&family=Heebo:wght@200;300;400;500;700&display=swap');
+
+.mindhacker-theme {
+  --mh-bg: 0 0% 4%;
+  --mh-bg-2: 0 0% 7%;
+  --mh-ink: 40 25% 92%;
+  --mh-sand: 35 18% 78%;
+  --mh-ember: 28 30% 62%;
+  --mh-line: 35 8% 22%;
+  --mh-mute: 35 6% 45%;
+
+  background-color: hsl(var(--mh-bg));
+  color: hsl(var(--mh-ink));
+  font-family: 'Heebo', system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.005em;
+}
+
+.mindhacker-theme .mh-serif {
+  font-family: 'Frank Ruhl Libre', 'Heebo', serif;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+.mindhacker-theme .mh-eyebrow {
+  font-family: 'Heebo', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: hsl(var(--mh-mute));
+}
+
+.mindhacker-theme .mh-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--mh-line)) 30%,
+    hsl(var(--mh-line)) 70%,
+    transparent
+  );
+}
+
+.mindhacker-theme .mh-cta-primary {
+  font-family: 'Heebo', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  font-size: 0.85rem;
+  padding: 1.1rem 2.2rem;
+  background: hsl(var(--mh-ink));
+  color: hsl(var(--mh-bg));
+  border: 1px solid hsl(var(--mh-ink));
+  border-radius: 9999px;
+  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.mindhacker-theme .mh-cta-primary:hover {
+  background: transparent;
+  color: hsl(var(--mh-ink));
+  letter-spacing: 0.24em;
+}
+
+.mindhacker-theme .mh-cta-ghost {
+  font-family: 'Heebo', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  font-size: 0.8rem;
+  padding: 1.05rem 2rem;
+  color: hsl(var(--mh-sand));
+  border: 1px solid hsl(var(--mh-line));
+  border-radius: 9999px;
+  background: transparent;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.mindhacker-theme .mh-cta-ghost:hover {
+  border-color: hsl(var(--mh-sand));
+  color: hsl(var(--mh-ink));
+}
+
+/* Slow ambient breathing for orb halo */
+@keyframes mh-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.04); }
+}
+.mindhacker-theme .mh-breathe { animation: mh-breathe 9s ease-in-out infinite; }
+
+/* Drift particles */
+@keyframes mh-drift {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(0,-40px,0); }
+}
+
+/* Scroll fade-in */
+.mh-reveal { opacity: 0; transform: translateY(24px); transition: opacity 1.2s ease, transform 1.2s ease; }
+.mh-reveal.is-in { opacity: 1; transform: translateY(0); }
+
+/* Static grain */
+.mh-grain::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(hsla(40, 25%, 92%, 0.025) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+}
