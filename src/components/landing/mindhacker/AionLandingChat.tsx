@@ -115,7 +115,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
               <OrbView
                 size={80}
                 state="idle"
-                tier="presence"
+                tier="cinematic"
                 profile={HOLO_AION_PROFILE}
                 className="relative h-20 w-20"
                 ariaLabel="AION"
@@ -156,11 +156,11 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
               {(status === 'submitted' || status === 'streaming') && (
                 <div className="flex items-start gap-3 text-[hsl(var(--mh-mute))]">
                   <OrbView
-                    size={28}
+                    size={32}
                     state="thinking"
-                    tier="presence"
+                    tier="standard"
                     profile={HOLO_AION_PROFILE}
-                    className="mt-0.5 h-7 w-7 shrink-0"
+                    className="mt-0.5 h-8 w-8 shrink-0"
                     ariaLabel=""
                   />
                   <span className="mh-eyebrow text-[0.6rem] leading-7">AION חושב…</span>
@@ -271,11 +271,11 @@ function MessageRow({
   return (
     <div className="flex items-start gap-3">
       <OrbView
-        size={28}
+        size={32}
         state="idle"
-        tier="presence"
+        tier="standard"
         profile={HOLO_AION_PROFILE}
-        className="mt-1 h-7 w-7 shrink-0"
+        className="mt-1 h-8 w-8 shrink-0"
         ariaLabel=""
       />
       <div className="flex-1 space-y-3">
