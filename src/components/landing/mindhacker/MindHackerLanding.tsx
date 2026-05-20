@@ -3,7 +3,7 @@
  * Primary CTAs open the cinematic AION intake chat modal (no navigation, no login).
  */
 import { useState } from 'react';
-import { useAuthModal } from '@/contexts/AuthModalContext';
+
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import IntakeChatModal from './intake/IntakeChatModal';
 import founderHero from '@/assets/founder-hero.jpg';
