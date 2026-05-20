@@ -615,15 +615,6 @@ export const en: TranslationKeys = {
       duplicated: "Offer duplicated successfully",
     },
   },
-  landing: {
-    heroTitle: "Deep Consciousness Change",
-    heroSubtitle: "Three paths to real transformation",
-    ctaButton: "Start Now",
-    learnMore: "Learn More",
-    testimonials: "What people say",
-    faq: "FAQ",
-    contact: "Contact",
-  },
   hero: {
     hackerWord: "Hacker",
     mainSubtitle: "I guide you through a deep process — not therapy, not psychology.",
