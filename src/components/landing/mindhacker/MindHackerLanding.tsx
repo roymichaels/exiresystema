@@ -8,7 +8,7 @@ import { Suspense, lazy, useState } from 'react';
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import Picture from './Picture';
 import OrbView from '@/components/orb/v2/OrbView';
-import { CANONICAL_AION_PROFILE } from '@/components/orb/CanonicalAionModel';
+import { HOLO_AION_PROFILE } from './holoAionProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation, type Language } from '@/i18n';
 
@@ -103,31 +103,6 @@ export default function MindHackerLanding() {
 
 /* ─────────────── Floating AION chat widget ─────────────── */
 
-/** Full-spectrum holographic AION variant for the floating widget. */
-const HOLO_AION_PROFILE = {
-  ...CANONICAL_AION_PROFILE,
-  materialType: 'holographic' as const,
-  gradientStops: [
-    '340 90% 65%', // magenta
-    '265 85% 66%', // violet
-    '220 95% 65%', // blue
-    '188 95% 65%', // cyan
-    '155 80% 60%', // mint
-    '60 90% 65%',  // gold
-    '20 95% 65%',  // coral
-  ],
-  secondaryColors: ['188 95% 65%', '60 90% 65%', '340 90% 65%'],
-  particlePalette: ['188 95% 65%', '265 85% 66%', '340 90% 65%', '60 90% 65%'],
-  chromaShift: 0.95,
-  bloomStrength: 1.1,
-  patternIntensity: 0.75,
-  materialParams: {
-    ...CANONICAL_AION_PROFILE.materialParams,
-    clearcoat: 1.0,
-    roughness: 0.12,
-    emissiveIntensity: 0.7,
-  },
-};
 
 
 function AionFloatingWidget({ t, onOpen, hidden }: { t: T; onOpen: () => void; hidden: boolean }) {

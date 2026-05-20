@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { X, ArrowUp } from 'lucide-react';
+import OrbView from '@/components/orb/v2/OrbView';
+import { HOLO_AION_PROFILE } from './holoAionProfile';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/aion-landing-chat`;
 
@@ -91,9 +93,23 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
         {/* Header */}
         <header className="flex items-center justify-between border-b border-[hsl(var(--mh-line))] px-5 py-4">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))]" />
+            <span className="relative flex h-9 w-9 items-center justify-center">
+              <span
+                aria-hidden
+                className="absolute inset-[-4px] rounded-full"
+                style={{
+                  background:
+                    'radial-gradient(circle, hsl(var(--mh-sand) / 0.3) 0%, transparent 70%)',
+                }}
+              />
+              <OrbView
+                size={36}
+                state="idle"
+                tier="presence"
+                profile={HOLO_AION_PROFILE}
+                className="relative h-9 w-9"
+                ariaLabel=""
+              />
             </span>
             <div className="flex flex-col">
               <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-ink))]">
@@ -132,9 +148,16 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
                 />
               ))}
               {(status === 'submitted' || status === 'streaming') && (
-                <div className="flex items-center gap-2 text-[hsl(var(--mh-mute))]">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[hsl(var(--mh-sand))]" />
-                  <span className="mh-eyebrow text-[0.6rem]">AION חושב…</span>
+                <div className="flex items-start gap-3 text-[hsl(var(--mh-mute))]">
+                  <OrbView
+                    size={28}
+                    state="thinking"
+                    tier="presence"
+                    profile={HOLO_AION_PROFILE}
+                    className="mt-0.5 h-7 w-7 shrink-0"
+                    ariaLabel=""
+                  />
+                  <span className="mh-eyebrow text-[0.6rem] leading-7">AION חושב…</span>
                 </div>
               )}
               {error && (
@@ -240,15 +263,25 @@ function MessageRow({
   }
 
   return (
-    <div className="space-y-3">
-      <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.85] text-[hsl(var(--mh-ink))]">
-        {cleaned}
+    <div className="flex items-start gap-3">
+      <OrbView
+        size={28}
+        state="idle"
+        tier="presence"
+        profile={HOLO_AION_PROFILE}
+        className="mt-1 h-7 w-7 shrink-0"
+        ariaLabel=""
+      />
+      <div className="flex-1 space-y-3">
+        <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.85] text-[hsl(var(--mh-ink))]">
+          {cleaned}
+        </div>
+        {hasIntake && (
+          <button type="button" onClick={onOpenIntake} className="mh-cta-primary">
+            התחל את השכתוב
+          </button>
+        )}
       </div>
-      {hasIntake && (
-        <button type="button" onClick={onOpenIntake} className="mh-cta-primary">
-          התחל את השכתוב
-        </button>
-      )}
     </div>
   );
 }
