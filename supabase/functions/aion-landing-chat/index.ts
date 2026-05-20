@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
         });
 
     const modelId = useOpenRouter
-      ? 'google/gemini-2.5-flash'
+      ? 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free'
       : 'google/gemini-3-flash-preview';
 
     const result = streamText({
