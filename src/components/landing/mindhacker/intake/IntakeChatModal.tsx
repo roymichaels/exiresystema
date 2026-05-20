@@ -229,8 +229,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
           <div className="border-t border-[hsl(var(--mh-mute)/0.15)] px-4 py-4 md:px-10">
             <div className="mx-auto max-w-2xl">
               <PromptInput
-                onSubmit={(e) => {
-                  e.preventDefault();
+                onSubmit={() => {
                   handleSend();
                 }}
               >
