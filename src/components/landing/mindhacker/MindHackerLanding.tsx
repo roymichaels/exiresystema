@@ -157,18 +157,27 @@ function Hero({ onStart }: { onStart: () => void }) {
         <AmbientBackdrop variant="hero" />
       </div>
 
-      {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
-      <div className="relative z-10 w-full px-6 md:px-12 lg:px-20">
-        <div className="max-w-xl text-start md:max-w-2xl">
-          <p className="mh-eyebrow mh-reveal mb-8">Exire Systema · פרק ראשון</p>
+      {/* Soft dark wash behind text for readability */}
+      <div
+        className="absolute inset-y-0 start-0 z-[5] w-full md:w-2/3 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(80% 60% at 30% 55%, hsl(var(--mh-bg) / 0.7) 0%, hsl(var(--mh-bg) / 0.35) 50%, transparent 80%)',
+        }}
+      />
 
-          <h1 className="mh-serif mh-reveal text-[2.4rem] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[5rem]">
+      {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pt-40 md:pt-44">
+        <div className="max-w-xl text-start md:max-w-2xl">
+          <p className="mh-eyebrow mh-reveal mb-10 md:mb-12">פרק ראשון</p>
+
+          <h1 className="mh-serif mh-reveal text-[2.4rem] leading-[1.1] sm:text-6xl md:text-7xl lg:text-[5rem]">
             התודעה שלך
             <br />
             <span className="text-[hsl(var(--mh-sand))]">לא נבנתה</span> על ידך
           </h1>
 
-          <p className="mh-reveal mt-8 max-w-md text-[0.95rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
+          <p className="mh-reveal mt-10 md:mt-12 max-w-md text-[0.95rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
             רוב האנשים חיים מתוך זהות, פחדים ואמונות
             <br />
             שהותקנו בהם מגיל אפס.
@@ -176,13 +185,14 @@ function Hero({ onStart }: { onStart: () => void }) {
             <span className="text-[hsl(var(--mh-sand))]">מעטים לומדים לכתוב את עצמם מחדש.</span>
           </p>
 
-          <div className="mh-reveal mt-12 flex flex-col gap-4 sm:flex-row sm:gap-5">
+          <div className="mh-reveal mt-14 md:mt-16 flex flex-col gap-4 sm:flex-row sm:gap-5">
             <button onClick={onStart} className="mh-cta-primary">
               התחל את השכתוב
             </button>
           </div>
         </div>
       </div>
+
 
       {/* scroll indicator */}
       <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 mh-reveal">
