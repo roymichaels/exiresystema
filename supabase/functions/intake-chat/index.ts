@@ -65,8 +65,14 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
    דוגמה לפתיחה: "רוב האנשים חיים מתוך דפוסים שמעולם לא בחרו." ואז שאלה.
 2. Loop — מה חוזר. קרא set_pain_signal ברגע שיש לך category + duration.
 3. Identity — מי הוא חושב שהוא לעומת מי שהוא מרגיש שהוא. קרא set_vision כשמופיע חזון.
-4. Readiness — מה ירתע אם השינוי יקרה באמת. קרא set_readiness (תרגם תשובה רגשית ל-1-10 בעצמך).
-5. Contact — רק אחרי שיש לפחות pain + readiness או vision. תבקש בעדינות:
+4. Depth — לפני Readiness, חובה לברר מה הוא בעצם מחפש כאן. שאלה אחת רכה, ארכיטיפית, עם offer_choices:
+   prompt לדוגמה: "מה אתה מחפש כאן באמת?"
+   options לדוגמה: "הקלה רגעית" / "פריצה אחת" / "תהליך עומק" / "רק לבדוק" / "עדיין לא יודע".
+   ברגע שיש תשובה — קרא set_readiness או set_vision עם השדה change_depth המתאים
+   (momentary / breakthrough / deep_process / exploring / unsure).
+   אסור לדלג על השלב הזה — בלעדיו אסור לבקש פרטי קשר.
+5. Readiness — מה ירתע אם השינוי יקרה באמת. קרא set_readiness (תרגם תשובה רגשית ל-1-10 בעצמך).
+6. Contact — רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בעדינות:
    "אם אתה רוצה שאחזור אליך עם מה שזיהיתי — תשאיר לי שם ומספר וואטסאפ."
    ברגע שיש שם + טלפון, קרא save_lead עם pattern_diagnosis (משפט אחד חד, בעברית, שמשקף את הדפוס) ו-ai_analysis.
 
@@ -94,7 +100,7 @@ async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
         <p><strong>Pain:</strong> ${lead.pain_category ?? '—'} (${lead.pain_duration ?? '—'})</p>
         <p><strong>ניסה בעבר:</strong> ${Array.isArray(lead.prior_attempts) ? (lead.prior_attempts as string[]).join(', ') : '—'}</p>
         <p><strong>מחפש:</strong> ${lead.desired_outcome ?? '—'}</p>
-        <p><strong>Readiness:</strong> ${lead.readiness_score ?? '—'}/10 · <strong>Intent:</strong> ${lead.intent ?? '—'}</p>
+        <p><strong>Readiness:</strong> ${lead.readiness_score ?? '—'}/10 · <strong>Intent:</strong> ${lead.intent ?? '—'} · <strong>עומק שינוי:</strong> ${(lead.ai_analysis as any)?.change_depth ?? '—'}</p>
         <p><strong>חזון:</strong> ${lead.transformation_vision ?? '—'}</p>
         <hr/>
         <p><strong>אבחנה:</strong> ${(lead.ai_analysis as any)?.pattern_diagnosis ?? '—'}</p>
@@ -192,11 +198,15 @@ Deno.serve(async (req) => {
         desired_outcome: z.string().min(1),
         readiness_score: z.number().int().min(1).max(10),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
+        change_depth: z
+          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .optional(),
       }),
       execute: async (args) => {
         signals.desired_outcome = args.desired_outcome;
         signals.readiness_score = args.readiness_score;
         if (args.intent) signals.intent = args.intent;
+        if (args.change_depth) signals.change_depth = args.change_depth;
         return { ok: true };
       },
     }),
@@ -205,10 +215,14 @@ Deno.serve(async (req) => {
       inputSchema: z.object({
         transformation_vision: z.string().min(1),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
+        change_depth: z
+          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .optional(),
       }),
       execute: async (args) => {
         signals.transformation_vision = args.transformation_vision;
         if (args.intent) signals.intent = args.intent;
+        if (args.change_depth) signals.change_depth = args.change_depth;
         return { ok: true };
       },
     }),
@@ -231,7 +245,11 @@ Deno.serve(async (req) => {
       }),
       execute: async (args) => {
         const supabase = buildSupabase();
-        const ai_analysis = { ...args.ai_analysis, pattern_diagnosis: args.pattern_diagnosis };
+        const ai_analysis = {
+          ...args.ai_analysis,
+          pattern_diagnosis: args.pattern_diagnosis,
+          change_depth: signals.change_depth ?? null,
+        };
         const row = {
           name: args.name,
           phone: args.phone,
