@@ -375,8 +375,9 @@ const App = () => (
                                                 <Route path="/strategy/:pillar/*" element={<StrategyMazeRedirect />} />
                                                 {renderProtectedRedirectRoutes()}
                                                 <Route path="/arena/:domainId/*" element={<ArenaToAIONRedirect />} />
-                                                {/* Coaches */}
-                                                <Route path="/coaches" element={<CoachesLayoutWrapper />} />
+                                                {/* Coaches → unified into Admin (sole-coach app) */}
+                                                <Route path="/coaches" element={<Navigate to="/admin-hub?tab=coach" replace />} />
+                                                <Route path="/coaches/*" element={<Navigate to="/admin-hub?tab=coach" replace />} />
                                                 {/* Admin Hub */}
                                                 <Route path="/admin-hub" element={<AdminRoute><AdminLayoutWrapper /></AdminRoute>} />
                                                 {/* Launchpad */}
