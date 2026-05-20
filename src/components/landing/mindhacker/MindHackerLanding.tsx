@@ -206,6 +206,15 @@ function LangToggle({ t }: { t: T }) {
       >
         {t('langToggle.en')}
       </button>
+      <span className="h-3 w-px bg-[hsl(var(--mh-line))]" />
+      <button
+        type="button"
+        onClick={() => setLanguage('es')}
+        aria-pressed={language === 'es'}
+        className={`${base} ${language === 'es' ? active : idle}`}
+      >
+        {t('langToggle.es')}
+      </button>
     </div>
   );
 }
