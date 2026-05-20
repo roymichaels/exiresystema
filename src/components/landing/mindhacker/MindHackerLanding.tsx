@@ -56,32 +56,74 @@ function TopBar({ onLogin }: { onLogin: () => void }) {
 function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }) {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <section ref={ref} className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden">
-      <AmbientBackdrop variant="hero" />
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-        <p className="mh-eyebrow mh-reveal mb-10">Exire Systema · פרק ראשון</p>
+    <section
+      ref={ref}
+      className="relative isolate flex min-h-[100svh] items-center overflow-hidden"
+    >
+      {/* Cinematic photograph — full bleed, subject anchored to the right */}
+      <img
+        src={founderHero}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 h-full w-full object-cover object-[85%_center] md:object-[75%_center]"
+        loading="eager"
+        decoding="async"
+      />
 
-        <h1 className="mh-serif mh-reveal text-[2.6rem] leading-[1.08] sm:text-6xl md:text-7xl lg:text-[5.5rem]">
-          התודעה שלך
-          <br />
-          <span className="text-[hsl(var(--mh-sand))]">לא נבנתה</span> על ידך
-        </h1>
+      {/* Cinematic grade — darkens edges, vignettes corners, preserves skin */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(120% 80% at 75% 50%, transparent 0%, hsl(var(--mh-bg) / 0.15) 45%, hsl(var(--mh-bg) / 0.75) 80%, hsl(var(--mh-bg)) 100%)',
+        }}
+      />
+      {/* Negative-space wash over the left so Hebrew typography breathes */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(90deg, hsl(var(--mh-bg) / 0.92) 0%, hsl(var(--mh-bg) / 0.78) 30%, hsl(var(--mh-bg) / 0.35) 55%, transparent 80%)',
+        }}
+      />
+      {/* Bottom fade into next section */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-48"
+        style={{
+          background:
+            'linear-gradient(to bottom, transparent 0%, hsl(var(--mh-bg)) 100%)',
+        }}
+      />
+      {/* Subtle rain/fog grain */}
+      <AmbientBackdrop variant="hero" className="opacity-40" />
 
-        <p className="mh-reveal mx-auto mt-10 max-w-2xl text-[0.98rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
-          רוב האנשים חיים מתוך זהות, פחדים ואמונות
-          <br />
-          שהותקנו בהם מגיל אפס.
-          <br />
-          <span className="text-[hsl(var(--mh-sand))]">מעטים לומדים לכתוב את עצמם מחדש.</span>
-        </p>
+      {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
+      <div className="relative z-10 w-full px-6 md:px-12 lg:px-20">
+        <div className="max-w-xl text-start md:max-w-2xl">
+          <p className="mh-eyebrow mh-reveal mb-8">Exire Systema · פרק ראשון</p>
 
-        <div className="mh-reveal mt-14 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
-          <button onClick={onStart} className="mh-cta-primary">
-            התחל את השכתוב
-          </button>
-          <button onClick={onLogin} className="mh-cta-ghost">
-            כניסה למערכת
-          </button>
+          <h1 className="mh-serif mh-reveal text-[2.4rem] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[5rem]">
+            התודעה שלך
+            <br />
+            <span className="text-[hsl(var(--mh-sand))]">לא נבנתה</span> על ידך
+          </h1>
+
+          <p className="mh-reveal mt-8 max-w-md text-[0.95rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
+            רוב האנשים חיים מתוך זהות, פחדים ואמונות
+            <br />
+            שהותקנו בהם מגיל אפס.
+            <br />
+            <span className="text-[hsl(var(--mh-sand))]">מעטים לומדים לכתוב את עצמם מחדש.</span>
+          </p>
+
+          <div className="mh-reveal mt-12 flex flex-col gap-4 sm:flex-row sm:gap-5">
+            <button onClick={onStart} className="mh-cta-primary">
+              התחל את השכתוב
+            </button>
+            <button onClick={onLogin} className="mh-cta-ghost">
+              כניסה למערכת
+            </button>
+          </div>
         </div>
       </div>
 
