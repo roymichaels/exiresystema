@@ -360,44 +360,32 @@ function ContentSection() {
           {TOPICS.map((topic) => (
             <article
               key={topic.t}
-              className="mh-reveal group relative aspect-[4/5] overflow-hidden bg-[hsl(var(--mh-bg))] transition-colors duration-700 hover:bg-[hsl(var(--mh-bg-2))]"
+              className="mh-reveal group relative aspect-square overflow-hidden bg-[hsl(var(--mh-bg))]"
             >
-              {topic.img ? (
-                <>
-                  <img
-                    src={topic.img}
-                    alt={topic.t}
-                    className="absolute inset-0 h-full w-full object-cover transition-all duration-1000 group-hover:scale-105"
-                  />
-                  {/* Soft vignette only — no bottom darkening so in-image Hebrew text stays readable */}
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at center, transparent 65%, rgba(5,3,12,0.18) 100%)',
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
-                    }}
-                  />
-                  <div className="absolute inset-0 flex flex-col justify-between p-8">
-                    <span dir="ltr" className="mh-serif text-xl text-[hsl(var(--mh-sand))]">
-                      {topic.tag}
-                    </span>
-                    <div>
-                      <div className="mb-4 h-px w-8 bg-[hsl(var(--mh-line))] transition-all duration-700 group-hover:w-20 group-hover:bg-[hsl(var(--mh-sand))]" />
-                      <h3 className="mh-serif text-3xl md:text-4xl">{topic.t}</h3>
-                    </div>
-                  </div>
-                </>
+              {topic.img && (
+                <img
+                  src={topic.img}
+                  alt={topic.t}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+                  loading="lazy"
+                  decoding="async"
+                />
               )}
+              {/* Cinematic bottom gradient for readability */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    'linear-gradient(to top, rgba(5,3,12,0.92) 0%, rgba(5,3,12,0.55) 35%, rgba(5,3,12,0.05) 65%, transparent 100%)',
+                }}
+              />
+              {/* Caption */}
+              <div className="absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-4 p-5 md:p-6">
+                <h3 className="mh-serif text-2xl text-[hsl(var(--mh-ink))] md:text-3xl">{topic.t}</h3>
+                <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-sand))]/80 md:text-lg">
+                  {topic.tag}
+                </span>
+              </div>
             </article>
           ))}
         </div>
