@@ -15,9 +15,10 @@ import topicHypnosis from '@/assets/topic-hypnosis.jpg';
 import topicShadowWork from '@/assets/topic-shadow-work.jpg';
 import topicControlSystems from '@/assets/topic-control-systems.jpg';
 import topicSovereignty from '@/assets/topic-sovereignty.jpg';
+import exireSigil from '@/assets/exire-sigil.png';
 import './theme.css';
 
-const BRAND = 'מיינד האקר';
+const BRAND = 'EXIRE SYSTEMA';
 
 export default function MindHackerLanding() {
   const [intakeOpen, setIntakeOpen] = useState(false);
