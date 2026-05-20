@@ -10,14 +10,10 @@ import { DefaultChatTransport } from 'ai';
 import { X, ArrowUp } from 'lucide-react';
 import OrbView from '@/components/orb/v2/OrbView';
 import { HOLO_AION_PROFILE } from './holoAionProfile';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslation, type Language } from '@/i18n';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/aion-landing-chat`;
-
-const SUGGESTIONS = [
-  'מה זה Exire Systema?',
-  'מה ההבדל בין היפנוזה רגילה לעבודה שלך?',
-  'איך מתחילים?',
-];
 
 interface Props {
   open: boolean;
@@ -26,13 +22,17 @@ interface Props {
 }
 
 export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Props) {
+  const { language, isRTL } = useLanguage();
+  const t = (key: string) => getTranslation(language, `landing.chat.${key}`);
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: ENDPOINT,
         headers: { 'Content-Type': 'application/json' },
+        body: { language },
       }),
-    [],
+    [language],
   );
 
   const { messages, sendMessage, status, error } = useChat({ transport });
