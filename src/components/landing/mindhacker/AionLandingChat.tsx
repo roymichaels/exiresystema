@@ -90,44 +90,50 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
         className="absolute inset-y-0 end-0 flex w-full flex-col border-s border-[hsl(var(--mh-line))] bg-[hsl(var(--mh-bg))] sm:max-w-md"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        {/* Header */}
-        <header className="flex items-center justify-between border-b border-[hsl(var(--mh-line))] px-5 py-4">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-9 w-9 items-center justify-center">
-              <span
-                aria-hidden
-                className="absolute inset-[-4px] rounded-full"
-                style={{
-                  background:
-                    'radial-gradient(circle, hsl(var(--mh-sand) / 0.3) 0%, transparent 70%)',
-                }}
-              />
-              <OrbView
-                size={36}
-                state="idle"
-                tier="presence"
-                profile={HOLO_AION_PROFILE}
-                className="relative h-9 w-9"
-                ariaLabel=""
-              />
-            </span>
-            <div className="flex flex-col">
-              <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-ink))]">
-                AION
-              </span>
-              <span className="mh-eyebrow text-[0.55rem] text-[hsl(var(--mh-mute))]">
-                שואל על הדף הזה
-              </span>
-            </div>
-          </div>
+        {/* Header — entity-style profile */}
+        <header className="relative border-b border-[hsl(var(--mh-line))] px-5 pb-5 pt-6">
           <button
             type="button"
             aria-label="סגור שיחה"
             onClick={() => onOpenChange(false)}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[hsl(var(--mh-mute))] transition-colors hover:bg-[hsl(var(--mh-bg-2))] hover:text-[hsl(var(--mh-ink))]"
+            className="absolute start-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-[hsl(var(--mh-mute))] transition-colors hover:bg-[hsl(var(--mh-bg-2))] hover:text-[hsl(var(--mh-ink))]"
           >
             <X className="h-4 w-4" />
           </button>
+
+          <div className="flex flex-col items-center gap-3">
+            <span className="relative flex h-20 w-20 items-center justify-center">
+              <span
+                aria-hidden
+                className="absolute inset-[-14px] rounded-full animate-pulse"
+                style={{
+                  background:
+                    'radial-gradient(circle, hsl(var(--mh-sand) / 0.35) 0%, hsl(280 70% 60% / 0.18) 45%, transparent 75%)',
+                  filter: 'blur(6px)',
+                }}
+              />
+              <OrbView
+                size={80}
+                state="idle"
+                tier="presence"
+                profile={HOLO_AION_PROFILE}
+                className="relative h-20 w-20"
+                ariaLabel="AION"
+              />
+            </span>
+            <div className="flex flex-col items-center gap-1">
+              <span dir="ltr" className="mh-serif text-xl leading-none text-[hsl(var(--mh-ink))]">
+                AION
+              </span>
+              <span className="flex items-center gap-1.5 text-[0.7rem] text-[hsl(var(--mh-mute))]">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+                  <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                </span>
+                כאן, מקשיב לך
+              </span>
+            </div>
+          </div>
         </header>
 
         {/* Messages */}
