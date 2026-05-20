@@ -322,34 +322,39 @@ function ContentSection() {
                   <img
                     src={topic.img}
                     alt={topic.t}
-                    className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-1000 group-hover:opacity-90 group-hover:scale-105"
+                    className="absolute inset-0 h-full w-full object-cover transition-all duration-1000 group-hover:scale-105"
                   />
+                  {/* Stronger cinematic bottom-fade for readability of in-image text */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(to top, rgba(5,3,12,0.78) 0%, rgba(5,3,12,0.35) 50%, transparent 100%)',
+                    }}
+                  />
+                  {/* Purple accent line — preserved */}
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 h-px w-10 bg-[hsl(var(--mh-accent,260_70%_60%))] opacity-80 transition-all duration-700 group-hover:w-16" />
+                </>
+              ) : (
+                <>
                   <div
                     className="absolute inset-0"
                     style={{
                       background:
-                        'linear-gradient(to top, hsl(var(--mh-bg)) 0%, hsla(0,0%,0%,0.2) 50%, transparent 100%)',
+                        'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
                     }}
                   />
+                  <div className="absolute inset-0 flex flex-col justify-between p-8">
+                    <span dir="ltr" className="mh-serif text-xl text-[hsl(var(--mh-sand))]">
+                      {topic.tag}
+                    </span>
+                    <div>
+                      <div className="mb-4 h-px w-8 bg-[hsl(var(--mh-line))] transition-all duration-700 group-hover:w-20 group-hover:bg-[hsl(var(--mh-sand))]" />
+                      <h3 className="mh-serif text-3xl md:text-4xl">{topic.t}</h3>
+                    </div>
+                  </div>
                 </>
-              ) : (
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
-                  }}
-                />
               )}
-              <div className="absolute inset-0 flex flex-col justify-between p-8">
-                <span dir="ltr" className="mh-serif text-xl text-[hsl(var(--mh-sand))]">
-                  {topic.tag}
-                </span>
-                <div>
-                  <div className="mb-4 h-px w-8 bg-[hsl(var(--mh-line))] transition-all duration-700 group-hover:w-20 group-hover:bg-[hsl(var(--mh-sand))]" />
-                  <h3 className="mh-serif text-3xl md:text-4xl">{topic.t}</h3>
-                </div>
-              </div>
             </article>
           ))}
         </div>
