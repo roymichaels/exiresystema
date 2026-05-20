@@ -55,17 +55,18 @@ export function ConsciousnessField({ intense = false }: Props) {
 
     // Particles drift gently upward and sideways; a few "stars" stay nearly still.
     const particles = Array.from({ length: COUNT }, () => {
-      const r = Math.random() * 1.3 + 0.25;
+      const r = Math.random() * 1.6 + 0.35;
       return {
         x: Math.random() * w,
         y: Math.random() * h,
         r,
-        // Slow vertical drift; tiny horizontal sway via sine.
-        vy: Math.random() * 0.15 + 0.02,
-        sway: Math.random() * 0.35 + 0.05,
+        // Slow upward drift; tiny horizontal sway via sine.
+        vy: Math.random() * 0.22 + 0.05,
+        sway: Math.random() * 0.5 + 0.1,
         phase: Math.random() * Math.PI * 2,
-        // Faint sand-tinted glow; bigger particles = brighter.
-        a: Math.min(0.55, 0.12 + r * 0.18),
+        twinklePhase: Math.random() * Math.PI * 2,
+        // Brighter base + twinkle on top.
+        a: Math.min(0.85, 0.28 + r * 0.22),
       };
     });
 
