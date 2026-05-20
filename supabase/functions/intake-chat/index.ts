@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
         transformation_vision: z.string().min(1),
         intent: z.enum(['start_process', 'exploring', 'curious']).optional(),
         change_depth: z
-          .enum(['momentary', 'breakthrough', 'deep_process', 'exploring', 'unsure'])
+          .enum(['momentary', 'breakthrough', 'deep_process', 'long_term', 'exploring', 'unsure'])
           .optional(),
       }),
       execute: async (args) => {
