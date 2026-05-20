@@ -177,9 +177,17 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 md:px-10 shrink-0">
-        <div className="flex items-center gap-3">
-          <span className="block h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
-          <span className="mh-eyebrow opacity-70">AION</span>
+        <div className="flex items-center gap-2.5">
+          <img
+            src="/exire-sigil.png"
+            alt=""
+            aria-hidden
+            className="h-6 w-6 object-contain opacity-80 mix-blend-screen"
+            style={{ filter: 'brightness(1.2) drop-shadow(0 0 6px rgba(180,150,255,0.25))' }}
+          />
+          <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/70 text-[0.6rem]">
+            EXIRE SYSTEMA
+          </span>
         </div>
         <button
           onClick={tryClose}

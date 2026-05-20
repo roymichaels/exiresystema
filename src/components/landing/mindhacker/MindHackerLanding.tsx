@@ -15,9 +15,10 @@ import topicHypnosis from '@/assets/topic-hypnosis.jpg';
 import topicShadowWork from '@/assets/topic-shadow-work.jpg';
 import topicControlSystems from '@/assets/topic-control-systems.jpg';
 import topicSovereignty from '@/assets/topic-sovereignty.jpg';
+import exireSigil from '@/assets/exire-sigil.png';
 import './theme.css';
 
-const BRAND = 'מיינד האקר';
+const BRAND = 'EXIRE SYSTEMA';
 
 export default function MindHackerLanding() {
   const [intakeOpen, setIntakeOpen] = useState(false);
@@ -81,12 +82,15 @@ function TopBar() {
   return (
     <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
       <div className="flex items-center gap-3">
-        <span className="block h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
-        <span className="mh-eyebrow">{BRAND}</span>
+        <img
+          src={exireSigil}
+          alt=""
+          aria-hidden
+          className="h-7 w-7 object-contain opacity-90 mix-blend-screen"
+          style={{ filter: 'brightness(1.2) contrast(1.1) drop-shadow(0 0 6px rgba(180,150,255,0.25))' }}
+        />
+        <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/85">{BRAND}</span>
       </div>
-      <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-sand))]/60">
-        Powered by AION
-      </span>
     </header>
   );
 }
@@ -356,44 +360,32 @@ function ContentSection() {
           {TOPICS.map((topic) => (
             <article
               key={topic.t}
-              className="mh-reveal group relative aspect-[4/5] overflow-hidden bg-[hsl(var(--mh-bg))] transition-colors duration-700 hover:bg-[hsl(var(--mh-bg-2))]"
+              className="mh-reveal group relative aspect-square overflow-hidden bg-[hsl(var(--mh-bg))]"
             >
-              {topic.img ? (
-                <>
-                  <img
-                    src={topic.img}
-                    alt={topic.t}
-                    className="absolute inset-0 h-full w-full object-cover transition-all duration-1000 group-hover:scale-105"
-                  />
-                  {/* Soft vignette only — no bottom darkening so in-image Hebrew text stays readable */}
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at center, transparent 65%, rgba(5,3,12,0.18) 100%)',
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
-                    }}
-                  />
-                  <div className="absolute inset-0 flex flex-col justify-between p-8">
-                    <span dir="ltr" className="mh-serif text-xl text-[hsl(var(--mh-sand))]">
-                      {topic.tag}
-                    </span>
-                    <div>
-                      <div className="mb-4 h-px w-8 bg-[hsl(var(--mh-line))] transition-all duration-700 group-hover:w-20 group-hover:bg-[hsl(var(--mh-sand))]" />
-                      <h3 className="mh-serif text-3xl md:text-4xl">{topic.t}</h3>
-                    </div>
-                  </div>
-                </>
+              {topic.img && (
+                <img
+                  src={topic.img}
+                  alt={topic.t}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+                  loading="lazy"
+                  decoding="async"
+                />
               )}
+              {/* Cinematic bottom gradient for readability */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    'linear-gradient(to top, rgba(5,3,12,0.92) 0%, rgba(5,3,12,0.55) 35%, rgba(5,3,12,0.05) 65%, transparent 100%)',
+                }}
+              />
+              {/* Caption */}
+              <div className="absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-4 p-5 md:p-6">
+                <h3 className="mh-serif text-2xl text-[hsl(var(--mh-ink))] md:text-3xl">{topic.t}</h3>
+                <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-sand))]/80 md:text-lg">
+                  {topic.tag}
+                </span>
+              </div>
             </article>
           ))}
         </div>
@@ -435,19 +427,22 @@ function FinalCTA({ onStart }: { onStart: () => void }) {
 
 function Footer() {
   return (
-    <footer className="relative border-t border-[hsl(var(--mh-line))] py-10">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-center md:flex-row md:text-start">
-        <div className="flex items-center gap-3">
-          <span className="block h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))]" />
-          <span className="mh-eyebrow">{BRAND}</span>
-        </div>
-        <p className="mh-eyebrow text-[0.65rem]">
-          Exire Systema · כל הזכויות שמורות
+    <footer className="relative border-t border-[hsl(var(--mh-line))] py-12">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 text-center">
+        <img
+          src={exireSigil}
+          alt="Exire Systema"
+          className="h-12 w-12 object-contain opacity-70 mix-blend-screen"
+          style={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
+        />
+        <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/80">
+          {BRAND}
+        </span>
+        <p className="mh-eyebrow text-[0.6rem] text-[hsl(var(--mh-mute))]">
+          תהליך אישי לבנייה מחדש של התודעה · כל הזכויות שמורות
         </p>
-      </div>
-      <div className="mx-auto mt-6 max-w-6xl px-6 text-center">
-        <span dir="ltr" className="mh-eyebrow text-[0.6rem] tracking-[0.42em] text-[hsl(var(--mh-sand))]/55">
-          ⌁ Powered by AION
+        <span dir="ltr" className="mh-eyebrow text-[0.55rem] tracking-[0.5em] text-[hsl(var(--mh-sand))]/35">
+          built on aion
         </span>
       </div>
     </footer>
