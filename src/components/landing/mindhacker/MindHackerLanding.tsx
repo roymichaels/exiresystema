@@ -78,7 +78,7 @@ export default function MindHackerLanding() {
         <SystemSection t={t} />
         <WhatIDoSection t={t} />
         <MethodSection t={t} />
-        <ContentSection t={t} />
+        <ContentSection t={t} language={language} />
         <FinalCTA t={t} onStart={startIntake} />
       </main>
       <Footer t={t} />
