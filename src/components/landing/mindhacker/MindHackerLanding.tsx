@@ -129,9 +129,9 @@ function AionFloatingWidget({ t, onOpen, hidden }: { t: T; onOpen: () => void; h
         />
         <OrbView
           size={40}
-          identity="aion"
           state="idle"
           tier="presence"
+          profile={HOLO_AION_PROFILE}
           className="relative h-10 w-10"
           ariaLabel=""
         />
