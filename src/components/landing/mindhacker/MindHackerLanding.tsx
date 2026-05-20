@@ -17,7 +17,6 @@ export default function MindHackerLanding() {
   const [intakeOpen, setIntakeOpen] = useState(false);
 
   const startIntake = () => setIntakeOpen(true);
-  const openLogin = () => openAuthModal('login');
 
   return (
     <div className="mindhacker-theme min-h-screen" dir="rtl" lang="he">
@@ -38,16 +37,13 @@ export default function MindHackerLanding() {
 
 /* ─────────────── Top bar ─────────────── */
 
-function TopBar({ onLogin }: { onLogin: () => void }) {
+function TopBar() {
   return (
-    <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
+    <header className="absolute inset-x-0 top-0 z-30 flex items-center px-6 py-6 md:px-12">
       <div className="flex items-center gap-3">
         <span className="block h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] mh-breathe" />
         <span className="mh-eyebrow">{BRAND}</span>
       </div>
-      <button onClick={onLogin} className="mh-eyebrow hover:text-[hsl(var(--mh-ink))] transition-colors">
-        כניסה
-      </button>
     </header>
   );
 }
@@ -122,9 +118,6 @@ function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }
           <div className="mh-reveal mt-12 flex flex-col gap-4 sm:flex-row sm:gap-5">
             <button onClick={onStart} className="mh-cta-primary">
               התחל את השכתוב
-            </button>
-            <button onClick={onLogin} className="mh-cta-ghost">
-              כניסה למערכת
             </button>
           </div>
         </div>
