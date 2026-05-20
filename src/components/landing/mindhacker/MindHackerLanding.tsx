@@ -51,8 +51,11 @@ import exireSigilWebp from '@/assets/exire-sigil.webp';
 import './theme.css';
 
 // Lazy: keep modal/chat off the critical path
-const IntakeChatModal = lazy(() => import('./intake/IntakeChatModal'));
-const AionLandingChat = lazy(() => import('./AionLandingChat'));
+const intakeModalImport = () => import('./intake/IntakeChatModal');
+const aionChatImport = () => import('./AionLandingChat');
+const IntakeChatModal = lazy(intakeModalImport);
+const AionLandingChat = lazy(aionChatImport);
+
 
 const HERO_LQIP =
   'data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAwBACdASoYAA4APxFysFCsJqSisAgBgCIJZwDKABbB2R10ASTKDZr8sAAA/iLu22/Sl3hWKsEzIQUYEUmesH7h4tyL9gMjnEIhYTyLq49v9kIBNCHDq5fJgAA=';
