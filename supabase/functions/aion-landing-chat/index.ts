@@ -41,9 +41,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'LOVABLE_API_KEY missing' }), {
+    const openrouterKey = Deno.env.get('OPENROUTER_API_KEY');
+    const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+    const useOpenRouter = !!openrouterKey;
+
+    if (!useOpenRouter && !lovableKey) {
+      return new Response(JSON.stringify({ error: 'No AI key configured' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -59,17 +62,31 @@ Deno.serve(async (req) => {
       });
     }
 
-    const gateway = createOpenAICompatible({
-      name: 'lovable',
-      baseURL: 'https://ai.gateway.lovable.dev/v1',
-      headers: {
-        'Lovable-API-Key': apiKey,
-        'X-Lovable-AIG-SDK': 'vercel-ai-sdk',
-      },
-    });
+    const gateway = useOpenRouter
+      ? createOpenAICompatible({
+          name: 'openrouter',
+          baseURL: 'https://openrouter.ai/api/v1',
+          headers: {
+            Authorization: `Bearer ${openrouterKey}`,
+            'HTTP-Referer': 'https://mind-hacker.net',
+            'X-Title': 'AION',
+          },
+        })
+      : createOpenAICompatible({
+          name: 'lovable',
+          baseURL: 'https://ai.gateway.lovable.dev/v1',
+          headers: {
+            'Lovable-API-Key': lovableKey!,
+            'X-Lovable-AIG-SDK': 'vercel-ai-sdk',
+          },
+        });
+
+    const modelId = useOpenRouter
+      ? 'google/gemini-2.5-flash'
+      : 'google/gemini-3-flash-preview';
 
     const result = streamText({
-      model: gateway('google/gemini-3-flash-preview'),
+      model: gateway(modelId),
       system: SYSTEM_PROMPT,
       messages: await convertToModelMessages(messages),
     });
