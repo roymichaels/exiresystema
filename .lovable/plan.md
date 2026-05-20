@@ -1,70 +1,86 @@
-## Status of email infrastructure
+## Findings (root causes)
 
-- `RESEND_API_KEY` is **already configured** in the project.
-- `intake-chat` already calls Resend to notify the founder, but the recipient address, sender, and template are hardcoded — none of it is editable from admin.
-- There is no auto-reply to the lead, no per-lead manual send, no broadcast.
+The landing currently ships **~22 MB of raw images** for a single page on a mobile-first audience, plus three overlapping background systems running at once:
 
-## What I'll build
+| Asset | Size | Problem |
+|---|---|---|
+| `exire-sigil.png` | 2.5 MB | Used as small clipped logo. Should be inline SVG / 64 px WebP. |
+| `founder-hero.jpg` / `founder-portrait.jpg` | 2.0 + 1.8 MB | Hero only needs ~1600 px wide AVIF (~120 KB). |
+| 6 × `topic-*.jpg` | ~1.6–2.0 MB each (≈11 MB total) | Below-the-fold cards loaded eagerly. |
+| `aion-logo/aion-icon/aion-orb/apple-touch-icon/logo.png` | 0.5–0.9 MB each | Many are 1024² PNGs used at 32–64 px. |
+| Background layers | — | `ConsciousnessField.tsx` (Canvas2D), `ConsciousnessFieldGL.tsx` (WebGL), `AmbientBackdrop.tsx` (DOM fog/gradients) all coexist. |
+| Logo wordmark | — | "MindHacker" / duplicate "Powered by AION" pills still visible. |
 
-### 1. New `email_settings` table (single-row config, admin-only)
-Stored in DB so it can be edited live from the admin panel. Fields:
-- `from_name`, `from_email` (default: `Exire Systema <noreply@exiresystema.com>`)
-- `reply_to_email`
-- `admin_notify_email` (default: current `FOUNDER_NOTIFY_EMAIL`)
-- `admin_notify_enabled` (bool)
-- `auto_reply_enabled` (bool)
-- `admin_notify_subject`, `admin_notify_html` (template with `{{name}} {{phone}} {{email}} {{intent}} {{pattern_diagnosis}}` variables)
-- `auto_reply_subject`, `auto_reply_html` (template with `{{name}}`)
-- `broadcast_default_subject`, `broadcast_default_html`
+Also: no `loading="lazy"`, no `decoding="async"`, no width/height (CLS), no preload hint on the LCP image, and the dev server eagerly compiles all of the above on first paint.
 
-RLS: select/update restricted to admins via `has_role(auth.uid(), 'admin')`.
+## What I'll do
 
-### 2. One unified edge function: `send-lead-email`
-Single entry point used by everything:
-- `mode: "admin_notify"` — fired by `intake-chat` after a lead is saved
-- `mode: "auto_reply"` — fired by `intake-chat` when lead provided email
-- `mode: "manual"` — admin sends a custom email to one lead from the Leads page
-- `mode: "broadcast"` — admin sends to all leads matching filters (status, source)
+### 1. Image pipeline (the biggest win — ~90% smaller payload)
+- Add **`vite-imagetools`** to the Vite config so imports can request `?format=avif&w=1600` / `?format=webp&w=1600` at build time. No new CDN, no runtime cost.
+- Re-encode the **8 large JPG/PNG assets** at the sandbox using `sharp` and commit them as `.avif` + `.webp` siblings:
+  - `founder-hero` → 1600 w AVIF + WebP (~120 KB / ~180 KB)
+  - `founder-portrait` → 1200 w AVIF + WebP
+  - 6 × `topic-*` → 900 w AVIF + WebP
+  - `exire-sigil` → re-trace as **inline SVG** (used everywhere; PNG dropped entirely)
+  - `aion-logo/aion-icon/aion-orb/logo` → 256 w WebP + delete oversized PNGs from `public/` (PWA icons stay at 192/512)
+- New tiny **`<Picture>` component** (`<picture><source type=avif><source type=webp><img>`) with `loading`, `decoding`, `width`, `height`, `sizes` and a blurred LQIP placeholder (base64, ~400 B per image generated at build).
 
-Function loads `email_settings` from DB, renders the template (simple `{{var}}` interpolation, all values escaped), sends via Resend through the connector gateway, and logs every send into a new `email_send_log` table (recipient, mode, subject, status, error, lead_id, sent_at) — visible in the admin panel.
+### 2. Loading strategy
+- **Preload only the hero AVIF** via `<link rel="preload" as="image" imagesrcset>` in `index.html`. `fetchpriority="high"` on the hero `<img>`.
+- Everything below the fold (`founder-portrait`, all `topic-*`, AION chat panel, intake modal) → `loading="lazy"` + `decoding="async"`.
+- New **`useReveal()` hook** using `IntersectionObserver` + `prefers-reduced-motion`, applies a 350 ms staggered fade/slide reveal to sections and cards. Stagger keeps the cinematic feel without simultaneous paints.
 
-JWT verification on for manual/broadcast (admin only); off for the intake-chat-triggered modes (called server-side).
+### 3. Background system consolidation (the biggest perf win after images)
+- **Delete `ConsciousnessField.tsx` and `AmbientBackdrop.tsx`.** Keep only `ConsciousnessFieldGL.tsx`, and slim it down:
+  - Single shared OGL/Three scene at **DPR capped at 1.5**, **paused via `IntersectionObserver` + `document.visibilityState`**.
+  - Reduce particles to ~80 on mobile / ~180 on desktop (gated by `matchMedia('(max-width: 768px)')` and `navigator.hardwareConcurrency`).
+  - Replace DOM "fog" PNG overlays with CSS `radial-gradient` + a single 1 KB SVG noise tile + `backdrop-filter: blur()` only on text panels (never full-screen).
+  - Respect `prefers-reduced-motion` → static gradient + grain only.
 
-### 3. Update `intake-chat`
-Replace the inline `notifyFounder` with two calls to `send-lead-email` (`admin_notify` + `auto_reply` when an email exists), so all email behavior is driven by `email_settings`.
+### 4. Hero refinements (no visual regression)
+- One optimized `founder-hero` `<Picture>` as the LCP image.
+- Dark vignette + soft purple glow via CSS, **no stacked overlays**.
+- Explicit `aspect-ratio` on hero container → zero CLS.
+- "EXIRE SYSTEMA" stays; "MindHacker" wordmark and duplicate "Powered by AION" chips removed (sigil + small AION pill in the header is the only AION surface).
 
-### 4. New admin tab: **Settings → Emails**
-Added to `ADMIN_TABS` (sub-tab of Settings, or a new tab depending on the existing structure). Three sections:
+### 5. CSS / paint cost
+- Drop `box-shadow` on cards in favor of 1 px borders + subtle inner gradient.
+- Limit `backdrop-filter` to ≤ 2 elements per viewport.
+- Cards use `will-change: opacity, transform` only during reveal animation, removed after.
+- Tailwind purge already on, but I'll also remove unused gradient utilities introduced in earlier passes.
 
-1. **Sender & recipients** — From name, From email, Reply-to, Admin notify recipient.
-2. **Toggles** — Enable/disable admin notify, auto-reply.
-3. **Templates** — Subject + HTML body editors for each of: admin notify, auto-reply, broadcast default. Live "Available variables" hint and a **Send test** button (sends the rendered template to the admin's email).
+### 6. Branding cleanup
+- Search/replace `MindHacker` strings (Hebrew header chip + footer) → either removed or replaced with `EXIRE SYSTEMA`.
+- Remove dev/debug overlays (`ShellV2MountDebug` style) from the landing render tree if any still mount on `/`.
+- Single AION presence: one tiny pill ("שיחה עם AION") in the header, nothing else on the landing.
 
-All fields save back to `email_settings` (no redeploy needed).
+## Targets
 
-### 5. Enhance the admin **Leads** page
-- New **"Send email"** button per lead → opens a dialog (recipient prefilled, subject + body editable, starts from auto-reply template), POSTs to `send-lead-email` with `mode: "manual"`.
-- New **"Broadcast"** button at the top → dialog with status/source filters, subject + body editors prefilled from broadcast template, confirm count, POSTs with `mode: "broadcast"`.
-- New **Email log** sub-tab showing recent sends from `email_send_log` with status badges.
-
-### 6. From-address note
-You picked `noreply@exiresystema.com`. For Resend to actually deliver from that address you need to verify `exiresystema.com` in your Resend dashboard (SPF/DKIM records). I'll make the field editable so:
-- Until verification is complete, you can temporarily set it to `onboarding@resend.dev` from the admin panel and emails will still flow.
-- Once verified, change the From field in Settings → Emails — no redeploy needed.
-
-I'll surface a small warning banner in the admin Emails tab if the From domain isn't `resend.dev` and a test send fails with a domain-verification error.
+| Metric (mobile, 4G) | Now (est.) | After |
+|---|---|---|
+| Transfer size (landing) | ~22 MB | **≤ 600 KB** |
+| LCP image | 2.0 MB JPG | **~120 KB AVIF** |
+| LCP | ~6–8 s | **≤ 2.0 s** |
+| CLS | visible jumps | **0** |
+| Background FPS (iPhone, low-power) | drops | **steady 60 fps**, paused off-screen |
 
 ## Files touched
 
-- Migration: create `email_settings` (with sane defaults), `email_send_log`, RLS policies.
-- New: `supabase/functions/send-lead-email/index.ts`
-- Edited: `supabase/functions/intake-chat/index.ts` (replace notifyFounder)
-- New: `src/pages/admin/EmailSettings.tsx` + register in `src/domain/admin/tabConfig.ts`
-- Edited: `src/pages/admin/Leads.tsx` (per-lead Send + Broadcast dialogs, email log view)
-- New hook: `src/hooks/admin/useEmailSettings.ts`
+- `vite.config.ts` — add `vite-imagetools`.
+- `package.json` — add `vite-imagetools` (and `sharp` as devDep for the one-shot re-encode script).
+- `scripts/optimize-assets.mjs` (new, one-shot) — generates `.avif` + `.webp` + LQIP base64 for every asset in `src/assets/`.
+- `src/components/ui/Picture.tsx` (new) — `<picture>` wrapper with LQIP + lazy + width/height.
+- `src/hooks/useReveal.ts` (new) — IntersectionObserver reveal with stagger + reduced-motion.
+- `src/components/landing/mindhacker/MindHackerLanding.tsx` — swap `<img>`/`<div bg>` for `<Picture>`, add reveals, drop duplicate branding.
+- `src/components/landing/mindhacker/ConsciousnessFieldGL.tsx` — DPR clamp, particle gating, pause hooks, removed PNG overlays.
+- **Delete** `ConsciousnessField.tsx`, `AmbientBackdrop.tsx`, oversized `public/*.png` duplicates, raw `src/assets/topic-*.jpg` originals (replaced with `.avif`/`.webp`).
+- `index.html` — preload hero AVIF, drop unused preconnects, keep PWA icons.
+- `src/components/landing/mindhacker/intake/IntakeChatModal.tsx` — code-split via `React.lazy` so it doesn't block first paint.
 
-## Out of scope (ask before adding)
+## Out of scope (will not touch unless asked)
+- The authenticated app shell (`/app`, `/worlds/…`), admin panel, onboarding ceremony — performance pass is **landing-only** for this turn.
+- AI/edge-function logic.
+- Email/lead system (already approved separately).
+- Replacing OGL/Three with a custom shader from scratch — only tuning the existing one.
 
-- Scheduled/drip campaigns
-- Visual template builder (we ship HTML + variable hints)
-- Switching to Lovable's managed email system (you already use Resend directly — keeping it)
+If you approve, I'll execute everything in one pass and verify with a final build-size check before handing back.
