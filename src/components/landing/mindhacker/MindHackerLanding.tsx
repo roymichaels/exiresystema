@@ -13,16 +13,15 @@ import './theme.css';
 const BRAND = 'מיינד האקר';
 
 export default function MindHackerLanding() {
-  const { openAuthModal } = useAuthModal();
   const [intakeOpen, setIntakeOpen] = useState(false);
 
   const startIntake = () => setIntakeOpen(true);
 
   return (
     <div className="mindhacker-theme min-h-screen" dir="rtl" lang="he">
-      <TopBar onLogin={openLogin} />
+      <TopBar />
       <main>
-        <Hero onStart={startIntake} onLogin={openLogin} />
+        <Hero onStart={startIntake} />
         <SystemSection />
         <WhatIDoSection />
         <MethodSection />
@@ -50,7 +49,7 @@ function TopBar() {
 
 /* ─────────────── 1. Hero ─────────────── */
 
-function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }) {
+function Hero({ onStart }: { onStart: () => void }) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <section
