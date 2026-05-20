@@ -139,6 +139,17 @@ function TopBar() {
           }}
         />
       </div>
+      <p
+        dir="ltr"
+        className="mt-3 text-[0.6rem] md:text-[0.65rem] font-light text-[hsl(var(--mh-ink)/0.7)]"
+        style={{
+          fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
+          letterSpacing: '0.55em',
+          textIndent: '0.55em',
+        }}
+      >
+        EXIRE SYSTEMA
+      </p>
     </header>
   );
 }
