@@ -5955,45 +5955,72 @@ export type Database = {
       leads: {
         Row: {
           affiliate_code: string | null
+          ai_analysis: Json
           contacted_at: string | null
           contacted_by: string | null
+          conversation: Json
           created_at: string
+          desired_outcome: string | null
           email: string | null
           id: string
+          intent: string | null
           name: string
           notes: string | null
+          pain_category: string | null
+          pain_duration: string | null
           phone: string
           preferred_time: string | null
+          prior_attempts: string[] | null
+          readiness_score: number | null
           source: string
           status: string
+          transformation_vision: string | null
         }
         Insert: {
           affiliate_code?: string | null
+          ai_analysis?: Json
           contacted_at?: string | null
           contacted_by?: string | null
+          conversation?: Json
           created_at?: string
+          desired_outcome?: string | null
           email?: string | null
           id?: string
+          intent?: string | null
           name: string
           notes?: string | null
+          pain_category?: string | null
+          pain_duration?: string | null
           phone: string
           preferred_time?: string | null
+          prior_attempts?: string[] | null
+          readiness_score?: number | null
           source?: string
           status?: string
+          transformation_vision?: string | null
         }
         Update: {
           affiliate_code?: string | null
+          ai_analysis?: Json
           contacted_at?: string | null
           contacted_by?: string | null
+          conversation?: Json
           created_at?: string
+          desired_outcome?: string | null
           email?: string | null
           id?: string
+          intent?: string | null
           name?: string
           notes?: string | null
+          pain_category?: string | null
+          pain_duration?: string | null
           phone?: string
           preferred_time?: string | null
+          prior_attempts?: string[] | null
+          readiness_score?: number | null
           source?: string
           status?: string
+          transformation_vision?: string | null
         }
         Relationships: []
       }
