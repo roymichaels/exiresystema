@@ -115,7 +115,7 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
               <OrbView
                 size={80}
                 state="idle"
-                tier="presence"
+                tier="cinematic"
                 profile={HOLO_AION_PROFILE}
                 className="relative h-20 w-20"
                 ariaLabel="AION"
