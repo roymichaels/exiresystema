@@ -5390,7 +5390,7 @@ export const he = {
     },
     landing: {
       header: { brand: 'EXIRE SYSTEMA' },
-      widget: { chatLabel: 'chat with aion', aria: 'פתח שיחה עם AION' },
+      widget: { chatLabel: 'chat with aion', brand: 'AION', invite: 'התחל שיחה', aria: 'פתח שיחה עם AION' },
       langToggle: { aria: 'החלף שפה', he: 'HE', en: 'EN' },
       hero: {
         eyebrow: 'פרק ראשון',
