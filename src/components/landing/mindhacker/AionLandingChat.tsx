@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { X, ArrowUp } from 'lucide-react';
+import OrbView from '@/components/orb/v2/OrbView';
+import { HOLO_AION_PROFILE } from './holoAionProfile';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/aion-landing-chat`;
 
