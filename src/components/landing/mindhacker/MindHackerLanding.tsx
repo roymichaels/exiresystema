@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import IntakeChatModal from './intake/IntakeChatModal';
+import AionLandingChat from './AionLandingChat';
 import founderHero from '@/assets/founder-hero.jpg';
 import founderPortrait from '@/assets/founder-portrait.jpg';
 import topicConsciousness from '@/assets/topic-consciousness.jpg';
@@ -20,8 +21,10 @@ const BRAND = 'מיינד האקר';
 
 export default function MindHackerLanding() {
   const [intakeOpen, setIntakeOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const startIntake = () => setIntakeOpen(true);
+  const openChat = () => setChatOpen(true);
 
   return (
     <div className="mindhacker-theme min-h-screen" dir="rtl" lang="he">
@@ -35,7 +38,12 @@ export default function MindHackerLanding() {
         <FinalCTA onStart={startIntake} />
       </main>
       <Footer />
-      <AionFloatingWidget onOpen={startIntake} hidden={intakeOpen} />
+      <AionFloatingWidget onOpen={openChat} hidden={intakeOpen || chatOpen} />
+      <AionLandingChat
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        onOpenIntake={startIntake}
+      />
       <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
     </div>
   );
