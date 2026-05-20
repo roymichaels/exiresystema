@@ -271,11 +271,11 @@ function MessageRow({
   return (
     <div className="flex items-start gap-3">
       <OrbView
-        size={28}
+        size={32}
         state="idle"
-        tier="presence"
+        tier="standard"
         profile={HOLO_AION_PROFILE}
-        className="mt-1 h-7 w-7 shrink-0"
+        className="mt-1 h-8 w-8 shrink-0"
         ariaLabel=""
       />
       <div className="flex-1 space-y-3">
