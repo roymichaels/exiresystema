@@ -59,19 +59,20 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
       type="button"
       onClick={onOpen}
       aria-label="פתח שיחה עם AION"
-      className="group fixed z-40 flex items-center gap-2.5 rounded-full border border-[hsl(var(--mh-line))] bg-black/55 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-black/75 hover:border-[hsl(var(--mh-sand))]"
+      className="group fixed z-40 flex items-center gap-2 rounded-full border border-[hsl(var(--mh-line)/0.7)] bg-black/40 px-3 py-1.5 backdrop-blur-md opacity-70 transition-all hover:opacity-100 hover:bg-black/60"
       style={{
         insetInlineStart: 'max(1rem, env(safe-area-inset-left))',
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
       }}
     >
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[hsl(var(--mh-sand))]" />
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-40" />
+        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))]" />
       </span>
-      <span dir="ltr" className="mh-eyebrow text-[0.65rem] text-[hsl(var(--mh-sand))]">
-        Chat with AION
+      <span dir="ltr" className="text-[0.55rem] tracking-[0.25em] text-[hsl(var(--mh-ink)/0.75)]">
+        chat with aion
       </span>
+
     </button>
   );
 }
