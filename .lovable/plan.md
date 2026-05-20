@@ -1,31 +1,98 @@
-# הסרת באנר עוגיות + ווידג'ט AION + Powered by AION
+## מטרה
 
-## 1. הסרת באנר העוגיות
-- מסירים את `<CookieConsent />` מ-`src/App.tsx` (שורה 441) ואת ה-import (שורה 38).
-- הקובץ `src/components/CookieConsent.tsx` יישאר על הדיסק אך לא ייטען (אפשר למחוק בהמשך).
+להחליף את ה-floating button שפותח את ה-Intake Onboarding בצ׳אט בוט אמיתי, סשני, שיודע לענות על שאלות לגבי דף הבית — תוכן, מתודולוגיית Exire Systema, ושדות החקירה — ובמקומות הנכונים דוחף ל-CTA של ה-intake הקיים.
 
-## 2. "POWERED BY AION" branding
-- **Footer** (`MindHackerLanding.tsx`, שורות 397–410): מוסיפים שורה נפרדת זעירה ועדינה: `POWERED BY AION` ב-LTR, letter-spacing רחב, צבע `mh-sand` בעמעום ~60%.
-- **TopBar** (שורות 42–51): מוסיפים תג קטן בצד שמאל `· POWERED BY AION` באותו סגנון eyebrow זעיר, כך שבכל גלילה רואים את החתימה של AION כתשתית.
+הצ׳אט ייראה ויישמע כמו חלק מהדף (theme: `mh-bg`, `mh-sand`, `mh-serif`), לא כמו widget זר.
 
-## 3. ווידג'ט צ'אט AION צף בעמוד הבית
-כפתור צף בפינה (bottom-start, מעל ה-safe area) שפותח את `IntakeChatModal` הקיים — שזה כבר ה-AION cinematic intake chat. כך לא ממציאים צ'אט שני; מאחדים את כל ה-CTAs לאותה שיחה.
+---
 
-מבנה הכפתור:
-- עיגול ~56px, רקע כהה זכוכיתי (`backdrop-blur`, `border` עדין `mh-line`), ללא צל בולט (לפי כללי העיצוב).
-- בתוך הכפתור: נקודת `mh-sand` פועמת + כיתוב "AION" זעיר ב-LTR.
-- ברירת מחדל מוצג רק מתחת ל-md (מובייל); ב-desktop גם נשאר אבל קטן יותר ובפינה.
-- onClick → `setIntakeOpen(true)` (אותה state שכבר קיימת ב-`MindHackerLanding`).
-- מסתתר בזמן שה-modal פתוח כדי לא להפריע.
+## 1. UX
 
-הערה (כללי AION Presence): אופציה מועדפת היא לרנדר `CanonicalAionModel` כאורב ה-AION בתוך הכפתור. אם הקומפוננטה זמינה ולא יקרה ביצועית (קנבס WebGL נוסף בעמוד הבית), נשתמש בה; אחרת — נסתפק בנקודה פועמת + הטקסט "AION" (זה לא chrome, זה landing page, אז fallback מותר).
+**Trigger** — אותו כפתור צף שכבר קיים (`AionFloatingWidget`), אבל onClick פותח את ה-`AionLandingChat` במקום את `IntakeChatModal`.
 
-## קבצים מושפעים
+**Surface** — Drawer מימין (RTL) ברוחב `max-w-md` במובייל מסך מלא, ב-desktop `~420px`. רקע `hsl(var(--mh-bg))` עם `border-inline-start` ב-`mh-line`. ללא צל/glow — נאמן ל-design memory (NO gradients/shadows).
+
+**Header** —
+- כותרת: `AION` (LTR, serif)
+- Subtitle זעיר: "שואל על הדף הזה" (eyebrow)
+- כפתור סגירה (X)
+
+**Empty state** — הודעה פתיחה מאת AION + 3 quick-suggestions:
+- "מה זה Exire Systema?"
+- "מה ההבדל בין היפנוזה רגילה לעבודה שלך?"
+- "איך מתחילים?"
+
+**Messages**
+- Assistant: ללא רקע. טקסט `mh-ink` עם `mh-serif` לפסקאות קצרות, body בעברית בגופן הרגיל.
+- User: bubble דק (`bg-[hsl(var(--mh-bg-2))]`, `text-[hsl(var(--mh-ink))]`), פינות `rounded-2xl`, צמוד ל-inline-end.
+- תמיכה ב-markdown ל-assistant.
+- Streaming text — תווים מופיעים בזרימה.
+
+**Composer** — textarea (rows=1, auto-grow), placeholder "שאל את AION על המסע…", כפתור שליחה בצד עם אייקון, Enter שולח, Shift+Enter שורה חדשה. Focus אוטומטי בפתיחה / אחרי שליחה / אחרי סיום stream.
+
+**CTA דחיפה** — כאשר המודל מזהה כוונה ("איך מתחילים", "אני רוצה להתחיל", "כמה זה עולה", "תיאום שיחה") הוא יחזיר Markdown link שמובנה במערכת ההודעות. הלינק הזה במקום לפתוח URL — מפעיל `onOpenIntake()` שסוגר את הצ׳אט ופותח את `IntakeChatModal`. הזיהוי בצד הקליינט: נחפש token מיוחד שהמודל יודע להחזיר (`[[OPEN_INTAKE]]`) ונרנדר אותו ככפתור `mh-cta-primary` קטן בתוך הבועה.
+
+---
+
+## 2. ארכיטקטורה
+
+### Frontend
+
+קובץ חדש: `src/components/landing/mindhacker/AionLandingChat.tsx`
+- מצב מקומי בלבד (`useState<UIMessage[]>`). אין persistence.
+- שימוש ב-AI SDK `useChat` + `DefaultChatTransport` עם endpoint של edge function.
+- רינדור דרך `message.parts` (text parts).
+- Loading state: "AION חושב…" עם נקודה פועמת ב-`mh-sand`.
+
+עדכון `MindHackerLanding.tsx`:
+- state חדש `chatOpen` (נפרד מ-`intakeOpen`).
+- `AionFloatingWidget.onOpen` → `setChatOpen(true)`.
+- הוספת `<AionLandingChat open={chatOpen} onOpenChange={setChatOpen} onOpenIntake={() => { setChatOpen(false); setIntakeOpen(true); }} />`.
+
+ה-Intake הקיים לא נוגעים בו. ה-CTAs של ה-Hero/Final נשארים פותחים את ה-intake ישירות.
+
+### Backend — Edge Function חדש
+
+`supabase/functions/aion-landing-chat/index.ts`
+
+- `verify_jwt = false` (אנונימי, דף נחיתה).
+- CORS מלא.
+- משתמש ב-`_shared/aiGateway.ts` הקיים בפרויקט (כבר תומך ב-OpenRouter / Lovable AI Gateway fallback). מודל ברירת מחדל: `google/gemini-3-flash-preview`.
+- מקבל `{ messages: UIMessage[] }` ומחזיר `streamText().toUIMessageStreamResponse()`.
+- System prompt קומפקטי (נטמע inline) שמכיל:
+  - מי זה מיינד האקר ("אדריכל תודעה ואסטרטג זהות תת־מודעת", solo founder, "אני").
+  - תקציר הסקשנים: Hero ("התודעה שלך לא נבנתה על ידך"), The System, What I Do, Method (5 שלבי Exire Systema המלאים מ-`STEPS`), Content (6 שדות חקירה).
+  - **חוקי תגובה**:
+    - תמיד עברית, ניסוח קצר וצלול בטון של הדף (קולנועי, רך, ישיר).
+    - אסור להמציא מחירים, תאריכים, או הבטחות תוצאה.
+    - ענה רק על הדף — אם נשאל על משהו אחר, החזר את השיחה לעמוד.
+    - לזיהוי כוונת התחלה → להחזיר בסוף ההודעה את ה-token `[[OPEN_INTAKE]]` בשורה משלו (הקליינט מסתיר אותו וממיר לכפתור).
+    - ללא emojis, ללא markdown כבד — רק פסקאות קצרות.
+- אין tools. אין persistence.
+
+### חבילות
+
+- `ai` ו-`@ai-sdk/react` ו-`@ai-sdk/openai-compatible` — נבדוק אם כבר מותקנים; אם לא, `bun add`.
+
+---
+
+## 3. מפרט טכני
 
 ```text
-src/App.tsx                                              ← הסרת CookieConsent
-src/components/landing/mindhacker/MindHackerLanding.tsx  ← footer + topbar + floating widget
-src/components/landing/mindhacker/AionWidgetButton.tsx   ← קומפוננטה חדשה קטנה
+src/components/landing/mindhacker/
+├── MindHackerLanding.tsx        ← עדכון: state chatOpen, רינדור AionLandingChat
+└── AionLandingChat.tsx          ← חדש: Drawer + useChat + composer
+
+supabase/functions/
+└── aion-landing-chat/index.ts   ← חדש: streamText, system prompt מהדף, [[OPEN_INTAKE]]
 ```
 
-ללא שינויי DB, ללא שינויי תוכן בצ'אט עצמו (משתמש ב-intake הקיים).
+**CTA token flow**
+1. המודל מסיים תשובה ב-`\n[[OPEN_INTAKE]]`.
+2. קליינט מפצל: לפני ה-token = טקסט רגיל, ה-token עצמו → רנדור כפתור "התחל את השכתוב" שמפעיל `onOpenIntake`.
+
+**Auto-scroll** — `useEffect` עם `messages.length` שגולל ל-bottom של אזור ההודעות.
+
+**Focus management** — `ref.current?.focus()` ב-mount, אחרי `status === 'ready'`, ואחרי שליחה.
+
+**אין שינויי DB**, אין secrets חדשים (משתמש ב-`LOVABLE_API_KEY` / `OPENROUTER_API_KEY` הקיימים).
