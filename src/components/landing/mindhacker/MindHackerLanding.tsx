@@ -95,7 +95,9 @@ function Hero({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }
         }}
       />
       {/* Subtle rain/fog grain */}
-      <AmbientBackdrop variant="hero" className="opacity-40" />
+      <div className="absolute inset-0 opacity-40 pointer-events-none">
+        <AmbientBackdrop variant="hero" />
+      </div>
 
       {/* Asymmetric text block — sits over the misted mountains, leaves the subject untouched */}
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-20">
