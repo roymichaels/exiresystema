@@ -1,12 +1,14 @@
 import { he } from './translations/he';
 import { en } from './translations/en';
+import { es } from './translations/es';
 import type { TranslationKeys } from './translations/he';
 
-export type Language = 'he' | 'en';
+export type Language = 'he' | 'en' | 'es';
 
 const translations: Record<Language, TranslationKeys> = {
   he,
   en,
+  es,
 };
 
 export const getTranslation = (language: Language, key: string): string => {
@@ -25,5 +27,5 @@ export const getTranslation = (language: Language, key: string): string => {
   return typeof result === 'string' ? result : key;
 };
 
-export { he, en };
+export { he, en, es };
 export type { TranslationKeys };
