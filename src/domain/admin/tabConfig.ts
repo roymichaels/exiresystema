@@ -14,8 +14,17 @@ import {
   FileText,
   Settings,
   Globe,
+  Briefcase,
 } from 'lucide-react';
 import type { AdminTabConfig } from './types';
+
+// ─── Lazy-loaded Coach Sub-Pages (admin === sole coach) ─────────────────────
+const CoachDashboardOverview = lazy(() => import('@/components/careers/coach/CoachDashboardOverview'));
+const CoachClientsTab        = lazy(() => import('@/components/careers/coach/CoachClientsTab'));
+const CoachLeadsTab          = lazy(() => import('@/components/careers/coach/CoachLeadsTab'));
+const CoachPlansTab          = lazy(() => import('@/components/careers/coach/CoachPlansTab'));
+const CoachMarketingTab      = lazy(() => import('@/components/careers/coach/CoachMarketingTab'));
+const CoachSettingsTab       = lazy(() => import('@/components/careers/coach/CoachSettingsTab'));
 
 // ─── Lazy-loaded Admin Sub-Pages ────────────────────────────────────────────
 
