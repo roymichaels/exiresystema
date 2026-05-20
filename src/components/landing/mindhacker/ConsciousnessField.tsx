@@ -79,16 +79,27 @@ export function ConsciousnessField({ intense = false }: Props) {
 
       for (const p of particles) {
         p.y -= p.vy * (dt / 16);
-        p.phase += 0.0025 * (dt / 16);
+        p.phase += 0.0028 * (dt / 16);
+        p.twinklePhase += 0.04 * (dt / 16);
         if (p.y < -4) {
           p.y = h + 4;
           p.x = Math.random() * w;
         }
-        const x = p.x + Math.sin(p.phase) * p.sway * 6;
-        // Warm sand-white tint to feel like consciousness motes, not snow.
+        const x = p.x + Math.sin(p.phase) * p.sway * 10;
+        const twinkle = 0.7 + 0.3 * Math.sin(p.twinklePhase);
+        // Warm sand-white glow with soft halo for the larger motes.
+        if (p.r > 1.2) {
+          const grd = ctx.createRadialGradient(x, p.y, 0, x, p.y, p.r * 4);
+          grd.addColorStop(0, `hsla(38, 60%, 92%, ${p.a * twinkle})`);
+          grd.addColorStop(1, 'hsla(285, 60%, 60%, 0)');
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(x, p.y, p.r * 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
         ctx.beginPath();
         ctx.arc(x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(38, 35%, 88%, ${p.a})`;
+        ctx.fillStyle = `hsla(38, 45%, 92%, ${p.a * twinkle})`;
         ctx.fill();
       }
 
