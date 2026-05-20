@@ -7,6 +7,7 @@ import { useAuthModal } from '@/contexts/AuthModalContext';
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import IntakeChatModal from './intake/IntakeChatModal';
 import founderHero from '@/assets/founder-hero.jpg';
+import founderPortrait from '@/assets/founder-portrait.jpg';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
@@ -183,34 +184,29 @@ function WhatIDoSection() {
         <div className="grid gap-16 md:grid-cols-2 md:gap-24 md:items-center">
           {/* Cinematic portrait placeholder */}
           <div className="mh-reveal order-2 md:order-1">
-            <div
-              className="relative aspect-[3/4] w-full overflow-hidden rounded-sm"
-              style={{
-                background:
-                  'linear-gradient(135deg, hsl(var(--mh-bg-2)) 0%, #000 100%)',
-              }}
-            >
-              {/* silhouette glyph */}
-              <svg viewBox="0 0 300 400" className="absolute inset-0 h-full w-full opacity-40">
-                <defs>
-                  <radialGradient id="mh-glow" cx="50%" cy="35%">
-                    <stop offset="0%" stopColor="hsl(35, 28%, 72%)" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="hsl(0,0%,0%)" stopOpacity="0" />
-                  </radialGradient>
-                </defs>
-                <rect width="300" height="400" fill="url(#mh-glow)" />
-                <path
-                  d="M150 110 c30 0 48 22 48 52 c0 22 -10 38 -26 48 c34 12 56 42 56 80 v110 H72 v-110 c0 -38 22 -68 56 -80 c-16 -10 -26 -26 -26 -48 c0 -30 18 -52 48 -52 z"
-                  fill="#000"
-                  stroke="hsl(var(--mh-line))"
-                  strokeWidth="0.5"
-                />
-              </svg>
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm bg-[hsl(var(--mh-bg-2))]">
+              <img
+                src={founderPortrait}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+              {/* cinematic grade — deepen edges, preserve face */}
               <div
                 className="absolute inset-0"
                 style={{
                   background:
-                    'linear-gradient(to top, hsl(var(--mh-bg)) 0%, transparent 50%)',
+                    'radial-gradient(110% 80% at 50% 40%, transparent 0%, hsl(var(--mh-bg) / 0.25) 55%, hsl(var(--mh-bg) / 0.75) 90%, hsl(var(--mh-bg)) 100%)',
+                }}
+              />
+              {/* bottom fade into section */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-1/3"
+                style={{
+                  background:
+                    'linear-gradient(to bottom, transparent 0%, hsl(var(--mh-bg)) 100%)',
                 }}
               />
             </div>
