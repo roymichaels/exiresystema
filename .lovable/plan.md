@@ -1,95 +1,71 @@
+## אבחנה — למה זה לא עובד
 
-# Intake Chat — Consciousness Scanner (לא טופס)
-
-מחליף את `smartNavigate()` ב-CTA. פותח מודאל פולסקרין קולנועי מעל הלנדינג, בו AION מנהל שיחה זורמת בעברית שמסננת ומאספת ליד. שמירה רק כשיש שם+טלפון. הקוד הישן של onboarding נזרק לגמרי.
-
-## 1. סקרטים חסרים (לפני בנייה)
-
-לפני שאני בונה אני צריך שתאשר/תספק:
-- `RESEND_API_KEY` — להתראת מייל אליך (אתה אמרת שכן)
-- `FOUNDER_NOTIFY_EMAIL` — לאן לשלוח את ההתראה כשנכנס ליד
-- `FOUNDER_WHATSAPP_NUMBER` — מספר ב-E.164 (למשל `972501234567`) שאליו ה-`wa.me` link מפנה את הליד בסוף
-
-(אבקש דרך add_secret ברגע שתאשר את התוכנית)
-
-## 2. סכמת DB — טבלת `leads`
-
-```text
-leads
-├── id, created_at, updated_at
-├── name TEXT NOT NULL
-├── contact_phone TEXT       — וואטסאפ/טלפון
-├── contact_email TEXT
-├── conversation JSONB       — מערך ההודעות המלא (UIMessage[])
-├── pain_category TEXT       — מה שזיהה ה-AI (פחדים/דחיינות/...)
-├── pain_duration TEXT       — חודשים/שנים/כל החיים
-├── prior_attempts TEXT[]    — מה ניסה בעבר
-├── desired_outcome TEXT     — מה מחפש
-├── transformation_vision TEXT — תשובה פתוחה: איך החיים היו נראים
-├── readiness_score INT      — 1-10 (מהסליידר)
-├── intent TEXT              — start_process | exploring | curious
-├── ai_analysis JSONB        — { emotional_intensity, self_awareness_level, openness, buying_intent, pattern_diagnosis }
-└── status TEXT DEFAULT 'new' — new | contacted | converted | dismissed
+**1. "Load failed" (השגיאה האדומה במסך)**
+ה־edge function `intake-chat` **לא פרוס**. בדקתי ישירות מול הגייטוויי:
 ```
+POST /functions/v1/intake-chat → 404 NOT_FOUND
+"Requested function was not found"
+```
+הקוד קיים ב־`supabase/functions/intake-chat/index.ts`, אבל הוא מעולם לא דופלוי. בנוסף, אין לו ערך ב־`supabase/config.toml` — לכן כש־`useChat` עושה POST, הוא חוזר עם 404 לפני שמתחילה שום בקשת AI. לכן גם אין שום לוג.
 
-**RLS:**
-- INSERT: כל אחד (anonymous), כדי שהפונקציה תוכל ליצור ליד גם לא-מחובר. ולידציה בצד השרת (edge function) מגבילה את זה.
-- SELECT/UPDATE/DELETE: רק `has_role(auth.uid(),'admin')`
+**2. למה יש צ׳אט/קומפוזר חדשים במקום AION**
+זה היה שיקול דעת שגוי שלי. בנינו פה stack מקביל:
+- `IntakeChatModal` במקום ה־shell של AION
+- AI Elements (`PromptInput`, `PromptInputTextarea`, `PromptInputSubmit`, `Shimmer`) במקום `AuroraChatInput` / `AuroraChatMessage` / `AuroraTypingIndicator` / `AuroraHoloOrb`
+- `useChat` ישיר מ־`@ai-sdk/react` במקום הצינור של AION
 
-## 3. Edge function — `supabase/functions/intake-chat/index.ts`
+הסיבה הטכנית: `AuroraChatArea` קשור ל־`useAuroraChat(conversationId)` שדורש משתמש מחובר ומסנכרן ל־`messages` בדאטה־בייס. הסריקה היא **אנונימית** (לפני login) ועם transport אחר (`intake-chat`), אז לא יכולתי לחבר אותה 1:1 ל־AuroraChatArea. אבל זו לא סיבה לבנות UI חדש — היה צריך לעטוף את אותם רכיבי המסך של AION סביב transport אחר. זה מה שאתקן.
 
-- public (`verify_jwt = false`) — חייב לעבוד למבקרים אנונימיים
-- מקבל `{ messages: UIMessage[] }`, מפעיל `streamText` עם Lovable AI Gateway, מודל `google/gemini-3-flash-preview`
-- `system` prompt בעברית שמגדיר את AION כ-**consciousness scanner** (לא bot, לא טופס) — מנחה לעבור 5 שלבים (Hook→Pain→Readiness→Qualification→Lead Capture) באופן שיחתי, קצר וחד
-- **כללים בפרומפט:** אסור לשאול גיל/מקצוע/תקציב/"איפה שמעת". מותר להציע בחירות כשורות-טקסט בעברית. בסיום השלבים מחזיר תובנת-Pattern ("נראה שאתה לא תקוע בגלל X, אלא דפוס של ___")
-- **Tools (AI SDK `tool()`):**
-  - `set_pain_signal({ category, duration, prior_attempts[] })`
-  - `set_readiness({ desired_outcome, readiness_score, intent })`
-  - `set_vision({ transformation_vision })`
-  - `save_lead({ name, phone, email?, pattern_diagnosis, ai_analysis })` — `needsApproval: false`; כאן:
-    1. valid via zod (שם+phone חובה)
-    2. INSERT ל-`leads` עם כל ה-state שנאסף + `conversation` המלאה
-    3. קורא ל-Resend gateway → מייל אל `FOUNDER_NOTIFY_EMAIL` עם תקציר
-    4. מחזיר `{ ok, lead_id, whatsapp_url: "https://wa.me/${FOUNDER_WHATSAPP_NUMBER}?text=..." }`
-- `stopWhen: stepCountIs(50)`
-- CORS מלא
+---
 
-## 4. Frontend
+## תכנית
 
-### חבילות חדשות
-`ai`, `@ai-sdk/react`, `@ai-sdk/openai-compatible`, `zod` (אם חסר)
+### שלב 1 — להפעיל את הצ׳אט (סוגר את "Load failed")
+1. להוסיף ל־`supabase/config.toml`:
+   ```
+   [functions.intake-chat]
+   verify_jwt = false
+   ```
+   (כדי לאפשר גישה אנונימית מנחיתה).
+2. לעשות deploy של `intake-chat` ולוודא עם curl ש־POST מחזיר stream תקין.
+3. לבדוק שה־ENV הקיים מספיק: `LOVABLE_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `FOUNDER_NOTIFY_EMAIL`, `FOUNDER_WHATSAPP_NUMBER`. אם חסר משהו → לבקש secret לפני הפריסה.
 
-### קבצים חדשים — `src/components/landing/mindhacker/intake/`
-- **`IntakeChatModal.tsx`** — מודאל פולסקרין `fixed inset-0 z-[100]` עם רקע `--mh-bg`, חזרה על `AmbientBackdrop` (ערפל+אורב חי) ברקע מטושטש. מציג:
-  - Stage A — **Hook screen**: כותרת ("רוב האנשים חיים מתוך דפוסים שהם מעולם לא בחרו") + כפתור "התחל" שמתחיל את ה-chat
-  - Stage B — **Chat**: `useChat({ transport: new DefaultChatTransport({ api: edgeFunctionUrl }) })`. רנדור `message.parts`. shimmer "AION סורק..." בעת `status === 'submitted'`. עיצוב: ללא בועות לאסיסטנט, בועות עדינות `--mh-sand/10` למשתמש. ספריית AI Elements מותקנת
-  - Stage C — **Reveal screen**: כשהtool `save_lead` החזיר תוצאה, מציג את האבחנה הקבלת + כפתור "המשך לוואטסאפ" → פותח `whatsapp_url` בtab חדש
-- **`PromptComposer.tsx`** — `PromptInput` + `PromptInputTextarea` + `PromptInputFooter` (justify-end) + `PromptInputSubmit`
-- אייקון/לוגו: אורב AION (לא Sparkles)
-- RTL מובנה, focus על textarea אחרי כל הודעה
-- ESC + כפתור X לסגירה (עם confirm אם יש שיחה פעילה)
+### שלב 2 — להשתמש ב־UI של AION (בלי קומפוזר חדש)
+לשכתב את `IntakeChatModal` כך שיהיה רק **shell קולנועי** + transport אנונימי, אבל **כל הרכיבים הויזואליים יהיו של AION**:
 
-### שינויים בקיים
-- `MindHackerLanding.tsx`: state `intakeOpen`, `HeroSection`/`FinalCTA` קוראים `setIntakeOpen(true)` במקום `smartNavigate`. מוצא את `<IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen}/>` בסוף ה-shell
-- `Index.tsx`: ללא שינוי
-- `src/App.tsx`: הסרת `SmartOnboardingProvider`, הסרת import של `OnboardingCeremony`, הסרת `/ceremony` route
-- `src/contexts/SmartOnboardingContext.tsx`: נמחק
-- `src/hooks/useSmartOnboardingRedirect.ts`: נמחק
-- `src/components/modals/MissingQuestModal.tsx`: אם לא בשימוש במקום אחר — נמחק
-- `src/routes/redirects.tsx`: ניקוי הפניות onboarding
-- `src/pages/OnboardingCeremony.tsx`: ניקוי import (אם נשאר מיותם — מחיקה)
+- בועות הודעות → `AuroraChatMessage`
+- אינדיקטור הקלדה → `AuroraTypingIndicator`
+- קומפוזר → `AuroraChatInput` (אותו טקסט־אריאה, אותם כפתורים — מיק, גלגול, slash, שליחה — שראית בצילום)
+- האורב המרכזי → `AuroraHoloOrb` (במקום הספירה החומה הנוכחית)
 
-## 5. עיצוב המודאל (mindhacker theme)
+מה כן נשאר ייחודי ל־intake:
+- ה־transport: `DefaultChatTransport({ api: '…/intake-chat' })`
+- Stage A (ה־Hook עם "התחל את הסריקה")
+- Stage C (ה־reveal עם CTA לוואטסאפ אחרי `save_lead`)
+- הכותרת "AION · Consciousness Scan" + כפתור X
 
-- רקע `bg-[hsl(var(--mh-bg))]/95 backdrop-blur-xl`
-- AION orb בראש (קטן, חי, מספיק שהמשתמש ירגיש "המערכת בוחנת אותו")
-- כותרת serif `mh-serif` עדינה למעלה
-- אזור chat גובה מלא, scroll פנימי, composer צף בתחתית
-- ללא צבעי wellness — רק `--mh-sand`, `--mh-ink`, `--mh-mute`
-- מובייל-first 402px עד דסקטופ
+תוצאה: זהה חזותית ל־AION, אבל ללא login וללא כתיבה ל־`messages`.
 
-## 6. בדיקות קבלה
+### שלב 3 — להסיר תלות מיותרת
+- להוריד את השימוש ב־AI Elements מהמסך הזה (`PromptInput*`, `Shimmer`). הקבצים יישארו לעת עתה (כדי לא לשבור משהו אחר), אבל לא בשימוש בנתיב ה־intake.
+- לוודא שאין import שבור אחרי השינוי.
 
-- לחיצה על "התחל את השכתוב" / "היכנס פנימה" בלנדינג → מודאל נפתח על המקום, ללא ניווט, ללא login
-- ה-AI מתחיל בעצמו ב-Hook (לא טופס, לא רשימת שאלות יבשה)
-- שיח
+### שלב 4 — אימות
+1. `curl` ל־`/intake-chat` עם payload של הודעה ראשונה → לקבל stream.
+2. לפתוח את המודאל מהלנדינג, ללחוץ "התחל" → לוודא שמופיעה הודעת AION עם בועה בסגנון AION ולא Load failed.
+3. לעבור את 5 השלבים עד `save_lead` → לבדוק ב־DB שנוצר רשומה ב־`leads` ושה־reveal עם CTA לוואטסאפ נפתח.
+
+---
+
+## פרטים טכניים
+
+**קבצים שיתעדכנו:**
+- `supabase/config.toml` — בלוק function עבור `intake-chat`.
+- `src/components/landing/mindhacker/intake/IntakeChatModal.tsx` — החלפת ה־composer והבועות ברכיבי Aurora; הסרת import ל־AI Elements; הוספת `AuroraHoloOrb` כרקע מרכזי.
+
+**מה לא משתנה:**
+- `supabase/functions/intake-chat/index.ts` — הקוד עצמו תקין; רק פריסה + config.
+- טבלת `leads` והעמודות שנוספו.
+- חיווט ה־CTA ב־`MindHackerLanding.tsx`.
+
+**הנחה:** אתה רוצה שה־intake **לא** ידרוש login (CTA אנונימי מהלנדינג). אם אתה רוצה דווקא login לפני intake — תגיד ואשנה.
