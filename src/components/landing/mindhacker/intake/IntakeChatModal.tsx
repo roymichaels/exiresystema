@@ -8,7 +8,7 @@ import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import { X, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AmbientBackdrop } from '../AmbientBackdrop';
+import { ConsciousnessField } from '../ConsciousnessField';
 import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/intake-chat`;
