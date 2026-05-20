@@ -108,19 +108,65 @@ function AionFloatingWidget({ t, onOpen, hidden }: { t: T; onOpen: () => void; h
       type="button"
       onClick={onOpen}
       aria-label={t('widget.aria')}
-      className="group fixed z-40 flex items-center gap-2 rounded-full border border-[hsl(var(--mh-line)/0.7)] bg-black/40 px-3 py-1.5 backdrop-blur-md opacity-70 transition-all hover:opacity-100 hover:bg-black/60"
+      className="mh-widget-enter group fixed z-40 flex items-center gap-3 rounded-full border border-[hsl(var(--mh-line))] bg-[hsl(var(--mh-bg)/0.6)] ps-2 pe-4 py-2 backdrop-blur-xl shadow-[0_8px_40px_-12px_hsl(var(--mh-sand)/0.35),inset_0_1px_0_hsl(var(--mh-ink)/0.08)] transition-all duration-500 hover:-translate-y-0.5 hover:border-[hsl(var(--mh-sand)/0.5)] hover:shadow-[0_12px_50px_-10px_hsl(var(--mh-sand)/0.55),inset_0_1px_0_hsl(var(--mh-ink)/0.12)]"
       style={{
         insetInlineStart: 'max(1rem, env(safe-area-inset-left))',
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
+        minHeight: '52px',
       }}
     >
-      <span className="relative flex h-1.5 w-1.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-40" />
-        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))]" />
+      {/* Sigil mark with halo + presence pulse */}
+      <span className="relative flex h-9 w-9 items-center justify-center">
+        <span
+          aria-hidden
+          className="mh-breathe absolute inset-[-4px] rounded-full"
+          style={{
+            background:
+              'radial-gradient(circle, hsl(var(--mh-sand) / 0.35) 0%, transparent 70%)',
+          }}
+        />
+        <Picture
+          avif={exireSigilAvif}
+          webp={exireSigilWebp}
+          fallback={exireSigilWebp}
+          alt=""
+          width={72}
+          height={72}
+          imgClassName="relative h-8 w-8 object-contain mix-blend-screen"
+          imgStyle={{ filter: 'brightness(1.15) drop-shadow(0 0 8px hsl(var(--mh-sand) / 0.5))' }}
+        />
+        <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))] shadow-[0_0_6px_hsl(var(--mh-sand))]" />
+        </span>
       </span>
-      <span dir="ltr" className="text-[0.55rem] tracking-[0.25em] text-[hsl(var(--mh-ink)/0.75)]">
-        {t('widget.chatLabel')}
+
+      {/* Label */}
+      <span className="flex flex-col items-start leading-tight text-start">
+        <span
+          dir="ltr"
+          className="mh-eyebrow text-[0.55rem] tracking-[0.32em] text-[hsl(var(--mh-sand))]"
+        >
+          {t('widget.brand')}
+        </span>
+        <span className="mh-serif text-[0.95rem] text-[hsl(var(--mh-ink))]">
+          {t('widget.invite')}
+        </span>
       </span>
+
+      {/* Chevron — flips under RTL via logical scale */}
+      <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4 text-[hsl(var(--mh-sand))] transition-transform duration-500 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+      >
+        <path d="M9 6l6 6-6 6" />
+      </svg>
     </button>
   );
 }
