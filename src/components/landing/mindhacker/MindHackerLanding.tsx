@@ -1,11 +1,14 @@
 /**
- * MindHackerLanding — cinematic Hebrew homepage.
+ * MindHackerLanding — cinematic homepage (HE / EN).
  * Optimized: AVIF/WebP via <Picture>, LQIP hero, lazy modals, paused background.
+ * Localized via shared LanguageContext + getTranslation.
  */
 import { Suspense, lazy, useState } from 'react';
 
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import Picture from './Picture';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslation, type Language } from '@/i18n';
 
 // Hero assets — AVIF + WebP + tiny JPG fallback
 import founderHeroAvif from '@/assets/founder-hero.avif';
@@ -52,9 +55,13 @@ const AionLandingChat = lazy(() => import('./AionLandingChat'));
 const HERO_LQIP =
   'data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAwBACdASoYAA4APxFysFCsJqSisAgBgCIJZwDKABbB2R10ASTKDZr8sAAA/iLu22/Sl3hWKsEzIQUYEUmesH7h4tyL9gMjnEIhYTyLq49v9kIBNCHDq5fJgAA=';
 
-const BRAND = 'EXIRE SYSTEMA';
+type T = (key: string) => string;
+const makeT = (language: Language): T => (key) => getTranslation(language, `landing.${key}`);
 
 export default function MindHackerLanding() {
+  const { language, isRTL } = useLanguage();
+  const t = makeT(language);
+
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
@@ -62,18 +69,18 @@ export default function MindHackerLanding() {
   const openChat = () => setChatOpen(true);
 
   return (
-    <div className="mindhacker-theme min-h-screen" dir="rtl" lang="he">
-      <TopBar />
+    <div className="mindhacker-theme min-h-screen" dir={isRTL ? 'rtl' : 'ltr'} lang={language}>
+      <TopBar t={t} />
       <main>
-        <Hero onStart={startIntake} />
-        <SystemSection />
-        <WhatIDoSection />
-        <MethodSection />
-        <ContentSection />
-        <FinalCTA onStart={startIntake} />
+        <Hero t={t} onStart={startIntake} />
+        <SystemSection t={t} />
+        <WhatIDoSection t={t} />
+        <MethodSection t={t} />
+        <ContentSection t={t} />
+        <FinalCTA t={t} onStart={startIntake} />
       </main>
-      <Footer />
-      <AionFloatingWidget onOpen={openChat} hidden={intakeOpen || chatOpen} />
+      <Footer t={t} />
+      <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen} />
       {(chatOpen || intakeOpen) && (
         <Suspense fallback={null}>
           {chatOpen && (
@@ -94,13 +101,13 @@ export default function MindHackerLanding() {
 
 /* ─────────────── Floating AION chat widget ─────────────── */
 
-function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: boolean }) {
+function AionFloatingWidget({ t, onOpen, hidden }: { t: T; onOpen: () => void; hidden: boolean }) {
   if (hidden) return null;
   return (
     <button
       type="button"
       onClick={onOpen}
-      aria-label="פתח שיחה עם AION"
+      aria-label={t('widget.aria')}
       className="group fixed z-40 flex items-center gap-2 rounded-full border border-[hsl(var(--mh-line)/0.7)] bg-black/40 px-3 py-1.5 backdrop-blur-md opacity-70 transition-all hover:opacity-100 hover:bg-black/60"
       style={{
         insetInlineStart: 'max(1rem, env(safe-area-inset-left))',
@@ -112,23 +119,60 @@ function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: bo
         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--mh-sand))]" />
       </span>
       <span dir="ltr" className="text-[0.55rem] tracking-[0.25em] text-[hsl(var(--mh-ink)/0.75)]">
-        chat with aion
+        {t('widget.chatLabel')}
       </span>
     </button>
   );
 }
 
+/* ─────────────── Language toggle ─────────────── */
+
+function LangToggle({ t }: { t: T }) {
+  const { language, setLanguage } = useLanguage();
+  const base =
+    'mh-eyebrow text-[0.6rem] tracking-[0.32em] transition-colors duration-300';
+  const active = 'text-[hsl(var(--mh-ink))]';
+  const idle = 'text-[hsl(var(--mh-mute)/0.7)] hover:text-[hsl(var(--mh-ink))]';
+  return (
+    <div
+      dir="ltr"
+      aria-label={t('langToggle.aria')}
+      className="absolute top-6 z-40 flex items-center gap-2 rounded-full border border-[hsl(var(--mh-line)/0.6)] bg-black/30 px-3 py-1.5 backdrop-blur-md md:top-8"
+      style={{ insetInlineEnd: 'max(1rem, env(safe-area-inset-right))' }}
+    >
+      <button
+        type="button"
+        onClick={() => setLanguage('he')}
+        aria-pressed={language === 'he'}
+        className={`${base} ${language === 'he' ? active : idle}`}
+      >
+        {t('langToggle.he')}
+      </button>
+      <span className="h-3 w-px bg-[hsl(var(--mh-line))]" />
+      <button
+        type="button"
+        onClick={() => setLanguage('en')}
+        aria-pressed={language === 'en'}
+        className={`${base} ${language === 'en' ? active : idle}`}
+      >
+        {t('langToggle.en')}
+      </button>
+    </div>
+  );
+}
+
 /* ─────────────── Top bar (logo only) ─────────────── */
 
-function TopBar() {
+function TopBar({ t }: { t: T }) {
   return (
     <header className="absolute inset-x-0 top-0 z-30 flex flex-col items-center px-6 pt-6 md:pt-8">
+      <LangToggle t={t} />
       <div className="relative h-24 w-24 md:h-28 md:w-28 overflow-hidden">
         <Picture
           avif={exireSigilAvif}
           webp={exireSigilWebp}
           fallback={exireSigilWebp}
-          alt="Exire Systema"
+          alt={t('header.brand')}
           width={512}
           height={768}
           eager
@@ -148,7 +192,7 @@ function TopBar() {
           textIndent: '0.55em',
         }}
       >
-        EXIRE SYSTEMA
+        {t('header.brand')}
       </p>
     </header>
   );
@@ -156,7 +200,7 @@ function TopBar() {
 
 /* ─────────────── 1. Hero ─────────────── */
 
-function Hero({ onStart }: { onStart: () => void }) {
+function Hero({ t, onStart }: { t: T; onStart: () => void }) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <section
@@ -210,25 +254,26 @@ function Hero({ onStart }: { onStart: () => void }) {
 
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 pt-40 md:pt-44">
         <div className="max-w-xl text-start md:max-w-2xl">
-          <p className="mh-eyebrow mh-reveal mb-10 md:mb-12">פרק ראשון</p>
+          <p className="mh-eyebrow mh-reveal mb-10 md:mb-12">{t('hero.eyebrow')}</p>
 
           <h1 className="mh-serif mh-reveal text-[2.4rem] leading-[1.1] sm:text-6xl md:text-7xl lg:text-[5rem]">
-            התודעה שלך
+            {t('hero.titleLine1')}
             <br />
-            <span className="text-[hsl(var(--mh-sand))]">לא נבנתה</span> על ידך
+            <span className="text-[hsl(var(--mh-sand))]">{t('hero.titleHighlight')}</span>
+            {t('hero.titleSuffix')}
           </h1>
 
           <p className="mh-reveal mt-10 md:mt-12 max-w-md text-[0.95rem] leading-[2] text-[hsl(var(--mh-mute))] sm:text-base md:text-lg md:leading-[2.1]">
-            רוב האנשים חיים מתוך זהות, פחדים ואמונות
+            {t('hero.bodyLine1')}
             <br />
-            שהותקנו בהם מגיל אפס.
+            {t('hero.bodyLine2')}
             <br />
-            <span className="text-[hsl(var(--mh-sand))]">מעטים לומדים לכתוב את עצמם מחדש.</span>
+            <span className="text-[hsl(var(--mh-sand))]">{t('hero.bodyHighlight')}</span>
           </p>
 
           <div className="mh-reveal mt-14 md:mt-16 flex flex-col gap-4 sm:flex-row sm:gap-5">
             <button onClick={onStart} className="mh-cta-primary">
-              התחל את השכתוב
+              {t('hero.cta')}
             </button>
           </div>
         </div>
@@ -243,14 +288,14 @@ function Hero({ onStart }: { onStart: () => void }) {
 
 /* ─────────────── 2. The System ─────────────── */
 
-function SystemSection() {
+function SystemSection({ t }: { t: T }) {
   const ref = useReveal<HTMLDivElement>();
-  const lines = ['לימדו אותך מה לחשוב.', 'מה לפחד.', 'מה לרצות.', 'מי להיות.'];
+  const lines = [t('system.line1'), t('system.line2'), t('system.line3'), t('system.line4')];
   return (
     <section ref={ref} className="relative overflow-hidden py-32 md:py-48">
       <AmbientBackdrop />
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-        <p className="mh-eyebrow mh-reveal mb-16">המערכת</p>
+        <p className="mh-eyebrow mh-reveal mb-16">{t('system.eyebrow')}</p>
         <div className="space-y-6 md:space-y-8">
           {lines.map((line, i) => (
             <p
@@ -265,10 +310,10 @@ function SystemSection() {
             <div className="mh-divider mx-auto w-32" />
           </div>
           <p className="mh-serif mh-reveal pt-8 text-2xl text-[hsl(var(--mh-mute))] sm:text-3xl md:text-4xl">
-            ואז קראו לזה:
+            {t('system.then')}
           </p>
           <p className="mh-serif mh-reveal text-4xl text-[hsl(var(--mh-sand))] sm:text-6xl md:text-7xl">
-            ״החיים״.
+            {t('system.life')}
           </p>
         </div>
       </div>
@@ -278,7 +323,7 @@ function SystemSection() {
 
 /* ─────────────── 3. What I Do ─────────────── */
 
-function WhatIDoSection() {
+function WhatIDoSection({ t }: { t: T }) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <section ref={ref} className="relative overflow-hidden py-32 md:py-48">
@@ -315,19 +360,19 @@ function WhatIDoSection() {
           </div>
 
           <div className="order-1 md:order-2">
-            <p className="mh-eyebrow mh-reveal mb-8">מה אני עושה</p>
+            <p className="mh-eyebrow mh-reveal mb-8">{t('whatIDo.eyebrow')}</p>
             <h2 className="mh-serif mh-reveal text-4xl leading-[1.15] sm:text-5xl md:text-6xl">
-              אני עובד עם
+              {t('whatIDo.titlePre')}
               <br />
-              <span className="text-[hsl(var(--mh-sand))]">התת־מודע</span>
+              <span className="text-[hsl(var(--mh-sand))]">{t('whatIDo.titleHighlight')}</span>
               <br />
-              כמו שמתכנת עובד עם קוד.
+              {t('whatIDo.titleSuffix')}
             </h2>
             <div className="mh-reveal mt-12 space-y-5 text-base leading-[2] text-[hsl(var(--mh-mute))] md:text-lg">
-              <p>מזהים דפוסים.</p>
-              <p>מפרקים זהויות ישנות.</p>
-              <p>משנים תכנותים פנימיים.</p>
-              <p className="text-[hsl(var(--mh-ink))]">ובונים ריבונות אישית אמיתית.</p>
+              <p>{t('whatIDo.b1')}</p>
+              <p>{t('whatIDo.b2')}</p>
+              <p>{t('whatIDo.b3')}</p>
+              <p className="text-[hsl(var(--mh-ink))]">{t('whatIDo.b4')}</p>
             </div>
           </div>
         </div>
@@ -338,27 +383,26 @@ function WhatIDoSection() {
 
 /* ─────────────── 4. Method ─────────────── */
 
-const STEPS = [
-  { n: 'I',   t: 'זיהוי התכנות',          d: 'מיפוי השכבות שעוצבו בך מבחוץ.' },
-  { n: 'II',  t: 'פירוק הזהות הישנה',     d: 'הפרדה בין מה שאתה לבין מה שהותקן בך.' },
-  { n: 'III', t: 'עבודה תת־הכרתית עמוקה', d: 'גישה לשכבות שבהן הקוד נכתב מלכתחילה.' },
-  { n: 'IV',  t: 'בנייה מחדש',           d: 'כתיבת זהות חדשה, מתוך בחירה מודעת.' },
-  { n: 'V',   t: 'ריבונות פנימית',        d: 'חיים מתוך מי שאתה — לא ממה שלימדו אותך להיות.' },
-];
-
-function MethodSection() {
+function MethodSection({ t }: { t: T }) {
   const ref = useReveal<HTMLDivElement>();
+  const steps = [
+    { n: 'I',   t: t('method.s1t'), d: t('method.s1d') },
+    { n: 'II',  t: t('method.s2t'), d: t('method.s2d') },
+    { n: 'III', t: t('method.s3t'), d: t('method.s3d') },
+    { n: 'IV',  t: t('method.s4t'), d: t('method.s4d') },
+    { n: 'V',   t: t('method.s5t'), d: t('method.s5d') },
+  ];
   return (
     <section ref={ref} className="relative overflow-hidden py-32 md:py-48">
       <AmbientBackdrop />
       <div className="relative z-10 mx-auto max-w-5xl px-6">
         <div className="mb-20 text-center">
-          <p className="mh-eyebrow mh-reveal mb-6">השיטה</p>
+          <p className="mh-eyebrow mh-reveal mb-6">{t('method.eyebrow')}</p>
           <h2 className="mh-serif mh-reveal text-5xl tracking-tight sm:text-6xl md:text-7xl">
-            Exire Systema
+            {t('method.title')}
           </h2>
           <p className="mh-reveal mt-6 text-sm tracking-[0.32em] text-[hsl(var(--mh-mute))]">
-            ח מ י ש ה   ש ל ב י ם
+            {t('method.stepsLabel')}
           </p>
         </div>
 
@@ -371,7 +415,7 @@ function MethodSection() {
                 'linear-gradient(to bottom, transparent, hsl(var(--mh-line)), transparent)',
             }}
           />
-          {STEPS.map((s) => (
+          {steps.map((s) => (
             <li key={s.n} className="mh-reveal group relative grid grid-cols-[auto_1fr] gap-6 py-8 md:gap-12 md:py-10">
               <span
                 dir="ltr"
@@ -395,32 +439,31 @@ function MethodSection() {
 
 /* ─────────────── 5. Content ─────────────── */
 
-const TOPICS = [
-  { t: 'תודעה',           tag: 'I',   avif: topicConsciousnessAvif, webp: topicConsciousnessWebp, jpg: topicConsciousnessJpg },
-  { t: 'זהות',            tag: 'II',  avif: topicIdentityAvif, webp: topicIdentityWebp, jpg: topicIdentityJpg },
-  { t: 'היפנוזה',         tag: 'III', avif: topicHypnosisAvif, webp: topicHypnosisWebp, jpg: topicHypnosisJpg },
-  { t: 'Shadow Work',     tag: 'IV',  avif: topicShadowWorkAvif, webp: topicShadowWorkWebp, jpg: topicShadowWorkJpg },
-  { t: 'מערכות שליטה',    tag: 'V',   avif: topicControlSystemsAvif, webp: topicControlSystemsWebp, jpg: topicControlSystemsJpg },
-  { t: 'ריבונות פנימית',  tag: 'VI',  avif: topicSovereigntyAvif, webp: topicSovereigntyWebp, jpg: topicSovereigntyJpg },
-];
-
-function ContentSection() {
+function ContentSection({ t }: { t: T }) {
   const ref = useReveal<HTMLDivElement>();
+  const topics = [
+    { t: t('content.consciousness'), tag: 'I',   avif: topicConsciousnessAvif, webp: topicConsciousnessWebp, jpg: topicConsciousnessJpg },
+    { t: t('content.identity'),      tag: 'II',  avif: topicIdentityAvif, webp: topicIdentityWebp, jpg: topicIdentityJpg },
+    { t: t('content.hypnosis'),      tag: 'III', avif: topicHypnosisAvif, webp: topicHypnosisWebp, jpg: topicHypnosisJpg },
+    { t: t('content.shadow'),        tag: 'IV',  avif: topicShadowWorkAvif, webp: topicShadowWorkWebp, jpg: topicShadowWorkJpg },
+    { t: t('content.control'),       tag: 'V',   avif: topicControlSystemsAvif, webp: topicControlSystemsWebp, jpg: topicControlSystemsJpg },
+    { t: t('content.sovereignty'),   tag: 'VI',  avif: topicSovereigntyAvif, webp: topicSovereigntyWebp, jpg: topicSovereigntyJpg },
+  ];
   return (
     <section ref={ref} className="relative overflow-hidden py-32 md:py-48">
       <AmbientBackdrop />
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <div className="mb-16 text-center">
-          <p className="mh-eyebrow mh-reveal mb-6">התוכן</p>
+          <p className="mh-eyebrow mh-reveal mb-6">{t('content.eyebrow')}</p>
           <h2 className="mh-serif mh-reveal text-4xl sm:text-5xl md:text-6xl">
-            שדות החקירה
+            {t('content.title')}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-px overflow-hidden rounded-sm bg-[hsl(var(--mh-line))] sm:grid-cols-2 lg:grid-cols-3">
-          {TOPICS.map((topic) => (
+          {topics.map((topic) => (
             <article
-              key={topic.t}
+              key={topic.tag}
               className="mh-reveal group relative aspect-square overflow-hidden bg-[hsl(var(--mh-bg))]"
             >
               <Picture
@@ -449,26 +492,26 @@ function ContentSection() {
 
 /* ─────────────── 6. Final CTA ─────────────── */
 
-function FinalCTA({ onStart }: { onStart: () => void }) {
+function FinalCTA({ t, onStart }: { t: T; onStart: () => void }) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <section ref={ref} className="relative isolate overflow-hidden py-40 md:py-56">
       <AmbientBackdrop />
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <h2 className="mh-serif mh-reveal text-4xl leading-[1.2] sm:text-5xl md:text-7xl">
-          או שתמשיך לחיות
+          {t('finalCta.line1a')}
           <br />
-          <span className="text-[hsl(var(--mh-mute))]">מתוך מי שתכנתו אותך להיות.</span>
+          <span className="text-[hsl(var(--mh-mute))]">{t('finalCta.line1b')}</span>
         </h2>
         <p className="mh-serif mh-reveal mt-10 text-4xl leading-[1.2] sm:text-5xl md:text-7xl">
-          או שתתחיל לבנות
+          {t('finalCta.line2a')}
           <br />
-          <span className="text-[hsl(var(--mh-sand))]">את עצמך מחדש.</span>
+          <span className="text-[hsl(var(--mh-sand))]">{t('finalCta.line2b')}</span>
         </p>
 
         <div className="mh-reveal mt-16">
           <button onClick={onStart} className="mh-cta-primary">
-            היכנס פנימה
+            {t('finalCta.button')}
           </button>
         </div>
       </div>
@@ -478,7 +521,7 @@ function FinalCTA({ onStart }: { onStart: () => void }) {
 
 /* ─────────────── Footer ─────────────── */
 
-function Footer() {
+function Footer({ t }: { t: T }) {
   return (
     <footer className="relative border-t border-[hsl(var(--mh-line))] py-12">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 text-center">
@@ -486,7 +529,7 @@ function Footer() {
           avif={exireSigilAvif}
           webp={exireSigilWebp}
           fallback={exireSigilWebp}
-          alt="Exire Systema"
+          alt={t('header.brand')}
           width={96}
           height={144}
           imgClassName="h-12 w-12 object-contain opacity-70 mix-blend-screen"
@@ -494,10 +537,10 @@ function Footer() {
         />
 
         <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/80">
-          {BRAND}
+          {t('header.brand')}
         </span>
         <p className="mh-eyebrow text-[0.6rem] text-[hsl(var(--mh-mute))]">
-          תהליך אישי לבנייה מחדש של התודעה · כל הזכויות שמורות
+          {t('footer.tagline')}
         </p>
       </div>
     </footer>
