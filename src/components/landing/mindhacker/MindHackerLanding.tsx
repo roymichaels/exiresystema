@@ -7,6 +7,7 @@ import { Suspense, lazy, useState } from 'react';
 
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import Picture from './Picture';
+import OrbView from '@/components/orb/v2/OrbView';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation, type Language } from '@/i18n';
 
