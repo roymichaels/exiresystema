@@ -93,13 +93,13 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
   }, [open]);
 
   const tryClose = () => {
-    if (messages.length > 0 && !window.confirm('לסגור את הסריקה? המידע יאבד.')) return;
+    if (messages.length > 0 && !window.confirm(t('closeConfirm'))) return;
     onOpenChange(false);
   };
 
   const startScan = () => {
     setStarted(true);
-    void sendMessage({ text: 'התחל' });
+    void sendMessage({ text: t('startMessage') });
   };
 
   const sendText = (text: string) => {
@@ -174,8 +174,8 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
   const node = (
     <div
       className="mindhacker-theme fixed inset-0 z-[100] flex flex-col"
-      dir="rtl"
-      lang="he"
+      dir={isRTL ? "rtl" : "ltr"}
+      lang={language}
       style={{ background: '#050207' }}
     >
       <div className="absolute inset-0 -z-10 pointer-events-none">
@@ -198,7 +198,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
         </div>
         <button
           onClick={tryClose}
-          aria-label="סגור"
+          aria-label={t('closeAria')}
           className="rounded-full p-2 text-[hsl(var(--mh-mute))] transition-colors hover:text-[hsl(var(--mh-ink))]"
         >
           <X className="h-5 w-5" />
@@ -212,15 +212,15 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
             <CanonicalAionModel size={160} ariaLabel="AION" />
           </div>
           <h2 className="mh-serif text-3xl leading-[1.2] sm:text-5xl md:text-6xl max-w-2xl">
-            רוב האנשים חיים מתוך דפוסים
+            {t('hookTitleLine1')}
             <br />
-            <span className="text-[hsl(var(--mh-sand))]">שמעולם לא בחרו.</span>
+            <span className="text-[hsl(var(--mh-sand))]">{t('hookTitleLine2')}</span>
           </h2>
           <p className="mt-8 max-w-md text-base leading-[2] text-[hsl(var(--mh-mute))]">
-            בוא נראה מה מנהל אותך.
+            {t('hookSubtitle')}
           </p>
           <button onClick={startScan} className="mh-cta-primary mt-12">
-            התחל
+            {t('hookCta')}
           </button>
         </div>
       )}
@@ -233,13 +233,13 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
           </div>
           {revealDelayDone ? (
             <div className="animate-fade-in">
-              <p className="mh-eyebrow mb-6 opacity-70">זוהה</p>
+              <p className="mh-eyebrow mb-6 opacity-70">{t('revealLabel')}</p>
               <h2 className="mh-serif text-2xl leading-[1.3] sm:text-4xl md:text-5xl max-w-3xl">
                 {saveResult.pattern_diagnosis ||
-                  'זיהיתי את הדפוס שמנהל אותך כרגע.'}
+                  t('revealFallback')}
               </h2>
               <p className="mt-8 max-w-md text-base leading-[2] text-[hsl(var(--mh-mute))]">
-                השלב הבא כבר ממתין.
+                {t('revealSubtitle')}
               </p>
               {saveResult.whatsapp_url ? (
                 <a
@@ -248,11 +248,11 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
                   rel="noopener noreferrer"
                   className="mh-cta-primary mt-12 inline-block"
                 >
-                  המשך
+                  {t('revealContinue')}
                 </a>
               ) : (
                 <button onClick={() => onOpenChange(false)} className="mh-cta-primary mt-12">
-                  סגור
+                  {t('revealClose')}
                 </button>
               )}
             </div>
@@ -331,7 +331,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
 
               {error && (
                 <div className="text-sm text-red-400/80 text-center">
-                  שגיאה: {(error as Error).message}
+                  {t('errorPrefix')}{(error as Error).message}
                 </div>
               )}
             </div>
@@ -366,7 +366,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
                       }}
                       className="rounded-full px-4 py-2 text-sm text-[hsl(var(--mh-mute))] hover:text-[hsl(var(--mh-ink))] transition-colors"
                     >
-                      אחר…
+                      {t('otherChoice')}
                     </button>
                   )}
                 </div>
@@ -389,10 +389,10 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="כתוב, או פשוט תרגיש"
+                        placeholder={t('inputPlaceholder')}
                         disabled={isBusy}
                         rows={1}
-                        dir="rtl"
+                        dir={isRTL ? "rtl" : "ltr"}
                         className={cn(
                           'w-full bg-transparent px-4 py-3 text-sm',
                           'resize-none overflow-hidden',
@@ -412,7 +412,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
                         'dark:aion-glow-soft transition-opacity',
                         'disabled:opacity-40 disabled:cursor-not-allowed',
                       )}
-                      aria-label="שלח"
+                      aria-label={t('sendAria')}
                     >
                       {isBusy ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
