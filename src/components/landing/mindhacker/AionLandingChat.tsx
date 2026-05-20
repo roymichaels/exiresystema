@@ -148,9 +148,16 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
                 />
               ))}
               {(status === 'submitted' || status === 'streaming') && (
-                <div className="flex items-center gap-2 text-[hsl(var(--mh-mute))]">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[hsl(var(--mh-sand))]" />
-                  <span className="mh-eyebrow text-[0.6rem]">AION חושב…</span>
+                <div className="flex items-start gap-3 text-[hsl(var(--mh-mute))]">
+                  <OrbView
+                    size={28}
+                    state="thinking"
+                    tier="presence"
+                    profile={HOLO_AION_PROFILE}
+                    className="mt-0.5 h-7 w-7 shrink-0"
+                    ariaLabel=""
+                  />
+                  <span className="mh-eyebrow text-[0.6rem] leading-7">AION חושב…</span>
                 </div>
               )}
               {error && (
