@@ -93,9 +93,23 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
         {/* Header */}
         <header className="flex items-center justify-between border-b border-[hsl(var(--mh-line))] px-5 py-4">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--mh-sand))]" />
+            <span className="relative flex h-9 w-9 items-center justify-center">
+              <span
+                aria-hidden
+                className="absolute inset-[-4px] rounded-full"
+                style={{
+                  background:
+                    'radial-gradient(circle, hsl(var(--mh-sand) / 0.3) 0%, transparent 70%)',
+                }}
+              />
+              <OrbView
+                size={36}
+                state="idle"
+                tier="presence"
+                profile={HOLO_AION_PROFILE}
+                className="relative h-9 w-9"
+                ariaLabel=""
+              />
             </span>
             <div className="flex flex-col">
               <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-ink))]">
