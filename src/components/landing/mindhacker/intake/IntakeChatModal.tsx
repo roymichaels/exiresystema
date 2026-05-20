@@ -171,7 +171,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       lang="he"
       style={{ background: '#050207' }}
     >
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 -z-10 pointer-events-none">
         <ConsciousnessField intense={!started && !saveResult} />
       </div>
 
