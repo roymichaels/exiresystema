@@ -66,9 +66,9 @@ Deno.serve(async (req) => {
 
     const languageDirective =
       language === 'en'
-        ? '\n\n== LANGUAGE OVERRIDE ==\nRespond ONLY in English. Keep the same cinematic, soft, direct tone. Short paragraphs. No emojis. No heavy markdown. Translate all responses naturally to English.'
+        ? '\n\n== LANGUAGE OVERRIDE (HIGHEST PRIORITY) ==\nIgnore any previous instruction to reply in Hebrew. Respond ONLY in English, regardless of the language of the user message. Keep the same cinematic, soft, direct tone. Short paragraphs. No emojis. No heavy markdown. The [[OPEN_INTAKE]] token must remain exactly as-is in English.'
         : language === 'es'
-        ? '\n\n== ANULACIÓN DE IDIOMA ==\nResponde SOLO en español. Mantén el mismo tono cinematográfico, suave y directo. Párrafos cortos. Sin emojis. Sin markdown pesado. Traduce todas las respuestas naturalmente al español.'
+        ? '\n\n== ANULACIÓN DE IDIOMA (MÁXIMA PRIORIDAD) ==\nIgnora cualquier instrucción previa de responder en hebreo. Responde SOLO en español, sin importar el idioma del mensaje del usuario. Mantén el mismo tono cinematográfico, suave y directo. Párrafos cortos. Sin emojis. Sin markdown pesado. El token [[OPEN_INTAKE]] debe permanecer exactamente igual.'
         : '';
 
     const gateway = useOpenRouter
@@ -97,6 +97,7 @@ Deno.serve(async (req) => {
     const result = streamText({
       model: gateway(modelId),
       system: SYSTEM_PROMPT + languageDirective,
+
       messages: await convertToModelMessages(messages),
     });
 
