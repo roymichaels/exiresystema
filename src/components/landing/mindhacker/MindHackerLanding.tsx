@@ -8,6 +8,7 @@ import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import IntakeChatModal from './intake/IntakeChatModal';
 import founderHero from '@/assets/founder-hero.jpg';
 import founderPortrait from '@/assets/founder-portrait.jpg';
+import topicConsciousness from '@/assets/topic-consciousness.jpg';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
@@ -287,7 +288,7 @@ function MethodSection() {
 /* ─────────────── 5. Content ─────────────── */
 
 const TOPICS = [
-  { t: 'תודעה',           tag: 'I' },
+  { t: 'תודעה',           tag: 'I',  img: topicConsciousness },
   { t: 'זהות',            tag: 'II' },
   { t: 'היפנוזה',         tag: 'III' },
   { t: 'Shadow Work',     tag: 'IV' },
@@ -314,13 +315,30 @@ function ContentSection() {
               key={topic.t}
               className="mh-reveal group relative aspect-[4/5] overflow-hidden bg-[hsl(var(--mh-bg))] transition-colors duration-700 hover:bg-[hsl(var(--mh-bg-2))]"
             >
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
-                }}
-              />
+              {topic.img ? (
+                <>
+                  <img
+                    src={topic.img}
+                    alt={topic.t}
+                    className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-1000 group-hover:opacity-90 group-hover:scale-105"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(to top, hsl(var(--mh-bg)) 0%, hsla(0,0%,0%,0.2) 50%, transparent 100%)',
+                    }}
+                  />
+                </>
+              ) : (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'radial-gradient(ellipse at 30% 30%, hsla(35, 18%, 50%, 0.18) 0%, transparent 60%)',
+                  }}
+                />
+              )}
               <div className="absolute inset-0 flex flex-col justify-between p-8">
                 <span dir="ltr" className="mh-serif text-xl text-[hsl(var(--mh-sand))]">
                   {topic.tag}
