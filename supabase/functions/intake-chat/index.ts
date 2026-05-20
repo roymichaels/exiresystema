@@ -245,7 +245,11 @@ Deno.serve(async (req) => {
       }),
       execute: async (args) => {
         const supabase = buildSupabase();
-        const ai_analysis = { ...args.ai_analysis, pattern_diagnosis: args.pattern_diagnosis };
+        const ai_analysis = {
+          ...args.ai_analysis,
+          pattern_diagnosis: args.pattern_diagnosis,
+          change_depth: signals.change_depth ?? null,
+        };
         const row = {
           name: args.name,
           phone: args.phone,
