@@ -7,19 +7,18 @@ const Index = () => {
   const { user, loading } = useAuth();
 
   useSEO({
-    title: "מיינד האקר — אדריכל תודעה ואסטרטג זהות",
+    title: "Exire Systema — תהליך לבנייה מחדש של התודעה",
     description:
-      "Exire Systema — מערכת לפירוק התכנות התת־מודע ובנייה מחדש של זהות. למי שמוכן לכתוב את עצמו מחדש.",
-    keywords: "תודעה, תת מודע, היפנוזה, זהות, Shadow Work, ריבונות פנימית, מיינד האקר",
+      "Exire Systema — תהליך אישי לפירוק התכנות התת־מודע ובנייה מחדש של זהות. למי שמוכן לכתוב את עצמו מחדש.",
+    keywords: "Exire Systema, תודעה, תת מודע, היפנוזה, זהות, Shadow Work, ריבונות פנימית",
     type: "website",
     structuredData: [
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        name: "מיינד האקר",
-        jobTitle: "אדריכל תודעה ואסטרטג זהות תת־מודעת",
+        "@type": "Organization",
+        name: "Exire Systema",
         description:
-          "עבודה עם התת־מודע כקוד — זיהוי דפוסים, פירוק זהויות ישנות, ובניית ריבונות פנימית.",
+          "תהליך אישי לבנייה מחדש של התודעה — פירוק דפוסים, ריבונות פנימית, וזהות נכתבת מחדש.",
       },
     ],
   });
