@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { AmbientBackdrop, useReveal } from './AmbientBackdrop';
 import IntakeChatModal from './intake/IntakeChatModal';
+import founderHero from '@/assets/founder-hero.jpg';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
