@@ -32,8 +32,35 @@ export default function MindHackerLanding() {
         <FinalCTA onStart={startIntake} />
       </main>
       <Footer />
+      <AionFloatingWidget onOpen={startIntake} hidden={intakeOpen} />
       <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
     </div>
+  );
+}
+
+/* ─────────────── Floating AION chat widget ─────────────── */
+
+function AionFloatingWidget({ onOpen, hidden }: { onOpen: () => void; hidden: boolean }) {
+  if (hidden) return null;
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label="פתח שיחה עם AION"
+      className="group fixed z-40 flex items-center gap-2.5 rounded-full border border-[hsl(var(--mh-line))] bg-black/55 px-4 py-2.5 backdrop-blur-md transition-all hover:bg-black/75 hover:border-[hsl(var(--mh-sand))]"
+      style={{
+        insetInlineStart: 'max(1rem, env(safe-area-inset-left))',
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
+      }}
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--mh-sand))] opacity-60" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[hsl(var(--mh-sand))]" />
+      </span>
+      <span dir="ltr" className="mh-eyebrow text-[0.65rem] text-[hsl(var(--mh-sand))]">
+        Chat with AION
+      </span>
+    </button>
   );
 }
 
