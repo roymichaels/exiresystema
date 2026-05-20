@@ -156,11 +156,11 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
               {(status === 'submitted' || status === 'streaming') && (
                 <div className="flex items-start gap-3 text-[hsl(var(--mh-mute))]">
                   <OrbView
-                    size={28}
+                    size={32}
                     state="thinking"
-                    tier="presence"
+                    tier="standard"
                     profile={HOLO_AION_PROFILE}
-                    className="mt-0.5 h-7 w-7 shrink-0"
+                    className="mt-0.5 h-8 w-8 shrink-0"
                     ariaLabel=""
                   />
                   <span className="mh-eyebrow text-[0.6rem] leading-7">AION חושב…</span>
