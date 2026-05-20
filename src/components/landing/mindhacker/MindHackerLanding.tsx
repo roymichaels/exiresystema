@@ -69,9 +69,33 @@ export default function MindHackerLanding() {
 
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [intakeLoading, setIntakeLoading] = useState(false);
 
-  const startIntake = () => setIntakeOpen(true);
-  const openChat = () => setChatOpen(true);
+  // Prefetch heavy modal chunks during idle time so first click is instant
+  useEffect(() => {
+    const idle =
+      (window as any).requestIdleCallback ??
+      ((cb: () => void) => setTimeout(cb, 1500));
+    const cancel =
+      (window as any).cancelIdleCallback ?? ((id: number) => clearTimeout(id));
+    const id = idle(() => {
+      void intakeModalImport();
+      void aionChatImport();
+    });
+    return () => cancel(id);
+  }, []);
+
+  const startIntake = () => {
+    setIntakeLoading(true);
+    // Ensure chunk is loaded before flipping the state — gives instant UI feedback
+    void intakeModalImport().finally(() => {
+      setIntakeOpen(true);
+      setIntakeLoading(false);
+    });
+  };
+  const openChat = () => {
+    void aionChatImport().finally(() => setChatOpen(true));
+  };
 
   return (
     <div className="mindhacker-theme min-h-screen" dir={isRTL ? 'rtl' : 'ltr'} lang={language}>
@@ -86,6 +110,15 @@ export default function MindHackerLanding() {
       </main>
       <Footer t={t} />
       <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen} />
+      {intakeLoading && (
+        <div
+          className="fixed inset-0 z-[99] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div className="h-10 w-10 rounded-full border-2 border-[hsl(var(--mh-sand))/0.3] border-t-[hsl(var(--mh-sand))] animate-spin" />
+        </div>
+      )}
       {(chatOpen || intakeOpen) && (
         <Suspense fallback={null}>
           {chatOpen && (
@@ -103,6 +136,7 @@ export default function MindHackerLanding() {
     </div>
   );
 }
+
 
 /* ─────────────── Floating AION chat widget ─────────────── */
 
