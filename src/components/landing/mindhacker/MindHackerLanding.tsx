@@ -130,10 +130,10 @@ function TopBar() {
           fallback={exireSigilWebp}
           alt="Exire Systema"
           width={512}
-          height={512}
+          height={768}
           eager
           imgClassName="absolute inset-x-0 top-0 h-[140%] w-full object-contain opacity-80 mix-blend-screen"
-          style={{
+          imgStyle={{
             filter: 'brightness(1.05) contrast(0.95) saturate(0.8) drop-shadow(0 0 18px rgba(180,150,255,0.25))',
             clipPath: 'inset(0 0 32% 0)',
           }}
@@ -484,10 +484,11 @@ function Footer() {
           fallback={exireSigilWebp}
           alt="Exire Systema"
           width={96}
-          height={96}
+          height={144}
           imgClassName="h-12 w-12 object-contain opacity-70 mix-blend-screen"
-          style={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
+          imgStyle={{ filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(180,150,255,0.2))' }}
         />
+
         <span dir="ltr" className="mh-eyebrow tracking-[0.42em] text-[hsl(var(--mh-sand))]/80">
           {BRAND}
         </span>
