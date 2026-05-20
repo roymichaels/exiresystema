@@ -130,10 +130,10 @@ function TopBar() {
           fallback={exireSigilWebp}
           alt="Exire Systema"
           width={512}
-          height={512}
+          height={768}
           eager
           imgClassName="absolute inset-x-0 top-0 h-[140%] w-full object-contain opacity-80 mix-blend-screen"
-          style={{
+          imgStyle={{
             filter: 'brightness(1.05) contrast(0.95) saturate(0.8) drop-shadow(0 0 18px rgba(180,150,255,0.25))',
             clipPath: 'inset(0 0 32% 0)',
           }}
