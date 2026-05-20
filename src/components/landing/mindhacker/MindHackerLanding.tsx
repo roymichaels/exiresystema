@@ -476,12 +476,13 @@ function ContentSection({ t }: { t: T }) {
                 className="absolute inset-0 h-full w-full"
                 imgClassName="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
               />
-              <div className="absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-4 p-5 md:p-6">
-                <h3 className="mh-serif text-2xl text-[hsl(var(--mh-ink))] drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] md:text-3xl">{topic.t}</h3>
-                <span dir="ltr" className="mh-serif text-base text-[hsl(var(--mh-sand))]/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] md:text-lg">
-                  {topic.tag}
-                </span>
-              </div>
+              <span
+                dir="ltr"
+                className="mh-serif absolute bottom-5 z-10 text-base text-[hsl(var(--mh-sand))]/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] md:bottom-6 md:text-lg"
+                style={{ insetInlineStart: '1.25rem' }}
+              >
+                {topic.tag}
+              </span>
             </article>
           ))}
         </div>
