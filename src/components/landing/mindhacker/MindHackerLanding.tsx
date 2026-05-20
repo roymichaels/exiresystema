@@ -11,6 +11,7 @@ import founderPortrait from '@/assets/founder-portrait.jpg';
 import topicConsciousness from '@/assets/topic-consciousness.jpg';
 import topicIdentity from '@/assets/topic-identity.jpg';
 import topicHypnosis from '@/assets/topic-hypnosis.jpg';
+import topicShadowWork from '@/assets/topic-shadow-work.jpg';
 import './theme.css';
 
 const BRAND = 'מיינד האקר';
@@ -323,7 +324,7 @@ const TOPICS = [
   { t: 'תודעה',           tag: 'I',   img: topicConsciousness },
   { t: 'זהות',            tag: 'II',  img: topicIdentity },
   { t: 'היפנוזה',         tag: 'III', img: topicHypnosis },
-  { t: 'Shadow Work',     tag: 'IV' },
+  { t: 'Shadow Work',     tag: 'IV', img: topicShadowWork },
   { t: 'מערכות שליטה',    tag: 'V' },
   { t: 'ריבונות פנימית',  tag: 'VI' },
 ];
