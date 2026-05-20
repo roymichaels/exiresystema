@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 
-type Language = 'he' | 'en';
+type Language = 'he' | 'en' | 'es';
 
 interface LanguageContextType {
   language: Language;
