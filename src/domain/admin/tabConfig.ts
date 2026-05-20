@@ -76,14 +76,26 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     ],
   },
   {
+    id: 'coach',
+    labelHe: 'מאמן',
+    labelEn: 'Coach',
+    icon: Briefcase,
+    subTabs: [
+      { id: 'overview',   labelHe: 'סקירה',     labelEn: 'Overview',  component: CoachDashboardOverview },
+      { id: 'clients',    labelHe: 'מתאמנים',   labelEn: 'Clients',   component: CoachClientsTab },
+      { id: 'leads',      labelHe: 'לידים',     labelEn: 'Leads',     component: CoachLeadsTab },
+      { id: 'plans',      labelHe: 'תוכניות',   labelEn: 'Plans',     component: CoachPlansTab },
+      { id: 'marketing',  labelHe: 'שיווק',     labelEn: 'Marketing', component: CoachMarketingTab },
+      { id: 'profile',    labelHe: 'פרופיל',    labelEn: 'Profile',   component: CoachSettingsTab },
+    ],
+  },
+  {
     id: 'admin',
     labelHe: 'ניהול',
     labelEn: 'Admin',
     icon: Shield,
     subTabs: [
       { id: 'users', labelHe: 'משתמשים', labelEn: 'Users', component: Users },
-      { id: 'coaches', labelHe: 'מאמנים', labelEn: 'Coaches', component: AdminCoaches },
-      { id: 'leads', labelHe: 'לידים', labelEn: 'Leads', component: Leads },
       { id: 'businesses', labelHe: 'עסקים', labelEn: 'Businesses', component: Businesses },
       { id: 'aurora-insights', labelHe: 'תובנות', labelEn: 'Insights', component: AuroraInsights },
       { id: 'fm-bounties', labelHe: 'באונטי FM', labelEn: 'FM Bounties', component: AdminFMBounties },
