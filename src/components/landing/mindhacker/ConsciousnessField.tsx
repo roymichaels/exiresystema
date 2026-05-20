@@ -33,8 +33,8 @@ export function ConsciousnessField({ intense = false }: Props) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const mobile = window.innerWidth < 640;
-    const baseCount = intense ? 44 : 28;
-    const COUNT = reduced ? 0 : mobile ? Math.round(baseCount * 0.5) : baseCount;
+    const baseCount = intense ? 90 : 55;
+    const COUNT = reduced ? 0 : mobile ? Math.round(baseCount * 0.6) : baseCount;
 
     const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
 
