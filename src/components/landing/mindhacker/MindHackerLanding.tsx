@@ -365,20 +365,12 @@ function ContentSection() {
                     alt={topic.t}
                     className="absolute inset-0 h-full w-full object-cover transition-all duration-1000 group-hover:scale-105"
                   />
-                  {/* Stronger cinematic bottom-fade for readability of in-image Hebrew text */}
+                  {/* Soft vignette only — no bottom darkening so in-image Hebrew text stays readable */}
                   <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
                       background:
-                        'linear-gradient(to top, rgba(5,3,12,0.88) 0%, rgba(5,3,12,0.45) 55%, transparent 100%)',
-                    }}
-                  />
-                  {/* Soft vignette */}
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at center, transparent 55%, rgba(5,3,12,0.35) 100%)',
+                        'radial-gradient(ellipse at center, transparent 65%, rgba(5,3,12,0.18) 100%)',
                     }}
                   />
                 </>
