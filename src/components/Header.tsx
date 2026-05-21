@@ -27,6 +27,7 @@ import { toast } from "@/hooks/use-toast";
 import { handleError } from "@/lib/errorHandling";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./admin/NotificationBell";
+import { UserNotificationBell } from "./UserNotificationBell";
 import { useTheme } from "next-themes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -271,8 +272,8 @@ const Header = ({ variant = "public", brandColors, onMenuClick }: HeaderProps) =
           className="relative grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:px-6"
           style={{ minHeight: 56 }}
         >
-          {/* LEFT — menu */}
-          <div className="flex items-center justify-self-start">
+          {/* LEFT — menu + notifications (logged-in) */}
+          <div className="flex items-center justify-self-start gap-1">
             {user ? (
               <>
                 {(onMenuClick || isAdminMode) && (
@@ -290,6 +291,11 @@ const Header = ({ variant = "public", brandColors, onMenuClick }: HeaderProps) =
                   >
                     <Menu className="h-[18px] w-[18px]" />
                   </Button>
+                )}
+                {!loading && (
+                  isAdmin
+                    ? <NotificationBell />
+                    : <UserNotificationBell />
                 )}
                 {isAdminMode && (
                   <Button
@@ -324,7 +330,6 @@ const Header = ({ variant = "public", brandColors, onMenuClick }: HeaderProps) =
 
           {/* RIGHT — AION orb anchor */}
           <div className="flex items-center justify-self-end gap-2">
-            {user && isAdmin && !loading && <NotificationBell />}
             <OrbAnchor />
           </div>
         </div>
