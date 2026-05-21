@@ -5389,7 +5389,7 @@ export const he = {
       wantToSharePrompt: 'אני רוצה לשתף אותך במשהו שעובר עליי',
     },
     landing: {
-      header: { brand: 'EXIRE SYSTEMA' },
+      header: { brand: 'EXIRE SYSTEMA', login: 'התחברות' },
       widget: { chatLabel: 'chat with aion', brand: 'AION', invite: 'התחל שיחה', aria: 'פתח שיחה עם AION' },
       langToggle: { aria: 'החלף שפה', he: 'HE', en: 'EN', es: 'ES' },
       hero: {

@@ -10,7 +10,7 @@ export const es: TranslationKeys = {
   ...en,
   landing: {
     ...en.landing,
-    header: { brand: 'EXIRE SYSTEMA' },
+    header: { brand: 'EXIRE SYSTEMA', login: 'Iniciar sesión' },
     widget: {
       chatLabel: 'habla con aion',
       brand: 'AION',

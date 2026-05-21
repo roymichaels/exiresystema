@@ -11,6 +11,7 @@ import OrbView from '@/components/orb/v2/OrbView';
 import { HOLO_AION_PROFILE } from './holoAionProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation, type Language } from '@/i18n';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 
 // Hero assets — AVIF + WebP + tiny JPG fallback
 import founderHeroAvif from '@/assets/founder-hero.avif';
@@ -294,9 +295,19 @@ function LangToggle({ t }: { t: T }) {
 /* ─────────────── Top bar (logo only) ─────────────── */
 
 function TopBar({ t }: { t: T }) {
+  const { openAuthModal } = useAuthModal();
   return (
     <header className="absolute inset-x-0 top-0 z-30 flex flex-col items-center px-6 pt-6 md:pt-8">
       <LangToggle t={t} />
+      <button
+        type="button"
+        onClick={() => openAuthModal('login')}
+        className="mh-eyebrow absolute top-6 z-40 md:top-8 rounded-full border border-[hsl(var(--mh-line)/0.6)] bg-black/30 px-3 py-1.5 text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-ink))] backdrop-blur-md transition-colors duration-300 hover:border-[hsl(var(--mh-line))]"
+        style={{ insetInlineStart: 'max(1rem, env(safe-area-inset-left))' }}
+        dir="ltr"
+      >
+        {t('header.login')}
+      </button>
       <div className="relative h-24 w-24 md:h-28 md:w-28 overflow-hidden">
         <Picture
           avif={exireSigilAvif}
