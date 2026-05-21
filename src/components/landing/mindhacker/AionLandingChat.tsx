@@ -12,6 +12,8 @@ import OrbView from '@/components/orb/v2/OrbView';
 import { HOLO_AION_PROFILE } from './holoAionProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/i18n';
+import { logLandingChatMessage } from '@/lib/landingChatLog';
+import { trackEvent } from '@/lib/analytics';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/aion-landing-chat`;
 
@@ -68,10 +70,33 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
   const submit = (text: string) => {
     const value = text.trim();
     if (!value || status === 'streaming' || status === 'submitted') return;
+    void logLandingChatMessage('aion_landing_chat', 'user', value, language);
     sendMessage({ text: value });
     if (inputRef.current) inputRef.current.value = '';
     formInputRef.current = '';
   };
+
+  // Log each new assistant message once it appears.
+  const loggedAssistantRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    for (const m of messages) {
+      if (m.role !== 'assistant') continue;
+      if (loggedAssistantRef.current.has(m.id)) continue;
+      const text = (m.parts ?? [])
+        .map((p: any) => (p?.type === 'text' && typeof p.text === 'string' ? p.text : ''))
+        .join('\n')
+        .trim();
+      if (!text) continue;
+      loggedAssistantRef.current.add(m.id);
+      void logLandingChatMessage('aion_landing_chat', 'assistant', text, language);
+    }
+  }, [messages, language]);
+
+  useEffect(() => {
+    if (!error) return;
+    void trackEvent('chat_error', 'aion_landing_chat', 'aion_landing_chat', { message: String(error) });
+    void logLandingChatMessage('aion_landing_chat', 'system', `__error__ ${String(error)}`, language);
+  }, [error, language]);
 
   if (!open) return null;
 
