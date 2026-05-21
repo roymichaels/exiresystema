@@ -27,6 +27,7 @@ import { toast } from "@/hooks/use-toast";
 import { handleError } from "@/lib/errorHandling";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./admin/NotificationBell";
+import { UserNotificationBell } from "./UserNotificationBell";
 import { useTheme } from "next-themes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLanguage } from "@/contexts/LanguageContext";
