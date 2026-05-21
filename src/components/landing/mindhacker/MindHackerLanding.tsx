@@ -132,12 +132,21 @@ export default function MindHackerLanding() {
           {chatOpen && (
             <AionLandingChat
               open={chatOpen}
-              onOpenChange={setChatOpen}
+              onOpenChange={(o) => {
+                setChatOpen(o);
+                if (!o) void trackDialogClose('aion_landing_chat');
+              }}
               onOpenIntake={startIntake}
             />
           )}
           {intakeOpen && (
-            <IntakeChatModal open={intakeOpen} onOpenChange={setIntakeOpen} />
+            <IntakeChatModal
+              open={intakeOpen}
+              onOpenChange={(o) => {
+                setIntakeOpen(o);
+                if (!o) void trackDialogClose('intake_chat');
+              }}
+            />
           )}
         </Suspense>
       )}
