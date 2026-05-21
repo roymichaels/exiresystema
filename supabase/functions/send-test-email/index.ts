@@ -31,12 +31,11 @@ Deno.serve(async (req) => {
     </div>`;
 
   try {
-    const res = await fetch('https://connector-gateway.lovable.dev/resend/emails', {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': RESEND_API_KEY,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
         from: 'Mind Hacker <onboarding@resend.dev>',
