@@ -12,6 +12,7 @@ import { HOLO_AION_PROFILE } from './holoAionProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation, type Language } from '@/i18n';
 import { useAuthModal } from '@/contexts/AuthModalContext';
+import { trackCTAClick, trackDialogOpen, trackDialogClose } from '@/lib/analytics';
 
 // Hero assets — AVIF + WebP + tiny JPG fallback
 import founderHeroAvif from '@/assets/founder-hero.avif';
@@ -87,15 +88,21 @@ export default function MindHackerLanding() {
   }, []);
 
   const startIntake = () => {
+    void trackCTAClick('hero_start_intake', 'intake_chat');
     setIntakeLoading(true);
     // Ensure chunk is loaded before flipping the state — gives instant UI feedback
     void intakeModalImport().finally(() => {
       setIntakeOpen(true);
+      void trackDialogOpen('intake_chat');
       setIntakeLoading(false);
     });
   };
   const openChat = () => {
-    void aionChatImport().finally(() => setChatOpen(true));
+    void trackCTAClick('open_aion_landing_chat', 'aion_landing_chat');
+    void aionChatImport().finally(() => {
+      setChatOpen(true);
+      void trackDialogOpen('aion_landing_chat');
+    });
   };
 
   return (
@@ -301,7 +308,10 @@ function TopBar({ t }: { t: T }) {
       <LangToggle t={t} />
       <button
         type="button"
-        onClick={() => openAuthModal('login')}
+        onClick={() => {
+          void trackCTAClick('topbar_login', 'auth_modal');
+          openAuthModal('login');
+        }}
         className="mh-eyebrow absolute top-6 z-40 md:top-8 rounded-full border border-[hsl(var(--mh-line)/0.6)] bg-black/30 px-3 py-1.5 text-[0.6rem] tracking-[0.32em] text-[hsl(var(--mh-ink))] backdrop-blur-md transition-colors duration-300 hover:border-[hsl(var(--mh-line))]"
         style={{ insetInlineStart: 'max(1rem, env(safe-area-inset-left))' }}
         dir="ltr"
