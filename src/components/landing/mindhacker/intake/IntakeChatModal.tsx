@@ -146,9 +146,39 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       setRevealDelayDone(false);
       return;
     }
-    const t = setTimeout(() => setRevealDelayDone(true), 1200);
-    return () => clearTimeout(t);
-  }, [saveResult]);
+    void trackFormSubmit('intake_chat', true, { lead_id: saveResult.lead_id });
+    void logLandingChatMessage(
+      'intake_chat',
+      'system',
+      `__save_lead_success__ ${saveResult.pattern_diagnosis ?? ''}`,
+      language,
+    );
+    const tm = setTimeout(() => setRevealDelayDone(true), 1200);
+    return () => clearTimeout(tm);
+  }, [saveResult, language]);
+
+  // Log each new assistant message (text parts only) once it appears.
+  const loggedAssistantRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    for (const m of messages) {
+      if (m.role !== 'assistant') continue;
+      if (loggedAssistantRef.current.has(m.id)) continue;
+      const text = (m.parts ?? [])
+        .map((p: any) => (p?.type === 'text' && typeof p.text === 'string' ? p.text : ''))
+        .join('\n')
+        .trim();
+      if (!text) continue;
+      loggedAssistantRef.current.add(m.id);
+      void logLandingChatMessage('intake_chat', 'assistant', text, language);
+    }
+  }, [messages, language]);
+
+  // Log errors so admin can see why a conversation stalled.
+  useEffect(() => {
+    if (!error) return;
+    void trackEvent('chat_error', 'intake_chat', 'intake_chat', { message: String(error) });
+    void logLandingChatMessage('intake_chat', 'system', `__error__ ${String(error)}`, language);
+  }, [error, language]);
 
   const isBusy = status === 'streaming' || status === 'submitted';
   const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant');
