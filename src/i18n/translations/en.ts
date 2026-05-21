@@ -5308,7 +5308,7 @@ export const en: TranslationKeys = {
       wantToSharePrompt: "I want to share something that I'm going through",
     },
     landing: {
-      header: { brand: 'EXIRE SYSTEMA' },
+      header: { brand: 'EXIRE SYSTEMA', login: 'Login' },
       widget: { chatLabel: 'chat with aion', brand: 'AION', invite: 'Begin the dialogue', aria: 'Open AION chat' },
       langToggle: { aria: 'Change language', he: 'HE', en: 'EN', es: 'ES' },
       hero: {
