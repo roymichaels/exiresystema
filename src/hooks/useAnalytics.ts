@@ -25,7 +25,8 @@ import {
 export const useAnalytics = () => {
   const location = useLocation();
   const initialized = useRef(false);
-  const analyticsEnabled = import.meta.env.VITE_ENABLE_APP_ANALYTICS === "true";
+  // On by default. Set VITE_ENABLE_APP_ANALYTICS="false" to disable (emergency off-switch).
+  const analyticsEnabled = import.meta.env.VITE_ENABLE_APP_ANALYTICS !== "false";
 
   // Initialize session on first load
   useEffect(() => {
