@@ -407,9 +407,8 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
                       disabled={isBusy || !input.trim()}
                       className={cn(
                         'rounded-full h-11 w-11 shrink-0 flex items-center justify-center',
-                        'dark:bg-aion-blue bg-[hsl(var(--mh-sand))] text-[hsl(var(--mh-bg))]',
-                        'dark:hover:bg-aion-blue/90 hover:opacity-90',
-                        'dark:aion-glow-soft transition-opacity',
+                        'bg-[hsl(var(--mh-sand))] text-[hsl(var(--mh-bg))]',
+                        'hover:opacity-90 transition-opacity',
                         'disabled:opacity-40 disabled:cursor-not-allowed',
                       )}
                       aria-label={t('sendAria')}
