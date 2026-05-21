@@ -381,7 +381,7 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
                     <div
                       className={cn(
                         'flex-1 relative atmo-surface-soft transition-shadow rounded-2xl',
-                        'focus-within:dark:aion-glow-cyan focus-within:ring-1 focus-within:ring-[hsl(var(--mh-sand)/0.4)]',
+                        'focus-within:ring-1 focus-within:ring-[hsl(var(--mh-sand)/0.4)]',
                       )}
                     >
                       <textarea
