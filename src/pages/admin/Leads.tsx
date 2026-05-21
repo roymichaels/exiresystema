@@ -632,6 +632,10 @@ const Leads = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="transcripts">
+          <LandingChatTranscripts />
+        </TabsContent>
       </Tabs>
 
       {/* Lead Notes Dialog */}
