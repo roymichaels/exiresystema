@@ -11,6 +11,7 @@ import OrbView from '@/components/orb/v2/OrbView';
 import { HOLO_AION_PROFILE } from './holoAionProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation, type Language } from '@/i18n';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 
 // Hero assets — AVIF + WebP + tiny JPG fallback
 import founderHeroAvif from '@/assets/founder-hero.avif';
