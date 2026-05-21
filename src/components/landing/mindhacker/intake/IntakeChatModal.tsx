@@ -12,6 +12,8 @@ import { ConsciousnessFieldGL as ConsciousnessField } from '../ConsciousnessFiel
 import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/i18n';
+import { logLandingChatMessage } from '@/lib/landingChatLog';
+import { trackFormStart, trackFormSubmit, trackEvent } from '@/lib/analytics';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/intake-chat`;
 
@@ -99,11 +101,14 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
 
   const startScan = () => {
     setStarted(true);
+    void trackFormStart('intake_chat');
+    void logLandingChatMessage('intake_chat', 'system', `__scan_started__ ${t('startMessage')}`, language);
     void sendMessage({ text: t('startMessage') });
   };
 
   const sendText = (text: string) => {
     if (!text.trim() || status === 'streaming' || status === 'submitted') return;
+    void logLandingChatMessage('intake_chat', 'user', text, language);
     void sendMessage({ text });
     setInput('');
     setFreeformOpen(false);
