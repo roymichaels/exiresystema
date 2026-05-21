@@ -10,6 +10,7 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { trackEvent, trackSignupStart, trackSignupComplete } from "@/lib/analytics";
 
 export default function CloudAuthModal() {
   const { isAuthFlowOpen, completeAuthFlow, cancelAuthFlow, failAuthFlow } = useAuthModalInternal();
@@ -22,6 +23,8 @@ export default function CloudAuthModal() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    if (tab === "signup") void trackSignupStart();
+    else void trackEvent("login_start", "auth", "email");
     try {
       if (tab === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -30,6 +33,7 @@ export default function CloudAuthModal() {
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         if (error) throw error;
+        void trackSignupComplete();
         toast({
           title: isRTL ? "בדקו את האימייל" : "Check your email",
           description: isRTL
@@ -40,10 +44,14 @@ export default function CloudAuthModal() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        void trackEvent("login_success", "auth", "email");
         toast({ title: isRTL ? "התחברתם" : "Signed in" });
         completeAuthFlow();
       }
     } catch (err: any) {
+      void trackEvent(tab === "signup" ? "signup_failed" : "login_failed", "auth", "email", {
+        message: err?.message,
+      });
       failAuthFlow(err?.message || (isRTL ? "ההזדהות נכשלה" : "Authentication failed"));
     } finally {
       setLoading(false);
@@ -52,16 +60,19 @@ export default function CloudAuthModal() {
 
   const handleGoogle = async () => {
     setLoading(true);
+    void trackEvent("login_start", "auth", "google");
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
       if (!result.redirected) {
+        void trackEvent("login_success", "auth", "google");
         toast({ title: isRTL ? "התחברתם" : "Signed in" });
         completeAuthFlow();
       }
     } catch (err: any) {
+      void trackEvent("login_failed", "auth", "google", { message: err?.message });
       failAuthFlow(err?.message || (isRTL ? "ההתחברות עם Google נכשלה" : "Google sign-in failed"));
       setLoading(false);
     }

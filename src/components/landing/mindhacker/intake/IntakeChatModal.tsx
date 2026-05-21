@@ -12,6 +12,8 @@ import { ConsciousnessFieldGL as ConsciousnessField } from '../ConsciousnessFiel
 import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/i18n';
+import { logLandingChatMessage } from '@/lib/landingChatLog';
+import { trackFormStart, trackFormSubmit, trackEvent } from '@/lib/analytics';
 
 const ENDPOINT = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/intake-chat`;
 
@@ -99,11 +101,14 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
 
   const startScan = () => {
     setStarted(true);
+    void trackFormStart('intake_chat');
+    void logLandingChatMessage('intake_chat', 'system', `__scan_started__ ${t('startMessage')}`, language);
     void sendMessage({ text: t('startMessage') });
   };
 
   const sendText = (text: string) => {
     if (!text.trim() || status === 'streaming' || status === 'submitted') return;
+    void logLandingChatMessage('intake_chat', 'user', text, language);
     void sendMessage({ text });
     setInput('');
     setFreeformOpen(false);
@@ -141,9 +146,39 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       setRevealDelayDone(false);
       return;
     }
-    const t = setTimeout(() => setRevealDelayDone(true), 1200);
-    return () => clearTimeout(t);
-  }, [saveResult]);
+    void trackFormSubmit('intake_chat', true, { lead_id: saveResult.lead_id });
+    void logLandingChatMessage(
+      'intake_chat',
+      'system',
+      `__save_lead_success__ ${saveResult.pattern_diagnosis ?? ''}`,
+      language,
+    );
+    const tm = setTimeout(() => setRevealDelayDone(true), 1200);
+    return () => clearTimeout(tm);
+  }, [saveResult, language]);
+
+  // Log each new assistant message (text parts only) once it appears.
+  const loggedAssistantRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    for (const m of messages) {
+      if (m.role !== 'assistant') continue;
+      if (loggedAssistantRef.current.has(m.id)) continue;
+      const text = (m.parts ?? [])
+        .map((p: any) => (p?.type === 'text' && typeof p.text === 'string' ? p.text : ''))
+        .join('\n')
+        .trim();
+      if (!text) continue;
+      loggedAssistantRef.current.add(m.id);
+      void logLandingChatMessage('intake_chat', 'assistant', text, language);
+    }
+  }, [messages, language]);
+
+  // Log errors so admin can see why a conversation stalled.
+  useEffect(() => {
+    if (!error) return;
+    void trackEvent('chat_error', 'intake_chat', 'intake_chat', { message: String(error) });
+    void logLandingChatMessage('intake_chat', 'system', `__error__ ${String(error)}`, language);
+  }, [error, language]);
 
   const isBusy = status === 'streaming' || status === 'submitted';
   const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant');

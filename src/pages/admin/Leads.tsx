@@ -40,9 +40,10 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, Calendar, Search, Loader2, CheckCircle, Clock, UserCheck, Users, Trash2 } from "lucide-react";
+import { Mail, Phone, Calendar, Search, Loader2, CheckCircle, Clock, UserCheck, Users, Trash2, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import LandingChatTranscripts from "@/components/admin/leads/LandingChatTranscripts";
 
 interface Lead {
   id: string;
@@ -450,6 +451,10 @@ const Leads = () => {
             <Mail className="h-4 w-4" />
             לידים מפופאפ יציאה ({exitLeads.length})
           </TabsTrigger>
+          <TabsTrigger value="transcripts" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            תמלילי שיחות
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="leads">
@@ -626,6 +631,10 @@ const Leads = () => {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="transcripts">
+          <LandingChatTranscripts />
         </TabsContent>
       </Tabs>
 
