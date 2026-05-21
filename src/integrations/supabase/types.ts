@@ -5653,6 +5653,42 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          language: string | null
+          referrer: string | null
+          role: string
+          session_id: string
+          source: string
+          user_agent: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          language?: string | null
+          referrer?: string | null
+          role: string
+          session_id: string
+          source: string
+          user_agent?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          language?: string | null
+          referrer?: string | null
+          role?: string
+          session_id?: string
+          source?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       landing_pages: {
         Row: {
           benefits: Json | null
