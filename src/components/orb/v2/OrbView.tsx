@@ -122,19 +122,24 @@ export const OrbView = forwardRef<HTMLDivElement, OrbViewProps>(function OrbView
   const resolvedTier = resolveTier(size, tier);
   const segments = tierSegments(resolvedTier);
 
-  const [stageReady, setStageReady] = useState<boolean>(() => {
+  // Synchronous WebGL capability detection. We render the WebGL <View>
+  // unconditionally when WebGL is supported — the global SharedOrbStage
+  // mounts at the App root, so the tunneled View paints as soon as the
+  // shared Canvas is alive (no race on a "stage ready" flag).
+  const hasWebGL = useMemo<boolean>(() => {
     if (typeof window === 'undefined') return false;
-    return Boolean((window as Window & { __MINDOS_ORB_STAGE_READY__?: boolean }).__MINDOS_ORB_STAGE_READY__);
-  });
-
-  useEffect(() => {
-    const onStage = (event: Event) => {
-      const detail = (event as CustomEvent<{ ready?: boolean }>).detail;
-      setStageReady(Boolean(detail?.ready));
-    };
-
-    window.addEventListener('mindos:orb-stage', onStage as EventListener);
-    return () => window.removeEventListener('mindos:orb-stage', onStage as EventListener);
+    const w = window as Window & { __MINDOS_WEBGL_OK__?: boolean };
+    if (typeof w.__MINDOS_WEBGL_OK__ === 'boolean') return w.__MINDOS_WEBGL_OK__;
+    try {
+      const c = document.createElement('canvas');
+      const gl = (c.getContext('webgl2') || c.getContext('webgl')) as WebGLRenderingContext | null;
+      const ok = Boolean(gl);
+      w.__MINDOS_WEBGL_OK__ = ok;
+      return ok;
+    } catch {
+      w.__MINDOS_WEBGL_OK__ = false;
+      return false;
+    }
   }, []);
 
   // Visibility gating — pause heavy frame work when offscreen
@@ -167,9 +172,8 @@ export const OrbView = forwardRef<HTMLDivElement, OrbViewProps>(function OrbView
     intensityBoost: baseMul.intensityBoost * tierDamp.intensityBoost,
   };
   const legacyState = LEGACY_STATE_MAP[resolvedState];
-  // Use the WebGL stage at every tier (header → cinematic). Only fall back
-  // to the CSS renderer when WebGL is genuinely unavailable.
-  const shouldUseFallback = !stageReady;
+  // Only fall back to CSS when WebGL is genuinely unsupported on the device.
+  const shouldUseFallback = !hasWebGL;
 
   const Wrapper: any = onClick ? 'button' : 'div';
   return (
