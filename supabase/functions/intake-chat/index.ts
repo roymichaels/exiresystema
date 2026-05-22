@@ -554,10 +554,24 @@ Deno.serve(async (req) => {
         }
 
         const supabase = buildSupabase();
+
+        // Deep analyst pass — re-read the full conversation with a stronger model.
+        const lang: 'he' | 'en' | 'es' =
+          (body as any)?.language === 'en' || (body as any)?.language === 'es'
+            ? (body as any).language
+            : 'he';
+        const deepReport = await analyzeConversationDeep(
+          body.messages ?? [],
+          signals,
+          args.pattern_diagnosis,
+          lang,
+        );
+
         const ai_analysis = {
           ...args.ai_analysis,
           pattern_diagnosis: args.pattern_diagnosis,
           change_depth: signals.change_depth ?? null,
+          deep_report: deepReport,
         };
         const row = {
           name,
@@ -584,7 +598,7 @@ Deno.serve(async (req) => {
           console.error('lead insert failed:', error);
           return { ok: false, error: error.message };
         }
-        await notifyFounder({ ...row, ai_analysis });
+        await notifyFounder({ ...row, ai_analysis }, body.messages ?? []);
         return {
           ok: true,
           lead_id: data.id,
