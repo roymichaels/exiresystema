@@ -252,8 +252,13 @@ const ConversionMetrics = () => {
                           <stage.icon className="h-4 w-4" />
                           <span>{stage.name}</span>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
                           <span className="font-bold">{stage.value}</span>
+                          {(stage as any).dbValue !== undefined && (stage as any).dbValue !== stage.value && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+                              DB: {(stage as any).dbValue}
+                            </span>
+                          )}
                           {index > 0 && (
                             <span className="text-xs text-destructive">-{dropRate}%</span>
                           )}
