@@ -300,7 +300,7 @@ Deno.serve(async (req) => {
       }),
       execute: async (args) => {
         // Server-side preconditions — defense in depth against premature saves.
-        const inferredContact = inferContactFromText(latestUserText(body.messages));
+        const inferredContact = inferContactFromText(latestUserText(body.messages ?? []));
         const name = (args.name || inferredContact.name || '').trim();
         const phone = (args.phone || inferredContact.phone || '').trim();
         if (!signals.pain_category && !signals.transformation_vision) {
@@ -377,7 +377,7 @@ Deno.serve(async (req) => {
       tools,
       stopWhen: stepCountIs(50),
     });
-    return result.toUIMessageStreamResponse({
+    return (result.toUIMessageStreamResponse as any)({
       headers: corsHeaders,
       originalMessages: body.messages,
     });
