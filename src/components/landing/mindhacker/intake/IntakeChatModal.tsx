@@ -127,18 +127,22 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
     }
   };
 
-  // Extract latest save_lead result
+  // Extract latest save_lead result — tolerate SDK part-shape variants
   const saveResult: SaveLeadResult | null = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
       const m = messages[i] as UIMessage;
       for (const part of m.parts ?? []) {
         const anyPart = part as any;
-        if (
-          anyPart?.type === 'tool-save_lead' &&
-          anyPart.state === 'output-available' &&
-          anyPart.output?.ok
-        ) {
-          return anyPart.output as SaveLeadResult;
+        const typeStr: string = typeof anyPart?.type === 'string' ? anyPart.type : '';
+        const isSaveLead =
+          typeStr === 'tool-save_lead' ||
+          typeStr === 'tool-result-save_lead' ||
+          (typeStr.includes('save_lead') && typeStr.startsWith('tool')) ||
+          anyPart?.toolName === 'save_lead';
+        if (!isSaveLead) continue;
+        const payload = anyPart.output ?? anyPart.result ?? anyPart.response ?? null;
+        if (payload && payload.ok) {
+          return payload as SaveLeadResult;
         }
       }
     }
