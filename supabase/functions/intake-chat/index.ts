@@ -341,10 +341,23 @@ Deno.serve(async (req) => {
           .default({}),
       }),
       execute: async (args) => {
-        // Server-side preconditions — defense in depth against premature saves.
+        // Merge with signals recovered from message history (survives across requests).
+        const recovered = recoverSignalsFromHistory(body.messages ?? []);
+        for (const [k, v] of Object.entries(recovered)) {
+          if (signals[k] === undefined || signals[k] === null) signals[k] = v;
+        }
+
         const inferredContact = inferContactFromText(latestUserText(body.messages ?? []));
-        const name = (args.name || inferredContact.name || '').trim();
-        const phone = (args.phone || inferredContact.phone || '').trim();
+        // Prefer inferred phone (real digits from the user) over whatever the AI sent.
+        const phone = (inferredContact.phone || args.phone || '').trim();
+        // Prefer inferred name; reject AI-supplied "name" that's just digits/+.
+        const argNameLooksLikePhone = /^[+\d\s().-]+$/.test((args.name || '').trim());
+        const name = (
+          inferredContact.name ||
+          (argNameLooksLikePhone ? '' : args.name) ||
+          ''
+        ).trim();
+
         if (!signals.pain_category && !signals.transformation_vision) {
           console.warn('save_lead rejected: missing pain/vision signals');
           return { ok: false, error: 'precondition_failed: missing pain or vision signals — keep asking' };
