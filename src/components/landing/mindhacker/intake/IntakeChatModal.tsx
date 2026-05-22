@@ -210,7 +210,9 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
     return null;
   }, [messages, lastAssistant]);
 
-  // Pending request_contact from latest assistant turn
+  // Pending request_contact from latest assistant turn.
+  // Primary path: AI called the request_contact tool.
+  // Fallback: AI wrote the ask as plain text ("שם" + "וואטסאפ/טלפון" etc.).
   const pendingContact: { sentence?: string } | null = useMemo(() => {
     if (!lastAssistant) return null;
     const lastIdx = messages.indexOf(lastAssistant);
@@ -228,6 +230,16 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
       const payload = p?.output ?? p?.result ?? p?.input ?? null;
       if (payload) return payload as { sentence?: string };
       return {};
+    }
+    // Text-based fallback: detect the contact ask in assistant text.
+    const text = (lastAssistant.parts ?? [])
+      .map((p: any) => (p?.type === 'text' && typeof p.text === 'string' ? p.text : ''))
+      .join(' ')
+      .trim();
+    if (text) {
+      const asksName = /\bשם\b|\bname\b|nombre/i.test(text);
+      const asksPhone = /וואטסאפ|טלפון|whatsapp|phone|teléfono|telefono/i.test(text);
+      if (asksName && asksPhone) return { sentence: text };
     }
     return null;
   }, [messages, lastAssistant]);

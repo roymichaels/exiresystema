@@ -179,8 +179,45 @@ function inferContactFromText(text: string): { name?: string; phone?: string } {
     .replace(/[+:,;|/\\()[\]{}<>"'`~!@#$%^&*_=?\d]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  const name = withoutPhone.split(' ').filter((token) => token.length >= 2).slice(0, 3).join(' ');
+  const cleaned = withoutPhone
+    .replace(/^(שמי|השם שלי|אני|my name is|name|שם)\s*[:\-]?\s*/i, '')
+    .replace(/\s+(הטלפון שלי|הטלפון|טלפון|וואטסאפ|phone|whatsapp).*$/i, '')
+    .trim();
+  const name = cleaned.split(' ').filter((token) => token.length >= 2).slice(0, 3).join(' ');
   return { name: name || undefined, phone };
+}
+
+/**
+ * Recover signals from prior tool calls in conversation history so save_lead
+ * preconditions survive across requests (the in-memory `signals` resets each turn).
+ */
+function recoverSignalsFromHistory(messages: UIMessage[]): Record<string, unknown> {
+  const recovered: Record<string, unknown> = {};
+  for (const m of messages ?? []) {
+    if ((m as any)?.role !== 'assistant') continue;
+    const parts = (m as any).parts ?? [];
+    for (const p of parts) {
+      const typeStr: string = typeof p?.type === 'string' ? p.type : '';
+      const toolName = typeStr.startsWith('tool-') ? typeStr.slice(5) : p?.toolName;
+      const input = p?.input ?? p?.args ?? null;
+      if (!toolName || !input) continue;
+      if (toolName === 'set_pain_signal') {
+        if (input.category) recovered.pain_category = input.category;
+        if (input.duration) recovered.pain_duration = input.duration;
+        if (Array.isArray(input.prior_attempts)) recovered.prior_attempts = input.prior_attempts;
+      } else if (toolName === 'set_readiness') {
+        if (input.desired_outcome) recovered.desired_outcome = input.desired_outcome;
+        if (typeof input.readiness_score === 'number') recovered.readiness_score = input.readiness_score;
+        if (input.intent) recovered.intent = input.intent;
+        if (input.change_depth) recovered.change_depth = input.change_depth;
+      } else if (toolName === 'set_vision') {
+        if (input.transformation_vision) recovered.transformation_vision = input.transformation_vision;
+        if (input.intent && !recovered.intent) recovered.intent = input.intent;
+        if (input.change_depth && !recovered.change_depth) recovered.change_depth = input.change_depth;
+      }
+    }
+  }
+  return recovered;
 }
 
 Deno.serve(async (req) => {
@@ -304,10 +341,23 @@ Deno.serve(async (req) => {
           .default({}),
       }),
       execute: async (args) => {
-        // Server-side preconditions — defense in depth against premature saves.
+        // Merge with signals recovered from message history (survives across requests).
+        const recovered = recoverSignalsFromHistory(body.messages ?? []);
+        for (const [k, v] of Object.entries(recovered)) {
+          if (signals[k] === undefined || signals[k] === null) signals[k] = v;
+        }
+
         const inferredContact = inferContactFromText(latestUserText(body.messages ?? []));
-        const name = (args.name || inferredContact.name || '').trim();
-        const phone = (args.phone || inferredContact.phone || '').trim();
+        // Prefer inferred phone (real digits from the user) over whatever the AI sent.
+        const phone = (inferredContact.phone || args.phone || '').trim();
+        // Prefer inferred name; reject AI-supplied "name" that's just digits/+.
+        const argNameLooksLikePhone = /^[+\d\s().-]+$/.test((args.name || '').trim());
+        const name = (
+          inferredContact.name ||
+          (argNameLooksLikePhone ? '' : args.name) ||
+          ''
+        ).trim();
+
         if (!signals.pain_category && !signals.transformation_vision) {
           console.warn('save_lead rejected: missing pain/vision signals');
           return { ok: false, error: 'precondition_failed: missing pain or vision signals — keep asking' };
