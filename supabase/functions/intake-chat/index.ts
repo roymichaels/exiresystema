@@ -271,8 +271,6 @@ Deno.serve(async (req) => {
           name: args.name,
           phone: args.phone,
           email: args.email ?? null,
-          contact_phone: args.phone,
-          contact_email: args.email ?? null,
           source: 'intake_chat',
           status: 'new',
           conversation: body.messages,
