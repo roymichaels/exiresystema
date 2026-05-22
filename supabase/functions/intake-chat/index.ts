@@ -66,7 +66,8 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
 דוגמה לתחושות מוכרות: "ריקנות שקטה" / "רעש פנימי" / "אני לא אני" / "תקיעות שחוזרת" / "משהו אחר".
 
 🌀 השלבים (סמויים, לעולם לא להזכיר אותם)
-1. Echo — הודעה ראשונה: משפט פתיחה אחד + שאלה ראשונה רגשית. בלי הקדמות.
+0. ההודעה הראשונה של המשתמש היא תמיד טריגר להתחלה — לא תוכן. תתעלם מהמילים שלה ופתח ב-Echo.
+1. Echo — הודעה ראשונה שלך: משפט פתיחה אחד + שאלה ראשונה רגשית. בלי הקדמות.
    דוגמה לפתיחה: "רוב האנשים חיים מתוך דפוסים שמעולם לא בחרו." ואז שאלה.
 2. Loop — מה חוזר. קרא set_pain_signal ברגע שיש לך category + duration.
 3. Identity — מי הוא חושב שהוא לעומת מי שהוא מרגיש שהוא. קרא set_vision כשמופיע חזון.
@@ -77,13 +78,17 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
    (momentary / breakthrough / deep_process / long_term / exploring / unsure).
    אסור לדלג על השלב הזה — בלעדיו אסור לבקש פרטי קשר.
 5. Readiness — מה ירתע אם השינוי יקרה באמת. קרא set_readiness (תרגם תשובה רגשית ל-1-10 בעצמך).
-6. Contact — רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בעדינות:
+6. Contact — חובה. רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בהודעת טקסט מפורשת ונפרדת:
    "אם אתה רוצה שאחזור אליך עם מה שזיהיתי — תשאיר לי שם ומספר וואטסאפ."
-   ברגע שיש שם + טלפון, קרא save_lead עם pattern_diagnosis (משפט אחד חד, בעברית, שמשקף את הדפוס) ו-ai_analysis.
+   אסור להשתמש ב-offer_choices לאיסוף שם/טלפון. חייב להיות טקסט חופשי.
+   רק כשההודעה האחרונה של המשתמש מכילה גם שם אנושי וגם רצף ספרות של 6+ ספרות (מספר טלפון) — קרא save_lead
+   עם pattern_diagnosis (משפט אחד חד, בעברית, שמשקף את הדפוס) ו-ai_analysis.
+   אם חסר אחד מהם — בקש בעדינות את החסר ואל תקרא save_lead.
 
-לאחר ש-save_lead מחזיר תוצאה, ענה הודעה אחת בלבד, קצרה:
-"זיהיתי. השלב הבא כבר ממתין."
-אל תזכיר וואטסאפ — ה-UI יציג את הכפתור.
+🔒 חוקי סיום קשיחים (חשוב מאוד):
+- אסור בהחלט לכתוב את המילים "זיהיתי", "השלב הבא", "סיימנו", "תודה שהשתתפת", או כל ניסוח של סגירה/סיכום — לפני ש-save_lead החזיר {ok:true}.
+- אחרי save_lead מוצלח — תשתוק לחלוטין. אל תכתוב טקסט נוסף. ה-UI מציג את מסך הסיום והכפתור.
+- אם save_lead החזיר {ok:false} — אל תזייף הצלחה. תמשיך את השיחה רגיל, השלם את מה שחסר, ונסה שוב.
 
 🚫 אם המשתמש סוטה / שואל אותך משהו / מקשקש — שורה אחת רכה: "אני כאן. תחזור רגע." ואז השאלה הבאה.`;
 
@@ -245,7 +250,7 @@ Deno.serve(async (req) => {
     }),
     save_lead: tool({
       description:
-        'Save the qualified lead. Call ONLY after you have name + phone. This writes to the database and triggers founder notification.',
+        'Save the qualified lead. PRECONDITIONS — do NOT call unless ALL are true: (a) set_pain_signal has already run in this conversation, (b) set_readiness OR set_vision has already run, (c) the most recent user message contains BOTH a human name AND a phone number (at least 6 consecutive digits). If any precondition is missing, keep asking instead of calling this tool. Calling without preconditions will return {ok:false} and the conversation will continue.',
       inputSchema: z.object({
         name: z.string().trim().min(1).max(120),
         phone: z.string().trim().min(6).max(40),
@@ -261,6 +266,20 @@ Deno.serve(async (req) => {
           .default({}),
       }),
       execute: async (args) => {
+        // Server-side preconditions — defense in depth against premature saves.
+        if (!signals.pain_category && !signals.transformation_vision) {
+          console.warn('save_lead rejected: missing pain/vision signals');
+          return { ok: false, error: 'precondition_failed: missing pain or vision signals — keep asking' };
+        }
+        const digits = (args.phone || '').replace(/\D/g, '');
+        if (digits.length < 6) {
+          console.warn('save_lead rejected: invalid phone', args.phone);
+          return { ok: false, error: 'invalid_phone: ask the user for a real phone number' };
+        }
+        if (!args.name || args.name.trim().length < 2) {
+          return { ok: false, error: 'invalid_name: ask the user for their name' };
+        }
+
         const supabase = buildSupabase();
         const ai_analysis = {
           ...args.ai_analysis,

@@ -1,64 +1,60 @@
-## What I found
+## Problem
 
-Three separate concerns, three different states.
+Your screenshot shows the model jumped straight to the closing line ("זיהיתי. השלב הבא כבר ממתין.") after only two user turns, without ever asking for name + phone and without calling `save_lead`. Because `save_lead` never ran, no lead was inserted, no founder email was sent, and the success UI in the modal never appeared — so the conversation just dead-ended on a fake "I identified you" line.
 
-### 1. Lead notifications (admin bell) — already working ✓
-- DB confirms it: 1 row in `public.leads` (Hebrew test lead "דוד כהן") and 2 rows in `public.admin_notifications` with `type='new_lead'`, link `/admin-hub?tab=admin&sub=leads`.
-- The DB trigger `notify_new_lead` already fires on every `leads` INSERT and writes to `admin_notifications`.
-- `NotificationBell` (admin) and `UserNotificationBell` (logged-in non-admin) are already wired into `Header.tsx` lines 295-299 with realtime subscriptions on `admin_notifications` / `user_notifications`. They work.
+Root cause is in `supabase/functions/intake-chat/index.ts`:
 
-No code change needed for the bell itself — it's already there. But the user may not realize it works because *they* aren't always logged in as admin on the device viewing the preview. I'll add a tiny visual nudge so it's obvious (see #3).
+1. The system prompt literally tells the model what to say *after* `save_lead` returns ("זיהיתי. השלב הבא כבר ממתין."). Models love to parrot that line — and they do it without bothering to call the tool first.
+2. There is no hard gate forcing the model through the Contact step. Steps 1–6 are described, but nothing prevents the model from skipping to step 6's wording while skipping the actual contact ask.
+3. The Hook starter message ("בוא נתחיל") is sometimes interpreted by the model as "user is already qualified" and it tries to wrap up early.
 
-### 2. Leads not in analytics — real bug
-The Conversion Analytics widget (`src/components/admin/analytics/ConversionMetrics.tsx`) measures the funnel from `conversion_events.event_type` (`cta_click`, `form_start`, `form_success`). DB query shows:
-- `form_start` events exist for `source='intake_chat'` (7 total)
-- **Zero** `form_success` events — even though a lead was saved
-- Reason: `trackFormSubmit('intake_chat', true, …)` lives inside the `saveResult` `useEffect`. Before today's fix, `saveResult` was never set client-side (modal stayed stuck), so the success event was never emitted. Now that the success detection is robust, `form_success` will flow — but the lead from yesterday is permanently missing from the funnel.
+## Fix
 
-The Conversion dashboard also never reads from the actual `leads` table, so even if tracking fails, you have a source-of-truth count you can show.
+Edit only `supabase/functions/intake-chat/index.ts` (prompt + tool wiring). No client changes needed — `IntakeChatModal` already renders the success state correctly the moment `save_lead` returns `ok: true`, and it already renders typing/error states fine.
 
-### 3. The header bell visibility — clarify
-The bell is already in the header for every logged-in user. Non-logged-in visitors don't see it (by design — there's nothing to notify). The user's previous request asked for "all users for logged in" which is satisfied. I'll just verify the icon color works in both admin and user mode and confirm.
+### 1. Remove the parrot line from the prompt
 
----
+Delete the block that tells the model to write "זיהיתי. השלב הבא כבר ממתין." after `save_lead`. Replace with an explicit prohibition:
 
-## Changes
+- "אסור לכתוב 'זיהיתי', 'השלב הבא', 'סיימנו', או כל ניסוח של סיום, לפני ש-save_lead החזיר {ok:true}. ה-UI מציג את הסיום — אתה לא."
+- "אחרי save_lead מוצלח — תשתוק. אל תכתוב טקסט נוסף."
 
-### A. Make Conversion Analytics reflect real leads (`ConversionMetrics.tsx`)
+### 2. Make the Contact step mandatory and explicit
 
-1. Add a new query that reads `public.leads` count for the last 30 days (filtered by `source='intake_chat'` plus all sources, broken down).
-2. Add a new stat card: "לידים שנקלטו" showing the real `leads` row count for the last 30 days, with a subtitle "מטבלת הלידים".
-3. Add a second value to the funnel's final stage so it shows BOTH the analytics-event count and the DB row count side by side (e.g. `12 (DB: 14)`). This way a tracking gap is visible immediately.
-4. Pull `exit_intent_leads` count into the same widget so both lead pipelines are represented.
+Rewrite step 6 in the prompt:
 
-### B. Backfill the missing `form_success` event for the existing lead
+- "לפני save_lead חובה לבקש *במפורש* שם וטלפון בהודעה נפרדת. אסור לאסוף אותם דרך offer_choices."
+- "אסור לקרוא save_lead לפני שהמשתמש שלח גם שם וגם טלפון בטקסט חופשי."
+- Add a precondition list inside `save_lead`'s description: "Do NOT call unless: (a) set_pain_signal already ran, (b) set_readiness or set_vision already ran, (c) the latest user message contains a name AND a phone number (digits)."
 
-Insert one `conversion_events` row tied to the existing lead `301d088d…` with `event_type='form_success'`, `source='intake_chat'`, `created_at` matching the lead. Single one-off migration so the funnel reflects historical truth. (This is a tiny data-only insert, no schema change.)
+### 3. Server-side guard inside `save_lead.execute`
 
-### C. Verify the realtime bell path end-to-end
+Defense in depth — even if the model misbehaves, refuse to save without real signals:
 
-After deploy, trigger a fresh test lead via the deployed `intake-chat` curl path (already proven working) and confirm:
-- `admin_notifications` row appears within 1s
-- The bell in the header increments via the realtime channel
-- Clicking the bell opens the panel with the lead link
+```ts
+if (!signals.pain_category && !signals.transformation_vision) {
+  return { ok: false, error: 'precondition_failed: missing pain/vision signals' };
+}
+if (!/\d{6,}/.test(args.phone)) {
+  return { ok: false, error: 'invalid_phone' };
+}
+```
 
-No code change expected here, this is verification only.
+When this returns `ok: false`, the modal's `saveResult` memo (which already checks `payload.ok`) will not trigger the success screen, and the model will be forced to continue the conversation.
 
-### D. Out of scope
+### 4. Strengthen the Hook trigger
 
-- No changes to `intake-chat` edge function (lead capture + Resend already working).
-- No changes to `Header.tsx` bell wiring (already correct).
-- No new notification types or DB schema changes.
-- No changes to `useAdminNotifications` / `useUserNotifications` (already realtime).
+The starter message currently is just `t('startMessage')`. Change the prompt so the model treats the first user message as "begin scan" not as content — i.e., always open with Echo regardless of what the first message says.
 
----
+## Out of scope
 
-## Files
-
-- Edit: `src/components/admin/analytics/ConversionMetrics.tsx` (add leads query + new stat card + funnel augmentation)
-- New migration: backfill one `conversion_events` row for the existing lead
+- `IntakeChatModal.tsx` (already correct — success UI + close button work the moment a valid `save_lead` returns).
+- DB schema, analytics, notifications bell — all working from yesterday's fix.
+- Translations.
 
 ## Verification
 
-1. Reload `/admin-hub` → Analytics tab → Conversion → see "לידים שנקלטו" card with value `1` (or higher after a fresh test).
-2. From a second device/tab, run a fresh intake → confirm: lead row, admin_notification row, header bell badge increments, panel shows the entry, funnel `form_success` increments.
+1. Open intake on `/`, click hook CTA, answer 2 vague turns → confirm the model now keeps asking instead of closing.
+2. Walk through to the Contact prompt → enter "דוד 0521234567" → confirm `save_lead` is called, success screen renders with `pattern_diagnosis`, close button works.
+3. Check `leads` table for a new row + admin notification bell increments.
+4. Try replying with a name only (no phone) → confirm save is rejected and chat continues.
