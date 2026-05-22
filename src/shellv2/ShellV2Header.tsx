@@ -16,10 +16,13 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { openInteractiveAION } from '@/components/aion/InteractiveAIONHost';
 import { AionHeader } from '@/components/aion/ui';
 import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
+import { UserNotificationBell } from '@/components/UserNotificationBell';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ShellV2Header() {
   const overlay = useOverlay();
   const { language, isRTL } = useTranslation();
+  const { user } = useAuth();
   const [brandOpen, setBrandOpen] = useState(false);
   const brand = 'AION';
   const isHe = language === 'he';
