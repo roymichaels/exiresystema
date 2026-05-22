@@ -81,7 +81,9 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
 6. Contact — חובה. רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בהודעת טקסט מפורשת ונפרדת:
    "אם אתה רוצה שאחזור אליך עם מה שזיהיתי — תשאיר לי שם ומספר וואטסאפ."
    אסור להשתמש ב-offer_choices לאיסוף שם/טלפון. חייב להיות טקסט חופשי.
-   רק כשההודעה האחרונה של המשתמש מכילה גם שם אנושי וגם רצף ספרות של 6+ ספרות (מספר טלפון) — קרא save_lead
+   שם עברי קצר כמו "דין" הוא שם תקין. מספר בינלאומי עם + כמו "+525612966383" הוא מספר תקין.
+   בגלל RTL ייתכן שה-+ יוצג בסוף המספר; זה עדיין תקין. אל תבקש שוב אם יש שם + 6 ספרות ומעלה.
+   רק כשההודעה האחרונה של המשתמש מכילה גם שם של 2+ תווים וגם 6+ ספרות בסך הכול (מספר טלפון) — קרא save_lead
    עם pattern_diagnosis (משפט אחד חד, בעברית, שמשקף את הדפוס) ו-ai_analysis.
    אם חסר אחד מהם — בקש בעדינות את החסר ואל תקרא save_lead.
 
@@ -151,6 +153,37 @@ function buildWhatsappUrl(name: string): string {
   if (!FOUNDER_WHATSAPP_NUMBER) return '';
   const text = encodeURIComponent(`שלום, אני ${name}. סיימתי את הסריקה במיינד האקר ואני רוצה להתחיל.`);
   return `https://wa.me/${FOUNDER_WHATSAPP_NUMBER}?text=${text}`;
+}
+
+function messageText(message: any): string {
+  if (!message) return '';
+  if (typeof message.content === 'string') return message.content;
+  if (Array.isArray(message.parts)) {
+    return message.parts
+      .map((part: any) => (typeof part?.text === 'string' ? part.text : typeof part?.content === 'string' ? part.content : ''))
+      .join(' ')
+      .trim();
+  }
+  return '';
+}
+
+function latestUserText(messages: UIMessage[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if ((messages[i] as any)?.role === 'user') return messageText(messages[i]);
+  }
+  return '';
+}
+
+function inferContactFromText(text: string): { name?: string; phone?: string } {
+  const phoneMatch = text.match(/(?:\+?\d[\d\s().-]{5,}\d|\d{6,})/);
+  const phone = phoneMatch?.[0]?.trim();
+  const withoutPhone = text
+    .replace(/(?:\+?\d[\d\s().-]{5,}\d|\d{6,})/g, ' ')
+    .replace(/[+:,;|/\\()[\]{}<>"'`~!@#$%^&*_=?\d]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const name = withoutPhone.split(' ').filter((token) => token.length >= 2).slice(0, 3).join(' ');
+  return { name: name || undefined, phone };
 }
 
 Deno.serve(async (req) => {
@@ -250,7 +283,7 @@ Deno.serve(async (req) => {
     }),
     save_lead: tool({
       description:
-        'Save the qualified lead. PRECONDITIONS — do NOT call unless ALL are true: (a) set_pain_signal has already run in this conversation, (b) set_readiness OR set_vision has already run, (c) the most recent user message contains BOTH a human name AND a phone number (at least 6 consecutive digits). If any precondition is missing, keep asking instead of calling this tool. Calling without preconditions will return {ok:false} and the conversation will continue.',
+        'Save the qualified lead. PRECONDITIONS — do NOT call unless ALL are true: (a) set_pain_signal has already run in this conversation, (b) set_readiness OR set_vision has already run, (c) the most recent user message contains BOTH a human name of 2+ characters and a phone number with at least 6 total digits. Hebrew names like "דין" are valid. International numbers with + like "+525612966383" are valid. If any precondition is missing, keep asking instead of calling this tool. Calling without preconditions will return {ok:false} and the conversation will continue.',
       inputSchema: z.object({
         name: z.string().trim().min(1).max(120),
         phone: z.string().trim().min(6).max(40),
@@ -267,16 +300,19 @@ Deno.serve(async (req) => {
       }),
       execute: async (args) => {
         // Server-side preconditions — defense in depth against premature saves.
+        const inferredContact = inferContactFromText(latestUserText(body.messages ?? []));
+        const name = (args.name || inferredContact.name || '').trim();
+        const phone = (args.phone || inferredContact.phone || '').trim();
         if (!signals.pain_category && !signals.transformation_vision) {
           console.warn('save_lead rejected: missing pain/vision signals');
           return { ok: false, error: 'precondition_failed: missing pain or vision signals — keep asking' };
         }
-        const digits = (args.phone || '').replace(/\D/g, '');
+        const digits = phone.replace(/\D/g, '');
         if (digits.length < 6) {
-          console.warn('save_lead rejected: invalid phone', args.phone);
+          console.warn('save_lead rejected: invalid phone', phone);
           return { ok: false, error: 'invalid_phone: ask the user for a real phone number' };
         }
-        if (!args.name || args.name.trim().length < 2) {
+        if (name.length < 2) {
           return { ok: false, error: 'invalid_name: ask the user for their name' };
         }
 
@@ -287,8 +323,8 @@ Deno.serve(async (req) => {
           change_depth: signals.change_depth ?? null,
         };
         const row = {
-          name: args.name,
-          phone: args.phone,
+          name,
+          phone,
           email: args.email ?? null,
           source: 'intake_chat',
           status: 'new',
@@ -316,7 +352,7 @@ Deno.serve(async (req) => {
           ok: true,
           lead_id: data.id,
           pattern_diagnosis: args.pattern_diagnosis,
-          whatsapp_url: buildWhatsappUrl(args.name),
+          whatsapp_url: buildWhatsappUrl(name),
         };
       },
     }),
@@ -341,7 +377,7 @@ Deno.serve(async (req) => {
       tools,
       stopWhen: stepCountIs(50),
     });
-    return result.toUIMessageStreamResponse({
+    return (result.toUIMessageStreamResponse as any)({
       headers: corsHeaders,
       originalMessages: body.messages,
     });
