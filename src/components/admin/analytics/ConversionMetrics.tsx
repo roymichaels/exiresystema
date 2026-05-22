@@ -116,7 +116,7 @@ const ConversionMetrics = () => {
     { name: "קליקים על CTA", value: events.filter((e: any) => e.event_type === "cta_click").length, icon: MousePointerClick },
     { name: "צפייה בטופס", value: events.filter((e: any) => e.event_type === "form_view").length, icon: FileEdit },
     { name: "התחלת מילוי", value: events.filter((e: any) => e.event_type === "form_start").length, icon: ArrowRight },
-    { name: "שליחת טופס", value: formSubmissions, icon: CheckCircle },
+    { name: "שליחת טופס", value: formSubmissions, icon: CheckCircle, dbValue: leadsCount },
   ];
 
   // Daily conversions
