@@ -11,10 +11,12 @@ import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { trackEvent, trackSignupStart, trackSignupComplete } from "@/lib/analytics";
+import { useSignupEnabled } from "@/hooks/useSignupEnabled";
 
 export default function CloudAuthModal() {
   const { isAuthFlowOpen, completeAuthFlow, cancelAuthFlow, failAuthFlow } = useAuthModalInternal();
   const { isRTL } = useTranslation();
+  const { enabled: signupEnabled } = useSignupEnabled();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
