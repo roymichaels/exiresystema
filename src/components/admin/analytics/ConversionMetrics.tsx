@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, MousePointerClick, TrendingUp, Clock, ArrowRight, Eye, FileEdit, CheckCircle } from "lucide-react";
+import { Users, MousePointerClick, TrendingUp, Clock, ArrowRight, Eye, FileEdit, CheckCircle, UserPlus } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 
