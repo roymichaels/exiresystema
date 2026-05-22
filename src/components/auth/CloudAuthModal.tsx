@@ -29,6 +29,9 @@ export default function CloudAuthModal() {
     else void trackEvent("login_start", "auth", "email");
     try {
       if (tab === "signup") {
+        if (!signupEnabled) {
+          throw new Error(isRTL ? "ההרשמה סגורה כרגע. ניתן להתחבר עם חשבון קיים." : "Registration is currently closed. Please sign in with an existing account.");
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
