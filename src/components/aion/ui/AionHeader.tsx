@@ -31,6 +31,7 @@ export function AionHeader({
   className,
   fixed = true,
   style,
+  menuExtras,
 }: AionHeaderProps) {
   const { isRTL, language } = useTranslation();
   const isHe = language === "he";
