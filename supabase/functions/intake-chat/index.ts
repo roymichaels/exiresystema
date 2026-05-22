@@ -278,6 +278,14 @@ Deno.serve(async (req) => {
         return { ok: true };
       },
     }),
+    request_contact: tool({
+      description:
+        'Render a name + phone input form to the user. Call this exactly once during step 6 (Contact) after pain + readiness/vision have been collected. After calling this tool, stay silent — do not write any text. Wait for the user response which will contain name and phone in a structured form like "שמי X, הטלפון שלי Y", then call save_lead immediately.',
+      inputSchema: z.object({
+        sentence: z.string().min(1).max(240).describe('One short sentence shown above the inputs explaining why you are asking.'),
+      }),
+      execute: async (args) => ({ ok: true, sentence: args.sentence }),
+    }),
     save_lead: tool({
       description:
         'Save the qualified lead. PRECONDITIONS — do NOT call unless ALL are true: (a) set_pain_signal has already run in this conversation, (b) set_readiness OR set_vision has already run, (c) the most recent user message contains BOTH a human name of 2+ characters and a phone number with at least 6 total digits. Hebrew names like "דין" are valid. International numbers with + like "+525612966383" are valid. If any precondition is missing, keep asking instead of calling this tool. Calling without preconditions will return {ok:false} and the conversation will continue.',
