@@ -61,18 +61,23 @@ export function AionHeader({
       />
       <div className="pointer-events-none relative mx-auto min-h-[56px] w-full max-w-screen-md px-2 sm:px-4">
         {/* Side controls — absolute, so the title stays pixel-centered */}
-        <button
-          type="button"
-          aria-label={isHe ? "תפריט" : "Menu"}
-          onClick={onMenuClick}
+        <div
           className={cn(
-            "pointer-events-auto absolute top-1/2 -translate-y-1/2",
+            "pointer-events-auto absolute top-1/2 -translate-y-1/2 flex items-center gap-1",
             isRTL ? "right-2 sm:right-4" : "left-2 sm:left-4",
-            "flex h-11 w-11 items-center justify-center rounded-full text-foreground/30 transition-colors hover:text-foreground/70",
           )}
         >
-          <Menu className="h-[18px] w-[18px]" strokeWidth={1.5} />
-        </button>
+          <button
+            type="button"
+            aria-label={isHe ? "תפריט" : "Menu"}
+            onClick={onMenuClick}
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/30 transition-colors hover:text-foreground/70"
+          >
+            <Menu className="h-[18px] w-[18px]" strokeWidth={1.5} />
+          </button>
+          {menuExtras}
+        </div>
+
 
         {/* Centered AION wordmark */}
         <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center">
