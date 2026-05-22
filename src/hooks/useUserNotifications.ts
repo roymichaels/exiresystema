@@ -137,7 +137,8 @@ export const useUserNotifications = () => {
 
       // Set up realtime subscription for new notifications
       const channel = supabase
-        .channel('user-notifications')
+        .channel(`user-notifications-${user.id}`)
+
         .on(
           'postgres_changes',
           {
@@ -148,12 +149,16 @@ export const useUserNotifications = () => {
           },
           (payload) => {
             const newNotification = payload.new as UserNotification;
-            setNotifications(prev => [newNotification, ...prev]);
+            setNotifications(prev => {
+              if (prev.some(n => n.id === newNotification.id)) return prev;
+              return [newNotification, ...prev];
+            });
             setUnreadCount(prev => {
               const newCount = prev + 1;
               updateAppBadge(newCount);
               return newCount;
             });
+
             
             // Trigger push notification for ALL notification types
             // This sends push to the user's devices when they receive any notification
