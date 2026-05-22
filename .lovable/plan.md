@@ -1,36 +1,67 @@
-# Fix Lead Email Notifications + Verify Intake Onboarding
+## Goal
 
-## Problem
+After the intake chat captures name + phone (lead saved), reliably transition the modal to a success state with a warm message and a primary "Close" button that actually shuts the window — replacing the current Stage-B chat view that sometimes lingers (as seen in the user screenshot, where AION confirmed "זיהיתי. השלב הבא כבר ממתין." but the chat remained open).
 
-The test email succeeded earlier because `send-test-email` calls Resend directly at `api.resend.com`. But the real lead-capture notification in `supabase/functions/intake-chat/index.ts` (`notifyFounder`) sends through `connector-gateway.lovable.dev/resend/emails` — a different path that requires the Lovable Resend connector to be wired. That mismatch is the most likely reason founder notifications aren't arriving even though the test email did.
+## Scope (frontend only)
 
-There are also zero rows in the `leads` table, so we have no historical evidence that `notifyFounder` was ever invoked successfully — meaning the onboarding intake conversation may never have reached `save_lead` either.
+Single file: `src/components/landing/mindhacker/intake/IntakeChatModal.tsx`
+Plus 3 i18n entries (he/en/es) for the new success copy.
+
+No edge-function / backend changes — `save_lead` already works (verified previous turn: row inserted, Resend 200).
 
 ## Changes
 
-### 1. Align lead notification with the working test pipeline
-File: `supabase/functions/intake-chat/index.ts` — `notifyFounder()`
+### 1. More robust success detection
 
-- Replace the `connector-gateway.lovable.dev/resend/emails` POST with a direct `https://api.resend.com/emails` POST using `Authorization: Bearer ${RESEND_API_KEY}` (identical headers/body shape to `send-test-email`).
-- Keep the same subject/HTML body (Hebrew RTL summary of the lead).
-- Add a `console.log` of `{ status, id }` from Resend so future founder-notify failures show up in edge-function logs.
-- Guard: if `RESEND_API_KEY` or `FOUNDER_NOTIFY_EMAIL` is missing, log a warning instead of silently returning.
+Currently `saveResult` only resolves when a message part has `type === 'tool-save_lead'` with `state === 'output-available'`. That's the primary signal, but if the AI SDK part shape differs across stream chunks or the tool result is wrapped differently, the modal stays stuck.
 
-### 2. Redeploy `intake-chat`
-Deploy after the edit so the new sender path goes live (edge functions serve the last deployed code, not file edits).
+Update `saveResult` `useMemo` to additionally detect:
+- any part whose `type` includes `save_lead` (e.g. `tool-save_lead`, `tool-result-save_lead`) with a truthy `output?.ok` OR `result?.ok`
+- fall back to `output ?? result` so we surface `lead_id`, `pattern_diagnosis`, `whatsapp_url` regardless of SDK field name
 
-### 3. Verify the full intake → notification path
-- Tail `intake-chat` logs and trigger a minimal scripted `save_lead` via `supabase--curl_edge_functions` with a fabricated conversation that already contains name+phone, so the model calls `save_lead` immediately.
-- Confirm:
-  - A row appears in `public.leads`.
-  - `notifyFounder` logs a 200 response from Resend.
-  - The admin (`FOUNDER_NOTIFY_EMAIL`) inbox receives the lead summary.
-- If the model refuses to call `save_lead`, fall back to invoking `notifyFounder` indirectly by inserting a synthetic lead row + calling the function — but only as a backup.
+This guarantees Stage C activates as soon as the tool completes.
 
-### 4. Verify onboarding (AION intake chat) is healthy
-- Hit `/` and `/intake` (or whichever route mounts `IntakeChatModal`) in the browser preview, confirm the chat streams, `offer_choices` chips render, and reaching name+phone triggers the success state (`__save_lead_success__`).
-- Check console + network for streaming errors against `aion-landing-chat` and `intake-chat`.
+### 2. Clean, warm Success card (replaces current reveal stage)
+
+Keep the existing Stage C container but rebuild the inner content as a single clear success card:
+
+```
+[AION orb, gentle breathe]
+[eyebrow: "זוהה" / "Captured" / "Recibido"]
+[serif headline: pattern_diagnosis or fallback]
+[soft body: "תודה ש{name}. נחזור אליך בוואטסאפ בקרוב." / EN / ES]
+[primary button: "סגור" / "Close" / "Cerrar"]   ← always present, always closes the modal
+[secondary link (only if whatsapp_url): "המשך לוואטסאפ" — opens in new tab, does NOT block close]
+```
+
+The primary button calls `onOpenChange(false)` unconditionally. Even when `whatsapp_url` exists, the close button is the primary action so the user can always exit.
+
+### 3. Skip the close-confirmation prompt after success
+
+`tryClose()` currently `window.confirm`s when `messages.length > 0`. Once `saveResult` is set, the data is already saved — skip the confirm so the X button and the new Close button close instantly.
+
+### 4. Keep the 1.2s cinematic beat
+
+Preserve the existing `revealDelayDone` delay so the orb breathes for a moment before the success copy fades in. Unchanged.
+
+### 5. i18n additions
+
+Add three keys under `landing.intake` in `he.ts`, `en.ts`, `es.ts`:
+
+- `successTitle` — "תודה" / "Thank you" / "Gracias"
+- `successBody` — "קיבלתי את הפרטים. אחזור אליך בוואטסאפ בקרוב." / EN equivalent / ES equivalent
+- (reuse existing `revealClose` for the close button label)
 
 ## Out of scope
 
-- No DB schema changes. No UI changes to the intake modal. No admin-settings UI for the recipient email — the recipient stays `FOUNDER_NOTIFY_EMAIL` (the secret already used by the working test email). If you want a settings-table-driven recipient later, that's a separate task.
+- No changes to `intake-chat` edge function, prompt, tool schemas, or DB.
+- No changes to email notification path.
+- No new onboarding steps or flow rework — only the closing moment.
+
+## Verification
+
+1. Open the preview, click "התחל" on the intake.
+2. Walk through to name + phone.
+3. Confirm modal transitions: chat → orb beat (~1.2s) → success card with Close button.
+4. Click Close → modal disappears, no confirm dialog.
+5. Reopen modal → starts fresh (existing reset effect already handles this).
