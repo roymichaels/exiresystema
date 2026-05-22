@@ -35,6 +35,7 @@ export default function ShellV2Header() {
       onMenuClick={() => overlay.open('drawer')}
       onBrandClick={() => setBrandOpen(true)}
       onOrbClick={() => openInteractiveAION()}
+      menuExtras={user ? <UserNotificationBell /> : null}
     />
 
     <Sheet open={brandOpen} onOpenChange={setBrandOpen}>
