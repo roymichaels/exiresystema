@@ -269,36 +269,42 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
         </div>
       )}
 
-      {/* Stage C — Reveal (cinematic beat) */}
+      {/* Stage C — Success / Reveal */}
       {saveResult && (
         <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
           <div className="mb-10 mh-breathe">
             <CanonicalAionModel size={140} ariaLabel="AION" />
           </div>
           {revealDelayDone ? (
-            <div className="animate-fade-in">
-              <p className="mh-eyebrow mb-6 opacity-70">{t('revealLabel')}</p>
-              <h2 className="mh-serif text-2xl leading-[1.3] sm:text-4xl md:text-5xl max-w-3xl">
-                {saveResult.pattern_diagnosis ||
-                  t('revealFallback')}
+            <div className="animate-fade-in flex flex-col items-center max-w-xl">
+              <p className="mh-eyebrow mb-4 opacity-70 tracking-[0.42em] text-[hsl(var(--mh-sand))]">
+                {t('successTitle')}
+              </p>
+              <h2 className="mh-serif text-2xl leading-[1.3] sm:text-4xl md:text-5xl">
+                {saveResult.pattern_diagnosis || t('revealFallback')}
               </h2>
               <p className="mt-8 max-w-md text-base leading-[2] text-[hsl(var(--mh-mute))]">
-                {t('revealSubtitle')}
+                {t('successBody')}
               </p>
-              {saveResult.whatsapp_url ? (
-                <a
-                  href={saveResult.whatsapp_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mh-cta-primary mt-12 inline-block"
+              <div className="mt-12 flex flex-col items-center gap-4">
+                <button
+                  onClick={() => onOpenChange(false)}
+                  className="mh-cta-primary"
+                  autoFocus
                 >
-                  {t('revealContinue')}
-                </a>
-              ) : (
-                <button onClick={() => onOpenChange(false)} className="mh-cta-primary mt-12">
                   {t('revealClose')}
                 </button>
-              )}
+                {saveResult.whatsapp_url && (
+                  <a
+                    href={saveResult.whatsapp_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[hsl(var(--mh-mute))] underline-offset-4 hover:text-[hsl(var(--mh-ink))] hover:underline transition-colors"
+                  >
+                    {t('revealContinue')}
+                  </a>
+                )}
+              </div>
             </div>
           ) : (
             <div className="h-12" aria-hidden />
