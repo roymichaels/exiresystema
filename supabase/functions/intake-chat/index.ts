@@ -92,7 +92,14 @@ const buildSupabase = () => createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 });
 
 async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
-  if (!RESEND_API_KEY || !FOUNDER_NOTIFY_EMAIL) return;
+  if (!RESEND_API_KEY) {
+    console.warn('notifyFounder skipped: RESEND_API_KEY missing');
+    return;
+  }
+  if (!FOUNDER_NOTIFY_EMAIL) {
+    console.warn('notifyFounder skipped: FOUNDER_NOTIFY_EMAIL missing');
+    return;
+  }
   try {
     const subject = `ליד חדש: ${lead.name ?? 'ללא שם'} (${lead.intent ?? '—'})`;
     const html = `
@@ -111,12 +118,11 @@ async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
         <p><strong>אבחנה:</strong> ${(lead.ai_analysis as any)?.pattern_diagnosis ?? '—'}</p>
         <pre style="background:#f4f4f4;padding:10px;border-radius:6px">${JSON.stringify(lead.ai_analysis, null, 2)}</pre>
       </div>`;
-    await fetch('https://connector-gateway.lovable.dev/resend/emails', {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': RESEND_API_KEY,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
         from: 'Mind Hacker <onboarding@resend.dev>',
@@ -124,6 +130,12 @@ async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
         subject,
         html,
       }),
+    });
+    const data = await res.json().catch(() => ({}));
+    console.log('notifyFounder resend response:', {
+      status: res.status,
+      id: (data as any)?.id,
+      error: (data as any)?.message,
     });
   } catch (err) {
     console.error('Resend notify failed:', err);
@@ -259,8 +271,6 @@ Deno.serve(async (req) => {
           name: args.name,
           phone: args.phone,
           email: args.email ?? null,
-          contact_phone: args.phone,
-          contact_email: args.email ?? null,
           source: 'intake_chat',
           status: 'new',
           conversation: body.messages,
