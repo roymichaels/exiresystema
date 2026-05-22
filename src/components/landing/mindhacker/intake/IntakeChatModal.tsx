@@ -43,6 +43,8 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
   const [input, setInput] = useState('');
   const [freeformOpen, setFreeformOpen] = useState(false);
   const [revealDelayDone, setRevealDelayDone] = useState(false);
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
