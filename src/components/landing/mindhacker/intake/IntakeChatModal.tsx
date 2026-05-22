@@ -43,6 +43,8 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
   const [input, setInput] = useState('');
   const [freeformOpen, setFreeformOpen] = useState(false);
   const [revealDelayDone, setRevealDelayDone] = useState(false);
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -207,6 +209,38 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
     }
     return null;
   }, [messages, lastAssistant]);
+
+  // Pending request_contact from latest assistant turn
+  const pendingContact: { sentence?: string } | null = useMemo(() => {
+    if (!lastAssistant) return null;
+    const lastIdx = messages.indexOf(lastAssistant);
+    const hasUserAfter = messages.slice(lastIdx + 1).some((m) => m.role === 'user');
+    if (hasUserAfter) return null;
+    for (let i = (lastAssistant.parts ?? []).length - 1; i >= 0; i--) {
+      const p = lastAssistant.parts![i] as any;
+      const typeStr: string = typeof p?.type === 'string' ? p.type : '';
+      const isReq =
+        typeStr === 'tool-request_contact' ||
+        typeStr === 'tool-result-request_contact' ||
+        (typeStr.includes('request_contact') && typeStr.startsWith('tool')) ||
+        p?.toolName === 'request_contact';
+      if (!isReq) continue;
+      const payload = p?.output ?? p?.result ?? p?.input ?? null;
+      if (payload) return payload as { sentence?: string };
+      return {};
+    }
+    return null;
+  }, [messages, lastAssistant]);
+
+  const submitContact = (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = contactName.trim();
+    const phone = contactPhone.trim();
+    if (name.length < 2 || phone.replace(/\D/g, '').length < 6) return;
+    sendText(`שמי ${name}, הטלפון שלי ${phone}`);
+    setContactName('');
+    setContactPhone('');
+  };
 
   const showTyping = isBusy && messages[messages.length - 1]?.role === 'user';
 
@@ -390,7 +424,53 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
           {/* Chips OR composer */}
           <div className="shrink-0 px-4 pb-6 pt-2 md:px-10">
             <div className="mx-auto max-w-xl">
-              {pendingChoices && !freeformOpen ? (
+              {pendingContact ? (
+                <form onSubmit={submitContact} className="flex flex-col gap-3 animate-fade-in">
+                  {pendingContact.sentence && (
+                    <p className="text-sm leading-[1.7] text-[hsl(var(--mh-mute))] text-center px-2">
+                      {pendingContact.sentence}
+                    </p>
+                  )}
+                  <input
+                    type="text"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    placeholder={isRTL ? 'שם' : language === 'es' ? 'Nombre' : 'Name'}
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    autoComplete="name"
+                    className="atmo-surface-soft rounded-2xl bg-transparent px-4 py-3 text-sm text-[hsl(var(--mh-ink))] placeholder:text-[hsl(var(--mh-mute))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--mh-sand)/0.4)]"
+                  />
+                  <input
+                    type="tel"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    placeholder={isRTL ? 'מספר וואטסאפ' : language === 'es' ? 'WhatsApp' : 'WhatsApp number'}
+                    dir="ltr"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    className="atmo-surface-soft rounded-2xl bg-transparent px-4 py-3 text-sm text-[hsl(var(--mh-ink))] placeholder:text-[hsl(var(--mh-mute))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--mh-sand)/0.4)]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={
+                      isBusy ||
+                      contactName.trim().length < 2 ||
+                      contactPhone.replace(/\D/g, '').length < 6
+                    }
+                    className="mh-cta-primary mt-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {isBusy ? (
+                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                    ) : isRTL ? (
+                      'שלח'
+                    ) : language === 'es' ? (
+                      'Enviar'
+                    ) : (
+                      'Send'
+                    )}
+                  </button>
+                </form>
+              ) : pendingChoices && !freeformOpen ? (
                 <div className="flex flex-wrap justify-center gap-2 animate-fade-in">
                   {pendingChoices.options.map((opt) => (
                     <button

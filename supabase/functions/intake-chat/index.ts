@@ -78,14 +78,11 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
    (momentary / breakthrough / deep_process / long_term / exploring / unsure).
    אסור לדלג על השלב הזה — בלעדיו אסור לבקש פרטי קשר.
 5. Readiness — מה ירתע אם השינוי יקרה באמת. קרא set_readiness (תרגם תשובה רגשית ל-1-10 בעצמך).
-6. Contact — חובה. רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בהודעת טקסט מפורשת ונפרדת:
-   "אם אתה רוצה שאחזור אליך עם מה שזיהיתי — תשאיר לי שם ומספר וואטסאפ."
-   אסור להשתמש ב-offer_choices לאיסוף שם/טלפון. חייב להיות טקסט חופשי.
-   שם עברי קצר כמו "דין" הוא שם תקין. מספר בינלאומי עם + כמו "+525612966383" הוא מספר תקין.
-   בגלל RTL ייתכן שה-+ יוצג בסוף המספר; זה עדיין תקין. אל תבקש שוב אם יש שם + 6 ספרות ומעלה.
-   רק כשההודעה האחרונה של המשתמש מכילה גם שם של 2+ תווים וגם 6+ ספרות בסך הכול (מספר טלפון) — קרא save_lead
-   עם pattern_diagnosis (משפט אחד חד, בעברית, שמשקף את הדפוס) ו-ai_analysis.
-   אם חסר אחד מהם — בקש בעדינות את החסר ואל תקרא save_lead.
+6. Contact — חובה. רק אחרי שיש pain + change_depth + (readiness או vision):
+   א. קרא ל-request_contact עם משפט קצר אחד (sentence) כמו: "אם אתה רוצה שאחזור אליך עם מה שזיהיתי — תשאיר שם ומספר וואטסאפ." זה יציג למשתמש שדות קלט של שם וטלפון.
+   ב. אל תכתוב טקסט נוסף אחרי request_contact. תחכה בשקט להודעה הבאה של המשתמש.
+   ג. כשתגיע ההודעה הבאה (היא תכיל "שמי X, הטלפון שלי Y") — קרא מיד ל-save_lead עם pattern_diagnosis (משפט אחד חד בעברית) ו-ai_analysis. אל תשאל שוב.
+   אסור להשתמש ב-offer_choices לאיסוף שם/טלפון. אסור לבקש שם/טלפון בטקסט חופשי — רק דרך request_contact.
 
 🔒 חוקי סיום קשיחים (חשוב מאוד):
 - אסור בהחלט לכתוב את המילים "זיהיתי", "השלב הבא", "סיימנו", "תודה שהשתתפת", או כל ניסוח של סגירה/סיכום — לפני ש-save_lead החזיר {ok:true}.
@@ -280,6 +277,14 @@ Deno.serve(async (req) => {
         if (args.change_depth) signals.change_depth = args.change_depth;
         return { ok: true };
       },
+    }),
+    request_contact: tool({
+      description:
+        'Render a name + phone input form to the user. Call this exactly once during step 6 (Contact) after pain + readiness/vision have been collected. After calling this tool, stay silent — do not write any text. Wait for the user response which will contain name and phone in a structured form like "שמי X, הטלפון שלי Y", then call save_lead immediately.',
+      inputSchema: z.object({
+        sentence: z.string().min(1).max(240).describe('One short sentence shown above the inputs explaining why you are asking.'),
+      }),
+      execute: async (args) => ({ ok: true, sentence: args.sentence }),
     }),
     save_lead: tool({
       description:
