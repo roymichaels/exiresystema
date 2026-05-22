@@ -48,6 +48,39 @@ const ConversionMetrics = () => {
     },
   });
 
+  // Real leads from DB (SSOT) — last 30 days
+  const { data: leadRows = [] } = useQuery({
+    queryKey: ["analytics-leads"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("leads")
+        .select("id, source, created_at")
+        .gte("created_at", subDays(new Date(), 30).toISOString());
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const { data: exitLeadRows = [] } = useQuery({
+    queryKey: ["analytics-exit-leads"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("exit_intent_leads")
+        .select("id, created_at")
+        .gte("created_at", subDays(new Date(), 30).toISOString());
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const leadsCount = leadRows.length;
+  const exitLeadsCount = exitLeadRows.length;
+  const leadsBySource = leadRows.reduce((acc: Record<string, number>, l: any) => {
+    const s = l.source || "unknown";
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+
   // Calculate stats
   const totalVisitors = sessions.length;
   const formSubmissions = events.filter((e: any) => e.event_type === "form_success").length;
