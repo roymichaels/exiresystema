@@ -81,7 +81,9 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
 6. Contact — חובה. רק אחרי שיש pain + change_depth + (readiness או vision). תבקש בהודעת טקסט מפורשת ונפרדת:
    "אם אתה רוצה שאחזור אליך עם מה שזיהיתי — תשאיר לי שם ומספר וואטסאפ."
    אסור להשתמש ב-offer_choices לאיסוף שם/טלפון. חייב להיות טקסט חופשי.
-   רק כשההודעה האחרונה של המשתמש מכילה גם שם אנושי וגם רצף ספרות של 6+ ספרות (מספר טלפון) — קרא save_lead
+   שם עברי קצר כמו "דין" הוא שם תקין. מספר בינלאומי עם + כמו "+525612966383" הוא מספר תקין.
+   בגלל RTL ייתכן שה-+ יוצג בסוף המספר; זה עדיין תקין. אל תבקש שוב אם יש שם + 6 ספרות ומעלה.
+   רק כשההודעה האחרונה של המשתמש מכילה גם שם של 2+ תווים וגם 6+ ספרות בסך הכול (מספר טלפון) — קרא save_lead
    עם pattern_diagnosis (משפט אחד חד, בעברית, שמשקף את הדפוס) ו-ai_analysis.
    אם חסר אחד מהם — בקש בעדינות את החסר ואל תקרא save_lead.
 
@@ -151,6 +153,37 @@ function buildWhatsappUrl(name: string): string {
   if (!FOUNDER_WHATSAPP_NUMBER) return '';
   const text = encodeURIComponent(`שלום, אני ${name}. סיימתי את הסריקה במיינד האקר ואני רוצה להתחיל.`);
   return `https://wa.me/${FOUNDER_WHATSAPP_NUMBER}?text=${text}`;
+}
+
+function messageText(message: any): string {
+  if (!message) return '';
+  if (typeof message.content === 'string') return message.content;
+  if (Array.isArray(message.parts)) {
+    return message.parts
+      .map((part: any) => (typeof part?.text === 'string' ? part.text : typeof part?.content === 'string' ? part.content : ''))
+      .join(' ')
+      .trim();
+  }
+  return '';
+}
+
+function latestUserText(messages: UIMessage[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if ((messages[i] as any)?.role === 'user') return messageText(messages[i]);
+  }
+  return '';
+}
+
+function inferContactFromText(text: string): { name?: string; phone?: string } {
+  const phoneMatch = text.match(/(?:\+?\d[\d\s().-]{5,}\d|\d{6,})/);
+  const phone = phoneMatch?.[0]?.trim();
+  const withoutPhone = text
+    .replace(/(?:\+?\d[\d\s().-]{5,}\d|\d{6,})/g, ' ')
+    .replace(/[+:,;|/\\()[\]{}<>"'`~!@#$%^&*_=?\d]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const name = withoutPhone.split(' ').filter((token) => token.length >= 2).slice(0, 3).join(' ');
+  return { name: name || undefined, phone };
 }
 
 Deno.serve(async (req) => {
