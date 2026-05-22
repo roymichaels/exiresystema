@@ -95,7 +95,161 @@ const buildSupabase = () => createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
   auth: { persistSession: false },
 });
 
-async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
+function esc(s: unknown): string {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+}
+
+function flattenTranscript(messages: UIMessage[]): Array<{ role: string; text: string }> {
+  const out: Array<{ role: string; text: string }> = [];
+  for (const m of messages ?? []) {
+    const role = (m as any)?.role;
+    if (role !== 'user' && role !== 'assistant') continue;
+    let text = '';
+    if (typeof (m as any).content === 'string') text = (m as any).content;
+    else if (Array.isArray((m as any).parts)) {
+      text = (m as any).parts
+        .map((p: any) => (typeof p?.text === 'string' ? p.text : ''))
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+    }
+    if (text) out.push({ role, text });
+  }
+  return out;
+}
+
+async function analyzeConversationDeep(
+  messages: UIMessage[],
+  signals: Record<string, unknown>,
+  shortDiagnosis: string,
+  language: 'he' | 'en' | 'es',
+): Promise<Record<string, unknown> | null> {
+  if (!LOVABLE_API_KEY) {
+    console.warn('analyzeConversationDeep skipped: LOVABLE_API_KEY missing');
+    return null;
+  }
+  const transcript = flattenTranscript(messages);
+  const transcriptText = transcript.map((t) => `${t.role.toUpperCase()}: ${t.text}`).join('\n');
+
+  const sysHe = `אתה אנליסט בכיר של פסיכולוגיית עומק ודפוסי שינוי. אתה מקבל תמלול מלא של שיחת אינטייק.
+תפקידך: לקרוא את כל השיחה ולחלץ את האמת מתחת לפני השטח — לא מה שהמשתמש אמר, אלא מה שבאמת קורה.
+
+עקרונות:
+- "יוגה" או כל דוגמה ספציפית שהמשתמש הזכיר הם תוכן פני שטח — לא הבעיה האמיתית.
+- חפש את הדפוס החוזר, ההתחמקות, הסתירות בין מה שהוא רוצה למה שהוא עושה, מה שהוא לא אמר.
+- אסור קלישאות מאמני חיים, אסור "מעולה", "מדהים", "צמיחה".
+- הצלב אותות: משך הקושי, ניסיונות עבר, רמת מוכנות שהצהיר עליה לעומת שפת ההתחמקות.
+- האבחנה הקצרה שה-AI כתב במהלך השיחה היא רק רמז — אתה רשאי לסתור אותה.
+
+החזר תוצאה רק דרך הכלי emit_lead_report. שפה: עברית מודרנית, חדה, ללא שטויות.`;
+
+  const sysEn = sysHe
+    .replace('עברית מודרנית', 'natural English')
+    .replace('אסור קלישאות מאמני חיים', 'No life-coach clichés')
+    .replace('"מעולה", "מדהים", "צמיחה"', '"awesome", "amazing", "growth"');
+
+  const sysEs = sysHe
+    .replace('עברית מודרנית', 'español natural')
+    .replace('אסור קלישאות מאמני חיים', 'Sin clichés de coaching');
+
+  const system = language === 'en' ? sysEn : language === 'es' ? sysEs : sysHe;
+
+  const userPayload = [
+    `== SIGNALS ==`,
+    JSON.stringify(signals, null, 2),
+    ``,
+    `== SHORT DIAGNOSIS FROM IN-CHAT AI (challenge if shallow) ==`,
+    shortDiagnosis || '(none)',
+    ``,
+    `== FULL TRANSCRIPT ==`,
+    transcriptText || '(empty)',
+  ].join('\n');
+
+  const tool = {
+    type: 'function',
+    function: {
+      name: 'emit_lead_report',
+      description: 'Emit the deep analyst report.',
+      parameters: {
+        type: 'object',
+        properties: {
+          headline: { type: 'string' },
+          stated_problem: { type: 'string' },
+          real_problem: { type: 'string' },
+          recurring_pattern: { type: 'string' },
+          avoidance: { type: 'string' },
+          contradictions: { type: 'array', items: { type: 'string' }, maxItems: 3 },
+          archetype: { type: 'string' },
+          readiness_read: { type: 'string' },
+          recommended_opening: { type: 'string' },
+          risk_flags: { type: 'array', items: { type: 'string' }, maxItems: 3 },
+          confidence: { type: 'number', minimum: 0, maximum: 1 },
+        },
+        required: [
+          'headline', 'stated_problem', 'real_problem', 'recurring_pattern',
+          'avoidance', 'archetype', 'readiness_read', 'recommended_opening', 'confidence',
+        ],
+        additionalProperties: false,
+      },
+    },
+  };
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-pro',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: userPayload },
+        ],
+        tools: [tool],
+        tool_choice: { type: 'function', function: { name: 'emit_lead_report' } },
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      console.error('deep analyst gateway error:', res.status, t);
+      return null;
+    }
+    const data = await res.json();
+    const call = data.choices?.[0]?.message?.tool_calls?.[0];
+    const raw = call?.function?.arguments;
+    if (!raw) {
+      console.warn('deep analyst: no tool call returned');
+      return null;
+    }
+    try {
+      return typeof raw === 'string' ? JSON.parse(raw) : raw;
+    } catch (e) {
+      console.error('deep analyst: failed to parse arguments', e, raw);
+      return null;
+    }
+  } catch (err) {
+    console.error('deep analyst failed:', err);
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function renderTranscriptHtml(messages: UIMessage[]): string {
+  const turns = flattenTranscript(messages);
+  if (!turns.length) return '<p>—</p>';
+  return turns
+    .map((t) => {
+      const label = t.role === 'user' ? 'משתמש' : 'AION';
+      const bg = t.role === 'user' ? '#eef5ff' : '#f5f0ff';
+      return `<div style="background:${bg};border-radius:8px;padding:8px 12px;margin:6px 0"><strong>${label}:</strong> ${esc(t.text)}</div>`;
+    })
+    .join('');
+}
+
+async function notifyFounder(lead: Record<string, unknown>, messages: UIMessage[]): Promise<void> {
   if (!RESEND_API_KEY) {
     console.warn('notifyFounder skipped: RESEND_API_KEY missing');
     return;
@@ -105,22 +259,50 @@ async function notifyFounder(lead: Record<string, unknown>): Promise<void> {
     return;
   }
   try {
-    const subject = `ליד חדש: ${lead.name ?? 'ללא שם'} (${lead.intent ?? '—'})`;
+    const ai = (lead.ai_analysis as any) ?? {};
+    const deep = ai.deep_report as Record<string, any> | null | undefined;
+    const subject = `ליד חדש: ${lead.name ?? 'ללא שם'} — ${deep?.headline ?? ai.pattern_diagnosis ?? lead.intent ?? '—'}`;
+
+    const deepBlock = deep
+      ? `
+        <h3 style="margin:24px 0 8px">🧠 הקריאה העמוקה</h3>
+        <p style="font-size:16px;background:#fff7e6;padding:10px 14px;border-right:3px solid #d97706;border-radius:6px"><strong>${esc(deep.headline)}</strong></p>
+        <p><strong>מה שהוא אמר:</strong> ${esc(deep.stated_problem)}</p>
+        <p><strong>מה שבאמת קורה:</strong> ${esc(deep.real_problem)}</p>
+        <p><strong>דפוס חוזר:</strong> ${esc(deep.recurring_pattern)}</p>
+        <p><strong>ממה הוא מתחמק:</strong> ${esc(deep.avoidance)}</p>
+        ${Array.isArray(deep.contradictions) && deep.contradictions.length ? `<p><strong>סתירות:</strong></p><ul>${deep.contradictions.map((c: string) => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
+        <p><strong>ארכיטיפ:</strong> ${esc(deep.archetype)}</p>
+        <p><strong>קריאת מוכנות:</strong> ${esc(deep.readiness_read)}</p>
+        ${Array.isArray(deep.risk_flags) && deep.risk_flags.length ? `<p><strong>דגלי סיכון:</strong> ${deep.risk_flags.map((r: string) => esc(r)).join(' · ')}</p>` : ''}
+        <p><strong>איך לפתוח את השיחה:</strong></p>
+        <p style="background:#ecfdf5;padding:10px 14px;border-right:3px solid #059669;border-radius:6px;font-style:italic">${esc(deep.recommended_opening)}</p>
+        <p style="font-size:12px;color:#888">ביטחון אנליסט: ${deep.confidence ?? '—'}</p>
+      `
+      : `<p style="color:#b91c1c"><em>הקריאה העמוקה לא נוצרה (timeout / error). ראה אבחנה קצרה למטה.</em></p>`;
+
     const html = `
-      <div style="font-family:system-ui;line-height:1.6;direction:rtl">
-        <h2>ליד חדש מ-AION Intake</h2>
-        <p><strong>שם:</strong> ${lead.name ?? '—'}</p>
-        <p><strong>טלפון:</strong> ${lead.phone ?? '—'}</p>
-        <p><strong>אימייל:</strong> ${lead.email ?? '—'}</p>
-        <hr/>
-        <p><strong>Pain:</strong> ${lead.pain_category ?? '—'} (${lead.pain_duration ?? '—'})</p>
-        <p><strong>ניסה בעבר:</strong> ${Array.isArray(lead.prior_attempts) ? (lead.prior_attempts as string[]).join(', ') : '—'}</p>
-        <p><strong>מחפש:</strong> ${lead.desired_outcome ?? '—'}</p>
-        <p><strong>Readiness:</strong> ${lead.readiness_score ?? '—'}/10 · <strong>Intent:</strong> ${lead.intent ?? '—'} · <strong>עומק שינוי:</strong> ${(lead.ai_analysis as any)?.change_depth ?? '—'}</p>
-        <p><strong>חזון:</strong> ${lead.transformation_vision ?? '—'}</p>
-        <hr/>
-        <p><strong>אבחנה:</strong> ${(lead.ai_analysis as any)?.pattern_diagnosis ?? '—'}</p>
-        <pre style="background:#f4f4f4;padding:10px;border-radius:6px">${JSON.stringify(lead.ai_analysis, null, 2)}</pre>
+      <div style="font-family:system-ui,-apple-system,sans-serif;line-height:1.6;direction:rtl;max-width:640px;margin:0 auto;color:#111">
+        <h2 style="margin:0 0 4px">ליד חדש מ-AION Intake</h2>
+        <p style="color:#666;margin:0 0 16px">${esc(lead.name)} · ${esc(lead.phone)}${lead.email ? ` · ${esc(lead.email)}` : ''}</p>
+
+        ${deepBlock}
+
+        <h3 style="margin:24px 0 8px">📋 חתימת שיחה</h3>
+        <p><strong>Pain:</strong> ${esc(lead.pain_category)} (${esc(lead.pain_duration)})</p>
+        <p><strong>ניסה בעבר:</strong> ${Array.isArray(lead.prior_attempts) ? (lead.prior_attempts as string[]).map(esc).join(', ') : '—'}</p>
+        <p><strong>מחפש:</strong> ${esc(lead.desired_outcome)}</p>
+        <p><strong>Readiness:</strong> ${esc(lead.readiness_score)}/10 · <strong>Intent:</strong> ${esc(lead.intent)} · <strong>עומק שינוי:</strong> ${esc(ai.change_depth)}</p>
+        <p><strong>חזון:</strong> ${esc(lead.transformation_vision)}</p>
+        <p><strong>אבחנה מקורית (AI בזמן אמת):</strong> ${esc(ai.pattern_diagnosis)}</p>
+
+        <h3 style="margin:24px 0 8px">💬 תמלול שיחה</h3>
+        ${renderTranscriptHtml(messages)}
+
+        <details style="margin-top:24px">
+          <summary style="cursor:pointer;color:#666">JSON גולמי</summary>
+          <pre style="background:#f4f4f4;padding:10px;border-radius:6px;direction:ltr;overflow:auto">${esc(JSON.stringify(lead.ai_analysis, null, 2))}</pre>
+        </details>
       </div>`;
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
