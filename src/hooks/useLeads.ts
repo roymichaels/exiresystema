@@ -72,7 +72,7 @@ export const useUpdateLead = () => {
       if (updates.status && updates.status !== 'new' && !('contacted_at' in updates)) {
         patch.contacted_at = new Date().toISOString();
       }
-      const { error } = await supabase.from('leads').update(patch).eq('id', id);
+      const { error } = await supabase.from('leads').update(patch as never).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => { invalidate(qc); toast.success('עודכן'); },
