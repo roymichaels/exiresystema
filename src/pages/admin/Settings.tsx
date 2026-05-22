@@ -10,6 +10,7 @@ import { Loader2, Save, Upload, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { z } from "zod";
 import { handleError } from "@/lib/errorHandling";
+import { SignupGateCard } from "@/components/admin/SignupGateCard";
 
 const settingsSchema = z.object({
   calendly_link: z.string().url("קישור Calendly לא חוקי").or(z.literal("")),
