@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, MousePointerClick, TrendingUp, Clock, ArrowRight, Eye, FileEdit, CheckCircle } from "lucide-react";
+import { Users, MousePointerClick, TrendingUp, Clock, ArrowRight, Eye, FileEdit, CheckCircle, UserPlus } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 
@@ -48,6 +48,39 @@ const ConversionMetrics = () => {
     },
   });
 
+  // Real leads from DB (SSOT) — last 30 days
+  const { data: leadRows = [] } = useQuery({
+    queryKey: ["analytics-leads"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("leads")
+        .select("id, source, created_at")
+        .gte("created_at", subDays(new Date(), 30).toISOString());
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const { data: exitLeadRows = [] } = useQuery({
+    queryKey: ["analytics-exit-leads"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("exit_intent_leads")
+        .select("id, created_at")
+        .gte("created_at", subDays(new Date(), 30).toISOString());
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const leadsCount = leadRows.length;
+  const exitLeadsCount = exitLeadRows.length;
+  const leadsBySource = leadRows.reduce((acc: Record<string, number>, l: any) => {
+    const s = l.source || "unknown";
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+
   // Calculate stats
   const totalVisitors = sessions.length;
   const formSubmissions = events.filter((e: any) => e.event_type === "form_success").length;
@@ -83,7 +116,7 @@ const ConversionMetrics = () => {
     { name: "קליקים על CTA", value: events.filter((e: any) => e.event_type === "cta_click").length, icon: MousePointerClick },
     { name: "צפייה בטופס", value: events.filter((e: any) => e.event_type === "form_view").length, icon: FileEdit },
     { name: "התחלת מילוי", value: events.filter((e: any) => e.event_type === "form_start").length, icon: ArrowRight },
-    { name: "שליחת טופס", value: formSubmissions, icon: CheckCircle },
+    { name: "שליחת טופס", value: formSubmissions, icon: CheckCircle, dbValue: leadsCount },
   ];
 
   // Daily conversions
@@ -131,7 +164,7 @@ const ConversionMetrics = () => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">סה"כ מבקרים</CardTitle>
@@ -142,7 +175,20 @@ const ConversionMetrics = () => {
             <p className="text-xs text-muted-foreground">ב-30 הימים האחרונים</p>
           </CardContent>
         </Card>
-        
+
+        <Card className="border-primary/40">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">לידים שנקלטו</CardTitle>
+            <UserPlus className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">{leadsCount}</div>
+            <p className="text-xs text-muted-foreground">
+              מטבלת הלידים{exitLeadsCount > 0 ? ` · +${exitLeadsCount} exit‑intent` : ""}
+            </p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">אחוז המרה</CardTitle>
@@ -206,8 +252,13 @@ const ConversionMetrics = () => {
                           <stage.icon className="h-4 w-4" />
                           <span>{stage.name}</span>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
                           <span className="font-bold">{stage.value}</span>
+                          {(stage as any).dbValue !== undefined && (stage as any).dbValue !== stage.value && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+                              DB: {(stage as any).dbValue}
+                            </span>
+                          )}
                           {index > 0 && (
                             <span className="text-xs text-destructive">-{dropRate}%</span>
                           )}
