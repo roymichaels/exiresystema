@@ -283,7 +283,7 @@ Deno.serve(async (req) => {
     }),
     save_lead: tool({
       description:
-        'Save the qualified lead. PRECONDITIONS — do NOT call unless ALL are true: (a) set_pain_signal has already run in this conversation, (b) set_readiness OR set_vision has already run, (c) the most recent user message contains BOTH a human name AND a phone number (at least 6 consecutive digits). If any precondition is missing, keep asking instead of calling this tool. Calling without preconditions will return {ok:false} and the conversation will continue.',
+        'Save the qualified lead. PRECONDITIONS — do NOT call unless ALL are true: (a) set_pain_signal has already run in this conversation, (b) set_readiness OR set_vision has already run, (c) the most recent user message contains BOTH a human name of 2+ characters and a phone number with at least 6 total digits. Hebrew names like "דין" are valid. International numbers with + like "+525612966383" are valid. If any precondition is missing, keep asking instead of calling this tool. Calling without preconditions will return {ok:false} and the conversation will continue.',
       inputSchema: z.object({
         name: z.string().trim().min(1).max(120),
         phone: z.string().trim().min(6).max(40),
@@ -300,16 +300,19 @@ Deno.serve(async (req) => {
       }),
       execute: async (args) => {
         // Server-side preconditions — defense in depth against premature saves.
+        const inferredContact = inferContactFromText(latestUserText(body.messages));
+        const name = (args.name || inferredContact.name || '').trim();
+        const phone = (args.phone || inferredContact.phone || '').trim();
         if (!signals.pain_category && !signals.transformation_vision) {
           console.warn('save_lead rejected: missing pain/vision signals');
           return { ok: false, error: 'precondition_failed: missing pain or vision signals — keep asking' };
         }
-        const digits = (args.phone || '').replace(/\D/g, '');
+        const digits = phone.replace(/\D/g, '');
         if (digits.length < 6) {
-          console.warn('save_lead rejected: invalid phone', args.phone);
+          console.warn('save_lead rejected: invalid phone', phone);
           return { ok: false, error: 'invalid_phone: ask the user for a real phone number' };
         }
-        if (!args.name || args.name.trim().length < 2) {
+        if (name.length < 2) {
           return { ok: false, error: 'invalid_name: ask the user for their name' };
         }
 
@@ -320,8 +323,8 @@ Deno.serve(async (req) => {
           change_depth: signals.change_depth ?? null,
         };
         const row = {
-          name: args.name,
-          phone: args.phone,
+          name,
+          phone,
           email: args.email ?? null,
           source: 'intake_chat',
           status: 'new',
@@ -349,7 +352,7 @@ Deno.serve(async (req) => {
           ok: true,
           lead_id: data.id,
           pattern_diagnosis: args.pattern_diagnosis,
-          whatsapp_url: buildWhatsappUrl(args.name),
+          whatsapp_url: buildWhatsappUrl(name),
         };
       },
     }),
