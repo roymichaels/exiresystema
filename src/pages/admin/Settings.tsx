@@ -371,6 +371,9 @@ const Settings = () => {
       </div>
 
       <div className="space-y-6">
+        {/* Signup gate */}
+        <SignupGateCard />
+
         {/* External Links Section */}
         <Card>
           <CardHeader>
