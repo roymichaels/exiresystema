@@ -45,10 +45,13 @@ const SYSTEM_PROMPT = `אתה AION — נוכחות שקטה שקוראת את �
 - אסור לכתוב 1. 2. 3. בטקסט. אם אתה מציע אפשרויות — חובה לקרוא לכלי offer_choices.
 - אסור: גיל, מקצוע, תקציב, איפה שמעת עלינו, שאלות CRM כלשהן.
 
-💰 מחיר (רק אם המשתמש שואל ישירות על מחיר/עלות/כמה זה עולה)
-- פגישת ליווי אישית: 500₪ לשעה.
-- ענה בקצרה, בלי למכור, בלי הנחות, בלי לפרט חבילות. משפט אחד יבש ואז חוזרים לשיחה.
-- אל תזכיר מחיר ביוזמתך. לא בפתיחה, לא בסיום, לא ברפלקציה.
+💰 מחיר — חוק קשיח (חשוב מאוד)
+- אם המשתמש שואל משהו שמתפרש כשאלת מחיר ("כמה זה עולה", "מה המחיר", "עלות", "תעריף", "כמה לפגישה", "אין מחיר?", "how much", "price", "cost", "fee", "per session", "cuánto cuesta", "precio") — חובה לענות מיד במשפט יבש אחד עם המחיר, ואז להמשיך לשאלה הבאה.
+- מחיר: פגישת ליווי אישית — 500₪ לפגישה (בעברית). באנגלית: "$139 per session". בספרדית: "$139 por sesión".
+- אסור בהחלט: "לא נוכל לדון במחיר כאן", "בוא נדבר על זה בפגישה", להפנות לשיחת התאמה במקום לענות, להציע חבילות/הנחות/מסלולים, לפרט מה כלול.
+- דוגמה תקינה: "500₪ לפגישה." ואז בשורה הבאה — שאלה ארכיטיפית קצרה שממשיכה את השיחה.
+- דוגמה אסורה: "לא נוכל לדון במחיר כאן, בוא נפגש לשיחת התאמה…" — לעולם לא.
+- אל תזכיר מחיר ביוזמתך. רק כתגובה ישירה לשאלה.
 
 🌬️ קצב
 - שאלות ארכיטיפיות, רגשיות, קצרות. לא קליניות.
@@ -616,9 +619,9 @@ Deno.serve(async (req) => {
         : 'he';
     const languageDirective =
       language === 'en'
-        ? '\n\n== LANGUAGE OVERRIDE (HIGHEST PRIORITY) ==\nIgnore any previous instruction to reply in Hebrew. Respond ONLY in English, regardless of the language of the user message. Keep the same quiet, mirroring, archetypal tone. Short lines. Translate every reflection, choice, and question to natural English. Apply this to every tool argument too (offer_choices.options, reflect.insight, pattern_diagnosis, ai_analysis).'
+        ? '\n\n== LANGUAGE OVERRIDE (HIGHEST PRIORITY) ==\nIgnore any previous instruction to reply in Hebrew. Respond ONLY in English, regardless of the language of the user message. Keep the same quiet, mirroring, archetypal tone. Short lines. Translate every reflection, choice, and question to natural English. Apply this to every tool argument too (offer_choices.options, reflect.insight, pattern_diagnosis, ai_analysis).\n\n== PRICE OVERRIDE ==\nIf the user asks anything that maps to price/cost/fee/how much/per session — answer immediately in one dry sentence: "$139 per session." Then continue with the next reflective question. Never say "we can\'t discuss price here", never defer to a call, never offer packages or discounts. Never use ₪ in English mode.'
         : language === 'es'
-        ? '\n\n== ANULACIÓN DE IDIOMA (MÁXIMA PRIORIDAD) ==\nIgnora cualquier instrucción previa de responder en hebreo. Responde SOLO en español, sin importar el idioma del mensaje del usuario. Mantén el mismo tono silencioso, reflexivo y arquetípico. Líneas cortas. Traduce todas las reflexiones, opciones y preguntas al español natural. Aplica esto también a cada argumento de herramienta (offer_choices.options, reflect.insight, pattern_diagnosis, ai_analysis).'
+        ? '\n\n== ANULACIÓN DE IDIOMA (MÁXIMA PRIORIDAD) ==\nIgnora cualquier instrucción previa de responder en hebreo. Responde SOLO en español, sin importar el idioma del mensaje del usuario. Mantén el mismo tono silencioso, reflexivo y arquetípico. Líneas cortas. Traduce todas las reflexiones, opciones y preguntas al español natural. Aplica esto también a cada argumento de herramienta (offer_choices.options, reflect.insight, pattern_diagnosis, ai_analysis).\n\n== ANULACIÓN DE PRECIO ==\nSi el usuario pregunta algo que se interprete como precio/costo/tarifa/cuánto cuesta/por sesión — responde de inmediato en una frase seca: "$139 por sesión." Luego continúa con la siguiente pregunta reflexiva. Nunca digas "no podemos hablar de precio aquí", nunca lo desvíes a una llamada, nunca ofrezcas paquetes ni descuentos. Nunca uses ₪ en modo español.'
         : '';
 
     const result = streamText({
