@@ -210,6 +210,38 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
     return null;
   }, [messages, lastAssistant]);
 
+  // Pending request_contact from latest assistant turn
+  const pendingContact: { sentence?: string } | null = useMemo(() => {
+    if (!lastAssistant) return null;
+    const lastIdx = messages.indexOf(lastAssistant);
+    const hasUserAfter = messages.slice(lastIdx + 1).some((m) => m.role === 'user');
+    if (hasUserAfter) return null;
+    for (let i = (lastAssistant.parts ?? []).length - 1; i >= 0; i--) {
+      const p = lastAssistant.parts![i] as any;
+      const typeStr: string = typeof p?.type === 'string' ? p.type : '';
+      const isReq =
+        typeStr === 'tool-request_contact' ||
+        typeStr === 'tool-result-request_contact' ||
+        (typeStr.includes('request_contact') && typeStr.startsWith('tool')) ||
+        p?.toolName === 'request_contact';
+      if (!isReq) continue;
+      const payload = p?.output ?? p?.result ?? p?.input ?? null;
+      if (payload) return payload as { sentence?: string };
+      return {};
+    }
+    return null;
+  }, [messages, lastAssistant]);
+
+  const submitContact = (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = contactName.trim();
+    const phone = contactPhone.trim();
+    if (name.length < 2 || phone.replace(/\D/g, '').length < 6) return;
+    sendText(`שמי ${name}, הטלפון שלי ${phone}`);
+    setContactName('');
+    setContactPhone('');
+  };
+
   const showTyping = isBusy && messages[messages.length - 1]?.role === 'user';
 
   if (!open) return null;
