@@ -95,6 +95,11 @@ export default function IntakeChatModal({ open, onOpenChange }: Props) {
   }, [open]);
 
   const tryClose = () => {
+    // If lead is saved, close instantly — data is safe.
+    if (saveResult) {
+      onOpenChange(false);
+      return;
+    }
     if (messages.length > 0 && !window.confirm(t('closeConfirm'))) return;
     onOpenChange(false);
   };
