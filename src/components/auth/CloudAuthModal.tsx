@@ -11,10 +11,12 @@ import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { trackEvent, trackSignupStart, trackSignupComplete } from "@/lib/analytics";
+import { useSignupEnabled } from "@/hooks/useSignupEnabled";
 
 export default function CloudAuthModal() {
   const { isAuthFlowOpen, completeAuthFlow, cancelAuthFlow, failAuthFlow } = useAuthModalInternal();
   const { isRTL } = useTranslation();
+  const { enabled: signupEnabled } = useSignupEnabled();
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +29,9 @@ export default function CloudAuthModal() {
     else void trackEvent("login_start", "auth", "email");
     try {
       if (tab === "signup") {
+        if (!signupEnabled) {
+          throw new Error(isRTL ? "ההרשמה סגורה כרגע. ניתן להתחבר עם חשבון קיים." : "Registration is currently closed. Please sign in with an existing account.");
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -105,12 +110,14 @@ export default function CloudAuthModal() {
           </div>
         </div>
 
-        <Tabs value={tab} onValueChange={(v) => setTab(v as "login" | "signup")}>
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs value={signupEnabled ? tab : "login"} onValueChange={(v) => setTab(v as "login" | "signup")}>
+          <TabsList className={`grid w-full ${signupEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
             <TabsTrigger value="login">{isRTL ? "התחברות" : "Sign in"}</TabsTrigger>
-            <TabsTrigger value="signup">{isRTL ? "הרשמה" : "Sign up"}</TabsTrigger>
+            {signupEnabled && (
+              <TabsTrigger value="signup">{isRTL ? "הרשמה" : "Sign up"}</TabsTrigger>
+            )}
           </TabsList>
-          <TabsContent value={tab}>
+          <TabsContent value={signupEnabled ? tab : "login"}>
             <form onSubmit={handleEmailAuth} className="space-y-3 pt-3">
               <div className="space-y-1">
                 <Label htmlFor="email">{isRTL ? "אימייל" : "Email"}</Label>
@@ -122,10 +129,15 @@ export default function CloudAuthModal() {
               </div>
               <Button type="submit" disabled={loading} className="w-full">
                 {loading && <Loader2 className={`${isRTL ? "ms-2" : "mr-2"} h-4 w-4 animate-spin`} />}
-                {tab === "signup"
+                {signupEnabled && tab === "signup"
                   ? (isRTL ? "פתחו חשבון" : "Create account")
                   : (isRTL ? "התחברו" : "Sign in")}
               </Button>
+              {!signupEnabled && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  {isRTL ? "ההרשמה לחברים חדשים סגורה כרגע." : "Registration for new members is currently closed."}
+                </p>
+              )}
             </form>
           </TabsContent>
         </Tabs>
