@@ -14,6 +14,8 @@ interface AionHeaderProps {
   /** Pull rendering up to the chrome layer (fixed top). Default true. */
   fixed?: boolean;
   style?: CSSProperties;
+  /** Optional slot rendered next to the menu button (e.g., notification bell). */
+  menuExtras?: ReactNode;
 }
 
 /**
