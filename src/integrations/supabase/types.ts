@@ -6000,17 +6000,21 @@ export type Database = {
           email: string | null
           id: string
           intent: string | null
+          landing_page_id: string | null
+          metadata: Json
           name: string
           notes: string | null
           pain_category: string | null
           pain_duration: string | null
-          phone: string
+          phone: string | null
           preferred_time: string | null
           prior_attempts: string[] | null
           readiness_score: number | null
           source: string
           status: string
+          tags: string[] | null
           transformation_vision: string | null
+          updated_at: string
         }
         Insert: {
           affiliate_code?: string | null
@@ -6023,17 +6027,21 @@ export type Database = {
           email?: string | null
           id?: string
           intent?: string | null
+          landing_page_id?: string | null
+          metadata?: Json
           name: string
           notes?: string | null
           pain_category?: string | null
           pain_duration?: string | null
-          phone: string
+          phone?: string | null
           preferred_time?: string | null
           prior_attempts?: string[] | null
           readiness_score?: number | null
           source?: string
           status?: string
+          tags?: string[] | null
           transformation_vision?: string | null
+          updated_at?: string
         }
         Update: {
           affiliate_code?: string | null
@@ -6046,19 +6054,31 @@ export type Database = {
           email?: string | null
           id?: string
           intent?: string | null
+          landing_page_id?: string | null
+          metadata?: Json
           name?: string
           notes?: string | null
           pain_category?: string | null
           pain_duration?: string | null
-          phone?: string
+          phone?: string | null
           preferred_time?: string | null
           prior_attempts?: string[] | null
           readiness_score?: number | null
           source?: string
           status?: string
+          tags?: string[] | null
           transformation_vision?: string | null
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leads_landing_page_id_fkey"
+            columns: ["landing_page_id"]
+            isOneToOne: false
+            referencedRelation: "coach_landing_pages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       learning_curricula: {
         Row: {
