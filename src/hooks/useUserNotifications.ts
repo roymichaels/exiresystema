@@ -137,7 +137,8 @@ export const useUserNotifications = () => {
 
       // Set up realtime subscription for new notifications
       const channel = supabase
-        .channel('user-notifications')
+        .channel(`user-notifications-${user.id}`)
+
         .on(
           'postgres_changes',
           {
