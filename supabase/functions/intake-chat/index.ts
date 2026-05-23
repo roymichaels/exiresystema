@@ -25,8 +25,8 @@ const gateway = createOpenAICompatible({
   baseURL: 'https://openrouter.ai/api/v1',
   headers: {
     Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-    'HTTP-Referer': 'https://mindhacker.app',
-    'X-Title': 'Mind Hacker Intake',
+    'HTTP-Referer': 'https://exiresystema.com',
+    'X-Title': 'Exire Systema Intake',
   },
 });
 
@@ -314,7 +314,7 @@ async function notifyFounder(lead: Record<string, unknown>, messages: UIMessage[
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Mind Hacker <onboarding@resend.dev>',
+        from: 'Exire Systema <onboarding@resend.dev>',
         to: [FOUNDER_NOTIFY_EMAIL],
         subject,
         html,

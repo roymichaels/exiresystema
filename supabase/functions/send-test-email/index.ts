@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     );
   }
 
-  const subject = '✅ Test email from Mind Hacker system';
+  const subject = '✅ Test email from Exire Systema';
   const html = `
     <div style="font-family:system-ui;line-height:1.6">
       <h2>This is a test email</h2>
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Mind Hacker <onboarding@resend.dev>',
+        from: 'Exire Systema <onboarding@resend.dev>',
         to: [FOUNDER_NOTIFY_EMAIL],
         subject,
         html,
