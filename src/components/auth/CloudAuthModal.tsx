@@ -1,67 +1,17 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuthModalInternal } from "@/contexts/AuthModalContext";
-import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { trackEvent, trackSignupStart, trackSignupComplete } from "@/lib/analytics";
-import { useSignupEnabled } from "@/hooks/useSignupEnabled";
+import { trackEvent } from "@/lib/analytics";
 
 export default function CloudAuthModal() {
   const { isAuthFlowOpen, completeAuthFlow, cancelAuthFlow, failAuthFlow } = useAuthModalInternal();
   const { isRTL } = useTranslation();
-  const { enabled: signupEnabled } = useSignupEnabled();
-  const [tab, setTab] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    if (tab === "signup") void trackSignupStart();
-    else void trackEvent("login_start", "auth", "email");
-    try {
-      if (tab === "signup") {
-        if (!signupEnabled) {
-          throw new Error(isRTL ? "ההרשמה סגורה כרגע. ניתן להתחבר עם חשבון קיים." : "Registration is currently closed. Please sign in with an existing account.");
-        }
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/` },
-        });
-        if (error) throw error;
-        void trackSignupComplete();
-        toast({
-          title: isRTL ? "בדקו את האימייל" : "Check your email",
-          description: isRTL
-            ? "אשרו את כתובת האימייל שלכם כדי לסיים את ההרשמה."
-            : "Confirm your address to finish signing up.",
-        });
-        completeAuthFlow();
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        void trackEvent("login_success", "auth", "email");
-        toast({ title: isRTL ? "התחברתם" : "Signed in" });
-        completeAuthFlow();
-      }
-    } catch (err: any) {
-      void trackEvent(tab === "signup" ? "signup_failed" : "login_failed", "auth", "email", {
-        message: err?.message,
-      });
-      failAuthFlow(err?.message || (isRTL ? "ההזדהות נכשלה" : "Authentication failed"));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogle = async () => {
     setLoading(true);
@@ -92,55 +42,15 @@ export default function CloudAuthModal() {
           </DialogTitle>
           <DialogDescription className={isRTL ? "text-right" : undefined}>
             {isRTL
-              ? "התחברו או פתחו חשבון חדש כדי להמשיך."
-              : "Sign in or create an account to continue."}
+              ? "התחברו עם חשבון Google כדי להמשיך."
+              : "Sign in with Google to continue."}
           </DialogDescription>
         </DialogHeader>
 
-        <Button type="button" variant="outline" onClick={handleGoogle} disabled={loading} className="w-full">
+        <Button type="button" onClick={handleGoogle} disabled={loading} className="w-full">
+          {loading && <Loader2 className={`${isRTL ? "ms-2" : "mr-2"} h-4 w-4 animate-spin`} />}
           {isRTL ? "המשיכו עם Google" : "Continue with Google"}
         </Button>
-
-        <div className="relative my-2">
-          <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              {isRTL ? "או" : "or"}
-            </span>
-          </div>
-        </div>
-
-        <Tabs value={signupEnabled ? tab : "login"} onValueChange={(v) => setTab(v as "login" | "signup")}>
-          <TabsList className={`grid w-full ${signupEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
-            <TabsTrigger value="login">{isRTL ? "התחברות" : "Sign in"}</TabsTrigger>
-            {signupEnabled && (
-              <TabsTrigger value="signup">{isRTL ? "הרשמה" : "Sign up"}</TabsTrigger>
-            )}
-          </TabsList>
-          <TabsContent value={signupEnabled ? tab : "login"}>
-            <form onSubmit={handleEmailAuth} className="space-y-3 pt-3">
-              <div className="space-y-1">
-                <Label htmlFor="email">{isRTL ? "אימייל" : "Email"}</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">{isRTL ? "סיסמה" : "Password"}</Label>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading && <Loader2 className={`${isRTL ? "ms-2" : "mr-2"} h-4 w-4 animate-spin`} />}
-                {signupEnabled && tab === "signup"
-                  ? (isRTL ? "פתחו חשבון" : "Create account")
-                  : (isRTL ? "התחברו" : "Sign in")}
-              </Button>
-              {!signupEnabled && (
-                <p className="text-xs text-muted-foreground text-center pt-1">
-                  {isRTL ? "ההרשמה לחברים חדשים סגורה כרגע." : "Registration for new members is currently closed."}
-                </p>
-              )}
-            </form>
-          </TabsContent>
-        </Tabs>
       </DialogContent>
     </Dialog>
   );
