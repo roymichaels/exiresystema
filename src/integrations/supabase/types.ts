@@ -2315,6 +2315,54 @@ export type Database = {
           },
         ]
       }
+      coach_integrations: {
+        Row: {
+          brand_color: string | null
+          created_at: string
+          default_calendar_id: string | null
+          default_session_duration_min: number | null
+          default_session_price_usd: number | null
+          email_from: string | null
+          email_signature: string | null
+          metadata: Json | null
+          stripe_session_price_id: string | null
+          twilio_from: string | null
+          twilio_whatsapp_from: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_color?: string | null
+          created_at?: string
+          default_calendar_id?: string | null
+          default_session_duration_min?: number | null
+          default_session_price_usd?: number | null
+          email_from?: string | null
+          email_signature?: string | null
+          metadata?: Json | null
+          stripe_session_price_id?: string | null
+          twilio_from?: string | null
+          twilio_whatsapp_from?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_color?: string | null
+          created_at?: string
+          default_calendar_id?: string | null
+          default_session_duration_min?: number | null
+          default_session_price_usd?: number | null
+          email_from?: string | null
+          email_signature?: string | null
+          metadata?: Json | null
+          stripe_session_price_id?: string | null
+          twilio_from?: string | null
+          twilio_whatsapp_from?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coach_landing_pages: {
         Row: {
           coach_id: string
@@ -5987,6 +6035,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      lead_activity: {
+        Row: {
+          body: string | null
+          client_user_id: string | null
+          created_at: string
+          created_by: string | null
+          direction: string | null
+          external_id: string | null
+          id: string
+          kind: string
+          lead_id: string | null
+          payload: Json | null
+          status: string | null
+          subject: string | null
+        }
+        Insert: {
+          body?: string | null
+          client_user_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: string | null
+          external_id?: string | null
+          id?: string
+          kind: string
+          lead_id?: string | null
+          payload?: Json | null
+          status?: string | null
+          subject?: string | null
+        }
+        Update: {
+          body?: string | null
+          client_user_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          direction?: string | null
+          external_id?: string | null
+          id?: string
+          kind?: string
+          lead_id?: string | null
+          payload?: Json | null
+          status?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activity_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {
