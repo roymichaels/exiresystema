@@ -493,4 +493,29 @@ const Field = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
+const ActivityFeed = ({ leadId }: { leadId: string }) => {
+  const { data: activity = [], isLoading } = useLeadActivity(leadId);
+  if (isLoading) return null;
+  if (activity.length === 0) return null;
+  return (
+    <details className="rounded-lg border border-border/50 p-3" open>
+      <summary className="text-xs font-semibold text-muted-foreground uppercase cursor-pointer">
+        Activity ({activity.length})
+      </summary>
+      <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+        {activity.map(a => (
+          <div key={a.id} className="text-xs rounded-lg p-2 bg-muted/30" dir="auto">
+            <span className="font-semibold opacity-70">[{a.kind}]</span>{' '}
+            {a.subject && <span className="font-medium">{a.subject} · </span>}
+            <span>{a.body}</span>
+            <div className="text-[10px] opacity-50 mt-0.5">
+              {format(new Date(a.created_at), 'dd MMM HH:mm', { locale: he })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+};
+
 export default LeadsCRM;
