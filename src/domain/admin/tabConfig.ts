@@ -1,116 +1,78 @@
 /**
  * @module domain/admin/tabConfig
- * @purpose Centralised tab + sub-tab configuration for AdminHub
- * 
- * All lazy imports for admin sub-pages live here so that
- * AdminHub.tsx remains a thin rendering shell.
+ * @purpose Centralised tab + sub-tab configuration for AdminHub.
+ *
+ * Single-coach console (admin === sole coach). Collapsed from 7 tabs to 4:
+ * Coach · Marketing · Content · System (with Integrations under System).
  */
 
 import { lazy } from 'react';
-import {
-  LayoutDashboard,
-  Shield,
-  Megaphone,
-  FileText,
-  Settings,
-  Globe,
-  Briefcase,
-} from 'lucide-react';
+import { Briefcase, Megaphone, FileText, Settings } from 'lucide-react';
 import type { AdminTabConfig } from './types';
 
-// ─── Lazy-loaded Coach Sub-Pages (admin === sole coach) ─────────────────────
+// ─── Coach (admin = sole coach) ─────────────────────────────────────────────
 const CoachDashboardOverview = lazy(() => import('@/components/careers/coach/CoachDashboardOverview'));
 const CoachClientsTab        = lazy(() => import('@/components/careers/coach/CoachClientsTab'));
 const CoachLeadsTab          = lazy(() => import('@/components/careers/coach/CoachLeadsTab'));
 const CoachPlansTab          = lazy(() => import('@/components/careers/coach/CoachPlansTab'));
-const CoachMarketingTab      = lazy(() => import('@/components/careers/coach/CoachMarketingTab'));
-const CoachSettingsTab       = lazy(() => import('@/components/careers/coach/CoachSettingsTab'));
+const Analytics              = lazy(() => import('@/pages/admin/Analytics'));
 
-// ─── Lazy-loaded Admin Sub-Pages ────────────────────────────────────────────
-
-// PanelDashboard was removed — admin overview now uses Analytics as default
-const AdminDashboardOverview = lazy(() => import('@/pages/admin/Analytics'));
-const Analytics         = lazy(() => import('@/pages/admin/Analytics'));
-const NotificationCenter = lazy(() => import('@/pages/admin/NotificationCenter'));
-const Users             = lazy(() => import('@/pages/admin/Users'));
-
-const Businesses        = lazy(() => import('@/pages/admin/Businesses'));
-const AuroraInsights    = lazy(() => import('@/pages/admin/AuroraInsights'));
+// ─── Marketing (Campaigns + Site merged) ────────────────────────────────────
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
 const Newsletter        = lazy(() => import('@/pages/admin/Newsletter'));
 const AdminOffers       = lazy(() => import('@/pages/admin/Offers'));
-const Purchases         = lazy(() => import('@/pages/admin/Purchases'));
-const AdminProducts     = lazy(() => import('@/pages/admin/Products'));
-const Content           = lazy(() => import('@/pages/admin/Content'));
-const Videos            = lazy(() => import('@/pages/admin/Videos'));
-const Recordings        = lazy(() => import('@/pages/admin/Recordings'));
-const Forms             = lazy(() => import('@/pages/admin/Forms'));
 const LandingPages      = lazy(() => import('@/pages/admin/LandingPages'));
 const HomepageSections  = lazy(() => import('@/pages/admin/HomepageSections'));
 const AdminTheme        = lazy(() => import('@/pages/admin/Theme'));
 const FAQs              = lazy(() => import('@/pages/admin/FAQs'));
 const Testimonials      = lazy(() => import('@/pages/admin/Testimonials'));
-const BugReports        = lazy(() => import('@/pages/admin/BugReports'));
-const ChatAssistant     = lazy(() => import('@/pages/admin/ChatAssistant'));
-const AdminSettings     = lazy(() => import('@/pages/admin/Settings'));
-const TemplateCoverage  = lazy(() => import('@/components/admin/TemplateCoveragePanel'));
-const AdminFMBounties   = lazy(() => import('@/pages/admin/FMBounties'));
+
+// ─── Content ────────────────────────────────────────────────────────────────
+const AdminProducts     = lazy(() => import('@/pages/admin/Products'));
 const AdminBlog         = lazy(() => import('@/pages/admin/Blog'));
-const WorkMonitor       = lazy(() => import('@/pages/admin/WorkMonitor'));
-const CareerApplications = lazy(() => import('@/pages/admin/CareerApplications'));
+const Content           = lazy(() => import('@/pages/admin/Content'));
+const Videos            = lazy(() => import('@/pages/admin/Videos'));
+const Recordings        = lazy(() => import('@/pages/admin/Recordings'));
+const Forms             = lazy(() => import('@/pages/admin/Forms'));
+const Purchases         = lazy(() => import('@/pages/admin/Purchases'));
+
+// ─── System ─────────────────────────────────────────────────────────────────
+const Users             = lazy(() => import('@/pages/admin/Users'));
+const NotificationCenter = lazy(() => import('@/pages/admin/NotificationCenter'));
+const BugReports        = lazy(() => import('@/pages/admin/BugReports'));
+const AdminSettings     = lazy(() => import('@/pages/admin/Settings'));
+const Integrations      = lazy(() => import('@/pages/admin/Integrations'));
 
 // ─── Tab Configuration ──────────────────────────────────────────────────────
 
 export const ADMIN_TABS: AdminTabConfig[] = [
-  {
-    id: 'overview',
-    labelHe: 'סקירה',
-    labelEn: 'Overview',
-    icon: LayoutDashboard,
-    subTabs: [
-      { id: 'dashboard', labelHe: 'דאשבורד', labelEn: 'Dashboard', component: AdminDashboardOverview },
-      { id: 'analytics', labelHe: 'אנליטיקס', labelEn: 'Analytics', component: Analytics },
-      { id: 'notifications', labelHe: 'התראות', labelEn: 'Notifications', component: NotificationCenter },
-    ],
-  },
   {
     id: 'coach',
     labelHe: 'מאמן',
     labelEn: 'Coach',
     icon: Briefcase,
     subTabs: [
-      { id: 'overview',   labelHe: 'סקירה',     labelEn: 'Overview',  component: CoachDashboardOverview },
-      { id: 'clients',    labelHe: 'מתאמנים',   labelEn: 'Clients',   component: CoachClientsTab },
-      { id: 'leads',      labelHe: 'לידים',     labelEn: 'Leads',     component: CoachLeadsTab },
-      { id: 'plans',      labelHe: 'תוכניות',   labelEn: 'Plans',     component: CoachPlansTab },
-      { id: 'marketing',  labelHe: 'שיווק',     labelEn: 'Marketing', component: CoachMarketingTab },
-      { id: 'profile',    labelHe: 'פרופיל',    labelEn: 'Profile',   component: CoachSettingsTab },
+      { id: 'overview',  labelHe: 'סקירה',    labelEn: 'Overview',  component: CoachDashboardOverview },
+      { id: 'clients',   labelHe: 'מתאמנים',  labelEn: 'Clients',   component: CoachClientsTab },
+      { id: 'leads',     labelHe: 'לידים',    labelEn: 'Leads',     component: CoachLeadsTab },
+      { id: 'plans',     labelHe: 'תוכניות',  labelEn: 'Plans',     component: CoachPlansTab },
+      { id: 'analytics', labelHe: 'אנליטיקס', labelEn: 'Analytics', component: Analytics },
     ],
   },
   {
-    id: 'admin',
-    labelHe: 'ניהול',
-    labelEn: 'Admin',
-    icon: Shield,
-    subTabs: [
-      { id: 'users', labelHe: 'משתמשים', labelEn: 'Users', component: Users },
-      { id: 'businesses', labelHe: 'עסקים', labelEn: 'Businesses', component: Businesses },
-      { id: 'aurora-insights', labelHe: 'תובנות', labelEn: 'Insights', component: AuroraInsights },
-      { id: 'fm-bounties', labelHe: 'באונטי FM', labelEn: 'FM Bounties', component: AdminFMBounties },
-      { id: 'work-monitor', labelHe: 'מוניטור עבודה', labelEn: 'Work Monitor', component: WorkMonitor },
-      { id: 'career-apps', labelHe: 'בקשות קריירה', labelEn: 'Career Apps', component: CareerApplications },
-    ],
-  },
-  {
-    id: 'campaigns',
-    labelHe: 'קמפיינים',
-    labelEn: 'Campaigns',
+    id: 'marketing',
+    labelHe: 'שיווק',
+    labelEn: 'Marketing',
     icon: Megaphone,
     subTabs: [
-      { id: 'affiliates', labelHe: 'שותפים', labelEn: 'Affiliates', component: AdminAffiliates },
-      { id: 'newsletter', labelHe: 'ניוזלטר', labelEn: 'Newsletter', component: Newsletter },
-      { id: 'offers', labelHe: 'הצעות', labelEn: 'Offers', component: AdminOffers },
-      { id: 'purchases', labelHe: 'רכישות', labelEn: 'Purchases', component: Purchases },
+      { id: 'landing-pages', labelHe: 'דפי נחיתה', labelEn: 'Landing Pages', component: LandingPages },
+      { id: 'homepage',      labelHe: 'עמוד הבית', labelEn: 'Homepage',      component: HomepageSections },
+      { id: 'offers',        labelHe: 'הצעות',     labelEn: 'Offers',        component: AdminOffers },
+      { id: 'affiliates',    labelHe: 'שותפים',    labelEn: 'Affiliates',    component: AdminAffiliates },
+      { id: 'newsletter',    labelHe: 'ניוזלטר',   labelEn: 'Newsletter',    component: Newsletter },
+      { id: 'theme',         labelHe: 'ערכת נושא', labelEn: 'Theme',         component: AdminTheme },
+      { id: 'faqs',          labelHe: 'שאלות',     labelEn: 'FAQs',          component: FAQs },
+      { id: 'testimonials',  labelHe: 'המלצות',    labelEn: 'Testimonials',  component: Testimonials },
     ],
   },
   {
@@ -119,25 +81,13 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelEn: 'Content',
     icon: FileText,
     subTabs: [
-      { id: 'products', labelHe: 'מוצרים', labelEn: 'Products', component: AdminProducts },
-      { id: 'blog', labelHe: 'בלוג', labelEn: 'Blog', component: AdminBlog },
-      { id: 'content-mgmt', labelHe: 'תוכן', labelEn: 'Content', component: Content },
-      { id: 'videos', labelHe: 'סרטונים', labelEn: 'Videos', component: Videos },
-      { id: 'recordings', labelHe: 'הקלטות', labelEn: 'Recordings', component: Recordings },
-      { id: 'forms', labelHe: 'טפסים', labelEn: 'Forms', component: Forms },
-    ],
-  },
-  {
-    id: 'site',
-    labelHe: 'אתר',
-    labelEn: 'Site',
-    icon: Globe,
-    subTabs: [
-      { id: 'landing-pages', labelHe: 'דפי נחיתה', labelEn: 'Landing Pages', component: LandingPages },
-      { id: 'homepage', labelHe: 'עמוד הבית', labelEn: 'Homepage', component: HomepageSections },
-      { id: 'theme', labelHe: 'ערכת נושא', labelEn: 'Theme', component: AdminTheme },
-      { id: 'faqs', labelHe: 'שאלות נפוצות', labelEn: 'FAQs', component: FAQs },
-      { id: 'testimonials', labelHe: 'המלצות', labelEn: 'Testimonials', component: Testimonials },
+      { id: 'products',    labelHe: 'מוצרים',   labelEn: 'Products',   component: AdminProducts },
+      { id: 'purchases',   labelHe: 'רכישות',   labelEn: 'Purchases',  component: Purchases },
+      { id: 'blog',        labelHe: 'בלוג',     labelEn: 'Blog',       component: AdminBlog },
+      { id: 'content-mgmt',labelHe: 'תוכן',     labelEn: 'Content',    component: Content },
+      { id: 'videos',      labelHe: 'סרטונים',  labelEn: 'Videos',     component: Videos },
+      { id: 'recordings',  labelHe: 'הקלטות',   labelEn: 'Recordings', component: Recordings },
+      { id: 'forms',       labelHe: 'טפסים',    labelEn: 'Forms',      component: Forms },
     ],
   },
   {
@@ -146,10 +96,11 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelEn: 'System',
     icon: Settings,
     subTabs: [
-      { id: 'bug-reports', labelHe: 'דיווחי באגים', labelEn: 'Bug Reports', component: BugReports },
-      { id: 'chat-assistant', labelHe: 'עוזר צ\'אט', labelEn: 'Chat Assistant', component: ChatAssistant },
-      { id: 'template-coverage', labelHe: 'כיסוי תבניות', labelEn: 'Template Coverage', component: TemplateCoverage },
-      { id: 'settings', labelHe: 'הגדרות', labelEn: 'Settings', component: AdminSettings },
+      { id: 'integrations',  labelHe: 'אינטגרציות', labelEn: 'Integrations', component: Integrations },
+      { id: 'notifications', labelHe: 'התראות',     labelEn: 'Notifications', component: NotificationCenter },
+      { id: 'users',         labelHe: 'משתמשים',    labelEn: 'Users',        component: Users },
+      { id: 'bug-reports',   labelHe: 'דיווחי באגים', labelEn: 'Bug Reports', component: BugReports },
+      { id: 'settings',      labelHe: 'הגדרות',     labelEn: 'Settings',     component: AdminSettings },
     ],
   },
 ];
