@@ -25,6 +25,8 @@ import {
 import {
   useLeads, useLeadStats, useUpdateLead, useDeleteLead, useAddLead, type Lead,
 } from '@/hooks/useLeads';
+import { EmailDialog, WhatsAppDialog, ScheduleDialog } from '@/components/crm/LeadQuickActions';
+import { useLeadActivity } from '@/hooks/useLeadActivity';
 
 interface LeadsCRMProps {
   scope?: 'admin' | 'coach';
@@ -351,26 +353,19 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               </DialogHeader>
 
               <div className="space-y-4">
-                {/* Contact */}
-                <div className="grid grid-cols-2 gap-2">
+                {/* Quick actions — integrated CRM */}
+                <div className="flex flex-wrap gap-2">
                   {selected.phone && (
                     <Button asChild variant="outline" size="sm" className="gap-2">
-                      <a href={`tel:${selected.phone}`} dir="ltr"><Phone className="h-4 w-4" />{selected.phone}</a>
+                      <a href={`tel:${selected.phone}`} dir="ltr"><Phone className="h-4 w-4" />Call</a>
                     </Button>
                   )}
-                  {selected.email && (
-                    <Button asChild variant="outline" size="sm" className="gap-2">
-                      <a href={`mailto:${selected.email}`}><Mail className="h-4 w-4" />{selected.email}</a>
-                    </Button>
-                  )}
-                  {waLink(selected.phone) && (
-                    <Button asChild variant="outline" size="sm" className="gap-2">
-                      <a href={waLink(selected.phone)!} target="_blank" rel="noopener noreferrer">
-                        <MessageCircle className="h-4 w-4" />ווטסאפ
-                      </a>
-                    </Button>
-                  )}
+                  <EmailDialog lead={selected} />
+                  <WhatsAppDialog lead={selected} />
+                  <ScheduleDialog lead={selected} />
                 </div>
+
+                <ActivityFeed leadId={selected.id} />
 
                 {/* Status */}
                 <div>
@@ -497,5 +492,30 @@ const Field = ({ label, value }: { label: string; value: string }) => (
     <span dir="auto">{value}</span>
   </div>
 );
+
+const ActivityFeed = ({ leadId }: { leadId: string }) => {
+  const { data: activity = [], isLoading } = useLeadActivity(leadId);
+  if (isLoading) return null;
+  if (activity.length === 0) return null;
+  return (
+    <details className="rounded-lg border border-border/50 p-3" open>
+      <summary className="text-xs font-semibold text-muted-foreground uppercase cursor-pointer">
+        Activity ({activity.length})
+      </summary>
+      <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+        {activity.map(a => (
+          <div key={a.id} className="text-xs rounded-lg p-2 bg-muted/30" dir="auto">
+            <span className="font-semibold opacity-70">[{a.kind}]</span>{' '}
+            {a.subject && <span className="font-medium">{a.subject} · </span>}
+            <span>{a.body}</span>
+            <div className="text-[10px] opacity-50 mt-0.5">
+              {format(new Date(a.created_at), 'dd MMM HH:mm', { locale: he })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+};
 
 export default LeadsCRM;
