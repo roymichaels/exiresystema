@@ -62,6 +62,8 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy load pages for better performance
 const Index = lazy(() => import("./pages/Index"));
+const CoachHub = lazy(() => import("./pages/CoachHub"));
+const MyCoachProfile = lazy(() => import("./pages/MyCoachProfile"));
 
 const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
@@ -376,8 +378,13 @@ const App = () => (
                                                 {renderProtectedRedirectRoutes()}
                                                 <Route path="/arena/:domainId/*" element={<ArenaToAIONRedirect />} />
                                                 {/* Coaches → unified into Admin (sole-coach app) */}
-                                                <Route path="/coaches" element={<Navigate to="/admin-hub?tab=coach" replace />} />
-                                                <Route path="/coaches/*" element={<Navigate to="/admin-hub?tab=coach" replace />} />
+                                                {/* Coach workspace — single-coach private app */}
+                                                <Route path="/workspace" element={<CoachHub />} />
+                                                <Route path="/coach-hub" element={<Navigate to="/workspace" replace />} />
+                                                <Route path="/me/coach" element={<MyCoachProfile />} />
+                                                {/* Legacy /coaches funnel → workspace in single-coach app */}
+                                                <Route path="/coaches" element={<Navigate to="/workspace" replace />} />
+                                                <Route path="/coaches/*" element={<Navigate to="/workspace" replace />} />
                                                 {/* Admin Hub */}
                                                 <Route path="/admin-hub" element={<AdminRoute><AdminLayoutWrapper /></AdminRoute>} />
                                                 {/* Launchpad */}
