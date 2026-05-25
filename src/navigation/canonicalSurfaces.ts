@@ -1,23 +1,22 @@
 /**
  * Canonical Surfaces — the ONLY source of truth for top-level navigation.
  *
- * AION has exactly 5 surfaces. Everything else is an overlay, artifact,
- * room, or capability output summoned by AION. Do not add a 6th entry here
- * without an architectural decision.
- *
- * See `.lovable/plan.md` (System Consolidation Plan) for rationale.
+ * Private Coach app: surfaces are coach-shaped, not AION-shaped.
+ * AION pages (/brain, /journey, /outer-world, /aurora) remain mounted
+ * and reachable from admin tools, but are not part of the daily nav.
  */
 import {
-  MessageCircle,
-  Brain,
-  Compass,
-  Globe,
+  LayoutDashboard,
+  Users,
+  FileText,
+  Megaphone,
+  Shield,
   User,
   type LucideIcon,
 } from 'lucide-react';
 
 export interface CanonicalSurface {
-  id: 'chat' | 'brain' | 'journey' | 'outer-world' | 'profile';
+  id: 'workspace' | 'clients' | 'content' | 'marketing' | 'admin' | 'profile';
   path: string;
   icon: LucideIcon;
   labelEn: string;
@@ -25,34 +24,39 @@ export interface CanonicalSurface {
 }
 
 export const CANONICAL_SURFACES: readonly CanonicalSurface[] = [
-  { id: 'chat',        path: '/',            icon: MessageCircle, labelEn: 'Chat',        labelHe: 'צ׳אט' },
-  { id: 'brain',       path: '/brain',       icon: Brain,         labelEn: 'Brain',       labelHe: 'מוח' },
-  { id: 'journey',     path: '/journey',     icon: Compass,       labelEn: 'Journey',     labelHe: 'מסע' },
-  { id: 'outer-world', path: '/outer-world', icon: Globe,         labelEn: 'Outer World', labelHe: 'עולם' },
-  { id: 'profile',     path: '/profile',     icon: User,          labelEn: 'Profile',     labelHe: 'פרופיל' },
+  { id: 'workspace', path: '/workspace',                 icon: LayoutDashboard, labelEn: 'Workspace', labelHe: 'מרכז' },
+  { id: 'clients',   path: '/workspace?tab=clients',     icon: Users,           labelEn: 'Clients',   labelHe: 'מתאמנים' },
+  { id: 'content',   path: '/workspace?tab=content',     icon: FileText,        labelEn: 'Content',   labelHe: 'תוכן' },
+  { id: 'marketing', path: '/workspace?tab=marketing',   icon: Megaphone,       labelEn: 'Marketing', labelHe: 'שיווק' },
+  { id: 'admin',     path: '/admin-hub',                 icon: Shield,          labelEn: 'Admin',     labelHe: 'ניהול' },
+  { id: 'profile',   path: '/me/coach',                  icon: User,            labelEn: 'Profile',   labelHe: 'פרופיל' },
 ] as const;
 
 export type CanonicalSurfaceId = (typeof CANONICAL_SURFACES)[number]['id'];
 
 /**
  * Map a legacy path → canonical surface + optional artifact intent.
- * Used by redirect tables and AION's intent router.
+ * Kept for AION's intent router; AION surfaces still resolve here.
  */
 export const LEGACY_TO_SURFACE: Record<string, { path: string; artifact?: string }> = {
-  '/aurora':    { path: '/' },
-  '/strategy':  { path: '/journey', artifact: 'plan' },
-  '/hypnosis':  { path: '/journey', artifact: 'hypnosis' },
-  '/journal':   { path: '/journey', artifact: 'journal' },
-  '/work':      { path: '/journey', artifact: 'work' },
-  '/play':      { path: '/journey', artifact: 'missions' },
-  '/now':       { path: '/journey', artifact: 'missions' },
-  '/plan':      { path: '/journey', artifact: 'plan' },
-  '/community': { path: '/outer-world', artifact: 'community' },
-  '/coaches':   { path: '/admin-hub', artifact: 'coach' },
-  '/fm':        { path: '/outer-world', artifact: 'market' },
-  '/messages':  { path: '/outer-world', artifact: 'messages' },
-  '/learn':     { path: '/outer-world', artifact: 'learn' },
-  '/me':        { path: '/profile' },
-  '/dashboard': { path: '/' },
-  '/hallway':   { path: '/' },
+  '/aurora':    { path: '/workspace' },
+  '/strategy':  { path: '/workspace', artifact: 'plan' },
+  '/hypnosis':  { path: '/workspace', artifact: 'hypnosis' },
+  '/journal':   { path: '/workspace', artifact: 'journal' },
+  '/work':      { path: '/workspace', artifact: 'work' },
+  '/play':      { path: '/workspace', artifact: 'missions' },
+  '/now':       { path: '/workspace' },
+  '/plan':      { path: '/workspace', artifact: 'plan' },
+  '/journey':   { path: '/workspace' },
+  '/chat':      { path: '/workspace?tab=clients' },
+  '/outer-world': { path: '/workspace?tab=marketing' },
+  '/community': { path: '/workspace?tab=marketing', artifact: 'community' },
+  '/coaches':   { path: '/workspace' },
+  '/fm':        { path: '/workspace', artifact: 'market' },
+  '/messages':  { path: '/workspace?tab=clients', artifact: 'messages' },
+  '/learn':     { path: '/workspace?tab=content', artifact: 'learn' },
+  '/me':        { path: '/me/coach' },
+  '/profile':   { path: '/me/coach' },
+  '/dashboard': { path: '/workspace' },
+  '/hallway':   { path: '/workspace' },
 };
