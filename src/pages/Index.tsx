@@ -32,7 +32,7 @@ const Index = () => {
   }
 
   if (user) {
-    return <Navigate to="/now" replace />;
+    return <Navigate to="/workspace" replace />;
   }
 
   return <MindHackerLanding />;

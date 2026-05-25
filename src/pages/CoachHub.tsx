@@ -2,7 +2,8 @@
  * CoachHub - Sidebar-less coach command center.
  * Tab navigation, client list, and stats are all inline.
  */
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useMyCoachProfile, useCoachReviewStats, useFirstCoachSlug, useCoach } from '@/domain/coaches';
@@ -38,8 +39,26 @@ import CoachPlansTab from '@/components/careers/coach/CoachPlansTab';
 export default function CoachHub() {
   const { language } = useTranslation();
   const isHe = language === 'he';
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'dashboard');
   const [profileOpen, setProfileOpen] = useState(false);
+
+  // Sync URL ?tab= → activeTab (deep links from canonical nav)
+  useEffect(() => {
+    const urlTab = searchParams.get('tab');
+    if (urlTab && urlTab !== activeTab) setActiveTab(urlTab);
+  }, [searchParams]);
+
+  // Reflect tab changes back into the URL (without polluting history)
+  useEffect(() => {
+    const urlTab = searchParams.get('tab');
+    if (activeTab !== (urlTab || 'dashboard')) {
+      const next = new URLSearchParams(searchParams);
+      if (activeTab === 'dashboard') next.delete('tab');
+      else next.set('tab', activeTab);
+      setSearchParams(next, { replace: true });
+    }
+  }, [activeTab]);
 
   // Profile & stats
   const { data: myProfile } = useMyCoachProfile();
