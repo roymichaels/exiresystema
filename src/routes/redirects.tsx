@@ -94,42 +94,40 @@ const PANEL_REDIRECTS: [string, string][] = [
 
 /** Protected-shell redirects (rendered inside ProtectedAppShell) */
 export const PROTECTED_REDIRECTS: [string, string][] = [
-  // Strategy (missions) aliases — point straight at canonical
-  ['/now', '/journey'],
-  ['/plan', '/journey'],
-  ['/play', '/journey'],
-  ['/play-hub', '/journey'],
-  ['/tactics', '/journey'],
-  ['/arena', '/strategy'],
-  // Phase D — /journey is the canonical action surface and renders directly
-  // (see App.tsx). Legacy /journey deep-paths fall back to it.
-  ['/journey/*', '/journey'],
+  // Legacy AION user-facing aliases → coach workspace
+  ['/now', '/workspace'],
+  ['/plan', '/workspace'],
+  ['/play', '/workspace'],
+  ['/play-hub', '/workspace'],
+  ['/tactics', '/workspace'],
+  ['/arena', '/workspace'],
+  ['/dashboard', '/workspace'],
+  ['/hallway', '/workspace'],
+  ['/hallway/:slug', '/workspace'],
+  ['/work', '/workspace'],
+  ['/work-hub', '/workspace'],
+  ['/journal-hub', '/workspace'],
+  ['/life', '/workspace'],
+  ['/life-plan', '/workspace'],
+  ['/career', '/workspace'],
+  ['/chat', '/workspace?tab=clients'],
+  // Profile → coach profile
+  ['/profile', '/me/coach'],
+  ['/profile-hub', '/me/coach'],
+  ['/me', '/me/coach'],
+  // Career hubs collapse
+  ['/creator-hub', '/workspace'],
+  ['/freelancer-hub', '/workspace'],
+  // Strategy maze deep-links still resolve to the canonical action surface
   ['/personal-hypnosis/success', '/journey'],
   ['/personal-hypnosis/pending', '/journey'],
-  // Legacy hub aliases
-  ['/dashboard', '/'],
-  ['/hallway', '/'],
-  ['/hallway/:slug', '/'],
-  ['/work', '/'],
-  ['/work-hub', '/'],
-  ['/journal-hub', '/journal'],
-  ['/life', '/'],
-  ['/life-plan', '/strategy'],
-  ['/career', '/outer-world'],
-  // Phase E — /profile is the lightweight account/profile surface inside Brain.
-  // BrainPage reads ?panel=profile and opens the profile overlay.
-  ['/profile', '/brain?panel=profile'],
-  ['/profile-hub', '/brain?panel=profile'],
-  ['/coach-hub', '/coaches'],
-  ['/creator-hub', '/creator'],
-  ['/freelancer-hub', '/freelancer'],
-  ['/me', '/aurora'],
-  // Legacy AION namespace → flat canonical
-  ['/mindos', '/aurora'],
-  ['/mindos/chat', '/aurora'],
-  ['/mindos/strategy', '/strategy'],
+  ['/journey/*', '/journey'],
+  // Legacy AION namespace → flat canonical (kept for deep-links)
+  ['/mindos', '/workspace'],
+  ['/mindos/chat', '/workspace?tab=clients'],
+  ['/mindos/strategy', '/journey'],
   ['/mindos/tactics', '/journey'],
-  ['/mindos/work', '/'],
+  ['/mindos/work', '/workspace'],
   ['/mindos/journal', '/journal'],
 ];
 
