@@ -45,15 +45,6 @@ export const REALM_MOOD: Record<CanonicalSurfaceId, RealmMood> = {
     transitionTone: 'warm',
     interaction: 'follow',
   },
-  messages: {
-    id: 'messages',
-    hue: { primary: '198 80% 56%', accent: '218 70% 30%' },
-    presence: 'listening',
-    atmosphereIntensity: 0.45,
-    navResonance: 0.65,
-    transitionTone: 'soft',
-    interaction: 'speak',
-  },
   community: {
     id: 'community',
     hue: { primary: '178 70% 45%', accent: '38 80% 55%' },
@@ -88,7 +79,7 @@ export function moodForPath(pathname: string): RealmMood | null {
   const map: Record<string, CanonicalSurfaceId> = {
     '/home':      'home',
     '/courses':   'courses',
-    '/messages':  'messages',
+    '/messages':  'home',
     '/community': 'community',
     '/me':        'profile',
     '/me/coach':  'profile',
