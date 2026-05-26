@@ -1,91 +1,68 @@
-# Plan — Turn the logged-in app into the Private Coach app
+# Switch logged-in default to the client view
 
-## Goal
+Right now, after login everyone lands on `/workspace` (CoachHub) and the side-nav is coach-shaped (Workspace · Clients · Content · Marketing · Admin · Profile). Even you, the coach, should see the **client-side experience by default** — the same thing your members see when they sign in. The coach/admin tools already live inside `/admin-hub`; the canonical nav should just point there for admins, not replace the main app.
 
-After login, the user (the coach) should land in a coach command center — not the AION Chat/Brain/Journey/Outer-World/Profile shell. We reuse what already exists (`CoachHub`, `AdminHub`, `PractitionerProfile`, `Courses`, `CoachProductsTab`, `CoachLandingPagesTab`, `CoachPricingPage`, etc.) and don't build new screens. AION brain, presence, hallway, world-runtime etc. stay in the codebase — they continue to power the public landing page, the admin AI features (Aurora Insights, Chat Assistant, content/copy generation), and underlying coach intelligence. They just stop being the navigation the coach sees.
+## What the client view is
 
-## Current state (verified)
+Reusing what already exists (no new pages):
 
-- After login, `Index.tsx` does `Navigate to="/now"` → `redirects.tsx` maps `/now` → `/journey` (AION's "Journey" surface).
-- `DesktopSideNav` + the mobile equivalents render the 5 canonical AION surfaces from `src/navigation/canonicalSurfaces.ts`: **Chat, Brain, Journey, Outer World, Profile** — none of which are coach-shaped.
-- The coach functionality already exists and is solid:
-  - `src/pages/CoachHub.tsx` — overview, clients, leads, products, content, plans, marketing, analytics, landing pages, settings, profile preview.
-  - `src/pages/AdminHub.tsx` + `src/domain/admin/tabConfig.ts` — already collapsed to 4 tabs (Coach / Marketing / Content / System) per the prior pass.
-  - `src/pages/PractitionerProfile.tsx` — public coach profile.
-  - `src/pages/Coaches.tsx` → currently routes to `CareerHub` ("become a coach" funnel) — irrelevant in a single-coach app.
-  - `Courses` / `CourseDetail` / `CourseWatch` — usable as the coach's course catalog.
-  - `Integrations` page — already unified.
+- **Home** → coach landing / member home (`MindHackerLanding` content, but as the logged-in shell — i.e. the coach's public site is the client home)
+- **Courses** → `/courses` (existing `Courses.tsx` + `CourseDetail` + `CourseWatch`)
+- **Messages** → `/messages` (existing `Messages.tsx`, chat with the coach, not AION)
+- **Community** → `/community` (existing)
+- **Profile** → `/me` → user's own profile (`ProfilePage.tsx`)
+- **Admin** → `/admin-hub` (only rendered in nav if the user has the admin role — that's you)
 
-## Strategy
+## Changes
 
-Strip the AION surfaces from the **logged-in shell only**, and route the coach into the coach workspace instead. No deletions of AION code — those pages remain reachable from admin tools / advanced routes, and the brain still powers AI features behind the scenes.
+### 1. Post-login redirect — `src/pages/Index.tsx`
+- Change `<Navigate to="/workspace" replace />` → `<Navigate to="/home" replace />` (new client home route).
 
-### 1. Change the post-login landing
+### 2. New `/home` route — `src/App.tsx`
+- Add `/home` as a `ProtectedRoute` rendering the coach's landing content (`MindHackerLanding`) inside the protected shell, so members get the coach's site as their home base.
+- Keep `/landing` (public landing) untouched.
 
-- `src/pages/Index.tsx`: replace `<Navigate to="/now" replace />` with a redirect to the new coach workspace root (`/workspace`, alias of `/coach-hub`). Use a single constant so we can flip it later.
-- Add `/workspace` to `App.tsx` as a `ProtectedRoute` rendering `CoachHub`.
+### 3. Canonical nav — `src/navigation/canonicalSurfaces.ts`
+Replace coach-shaped surfaces with client-shaped surfaces:
 
-### 2. Replace the 5 canonical surfaces with coach surfaces
+| id | path | icon | label |
+|---|---|---|---|
+| home | `/home` | Home | Home |
+| courses | `/courses` | GraduationCap | Courses |
+| messages | `/messages` | MessageSquare | Messages |
+| community | `/community` | Users | Community |
+| profile | `/me` | User | Profile |
 
-Rewrite `src/navigation/canonicalSurfaces.ts` so the side/bottom nav now exposes the coach's daily tools (all already exist):
+No `admin`/`workspace`/`clients`/`marketing`/`content` entries in the canonical surface list.
 
-```text
-Workspace   → /workspace      (CoachHub overview + tab pills)
-Clients     → /workspace?tab=clients
-Content     → /workspace?tab=content   (products, courses, blog, recordings)
-Marketing   → /workspace?tab=marketing (landing pages, offers, theme, FAQs)
-Admin       → /admin-hub                (already 4-tab collapsed)
-Profile     → /me/coach                  (PractitionerProfile of the current coach via storeSlug)
-```
+### 4. Admin entry — `src/components/navigation/DesktopSideNav.tsx` (+ mobile equivalent)
+Append an **Admin** nav item *only when* the current user is an admin (use existing `useUserRole` / `AdminRoute` check). The item links to `/admin-hub`. This keeps all coach/marketing/content/integrations tools where they already are — inside the admin hub — and out of every client's UI.
 
-`CoachHub` already drives the tabbed inner UI, so the nav can just deep-link via `?tab=` (a tiny adjustment in `CoachHub` to read `tab` from `useSearchParams` on mount).
+### 5. Redirect cleanup — `src/routes/redirects.tsx`
+Reverse the AION→workspace mappings I added previously:
+- `/now`, `/plan`, `/play`, `/play-hub`, `/tactics`, `/arena`, `/dashboard`, `/hallway*`, `/work*`, `/journal-hub`, `/life*`, `/career`, `/creator-hub`, `/freelancer-hub`, `/mindos*` → `/home` (not `/workspace`)
+- `/chat` → `/messages` (chat with coach, not the clients tab)
+- `/profile`, `/profile-hub`, `/me/coach` (legacy) → `/me`
+- Keep `/workspace` working (renders CoachHub) but only admins reach it (via the nav item / direct link).
 
-### 3. Add legacy aliases instead of deleting AION routes
+### 6. CoachHub access — `src/App.tsx`
+Wrap `/workspace` and `/me/coach` with `AdminRoute` so only the coach/admin can open the coach console. Non-admin clients who hit those URLs bounce to `/home`.
 
-In `src/routes/redirects.tsx` and `LEGACY_TO_SURFACE`, redirect the now-unused user-facing AION surfaces into the coach workspace:
+### 7. realmMood — `src/aion/realms/realmMood.ts`
+Update the surface→mood keys back to client surfaces (`home`, `courses`, `messages`, `community`, `profile`, plus `admin`).
 
-```text
-/         → /workspace   (when authed; Index handles this)
-/journey  → /workspace
-/now      → /workspace
-/chat     → /workspace?tab=clients   (coach uses CRM, not AION chat)
-/outer-world → /workspace?tab=marketing
-/profile  → /me/coach
-/brain    → keep — power-user/admin tool, link only from AdminHub → System
-```
+## What stays the same
 
-This keeps deep links alive, hides AION from the daily UI, and preserves the Brain page for admin use.
+- `/admin-hub` and everything inside it (Coach · Marketing · Content · System tabs incl. Integrations, CRM, leads) — no changes.
+- AION pages (`/aurora`, `/brain`, `/journey`, `/outer-world`, `/strategy`, `/hypnosis`, `/journal`) — still mounted and reachable, just not in the default nav.
+- Public landing (`/`, `/landing`), course/coach public pages — unchanged.
+- No schema, no edge functions, no new components.
 
-### 4. Coach profile route
+## Open question
 
-- Add `/me/coach` → resolves current user's `storeSlug` (via `useMyCoachProfile` + `useFirstCoachSlug`, already used in `CoachHub`) and renders the existing `PractitionerProfile` content (`PractitionerProfileHeader` + `PractitionerFeedTabs`) inside the logged-in shell — exactly what `CoachHub`'s profile dialog already does, just on a dedicated page.
+For the logged-in **Home** screen — do you want:
 
-### 5. Retire the "Become a coach" funnel for the single-coach app
+- **A.** The exact same `MindHackerLanding` content the public sees (just inside the app shell), or
+- **B.** A trimmed "member home" (welcome + continue-watching from `/courses` + latest message from coach + upcoming sessions)?
 
-- `Coaches.tsx` currently renders `CareerHub` (multi-coach marketplace funnel). For a single-coach template, change `/coaches` to redirect to `/workspace`. The public marketplace UI components (`CoachesLanding`, `PractitionerProfile`) remain available for the public site.
-
-### 6. Shell chrome
-
-- The shell (`ProtectedAppShellV2`, `ShellV2Header`, `DesktopSideNav`) stays as is — it already reads `CANONICAL_SURFACES`. Once that array is the coach surfaces (step 2), the chrome auto-updates: same logo at top, new icons/labels for the nav.
-- Keep `SharedOrbStage` / `InteractiveAIONHost` / `PersistentWorldOrb` mounted — they power the admin "AI assistant" widgets and the public landing. They render conditionally; on coach workspace routes we can short-circuit them with the existing `ChromeVisibilityContext` so the coach doesn't see floating AION orbs while working.
-
-### 7. Touch list (no new files, only edits)
-
-- `src/pages/Index.tsx` — post-login redirect target.
-- `src/App.tsx` — add `/workspace` and `/me/coach` routes; keep AION routes mounted.
-- `src/navigation/canonicalSurfaces.ts` — replace 5 entries with the coach surfaces above; update `LEGACY_TO_SURFACE`.
-- `src/routes/redirects.tsx` — point `/now`, `/journey`, `/chat`, `/outer-world` to `/workspace`.
-- `src/pages/CoachHub.tsx` — read `?tab=` from URL on mount so deep-links from the nav work.
-- `src/pages/Coaches.tsx` — redirect to `/workspace` in single-coach mode.
-- `src/contexts/ChromeVisibilityContext` consumer in `ProtectedAppShellV2` — hide floating AION orb on `/workspace`, `/admin-hub`, `/me/coach`.
-
-### 8. What is explicitly NOT changed
-
-- No deletion of `BrainPage`, `AuroraPage`, `HallwayShell`, `worlds/*`, `selfworld/*`, `presence/*`, `aion/*`, `identity/*`. They keep powering admin AI features and the public landing page.
-- No new components, no new tables, no new edge functions.
-- `AdminHub` already collapsed — no further restructure here.
-
-## Open question for you (one)
-
-For the single-coach template, do you want `/brain` to stay reachable for the coach (as a power-user "intelligence/insights" tool, linked from Admin → System), or should `/brain` also redirect into `/admin-hub?tab=system&sub=integrations` and become invisible to the coach? Default in this plan: **keep it reachable but unlinked** — easy to flip either way in `redirects.tsx`.
-
+Default if you don't answer: **A** (fastest, reuses existing landing). I can ship B as a second pass.
