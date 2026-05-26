@@ -178,6 +178,30 @@ const ClientHome = () => {
           ))}
         </section>
 
+        {/* Coach tools */}
+        {isCoach && (
+          <section className="space-y-4" aria-label={isHe ? 'כלי מאמן' : 'Coach tools'}>
+            <h2 className="text-xl font-semibold">
+              {isHe ? 'כלי מאמן' : 'Coach tools'}
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {coachTools.map(({ to, icon: Icon, label, desc }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="rounded-2xl border border-border bg-card/60 backdrop-blur p-4 hover:border-primary/50 hover:bg-card transition-colors"
+                >
+                  <Icon className="h-6 w-6 text-primary mb-3" />
+                  <div className="font-medium text-sm">{label}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{desc}</div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+
+
         {/* Catalog strip */}
         <section className="space-y-4">
           <div className="flex items-end justify-between">
