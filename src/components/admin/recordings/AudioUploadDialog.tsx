@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { debug } from "@/lib/debug";
 import { Loader2, Upload } from "lucide-react";
+import { fileToMp3 } from "@/lib/audioExtract";
 
 interface AudioUploadDialogProps {
   open: boolean;
@@ -37,6 +38,8 @@ export const AudioUploadDialog = ({
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [converting, setConverting] = useState(false);
+  const [convertProgress, setConvertProgress] = useState(0);
   const { toast } = useToast();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -110,29 +113,52 @@ export const AudioUploadDialog = ({
 
     setUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const isVideo = file.type.startsWith("video/");
+      let uploadFile: Blob = file;
+      let duration: number | null = null;
+
+      if (isVideo) {
+        setConverting(true);
+        setConvertProgress(0);
+        try {
+          const { blob, durationSeconds } = await fileToMp3(file, setConvertProgress);
+          uploadFile = blob;
+          duration = durationSeconds;
+        } catch (err) {
+          debug.log("Video→MP3 conversion failed", err);
+          toast({
+            title: "המרת וידאו ל-MP3 נכשלה. נסה קובץ אחר.",
+            variant: "destructive",
+          });
+          setConverting(false);
+          setUploading(false);
+          return;
+        }
+        setConverting(false);
+      }
+
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.mp3`;
 
       const { error: uploadError } = await supabase.storage
         .from("hypnosis-audios")
-        .upload(fileName, file);
+        .upload(fileName, uploadFile, { contentType: "audio/mpeg" });
 
       if (uploadError) throw uploadError;
 
-      // Get audio duration
-      let duration: number | null = null;
-      try {
-        const audio = document.createElement("audio");
-        audio.src = URL.createObjectURL(file);
-        await new Promise<void>((resolve) => {
-          audio.onloadedmetadata = () => {
-            duration = Math.round(audio.duration);
-            resolve();
-          };
-          audio.onerror = () => resolve();
-        });
-      } catch {
-        debug.log("Could not get audio duration");
+      if (duration === null) {
+        try {
+          const audio = document.createElement("audio");
+          audio.src = URL.createObjectURL(uploadFile);
+          await new Promise<void>((resolve) => {
+            audio.onloadedmetadata = () => {
+              duration = Math.round(audio.duration);
+              resolve();
+            };
+            audio.onerror = () => resolve();
+          });
+        } catch {
+          debug.log("Could not get audio duration");
+        }
       }
 
       createMutation.mutate({
@@ -148,7 +174,7 @@ export const AudioUploadDialog = ({
     }
   };
 
-  const isLoading = uploading || createMutation.isPending || updateMutation.isPending;
+  const isLoading = uploading || converting || createMutation.isPending || updateMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -184,12 +210,12 @@ export const AudioUploadDialog = ({
 
           {!editingAudio && (
             <div className="space-y-2">
-              <Label htmlFor="file">קובץ אודיו</Label>
+              <Label htmlFor="file">קובץ אודיו או וידאו</Label>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
                 <input
                   id="file"
                   type="file"
-                  accept="audio/*"
+                  accept="audio/*,video/*"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
@@ -205,8 +231,13 @@ export const AudioUploadDialog = ({
                 </label>
               </div>
               <p className="text-xs text-muted-foreground">
-                פורמטים נתמכים: MP3, WAV, M4A, OGG
+                אודיו: MP3, WAV, M4A, OGG · וידאו: MP4, MOV, WEBM (יומר אוטומטית ל-MP3)
               </p>
+              {converting && (
+                <p className="text-xs text-primary">
+                  ממיר וידאו ל-MP3... {Math.round(convertProgress)}%
+                </p>
+              )}
             </div>
           )}
 
