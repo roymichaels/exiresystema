@@ -210,12 +210,12 @@ export const AudioUploadDialog = ({
 
           {!editingAudio && (
             <div className="space-y-2">
-              <Label htmlFor="file">קובץ אודיו</Label>
+              <Label htmlFor="file">קובץ אודיו או וידאו</Label>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
                 <input
                   id="file"
                   type="file"
-                  accept="audio/*"
+                  accept="audio/*,video/*"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
@@ -231,8 +231,13 @@ export const AudioUploadDialog = ({
                 </label>
               </div>
               <p className="text-xs text-muted-foreground">
-                פורמטים נתמכים: MP3, WAV, M4A, OGG
+                אודיו: MP3, WAV, M4A, OGG · וידאו: MP4, MOV, WEBM (יומר אוטומטית ל-MP3)
               </p>
+              {converting && (
+                <p className="text-xs text-primary">
+                  ממיר וידאו ל-MP3... {Math.round(convertProgress)}%
+                </p>
+              )}
             </div>
           )}
 
