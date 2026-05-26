@@ -47,18 +47,18 @@ export default function ShellV2Header() {
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
         <SheetHeader className={isRTL ? 'text-right' : 'text-left'}>
           <div className="flex items-center gap-2">
-            <CanonicalAionModel size={32} ariaLabel="AION" />
+            <CanonicalAionModel size={32} ariaLabel="Exire Systema" />
             <SheetTitle className="text-lg">{brand}</SheetTitle>
           </div>
           <SheetDescription className="text-foreground/70">
             {isHe
-              ? 'מערכת ההפעלה של החיים שלך — משחק, מסע ותרגול יומי.'
-              : 'The operating system for your life — game, journey, and daily practice.'}
+              ? 'הקורסים, הקהילה והמסע שלך — במקום אחד.'
+              : 'Your courses, community, and journey — in one place.'}
           </SheetDescription>
         </SheetHeader>
         <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.04] px-3 py-2.5 text-xs text-foreground/60">
           <Info className="h-4 w-4 shrink-0" />
-          <span>{isHe ? 'נוכחות חיה · AION' : 'Living presence · AION'}</span>
+          <span>{isHe ? 'Exire Systema · אקוסיסטם של מאמן' : 'Exire Systema · coach ecosystem'}</span>
         </div>
       </SheetContent>
     </Sheet>
