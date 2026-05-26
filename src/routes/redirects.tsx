@@ -12,8 +12,7 @@ import { Route, Navigate } from 'react-router-dom';
 
 /** Public-shell redirects (rendered above the protected outlet). */
 const PUBLIC_REDIRECTS: [string, string][] = [
-  ['/index', '/'],
-  ['/home', '/'],
+  ['/index', '/home'],
   ['/onboarding', '/'],
 ];
 
