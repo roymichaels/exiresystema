@@ -57,7 +57,8 @@ export default function ShellV2({ children }: ShellV2Props) {
         {/* 5N.1 — atmospheric scrim bridging realm-to-realm traversal */}
         <RealmTransitionLayer />
         <NavLayer />
-        <ComposerLayer />
+        {/* ComposerLayer intentionally not mounted — the only chat surface
+            is the global floating AION widget (InteractiveAIONHost). */}
         <ChromeLayer />
         <OverlayLayer />
         <BlockingLayer />
