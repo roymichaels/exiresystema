@@ -24,7 +24,7 @@ export default function ShellV2Header() {
   const { language, isRTL } = useTranslation();
   const { user } = useAuth();
   const [brandOpen, setBrandOpen] = useState(false);
-  const brand = 'AION';
+  const brand = 'Exire Systema';
   const isHe = language === 'he';
 
   return (
