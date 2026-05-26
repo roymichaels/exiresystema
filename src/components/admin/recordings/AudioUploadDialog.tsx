@@ -113,29 +113,52 @@ export const AudioUploadDialog = ({
 
     setUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const isVideo = file.type.startsWith("video/");
+      let uploadFile: Blob = file;
+      let duration: number | null = null;
+
+      if (isVideo) {
+        setConverting(true);
+        setConvertProgress(0);
+        try {
+          const { blob, durationSeconds } = await fileToMp3(file, setConvertProgress);
+          uploadFile = blob;
+          duration = durationSeconds;
+        } catch (err) {
+          debug.log("Video→MP3 conversion failed", err);
+          toast({
+            title: "המרת וידאו ל-MP3 נכשלה. נסה קובץ אחר.",
+            variant: "destructive",
+          });
+          setConverting(false);
+          setUploading(false);
+          return;
+        }
+        setConverting(false);
+      }
+
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.mp3`;
 
       const { error: uploadError } = await supabase.storage
         .from("hypnosis-audios")
-        .upload(fileName, file);
+        .upload(fileName, uploadFile, { contentType: "audio/mpeg" });
 
       if (uploadError) throw uploadError;
 
-      // Get audio duration
-      let duration: number | null = null;
-      try {
-        const audio = document.createElement("audio");
-        audio.src = URL.createObjectURL(file);
-        await new Promise<void>((resolve) => {
-          audio.onloadedmetadata = () => {
-            duration = Math.round(audio.duration);
-            resolve();
-          };
-          audio.onerror = () => resolve();
-        });
-      } catch {
-        debug.log("Could not get audio duration");
+      if (duration === null) {
+        try {
+          const audio = document.createElement("audio");
+          audio.src = URL.createObjectURL(uploadFile);
+          await new Promise<void>((resolve) => {
+            audio.onloadedmetadata = () => {
+              duration = Math.round(audio.duration);
+              resolve();
+            };
+            audio.onerror = () => resolve();
+          });
+        } catch {
+          debug.log("Could not get audio duration");
+        }
       }
 
       createMutation.mutate({
@@ -151,7 +174,7 @@ export const AudioUploadDialog = ({
     }
   };
 
-  const isLoading = uploading || createMutation.isPending || updateMutation.isPending;
+  const isLoading = uploading || converting || createMutation.isPending || updateMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
