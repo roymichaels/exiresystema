@@ -377,7 +377,7 @@ const App = () => (
                                                 {renderProtectedRedirectRoutes()}
                                                 <Route path="/arena/:domainId/*" element={<ArenaToAIONRedirect />} />
                                                 {/* Client home — same coach landing the public sees, inside the protected shell */}
-                                                <Route path="/home" element={<MindHackerLanding />} />
+                                                <Route path="/home" element={<ClientHome />} />
                                                 {/* Profile — opens the global ProfileModal and bounces back */}
                                                 <Route path="/me" element={<MeRedirect />} />
                                                 {/* Coach workspace — admin-only in client-first app */}
