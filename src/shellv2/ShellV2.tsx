@@ -17,7 +17,7 @@
 import BackgroundLayer from './layers/BackgroundLayer';
 import AtmosphereLayer from './layers/AtmosphereLayer';
 import ChatLayer from './layers/ChatLayer';
-import ComposerLayer from './layers/ComposerLayer';
+// ComposerLayer import removed — see note near render site.
 import ChromeLayer from './layers/ChromeLayer';
 import OverlayLayer from './layers/OverlayLayer';
 import BlockingLayer from './layers/BlockingLayer';
