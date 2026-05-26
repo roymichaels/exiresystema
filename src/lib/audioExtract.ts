@@ -3,30 +3,69 @@ import { Mp3Encoder } from "@breezystack/lamejs";
 /**
  * Decode any audio/video file into MP3 Blob using WebAudio + lamejs.
  * Works for formats the browser can decode (mp3, wav, m4a, mp4, mov, webm in most browsers).
+ *
+ * Resamples to a lamejs-supported sample rate (44100Hz) to avoid encoder errors
+ * when the source uses something exotic (e.g. 48000Hz video audio on some browsers).
  */
+const SUPPORTED_RATES = [8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000];
+const TARGET_RATE = 44100;
+
 export async function fileToMp3(
   file: File,
   onProgress?: (pct: number) => void,
   kbps = 128,
 ): Promise<{ blob: Blob; durationSeconds: number }> {
   const arrayBuffer = await file.arrayBuffer();
+
   const AudioCtx: typeof AudioContext =
     (window as any).AudioContext || (window as any).webkitAudioContext;
-  const ctx = new AudioCtx();
-  let audioBuffer: AudioBuffer;
+  if (!AudioCtx) throw new Error("WebAudio not supported in this browser");
+
+  // Decode with a throwaway AudioContext
+  const decodeCtx = new AudioCtx();
+  let decoded: AudioBuffer;
   try {
-    audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
-  } finally {
-    ctx.close();
+    decoded = await new Promise<AudioBuffer>((resolve, reject) => {
+      // both promise + callback form for Safari compatibility
+      const p = decodeCtx.decodeAudioData(arrayBuffer.slice(0), resolve, reject);
+      if (p && typeof (p as any).then === "function") {
+        (p as Promise<AudioBuffer>).then(resolve, reject);
+      }
+    });
+  } catch (e: any) {
+    decodeCtx.close();
+    throw new Error(
+      `הדפדפן לא הצליח לפענח את הקובץ (${e?.message || "decode failed"}). נסה קובץ אחר.`,
+    );
+  }
+  decodeCtx.close();
+
+  // Resample if needed
+  let buffer: AudioBuffer = decoded;
+  if (!SUPPORTED_RATES.includes(decoded.sampleRate)) {
+    const targetLen = Math.ceil(decoded.duration * TARGET_RATE);
+    const OfflineCtx: typeof OfflineAudioContext =
+      (window as any).OfflineAudioContext ||
+      (window as any).webkitOfflineAudioContext;
+    const offline = new OfflineCtx(
+      Math.min(decoded.numberOfChannels, 2),
+      targetLen,
+      TARGET_RATE,
+    );
+    const src = offline.createBufferSource();
+    src.buffer = decoded;
+    src.connect(offline.destination);
+    src.start(0);
+    buffer = await offline.startRendering();
   }
 
-  const sampleRate = audioBuffer.sampleRate;
-  const channels = Math.min(audioBuffer.numberOfChannels, 2);
+  const sampleRate = buffer.sampleRate;
+  const channels = Math.min(buffer.numberOfChannels, 2);
   const encoder = new Mp3Encoder(channels, sampleRate, kbps);
 
-  const left = floatTo16(audioBuffer.getChannelData(0));
+  const left = floatTo16(buffer.getChannelData(0));
   const right =
-    channels === 2 ? floatTo16(audioBuffer.getChannelData(1)) : undefined;
+    channels === 2 ? floatTo16(buffer.getChannelData(1)) : undefined;
 
   const blockSize = 1152;
   const chunks: Uint8Array[] = [];
@@ -40,7 +79,6 @@ export async function fileToMp3(
     if (onProgress && i % (blockSize * 64) === 0) {
       onProgress(Math.min(99, (i / totalSamples) * 100));
     }
-    // yield occasionally to keep UI responsive
     if (i % (blockSize * 256) === 0) await new Promise((r) => setTimeout(r));
   }
   const end = encoder.flush();
@@ -49,7 +87,7 @@ export async function fileToMp3(
   onProgress?.(100);
   return {
     blob: new Blob(chunks as BlobPart[], { type: "audio/mpeg" }),
-    durationSeconds: Math.round(audioBuffer.duration),
+    durationSeconds: Math.round(buffer.duration),
   };
 }
 
