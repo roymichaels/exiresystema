@@ -171,8 +171,12 @@ export const AudioUploadDialog = ({
         file_path: fileName,
         duration_seconds: duration,
       });
-    } catch {
-      toast({ title: t("admin.recordingsPage.audioUploadError"), variant: "destructive" });
+    } catch (err: any) {
+      toast({
+        title: t("admin.recordingsPage.audioUploadError"),
+        description: err?.message || String(err),
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
     }
