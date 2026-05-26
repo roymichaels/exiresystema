@@ -114,20 +114,24 @@ export const AudioUploadDialog = ({
     setUploading(true);
     try {
       const isVideo = file.type.startsWith("video/");
+      const isMp3 =
+        file.type === "audio/mpeg" || /\.mp3$/i.test(file.name);
       let uploadFile: Blob = file;
       let duration: number | null = null;
 
-      if (isVideo) {
+      // Convert anything that is not already an MP3 (video or other audio) to MP3
+      if (isVideo || !isMp3) {
         setConverting(true);
         setConvertProgress(0);
         try {
           const { blob, durationSeconds } = await fileToMp3(file, setConvertProgress);
           uploadFile = blob;
           duration = durationSeconds;
-        } catch (err) {
-          debug.log("Video→MP3 conversion failed", err);
+        } catch (err: any) {
+          debug.log("→MP3 conversion failed", err);
           toast({
-            title: "המרת וידאו ל-MP3 נכשלה. נסה קובץ אחר.",
+            title: "המרה ל-MP3 נכשלה",
+            description: err?.message || String(err),
             variant: "destructive",
           });
           setConverting(false);
@@ -167,8 +171,12 @@ export const AudioUploadDialog = ({
         file_path: fileName,
         duration_seconds: duration,
       });
-    } catch {
-      toast({ title: t("admin.recordingsPage.audioUploadError"), variant: "destructive" });
+    } catch (err: any) {
+      toast({
+        title: t("admin.recordingsPage.audioUploadError"),
+        description: err?.message || String(err),
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
     }
