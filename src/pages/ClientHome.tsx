@@ -90,6 +90,57 @@ const ClientHome = () => {
       : []),
   ];
 
+  const coachTools = [
+    {
+      to: '/admin-hub?tab=content&sub=recordings&action=upload-audio',
+      icon: Mic,
+      label: isHe ? 'העלאת הקלטה' : 'Upload recording',
+      desc: isHe ? 'הקלטת היפנוזה חדשה' : 'New hypnosis audio',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=recordings&action=upload-video',
+      icon: Video,
+      label: isHe ? 'העלאת סרטון' : 'Upload video',
+      desc: isHe ? 'וידאו חדש' : 'New video',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=recordings',
+      icon: Library,
+      label: isHe ? 'ספריית מדיה' : 'Media library',
+      desc: isHe ? 'אודיו ווידאו' : 'Audio & video',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=recordings&action=assignments',
+      icon: Send,
+      label: isHe ? 'שליחת קישורים' : 'Send to client',
+      desc: isHe ? 'הקצאות ללקוחות' : 'Assignments',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=products',
+      icon: Package,
+      label: isHe ? 'מוצרים' : 'Products',
+      desc: isHe ? 'קטלוג ומכירות' : 'Catalog & offers',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=content-mgmt',
+      icon: FileText,
+      label: isHe ? 'תוכן' : 'Content',
+      desc: isHe ? 'סדרות ופרקים' : 'Series & episodes',
+    },
+    {
+      to: '/admin-hub?tab=coach&sub=clients',
+      icon: Users,
+      label: isHe ? 'מתאמנים' : 'Clients',
+      desc: isHe ? 'ניהול לקוחות' : 'Manage clients',
+    },
+    {
+      to: '/admin-hub',
+      icon: Shield,
+      label: isHe ? 'פאנל ניהול' : 'Admin home',
+      desc: isHe ? 'כל הכלים' : 'All tools',
+    },
+  ];
+
   return (
     <main
       dir={isRTL ? 'rtl' : 'ltr'}
