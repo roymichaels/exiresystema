@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AudioLibrary } from "@/components/admin/recordings/AudioLibrary";
 import { AudioAssignments } from "@/components/admin/recordings/AudioAssignments";
@@ -9,6 +10,26 @@ import { useTranslation } from "@/hooks/useTranslation";
 const Recordings = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("videos");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const action = searchParams.get("action");
+    if (!action) return;
+
+    if (action === "upload-audio") {
+      setActiveTab("library");
+      setTimeout(() => window.dispatchEvent(new Event("admin:open-audio-upload")), 50);
+    } else if (action === "upload-video") {
+      setActiveTab("videos");
+      setTimeout(() => window.dispatchEvent(new Event("admin:open-video-upload")), 50);
+    } else if (action === "assignments") {
+      setActiveTab("assignments");
+    }
+
+    const next = new URLSearchParams(searchParams);
+    next.delete("action");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   return (
     <div className="space-y-6">
