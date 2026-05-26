@@ -1,22 +1,22 @@
 /**
  * Canonical Surfaces — the ONLY source of truth for top-level navigation.
  *
- * Private Coach app: surfaces are coach-shaped, not AION-shaped.
- * AION pages (/brain, /journey, /outer-world, /aurora) remain mounted
- * and reachable from admin tools, but are not part of the daily nav.
+ * Client-first: every logged-in user (including the coach) gets the client
+ * experience by default. Coach/admin tools live behind /admin-hub and are
+ * appended to the nav only for users with the admin role (see DesktopSideNav).
  */
 import {
-  LayoutDashboard,
+  Home,
+  GraduationCap,
+  MessageSquare,
   Users,
-  FileText,
-  Megaphone,
-  Shield,
   User,
+  Shield,
   type LucideIcon,
 } from 'lucide-react';
 
 export interface CanonicalSurface {
-  id: 'workspace' | 'clients' | 'content' | 'marketing' | 'admin' | 'profile';
+  id: 'home' | 'courses' | 'messages' | 'community' | 'profile' | 'admin';
   path: string;
   icon: LucideIcon;
   labelEn: string;
@@ -24,39 +24,43 @@ export interface CanonicalSurface {
 }
 
 export const CANONICAL_SURFACES: readonly CanonicalSurface[] = [
-  { id: 'workspace', path: '/workspace',                 icon: LayoutDashboard, labelEn: 'Workspace', labelHe: 'מרכז' },
-  { id: 'clients',   path: '/workspace?tab=clients',     icon: Users,           labelEn: 'Clients',   labelHe: 'מתאמנים' },
-  { id: 'content',   path: '/workspace?tab=content',     icon: FileText,        labelEn: 'Content',   labelHe: 'תוכן' },
-  { id: 'marketing', path: '/workspace?tab=marketing',   icon: Megaphone,       labelEn: 'Marketing', labelHe: 'שיווק' },
-  { id: 'admin',     path: '/admin-hub',                 icon: Shield,          labelEn: 'Admin',     labelHe: 'ניהול' },
-  { id: 'profile',   path: '/me/coach',                  icon: User,            labelEn: 'Profile',   labelHe: 'פרופיל' },
+  { id: 'home',      path: '/home',      icon: Home,           labelEn: 'Home',      labelHe: 'בית' },
+  { id: 'courses',   path: '/courses',   icon: GraduationCap,  labelEn: 'Courses',   labelHe: 'קורסים' },
+  { id: 'messages',  path: '/messages',  icon: MessageSquare,  labelEn: 'Messages',  labelHe: 'הודעות' },
+  { id: 'community', path: '/community', icon: Users,          labelEn: 'Community', labelHe: 'קהילה' },
+  { id: 'profile',   path: '/me',        icon: User,           labelEn: 'Profile',   labelHe: 'פרופיל' },
 ] as const;
 
-export type CanonicalSurfaceId = (typeof CANONICAL_SURFACES)[number]['id'];
+/** Admin-only surface — appended to the nav by DesktopSideNav when the user is admin. */
+export const ADMIN_SURFACE: CanonicalSurface = {
+  id: 'admin', path: '/admin-hub', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול',
+};
+
+export type CanonicalSurfaceId = CanonicalSurface['id'];
 
 /**
  * Map a legacy path → canonical surface + optional artifact intent.
- * Kept for AION's intent router; AION surfaces still resolve here.
  */
 export const LEGACY_TO_SURFACE: Record<string, { path: string; artifact?: string }> = {
-  '/aurora':    { path: '/workspace' },
-  '/strategy':  { path: '/workspace', artifact: 'plan' },
-  '/hypnosis':  { path: '/workspace', artifact: 'hypnosis' },
-  '/journal':   { path: '/workspace', artifact: 'journal' },
-  '/work':      { path: '/workspace', artifact: 'work' },
-  '/play':      { path: '/workspace', artifact: 'missions' },
-  '/now':       { path: '/workspace' },
-  '/plan':      { path: '/workspace', artifact: 'plan' },
-  '/journey':   { path: '/workspace' },
-  '/chat':      { path: '/workspace?tab=clients' },
-  '/outer-world': { path: '/workspace?tab=marketing' },
-  '/community': { path: '/workspace?tab=marketing', artifact: 'community' },
-  '/coaches':   { path: '/workspace' },
-  '/fm':        { path: '/workspace', artifact: 'market' },
-  '/messages':  { path: '/workspace?tab=clients', artifact: 'messages' },
-  '/learn':     { path: '/workspace?tab=content', artifact: 'learn' },
-  '/me':        { path: '/me/coach' },
-  '/profile':   { path: '/me/coach' },
-  '/dashboard': { path: '/workspace' },
-  '/hallway':   { path: '/workspace' },
+  '/aurora':      { path: '/home' },
+  '/strategy':    { path: '/home', artifact: 'plan' },
+  '/hypnosis':    { path: '/home', artifact: 'hypnosis' },
+  '/journal':     { path: '/home', artifact: 'journal' },
+  '/work':        { path: '/home', artifact: 'work' },
+  '/play':        { path: '/home', artifact: 'missions' },
+  '/now':         { path: '/home' },
+  '/plan':        { path: '/home', artifact: 'plan' },
+  '/journey':     { path: '/home' },
+  '/chat':        { path: '/messages' },
+  '/outer-world': { path: '/community' },
+  '/community':   { path: '/community' },
+  '/coaches':     { path: '/home' },
+  '/fm':          { path: '/home', artifact: 'market' },
+  '/messages':    { path: '/messages' },
+  '/learn':       { path: '/courses' },
+  '/me':          { path: '/me' },
+  '/profile':     { path: '/me' },
+  '/dashboard':   { path: '/home' },
+  '/hallway':     { path: '/home' },
+  '/workspace':   { path: '/admin-hub' },
 };

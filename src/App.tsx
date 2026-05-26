@@ -377,14 +377,17 @@ const App = () => (
                                                 <Route path="/strategy/:pillar/*" element={<StrategyMazeRedirect />} />
                                                 {renderProtectedRedirectRoutes()}
                                                 <Route path="/arena/:domainId/*" element={<ArenaToAIONRedirect />} />
-                                                {/* Coaches → unified into Admin (sole-coach app) */}
-                                                {/* Coach workspace — single-coach private app */}
-                                                <Route path="/workspace" element={<CoachHub />} />
+                                                {/* Client home — same coach landing the public sees, inside the protected shell */}
+                                                <Route path="/home" element={<MindHackerLanding />} />
+                                                {/* Profile — opens the global ProfileModal and bounces back */}
+                                                <Route path="/me" element={<MeRedirect />} />
+                                                {/* Coach workspace — admin-only in client-first app */}
+                                                <Route path="/workspace" element={<AdminRoute><CoachHub /></AdminRoute>} />
                                                 <Route path="/coach-hub" element={<Navigate to="/workspace" replace />} />
-                                                <Route path="/me/coach" element={<MyCoachProfile />} />
-                                                {/* Legacy /coaches funnel → workspace in single-coach app */}
-                                                <Route path="/coaches" element={<Navigate to="/workspace" replace />} />
-                                                <Route path="/coaches/*" element={<Navigate to="/workspace" replace />} />
+                                                <Route path="/me/coach" element={<AdminRoute><MyCoachProfile /></AdminRoute>} />
+                                                {/* Legacy /coaches funnel → home */}
+                                                <Route path="/coaches" element={<Navigate to="/home" replace />} />
+                                                <Route path="/coaches/*" element={<Navigate to="/home" replace />} />
                                                 {/* Admin Hub */}
                                                 <Route path="/admin-hub" element={<AdminRoute><AdminLayoutWrapper /></AdminRoute>} />
                                                 {/* Launchpad */}
