@@ -112,6 +112,7 @@ import CreatorLayoutWrapper from "./components/careers/creator/CreatorLayoutWrap
 import TherapistLayoutWrapper from "./components/careers/therapist/TherapistLayoutWrapper";
 const ProfilePage = lazyWithRetry(() => import("./pages/ProfilePage"), "ProfilePage");
 const MindHackerLanding = lazyWithRetry(() => import("./components/landing/mindhacker/MindHackerLanding"), "MindHackerLanding");
+const ClientHome = lazyWithRetry(() => import("./pages/ClientHome"), "ClientHome");
 const MeRedirect = lazyWithRetry(() => import("./pages/MeRedirect"), "MeRedirect");
 const SoulAvatarMintWizardGlobal = lazy(() => import("./components/web3/SoulAvatarMintWizardGlobal"));
 // Phase A shell collapse: AIONFloatingWidget retired in favor of shell/AIONPresenceButton.
