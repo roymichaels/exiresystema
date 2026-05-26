@@ -6,7 +6,19 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Users, User, Shield, ArrowRight } from 'lucide-react';
+import {
+  GraduationCap,
+  Users,
+  User,
+  Shield,
+  ArrowRight,
+  Mic,
+  Video,
+  Package,
+  Library,
+  Send,
+  FileText,
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
@@ -21,6 +33,7 @@ const ClientHome = () => {
   const { isRTL, language } = useTranslation();
   const { hasRole } = useUserRoles();
   const isAdmin = hasRole('admin');
+  const isCoach = isAdmin || hasRole('practitioner');
   const isHe = language === 'he';
 
   useSEO({
