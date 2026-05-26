@@ -88,8 +88,6 @@ const CommunityThread = lazy(() => import("./pages/CommunityThread"));
 const Go = lazy(() => import("./pages/Go"));
 const FoundingLanding = lazy(() => import("./pages/FoundingLanding"));
 const FeatureDetailPage = lazy(() => import("./pages/FeatureDetailPage"));
-const Messages = lazy(() => import("./pages/Messages"));
-const MessageThread = lazy(() => import("./pages/MessageThread"));
 
 // ShellV2 — Phase 1 dev preview route (`/__shellv2`).
 const ShellV2DevPage = lazy(() => import("./shellv2/dev/ShellV2DevPage"));
@@ -354,9 +352,7 @@ const App = () => (
                                                 {/* Community */}
                                                 <Route path="/community" element={<CommunityLayoutWrapper />} />
                                                 <Route path="/community/post/:postId" element={<CommunityThread />} />
-                                                {/* Messages */}
-                                                <Route path="/messages" element={<Messages />} />
-                                                <Route path="/messages/:conversationId" element={<MessageThread />} />
+                                                {/* Messages removed — global AION chat widget is the only chat surface */}
                                                 {/* Phase 5: when ff_shell_v2 is on, /strategy summons the
                                                     `plan` artifact inside ShellV2; otherwise legacy page. */}
                                                 {/* Quarantined — legacy surfaces redirect to ShellV2 home. */}

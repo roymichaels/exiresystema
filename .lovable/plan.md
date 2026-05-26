@@ -1,68 +1,39 @@
-# Switch logged-in default to the client view
+## Goal
 
-Right now, after login everyone lands on `/workspace` (CoachHub) and the side-nav is coach-shaped (Workspace · Clients · Content · Marketing · Admin · Profile). Even you, the coach, should see the **client-side experience by default** — the same thing your members see when they sign in. The coach/admin tools already live inside `/admin-hub`; the canonical nav should just point there for admins, not replace the main app.
-
-## What the client view is
-
-Reusing what already exists (no new pages):
-
-- **Home** → coach landing / member home (`MindHackerLanding` content, but as the logged-in shell — i.e. the coach's public site is the client home)
-- **Courses** → `/courses` (existing `Courses.tsx` + `CourseDetail` + `CourseWatch`)
-- **Messages** → `/messages` (existing `Messages.tsx`, chat with the coach, not AION)
-- **Community** → `/community` (existing)
-- **Profile** → `/me` → user's own profile (`ProfilePage.tsx`)
-- **Admin** → `/admin-hub` (only rendered in nav if the user has the admin role — that's you)
+Use only the homepage's persistent floating chat widget (AION presence + GlobalChatInput) as the single chat surface across the app. Remove the dedicated `/messages`, `/messages/:id`, and legacy `/chat` pages plus their nav entry.
 
 ## Changes
 
-### 1. Post-login redirect — `src/pages/Index.tsx`
-- Change `<Navigate to="/workspace" replace />` → `<Navigate to="/home" replace />` (new client home route).
+1. **Navigation (`src/navigation/canonicalSurfaces.ts`)**
+   - Remove the `messages` surface from `CANONICAL_SURFACES`.
+   - Final nav: Home, Courses, Community, Profile (+ Admin for admins).
+   - Update `LEGACY_TO_SURFACE`: map `/messages`, `/chat`, `/mindos/chat`, `/messages/ai` → `/home` so any old link opens the home with the global widget available.
 
-### 2. New `/home` route — `src/App.tsx`
-- Add `/home` as a `ProtectedRoute` rendering the coach's landing content (`MindHackerLanding`) inside the protected shell, so members get the coach's site as their home base.
-- Keep `/landing` (public landing) untouched.
+2. **Routes (`src/App.tsx`)**
+   - Delete the `<Route path="/messages" …>` and `<Route path="/messages/:conversationId" …>` lines.
+   - Drop the `Messages` and `MessageThread` lazy imports.
+   - Add a catch redirect `/messages/*` → `/home` (handled via the legacy redirect map updated above; no extra route needed).
 
-### 3. Canonical nav — `src/navigation/canonicalSurfaces.ts`
-Replace coach-shaped surfaces with client-shaped surfaces:
+3. **Legacy redirects (`src/routes/redirects.tsx`)**
+   - Repoint `'/chat' → '/home'`, `'/mindos/chat' → '/home'`, `'/messages/ai' → '/home'`.
+   - Add `'/messages' → '/home'` and `'/messages/:conversationId' → '/home'`.
 
-| id | path | icon | label |
-|---|---|---|---|
-| home | `/home` | Home | Home |
-| courses | `/courses` | GraduationCap | Courses |
-| messages | `/messages` | MessageSquare | Messages |
-| community | `/community` | Users | Community |
-| profile | `/me` | User | Profile |
+4. **Dead-file cleanup (safe deletes)**
+   - Delete `src/pages/Messages.tsx` and `src/pages/MessageThread.tsx` once unreferenced.
+   - Leave `ConversationItem`, `NewMessageDialog`, `services/messaging.ts`, and the `conversations`/`messages` tables untouched (no DB changes — DM data preserved in case it's reintroduced later).
 
-No `admin`/`workspace`/`clients`/`marketing`/`content` entries in the canonical surface list.
+5. **Widget availability check**
+   - Confirm the floating AION widget (`InteractiveAIONHost` + `GlobalChatInput`, already mounted in `App.tsx` / ShellV2) renders on every protected route including `/home`, `/courses`, `/community`, `/me`, `/admin-hub`. No new mounts needed — it's already global.
 
-### 4. Admin entry — `src/components/navigation/DesktopSideNav.tsx` (+ mobile equivalent)
-Append an **Admin** nav item *only when* the current user is an admin (use existing `useUserRole` / `AdminRoute` check). The item links to `/admin-hub`. This keeps all coach/marketing/content/integrations tools where they already are — inside the admin hub — and out of every client's UI.
+## Out of scope
 
-### 5. Redirect cleanup — `src/routes/redirects.tsx`
-Reverse the AION→workspace mappings I added previously:
-- `/now`, `/plan`, `/play`, `/play-hub`, `/tactics`, `/arena`, `/dashboard`, `/hallway*`, `/work*`, `/journal-hub`, `/life*`, `/career`, `/creator-hub`, `/freelancer-hub`, `/mindos*` → `/home` (not `/workspace`)
-- `/chat` → `/messages` (chat with coach, not the clients tab)
-- `/profile`, `/profile-hub`, `/me/coach` (legacy) → `/me`
-- Keep `/workspace` working (renders CoachHub) but only admins reach it (via the nav item / direct link).
+- No DB schema changes; existing `conversations`/`messages` tables are retained.
+- No changes to the admin coach inbox (lives under `/admin-hub`).
+- Coach↔client direct messaging UI is removed from the client-facing nav. If you want clients to message the coach specifically (not the AI), say so and I'll add a "Message coach" entry point that opens the same global widget pre-targeted to the coach thread.
 
-### 6. CoachHub access — `src/App.tsx`
-Wrap `/workspace` and `/me/coach` with `AdminRoute` so only the coach/admin can open the coach console. Non-admin clients who hit those URLs bounce to `/home`.
+## Files touched
 
-### 7. realmMood — `src/aion/realms/realmMood.ts`
-Update the surface→mood keys back to client surfaces (`home`, `courses`, `messages`, `community`, `profile`, plus `admin`).
-
-## What stays the same
-
-- `/admin-hub` and everything inside it (Coach · Marketing · Content · System tabs incl. Integrations, CRM, leads) — no changes.
-- AION pages (`/aurora`, `/brain`, `/journey`, `/outer-world`, `/strategy`, `/hypnosis`, `/journal`) — still mounted and reachable, just not in the default nav.
-- Public landing (`/`, `/landing`), course/coach public pages — unchanged.
-- No schema, no edge functions, no new components.
-
-## Open question
-
-For the logged-in **Home** screen — do you want:
-
-- **A.** The exact same `MindHackerLanding` content the public sees (just inside the app shell), or
-- **B.** A trimmed "member home" (welcome + continue-watching from `/courses` + latest message from coach + upcoming sessions)?
-
-Default if you don't answer: **A** (fastest, reuses existing landing). I can ship B as a second pass.
+- edit: `src/navigation/canonicalSurfaces.ts`
+- edit: `src/App.tsx`
+- edit: `src/routes/redirects.tsx`
+- delete: `src/pages/Messages.tsx`, `src/pages/MessageThread.tsx`

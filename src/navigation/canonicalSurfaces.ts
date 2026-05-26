@@ -8,7 +8,6 @@
 import {
   Home,
   GraduationCap,
-  MessageSquare,
   Users,
   User,
   Shield,
@@ -16,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export interface CanonicalSurface {
-  id: 'home' | 'courses' | 'messages' | 'community' | 'profile' | 'admin';
+  id: 'home' | 'courses' | 'community' | 'profile' | 'admin';
   path: string;
   icon: LucideIcon;
   labelEn: string;
@@ -26,7 +25,6 @@ export interface CanonicalSurface {
 export const CANONICAL_SURFACES: readonly CanonicalSurface[] = [
   { id: 'home',      path: '/home',      icon: Home,           labelEn: 'Home',      labelHe: 'בית' },
   { id: 'courses',   path: '/courses',   icon: GraduationCap,  labelEn: 'Courses',   labelHe: 'קורסים' },
-  { id: 'messages',  path: '/messages',  icon: MessageSquare,  labelEn: 'Messages',  labelHe: 'הודעות' },
   { id: 'community', path: '/community', icon: Users,          labelEn: 'Community', labelHe: 'קהילה' },
   { id: 'profile',   path: '/me',        icon: User,           labelEn: 'Profile',   labelHe: 'פרופיל' },
 ] as const;
@@ -40,6 +38,7 @@ export type CanonicalSurfaceId = CanonicalSurface['id'];
 
 /**
  * Map a legacy path → canonical surface + optional artifact intent.
+ * Chat surfaces all collapse to /home — the global AION widget is the only chat UI.
  */
 export const LEGACY_TO_SURFACE: Record<string, { path: string; artifact?: string }> = {
   '/aurora':      { path: '/home' },
@@ -51,12 +50,12 @@ export const LEGACY_TO_SURFACE: Record<string, { path: string; artifact?: string
   '/now':         { path: '/home' },
   '/plan':        { path: '/home', artifact: 'plan' },
   '/journey':     { path: '/home' },
-  '/chat':        { path: '/messages' },
+  '/chat':        { path: '/home' },
+  '/messages':    { path: '/home' },
   '/outer-world': { path: '/community' },
   '/community':   { path: '/community' },
   '/coaches':     { path: '/home' },
   '/fm':          { path: '/home', artifact: 'market' },
-  '/messages':    { path: '/messages' },
   '/learn':       { path: '/courses' },
   '/me':          { path: '/me' },
   '/profile':     { path: '/me' },
