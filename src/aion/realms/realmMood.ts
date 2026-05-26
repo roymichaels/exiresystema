@@ -27,26 +27,17 @@ export interface RealmMood {
 }
 
 export const REALM_MOOD: Record<CanonicalSurfaceId, RealmMood> = {
-  workspace: {
-    id: 'workspace',
-    hue: { primary: '258 70% 60%', accent: '278 65% 45%' },
+  home: {
+    id: 'home',
+    hue: { primary: '292 75% 60%', accent: '258 70% 60%' },
     presence: 'noticing',
     atmosphereIntensity: 0.5,
     navResonance: 0.65,
     transitionTone: 'soft',
     interaction: 'explore',
   },
-  clients: {
-    id: 'clients',
-    hue: { primary: '198 80% 56%', accent: '218 70% 30%' },
-    presence: 'listening',
-    atmosphereIntensity: 0.45,
-    navResonance: 0.65,
-    transitionTone: 'soft',
-    interaction: 'speak',
-  },
-  content: {
-    id: 'content',
+  courses: {
+    id: 'courses',
     hue: { primary: '188 78% 55%', accent: '42 90% 60%' },
     presence: 'guiding',
     atmosphereIntensity: 0.55,
@@ -54,23 +45,23 @@ export const REALM_MOOD: Record<CanonicalSurfaceId, RealmMood> = {
     transitionTone: 'warm',
     interaction: 'follow',
   },
-  marketing: {
-    id: 'marketing',
+  messages: {
+    id: 'messages',
+    hue: { primary: '198 80% 56%', accent: '218 70% 30%' },
+    presence: 'listening',
+    atmosphereIntensity: 0.45,
+    navResonance: 0.65,
+    transitionTone: 'soft',
+    interaction: 'speak',
+  },
+  community: {
+    id: 'community',
     hue: { primary: '178 70% 45%', accent: '38 80% 55%' },
     presence: 'resonating',
     atmosphereIntensity: 0.6,
     navResonance: 0.6,
     transitionTone: 'deep',
     interaction: 'traverse',
-  },
-  admin: {
-    id: 'admin',
-    hue: { primary: '258 70% 60%', accent: '278 65% 45%' },
-    presence: 'noticing',
-    atmosphereIntensity: 0.6,
-    navResonance: 0.6,
-    transitionTone: 'deep',
-    interaction: 'explore',
   },
   profile: {
     id: 'profile',
@@ -81,14 +72,28 @@ export const REALM_MOOD: Record<CanonicalSurfaceId, RealmMood> = {
     transitionTone: 'soft',
     interaction: 'resonate',
   },
+  admin: {
+    id: 'admin',
+    hue: { primary: '258 70% 60%', accent: '278 65% 45%' },
+    presence: 'noticing',
+    atmosphereIntensity: 0.6,
+    navResonance: 0.6,
+    transitionTone: 'deep',
+    interaction: 'explore',
+  },
 };
 
 /** Resolve mood by path (canonical surface path). */
 export function moodForPath(pathname: string): RealmMood | null {
   const map: Record<string, CanonicalSurfaceId> = {
-    '/workspace': 'workspace',
+    '/home':      'home',
+    '/courses':   'courses',
+    '/messages':  'messages',
+    '/community': 'community',
+    '/me':        'profile',
+    '/me/coach':  'profile',
     '/admin-hub': 'admin',
-    '/me/coach': 'profile',
+    '/workspace': 'admin',
   };
   const id = map[pathname];
   return id ? REALM_MOOD[id] : null;

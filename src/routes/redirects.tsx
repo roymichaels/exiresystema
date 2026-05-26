@@ -94,40 +94,41 @@ const PANEL_REDIRECTS: [string, string][] = [
 
 /** Protected-shell redirects (rendered inside ProtectedAppShell) */
 export const PROTECTED_REDIRECTS: [string, string][] = [
-  // Legacy AION user-facing aliases → coach workspace
-  ['/now', '/workspace'],
-  ['/plan', '/workspace'],
-  ['/play', '/workspace'],
-  ['/play-hub', '/workspace'],
-  ['/tactics', '/workspace'],
-  ['/arena', '/workspace'],
-  ['/dashboard', '/workspace'],
-  ['/hallway', '/workspace'],
-  ['/hallway/:slug', '/workspace'],
-  ['/work', '/workspace'],
-  ['/work-hub', '/workspace'],
-  ['/journal-hub', '/workspace'],
-  ['/life', '/workspace'],
-  ['/life-plan', '/workspace'],
-  ['/career', '/workspace'],
-  ['/chat', '/workspace?tab=clients'],
-  // Profile → coach profile
-  ['/profile', '/me/coach'],
-  ['/profile-hub', '/me/coach'],
-  ['/me', '/me/coach'],
+  // Legacy AION / coach-workspace aliases → client home
+  ['/now', '/home'],
+  ['/plan', '/home'],
+  ['/play', '/home'],
+  ['/play-hub', '/home'],
+  ['/tactics', '/home'],
+  ['/arena', '/home'],
+  ['/dashboard', '/home'],
+  ['/hallway', '/home'],
+  ['/hallway/:slug', '/home'],
+  ['/work', '/home'],
+  ['/work-hub', '/home'],
+  ['/journal-hub', '/home'],
+  ['/life', '/home'],
+  ['/life-plan', '/home'],
+  ['/career', '/home'],
+  // Chat with the coach lives at /messages now
+  ['/chat', '/messages'],
+  // Profile → unified /me (opens profile modal)
+  ['/profile', '/me'],
+  ['/profile-hub', '/me'],
+  ['/me/coach', '/me'],
   // Career hubs collapse
-  ['/creator-hub', '/workspace'],
-  ['/freelancer-hub', '/workspace'],
+  ['/creator-hub', '/home'],
+  ['/freelancer-hub', '/home'],
   // Strategy maze deep-links still resolve to the canonical action surface
   ['/personal-hypnosis/success', '/journey'],
   ['/personal-hypnosis/pending', '/journey'],
   ['/journey/*', '/journey'],
   // Legacy AION namespace → flat canonical (kept for deep-links)
-  ['/mindos', '/workspace'],
-  ['/mindos/chat', '/workspace?tab=clients'],
+  ['/mindos', '/home'],
+  ['/mindos/chat', '/messages'],
   ['/mindos/strategy', '/journey'],
   ['/mindos/tactics', '/journey'],
-  ['/mindos/work', '/workspace'],
+  ['/mindos/work', '/home'],
   ['/mindos/journal', '/journal'],
 ];
 

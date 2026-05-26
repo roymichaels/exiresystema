@@ -1,15 +1,19 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
-import { CANONICAL_SURFACES } from '@/navigation/canonicalSurfaces';
+import { CANONICAL_SURFACES, ADMIN_SURFACE } from '@/navigation/canonicalSurfaces';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 function DesktopSideNavImpl() {
   const { isRTL } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { hasRole } = useUserRoles();
 
-  // Phase C — only the 5 canonical surfaces appear in user-facing nav.
-  const tabs = CANONICAL_SURFACES;
+  // Client-first canonical surfaces; admin entry appended for admins only.
+  const tabs = hasRole('admin')
+    ? [...CANONICAL_SURFACES, ADMIN_SURFACE]
+    : CANONICAL_SURFACES;
 
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
