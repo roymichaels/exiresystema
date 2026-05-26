@@ -10,23 +10,18 @@
  * Unauthenticated visitors still see the public marketing Index.
  */
 import { lazy, Suspense } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageSkeleton } from '@/components/ui/skeleton';
-import ShellV2 from '@/shellv2/ShellV2';
-import { OnboardingGate } from '@/components/layout/OnboardingGate';
 
 const Index = lazy(() => import('@/pages/Index'));
 
 export default function SmartRoot() {
   const { user, loading } = useAuth();
   if (loading) return <PageSkeleton />;
-  // Authenticated `/` is ShellV2 — no legacy shell, no fallback.
+  // Authenticated users land on the client coach app home (not the AION chat shell).
   if (user) {
-    return (
-      <OnboardingGate>
-        <ShellV2 />
-      </OnboardingGate>
-    );
+    return <Navigate to="/home" replace />;
   }
   return (
     <Suspense fallback={<PageSkeleton />}>
