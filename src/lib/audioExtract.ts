@@ -48,7 +48,7 @@ export async function fileToMp3(
 
   onProgress?.(100);
   return {
-    blob: new Blob(chunks, { type: "audio/mpeg" }),
+    blob: new Blob(chunks as BlobPart[], { type: "audio/mpeg" }),
     durationSeconds: Math.round(audioBuffer.duration),
   };
 }
