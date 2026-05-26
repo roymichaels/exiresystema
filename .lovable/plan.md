@@ -1,63 +1,49 @@
-## Problem
+# Restore access to uploads, media, and other admin tools
 
-When a logged-in user visits `/` or `/home`, they still see the full-screen AION chat surface with an "AION" header and "Message AION…" composer, instead of the client-facing coach app home.
+The features (audio/video upload, products, assignments, media player) still exist — they're just buried under `/admin-hub` with no deep links and no shortcut from the new client home. Plan: keep all existing code, add discoverability.
 
-Root cause:
-- `src/routes/redirects.tsx` declares `['/home', '/']` and `['/index', '/']` in `PUBLIC_REDIRECTS`. Every navigation to `/home` (including `Index.tsx`'s `<Navigate to="/home" />`) short-circuits back to `/`.
-- `/` renders `SmartRoot`, which for authenticated users renders `ShellV2` — the AION chat-first surface (header "AION", composer "Message AION…", floating orb fills the screen).
+## 1. Make `/admin-hub` honor `?tab=&sub=` (and `?action=`)
+- `src/pages/AdminHub.tsx` already accepts `activeTab`/`activeSubTab` props from `AdminLayoutWrapper.tsx`, which already reads `tab` and `sub` from `useSearchParams`. Verify deep links survive reload (they should — confirm and fix if not).
+- Pass `action` query param through to the active sub-page so `Recordings.tsx` can auto-open `AudioUploadDialog` when `?action=upload-audio` (or `upload-video`).
 
-So even though previous edits pointed everything to `/home`, the redirect map sends users back to the AION chat.
+## 2. Auto-open upload dialogs on `Recordings.tsx`
+- Read `?action=` via `useSearchParams`.
+- If `action=upload-audio` → open `AudioUploadDialog`, switch tab to `library`.
+- If `action=upload-video` → open `VideoUploadDialog`, switch tab to `videos`.
+- Clear the param after opening so reloads don't keep re-triggering.
 
-## Plan
+## 3. Replace single "Admin" tile on `ClientHome.tsx` with a Coach Tools section
+For admin/practitioner users, render a small grid of deep links instead of the one generic Admin card:
+- Upload hypnosis recording → `/admin-hub?tab=content&sub=recordings&action=upload-audio`
+- Upload video → `/admin-hub?tab=content&sub=recordings&action=upload-video`
+- Recordings library → `/admin-hub?tab=content&sub=recordings`
+- Products & offers → `/admin-hub?tab=content&sub=products`
+- Series & episodes → `/admin-hub?tab=content&sub=series`
+- Clients → `/admin-hub?tab=coach&sub=clients`
+- Assignments (send audio to client) → `/admin-hub?tab=content&sub=recordings` (assignments tab)
+- Admin home → `/admin-hub`
 
-### 1. Stop redirecting `/home` to `/`
-- `src/routes/redirects.tsx`:
-  - Remove `['/home', '/']` from `PUBLIC_REDIRECTS`.
-  - Keep `['/index', '/home']` (rewrite, not back to `/`) so deep links land on the client home.
-  - Keep `/messages/ai → /home`, `/now → /home`, etc.
+Tile style matches the existing shortcut grid (rounded-2xl, border, backdrop-blur).
 
-### 2. Make `/` the client home for logged-in users
-- `src/presence/SmartRoot.tsx`: when `user` is present, render `<Navigate to="/home" replace />` (inside `OnboardingGate`) instead of `ShellV2`. Unauthenticated `/` keeps the public `Index` (MindHackerLanding).
-- Net effect: logged-in `/` → `/home`. `/home` renders the client coach app (see step 3), not the AION chat shell.
+## 4. Sweep for anything else that disappeared
+Quick audit of routes that existed before the home rewrite to make sure they're still reachable from somewhere in the UI:
+- `/audio/:token` (AudioPlayer) — link-based, no nav needed ✓
+- `/courses`, `/community`, `/me` — already linked from home ✓
+- Any other top-level pages mounted in `App.tsx` that lost their entry point: add to a secondary "More" row on `ClientHome.tsx` (only the ones a logged-in client/coach actually needs day-to-day).
 
-### 3. Make `/home` a real client coach home (not the public marketing page, not chat)
-Currently `/home` renders `MindHackerLanding`, which is the public marketing site. For a logged-in client of the coach, the home should be the coach app:
-- Create `src/pages/ClientHome.tsx` that composes existing components only (no new business logic):
-  - Hero: founder/coach intro pulled from the existing `MindHackerLanding` hero block, simplified (no public CTAs like "book intake").
-  - "המסע שלך" row: shortcut cards → `/courses`, `/community`, `/me`, and (admin-only) `/admin-hub`. Uses the same icons already in `DesktopSideNav`.
-  - Catalog strip: reuse the existing course grid from `src/pages/Courses.tsx` (top 3–6 items) via the existing course-catalog hook/service (`services/courseCatalog.ts`).
-  - Coach card: reuse `PractitionerProfileHeader` from `src/components/practitioner-landing` to show the founder as the user's coach.
-- Mount `<Route path="/home" element={<ClientHome />} />` (replaces the current `MindHackerLanding` mount for `/home`). `MindHackerLanding` stays as the public landing for `/` when logged out.
-
-### 4. Keep the chat as a floating widget only (no full-screen AION shell on `/home`)
-- The floating `InteractiveAIONHost` is already mounted globally in `App.tsx` (line 290) and renders on every protected route — keep it.
-- Do NOT mount `ShellV2`'s chat layer on `/home`. Since `/home` is now `ClientHome`, the AION composer/header no longer fills the screen; only the floating orb remains.
-
-### 5. Remove "AION" branding from the client home chrome
-- `src/shellv2/ShellHeader.tsx` / `ShellV2Header.tsx`: when the active route is `/home` (or any non-chat client surface), render the coach/app name instead of the literal string "AION". Use the existing brand label already used on the public landing (Exire Systema / coach display name) — no new copy.
-- The floating orb's tooltip/label keeps the personal AION display name via `useAIONDisplayName` (that's the user's private AI, fine).
-- Composer placeholder: when the chat is summoned as an overlay it can keep "Message AION…"; on the home surface there is no composer at all (step 4).
-
-### 6. Cleanup
-- `src/pages/Index.tsx`: leave `<Navigate to="/home" />` for logged-in (now works because step 1 stops the loop).
-- `src/navigation/canonicalSurfaces.ts`: `home` surface already points to `/home`; no change needed.
-- Verify `/me`, `/courses`, `/community`, `/admin-hub` still resolve through the existing nav.
-
-## Out of scope
-
-- No DB / RLS / edge function changes.
-- No changes to how AION actually answers (canonical `aurora-chat` pipeline untouched).
-- No rework of `ShellV2` itself — it stays available for the explicit chat overlay; it just isn't the default home anymore.
-- No new copy beyond what already exists in `MindHackerLanding` / `PractitionerProfileHeader`.
+## 5. Confirm `tabConfig.ts` ids match the query strings
+Read `src/domain/admin/tabConfig.ts` to confirm tab id `content` has sub-ids `recordings`, `products`, `series`, and tab `coach` has sub-id `clients`. Adjust the links in step 3 to whatever the real ids are — no renaming of existing ids.
 
 ## Files touched
+- `src/pages/ClientHome.tsx` — new coach tools section
+- `src/pages/admin/Recordings.tsx` — read `?action=`, open upload dialog
+- `src/components/admin/AdminLayoutWrapper.tsx` — pass `action` through (or `Recordings` reads it directly via `useSearchParams`, no wrapper change needed)
+- Maybe `src/pages/AdminHub.tsx` if needed to forward extra query params
 
-- edit: `src/routes/redirects.tsx`
-- edit: `src/presence/SmartRoot.tsx`
-- edit: `src/App.tsx` (swap `/home` element)
-- edit: `src/shellv2/ShellHeader.tsx` and/or `ShellV2Header.tsx` (brand label on home)
-- new:  `src/pages/ClientHome.tsx`
+## Out of scope
+- No new tables, edge functions, or backend changes.
+- No changes to upload/player components themselves — they already work.
+- No reintroduction of the AION chat shell on `/home`.
 
 ## Open question
-
-The coach app currently has one coach (the founder). Should the home "Your coach" card always show the founder, or auto-pick the coach the logged-in user actually subscribed to via `useCoachSubscription`? Default below is: show the founder always; switch to subscribed coach only if one exists.
+Should the upload shortcuts appear only for `admin`, or also for `practitioner`? Default: both, since both roles upload content for their clients.

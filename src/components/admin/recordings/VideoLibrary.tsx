@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,12 @@ interface HypnosisVideo {
 
 export const VideoLibrary = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setIsUploadOpen(true);
+    window.addEventListener("admin:open-video-upload", handler);
+    return () => window.removeEventListener("admin:open-video-upload", handler);
+  }, []);
   const [editingVideo, setEditingVideo] = useState<HypnosisVideo | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [playingVideo, setPlayingVideo] = useState<HypnosisVideo | null>(null);

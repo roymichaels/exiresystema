@@ -40,6 +40,12 @@ interface HypnosisAudio {
 
 export const AudioLibrary = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setIsUploadOpen(true);
+    window.addEventListener("admin:open-audio-upload", handler);
+    return () => window.removeEventListener("admin:open-audio-upload", handler);
+  }, []);
   const [editingAudio, setEditingAudio] = useState<HypnosisAudio | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [playingAudio, setPlayingAudio] = useState<HypnosisAudio | null>(null);

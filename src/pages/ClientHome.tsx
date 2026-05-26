@@ -6,7 +6,19 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Users, User, Shield, ArrowRight } from 'lucide-react';
+import {
+  GraduationCap,
+  Users,
+  User,
+  Shield,
+  ArrowRight,
+  Mic,
+  Video,
+  Package,
+  Library,
+  Send,
+  FileText,
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRoles } from '@/hooks/useUserRoles';
@@ -21,6 +33,7 @@ const ClientHome = () => {
   const { isRTL, language } = useTranslation();
   const { hasRole } = useUserRoles();
   const isAdmin = hasRole('admin');
+  const isCoach = isAdmin || hasRole('practitioner');
   const isHe = language === 'he';
 
   useSEO({
@@ -77,6 +90,57 @@ const ClientHome = () => {
       : []),
   ];
 
+  const coachTools = [
+    {
+      to: '/admin-hub?tab=content&sub=recordings&action=upload-audio',
+      icon: Mic,
+      label: isHe ? 'העלאת הקלטה' : 'Upload recording',
+      desc: isHe ? 'הקלטת היפנוזה חדשה' : 'New hypnosis audio',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=recordings&action=upload-video',
+      icon: Video,
+      label: isHe ? 'העלאת סרטון' : 'Upload video',
+      desc: isHe ? 'וידאו חדש' : 'New video',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=recordings',
+      icon: Library,
+      label: isHe ? 'ספריית מדיה' : 'Media library',
+      desc: isHe ? 'אודיו ווידאו' : 'Audio & video',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=recordings&action=assignments',
+      icon: Send,
+      label: isHe ? 'שליחת קישורים' : 'Send to client',
+      desc: isHe ? 'הקצאות ללקוחות' : 'Assignments',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=products',
+      icon: Package,
+      label: isHe ? 'מוצרים' : 'Products',
+      desc: isHe ? 'קטלוג ומכירות' : 'Catalog & offers',
+    },
+    {
+      to: '/admin-hub?tab=content&sub=content-mgmt',
+      icon: FileText,
+      label: isHe ? 'תוכן' : 'Content',
+      desc: isHe ? 'סדרות ופרקים' : 'Series & episodes',
+    },
+    {
+      to: '/admin-hub?tab=coach&sub=clients',
+      icon: Users,
+      label: isHe ? 'מתאמנים' : 'Clients',
+      desc: isHe ? 'ניהול לקוחות' : 'Manage clients',
+    },
+    {
+      to: '/admin-hub',
+      icon: Shield,
+      label: isHe ? 'פאנל ניהול' : 'Admin home',
+      desc: isHe ? 'כל הכלים' : 'All tools',
+    },
+  ];
+
   return (
     <main
       dir={isRTL ? 'rtl' : 'ltr'}
@@ -113,6 +177,30 @@ const ClientHome = () => {
             </Link>
           ))}
         </section>
+
+        {/* Coach tools */}
+        {isCoach && (
+          <section className="space-y-4" aria-label={isHe ? 'כלי מאמן' : 'Coach tools'}>
+            <h2 className="text-xl font-semibold">
+              {isHe ? 'כלי מאמן' : 'Coach tools'}
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {coachTools.map(({ to, icon: Icon, label, desc }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="rounded-2xl border border-border bg-card/60 backdrop-blur p-4 hover:border-primary/50 hover:bg-card transition-colors"
+                >
+                  <Icon className="h-6 w-6 text-primary mb-3" />
+                  <div className="font-medium text-sm">{label}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{desc}</div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+
 
         {/* Catalog strip */}
         <section className="space-y-4">
