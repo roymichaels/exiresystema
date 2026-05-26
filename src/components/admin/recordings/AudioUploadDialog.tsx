@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { debug } from "@/lib/debug";
 import { Loader2, Upload } from "lucide-react";
+import { fileToMp3 } from "@/lib/audioExtract";
 
 interface AudioUploadDialogProps {
   open: boolean;
