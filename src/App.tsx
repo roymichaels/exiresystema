@@ -259,7 +259,38 @@ const UTMTrackerMount = () => {
   return null;
 };
 
-const App = () => (
+// Lightweight share-link routes (audio/video by token) bypass the heavy
+// provider tree so public recipients aren't blocked by app chunks that may
+// fail to load or take long to boot.
+const isShareLinkRoute = () => {
+  if (typeof window === "undefined") return false;
+  return /^\/(audio|video)\/[^/]+/.test(window.location.pathname);
+};
+
+const ShareLinkApp = () => (
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <BrowserRouter>
+          <LanguageProvider>
+            <Suspense fallback={<PageSkeleton />}>
+              <Routes>
+                <Route path="/audio/:token" element={<AudioPlayer />} />
+                <Route path="/video/:token" element={<VideoPlayer />} />
+              </Routes>
+              <Toaster />
+              <Sonner />
+            </Suspense>
+          </LanguageProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
+);
+
+const App = () => {
+  if (isShareLinkRoute()) return <ShareLinkApp />;
+  return (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
