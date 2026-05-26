@@ -19,7 +19,8 @@ import { Button } from '@/components/ui/button';
 const ClientHome = () => {
   const { user } = useAuth();
   const { isRTL, language } = useTranslation();
-  const { isAdmin } = useUserRoles();
+  const { hasRole } = useUserRoles();
+  const isAdmin = hasRole('admin');
   const isHe = language === 'he';
 
   useSEO({
