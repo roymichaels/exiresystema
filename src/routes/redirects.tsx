@@ -53,7 +53,7 @@ const SIMPLE_REDIRECTS: [string, string][] = [
   ['/purpose/*', '/journey'],
   ['/hobbies', '/journey'],
   ['/hobbies/*', '/journey'],
-  ['/messages/ai', '/aurora'],
+  ['/messages/ai', '/home'],
   // Admin
   ['/admin', '/admin-hub'],
   ['/admin/*', '/admin-hub'],
@@ -110,8 +110,10 @@ export const PROTECTED_REDIRECTS: [string, string][] = [
   ['/life', '/home'],
   ['/life-plan', '/home'],
   ['/career', '/home'],
-  // Chat with the coach lives at /messages now
-  ['/chat', '/messages'],
+  // All chat collapses into the global AION widget on /home
+  ['/chat', '/home'],
+  ['/messages', '/home'],
+  ['/messages/*', '/home'],
   // Profile → unified /me (opens profile modal)
   ['/profile', '/me'],
   ['/profile-hub', '/me'],
@@ -125,7 +127,7 @@ export const PROTECTED_REDIRECTS: [string, string][] = [
   ['/journey/*', '/journey'],
   // Legacy AION namespace → flat canonical (kept for deep-links)
   ['/mindos', '/home'],
-  ['/mindos/chat', '/messages'],
+  ['/mindos/chat', '/home'],
   ['/mindos/strategy', '/journey'],
   ['/mindos/tactics', '/journey'],
   ['/mindos/work', '/home'],
