@@ -111,26 +111,48 @@ export const VideoLibrary = () => {
     setGeneratingLinkFor(videoId);
     try {
       const { data: user } = await supabase.auth.getUser();
+      if (!user.user?.id) {
+        toast({ title: "יש להתחבר תחילה", variant: "destructive" });
+        return;
+      }
+
       const { data, error } = await supabase
         .from("user_video_access")
         .insert({
           video_id: videoId,
-          user_id: null, // No specific user - anonymous link
-          granted_by: user.user?.id,
+          user_id: null,
+          granted_by: user.user.id,
           notes: "קישור מהיר",
         })
         .select("access_token")
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("[VideoLibrary] create link error:", error);
+        toast({
+          title: "שגיאה ביצירת קישור",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
 
       const link = `${window.location.origin}/video/${data.access_token}`;
-      await navigator.clipboard.writeText(link);
+      try {
+        await navigator.clipboard.writeText(link);
+      } catch {
+        prompt("העתק את הקישור:", link);
+      }
       setCopiedVideoId(videoId);
       toast({ title: "הקישור הועתק ללוח! 🔗" });
       setTimeout(() => setCopiedVideoId(null), 2000);
-    } catch (err) {
-      toast({ title: "שגיאה ביצירת קישור", variant: "destructive" });
+    } catch (err: any) {
+      console.error("[VideoLibrary] create link exception:", err);
+      toast({
+        title: "שגיאה ביצירת קישור",
+        description: err?.message || String(err),
+        variant: "destructive",
+      });
     } finally {
       setGeneratingLinkFor(null);
     }
