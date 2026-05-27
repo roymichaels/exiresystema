@@ -73,10 +73,15 @@ serve(async (req) => {
       return errorResponse("שגיאה בטעינת הסרטון");
     }
 
+    const lowerPath = String(video.file_path || "").toLowerCase();
+    const mediaType = /\.(mp3|m4a|aac|wav|ogg|mov)$/i.test(lowerPath) ? "audio" : "video";
+
     return jsonResponse({
       title: video.title,
       description: video.description,
       duration_seconds: video.duration_seconds,
+      file_path: video.file_path,
+      media_type: mediaType,
       video_url: signedUrlData.signedUrl,
     });
   } catch (err) {
