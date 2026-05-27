@@ -3,13 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Loader2,
-  AlertCircle,
-  Video,
-  Maximize,
-  Minimize
-} from "lucide-react";
+import { Loader2, AlertCircle, Headphones, Video } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -18,6 +12,8 @@ interface VideoData {
   description: string | null;
   duration_seconds: number | null;
   video_url: string;
+  media_type?: "audio" | "video";
+  file_path?: string;
 }
 
 const VideoPlayer = () => {
@@ -31,6 +27,9 @@ const VideoPlayer = () => {
   const [error, setError] = useState<string | null>(null);
   const [videoData, setVideoData] = useState<VideoData | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const shouldRenderAudioOnly =
+    videoData?.media_type === "audio" ||
+    /\.(mp3|m4a|aac|wav|ogg)$/i.test(videoData?.file_path || videoData?.video_url || "");
 
   useSEO({
     title: videoData?.title || t('audioVideoPlayer.seoVideoTitle'),
