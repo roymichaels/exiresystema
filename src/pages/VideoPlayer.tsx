@@ -3,13 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Loader2,
-  AlertCircle,
-  Video,
-  Maximize,
-  Minimize
-} from "lucide-react";
+import { Loader2, AlertCircle, Headphones, Video } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -18,6 +12,8 @@ interface VideoData {
   description: string | null;
   duration_seconds: number | null;
   video_url: string;
+  media_type?: "audio" | "video";
+  file_path?: string;
 }
 
 const VideoPlayer = () => {
@@ -30,7 +26,9 @@ const VideoPlayer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [videoData, setVideoData] = useState<VideoData | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const shouldRenderAudioOnly =
+    videoData?.media_type === "audio" ||
+    /\.(mp3|m4a|aac|wav|ogg)$/i.test(videoData?.file_path || videoData?.video_url || "");
 
   useSEO({
     title: videoData?.title || t('audioVideoPlayer.seoVideoTitle'),
@@ -75,27 +73,6 @@ const VideoPlayer = () => {
     fetchVideo();
   }, [token, t]);
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
-  }, []);
-
-  const toggleFullscreen = async () => {
-    if (!containerRef.current) return;
-    
-    if (document.fullscreenElement) {
-      await document.exitFullscreen();
-    } else {
-      await containerRef.current.requestFullscreen();
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -126,7 +103,11 @@ const VideoPlayer = () => {
         {/* Header */}
         <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-transparent p-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <Video className="h-6 w-6 text-accent" />
+            {shouldRenderAudioOnly ? (
+              <Headphones className="h-6 w-6 text-accent" />
+            ) : (
+              <Video className="h-6 w-6 text-accent" />
+            )}
             <h1 className="text-2xl font-bold">{videoData?.title}</h1>
           </div>
           {videoData?.description && (
@@ -135,35 +116,29 @@ const VideoPlayer = () => {
         </div>
 
         <CardContent className="p-4 space-y-4">
-          {/* Video Player */}
-          <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-            <video
-              ref={videoRef}
+          {shouldRenderAudioOnly ? (
+            <audio
               src={videoData?.video_url || undefined}
               controls
-              className="w-full h-full"
-              playsInline
+              preload="metadata"
+              className="w-full"
             />
-            
-            {/* Fullscreen button overlay */}
-            <Button
-              size="icon"
-              variant="ghost"
-              className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} bg-black/50 hover:bg-black/70 text-white`}
-              onClick={toggleFullscreen}
-              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            >
-              {isFullscreen ? (
-                <Minimize className="h-4 w-4" />
-              ) : (
-                <Maximize className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+          ) : (
+            <div className="relative aspect-video bg-card rounded-lg overflow-hidden">
+              <video
+                ref={videoRef}
+                src={videoData?.video_url || undefined}
+                controls
+                className="w-full h-full"
+                playsInline
+                preload="metadata"
+              />
+            </div>
+          )}
 
           {/* Tip */}
           <p className="text-center text-xs text-muted-foreground">
-            {t('audioVideoPlayer.videoTip')}
+            {shouldRenderAudioOnly ? t('audioVideoPlayer.audioTip') : t('audioVideoPlayer.videoTip')}
           </p>
         </CardContent>
       </Card>
