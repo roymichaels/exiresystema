@@ -167,6 +167,15 @@ const Forms = () => {
         }}
       />
 
+      <AIFormWizard
+        open={isAIWizardOpen}
+        onOpenChange={setIsAIWizardOpen}
+        onCreated={(formId) => {
+          refetch();
+          setFieldEditorFormId(formId);
+        }}
+      />
+
       {fieldEditorFormId && (
         <FormFieldsEditor
           formId={fieldEditorFormId}
