@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiChatCompletion } from "../_shared/aiGateway.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,7 +29,7 @@ Strict JSON schema:
       "label": string,
       "placeholder": string,
       "is_required": boolean,
-      "options": string[]   // ONLY for select/radio/checkbox, else []
+      "options": string[]
     }
   ]
 }
@@ -43,9 +44,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -75,23 +73,18 @@ serve(async (req) => {
 
     const userMsg = `Intent: ${intent || "general"}\n\nBrief:\n${prompt}`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userMsg },
-        ],
-      }),
+    const response = await aiChatCompletion({
+      model: "nvidia/nemotron-3-super-120b-a12b:free",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userMsg },
+      ],
+      response_format: { type: "json_object" },
     });
 
     if (!response.ok) {
       const status = response.status;
+      const text = await response.text();
       if (status === 429) {
         return new Response(JSON.stringify({ error: "יותר מדי בקשות, נסה שוב בעוד רגע" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -102,7 +95,6 @@ serve(async (req) => {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const text = await response.text();
       throw new Error(`AI error ${status}: ${text}`);
     }
 
@@ -119,7 +111,6 @@ serve(async (req) => {
       parsed = JSON.parse(m[0]);
     }
 
-    // Sanitize
     const fields = Array.isArray(parsed.fields) ? parsed.fields : [];
     const cleanFields = fields
       .filter((f: any) => f && typeof f.label === "string" && ALLOWED_TYPES.includes(f.type))
