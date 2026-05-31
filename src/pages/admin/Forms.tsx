@@ -66,10 +66,16 @@ const Forms = () => {
           <h1 className="text-2xl font-bold">טפסים</h1>
           <p className="text-muted-foreground">יצירה וניהול טפסים ותשובות</p>
         </div>
-        <Button onClick={() => setIsFormDialogOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          טופס חדש
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsAIWizardOpen(true)} variant="default" className="gap-2 bg-primary">
+            <Sparkles className="h-4 w-4" />
+            צור עם AI
+          </Button>
+          <Button onClick={() => setIsFormDialogOpen(true)} variant="outline" className="gap-2">
+            <Plus className="h-4 w-4" />
+            טופס חדש
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
