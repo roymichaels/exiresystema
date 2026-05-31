@@ -4,15 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, FileEdit, Inbox, Clock, CheckCircle, FileText } from "lucide-react";
+import { Plus, FileEdit, Inbox, Clock, CheckCircle, FileText, Sparkles } from "lucide-react";
 import FormsList from "@/components/admin/forms/FormsList";
 import FormDialog from "@/components/admin/forms/FormDialog";
 import FormFieldsEditor from "@/components/admin/forms/FormFieldsEditor";
 import FormSubmissionsViewer from "@/components/admin/forms/FormSubmissionsViewer";
 import AllFormSubmissions from "@/components/admin/forms/AllFormSubmissions";
+import AIFormWizard from "@/components/admin/forms/AIFormWizard";
 
 const Forms = () => {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isAIWizardOpen, setIsAIWizardOpen] = useState(false);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
   const [fieldEditorFormId, setFieldEditorFormId] = useState<string | null>(null);
   const [submissionsFormId, setSubmissionsFormId] = useState<string | null>(null);
@@ -64,10 +66,16 @@ const Forms = () => {
           <h1 className="text-2xl font-bold">טפסים</h1>
           <p className="text-muted-foreground">יצירה וניהול טפסים ותשובות</p>
         </div>
-        <Button onClick={() => setIsFormDialogOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          טופס חדש
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsAIWizardOpen(true)} variant="default" className="gap-2 bg-primary">
+            <Sparkles className="h-4 w-4" />
+            צור עם AI
+          </Button>
+          <Button onClick={() => setIsFormDialogOpen(true)} variant="outline" className="gap-2">
+            <Plus className="h-4 w-4" />
+            טופס חדש
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -156,6 +164,15 @@ const Forms = () => {
         onSuccess={() => {
           handleDialogClose();
           refetch();
+        }}
+      />
+
+      <AIFormWizard
+        open={isAIWizardOpen}
+        onOpenChange={setIsAIWizardOpen}
+        onCreated={(formId) => {
+          refetch();
+          setFieldEditorFormId(formId);
         }}
       />
 
