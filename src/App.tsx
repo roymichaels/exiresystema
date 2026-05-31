@@ -352,6 +352,7 @@ const App = () => {
                                               <Route path="/install" element={<Install />} />
                                               <Route path="/audio/:token" element={<AudioPlayer />} />
                                               <Route path="/video/:token" element={<VideoPlayer />} />
+                                              <Route path="/form/:token" element={<PublicForm />} />
                                               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                                               <Route path="/terms-of-service" element={<TermsOfService />} />
                                               <Route path="/affiliate-signup" element={<AffiliateSignup />} />
