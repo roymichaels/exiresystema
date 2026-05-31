@@ -264,8 +264,10 @@ const UTMTrackerMount = () => {
 // fail to load or take long to boot.
 const isShareLinkRoute = () => {
   if (typeof window === "undefined") return false;
-  return /^\/(audio|video)\/[^/]+/.test(window.location.pathname);
+  return /^\/(audio|video|form)\/[^/]+/.test(window.location.pathname);
 };
+
+const PublicForm = lazyWithRetry(() => import("./pages/PublicForm"), "PublicForm");
 
 const ShareLinkApp = () => (
   <ErrorBoundary>
@@ -277,6 +279,7 @@ const ShareLinkApp = () => (
               <Routes>
                 <Route path="/audio/:token" element={<AudioPlayer />} />
                 <Route path="/video/:token" element={<VideoPlayer />} />
+                <Route path="/form/:token" element={<PublicForm />} />
               </Routes>
               <Toaster />
               <Sonner />
