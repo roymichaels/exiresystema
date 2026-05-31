@@ -4,15 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, FileEdit, Inbox, Clock, CheckCircle, FileText } from "lucide-react";
+import { Plus, FileEdit, Inbox, Clock, CheckCircle, FileText, Sparkles } from "lucide-react";
 import FormsList from "@/components/admin/forms/FormsList";
 import FormDialog from "@/components/admin/forms/FormDialog";
 import FormFieldsEditor from "@/components/admin/forms/FormFieldsEditor";
 import FormSubmissionsViewer from "@/components/admin/forms/FormSubmissionsViewer";
 import AllFormSubmissions from "@/components/admin/forms/AllFormSubmissions";
+import AIFormWizard from "@/components/admin/forms/AIFormWizard";
 
 const Forms = () => {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isAIWizardOpen, setIsAIWizardOpen] = useState(false);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
   const [fieldEditorFormId, setFieldEditorFormId] = useState<string | null>(null);
   const [submissionsFormId, setSubmissionsFormId] = useState<string | null>(null);
