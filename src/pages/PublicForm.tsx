@@ -108,7 +108,7 @@ export default function PublicForm() {
 
     const payload: Record<string, any> = {};
     for (const f of fields) {
-      payload[f.label] = responses[f.id] ?? null;
+      payload[f.id] = responses[f.id] ?? null;
     }
 
     const { data: { user } } = await supabase.auth.getUser();
