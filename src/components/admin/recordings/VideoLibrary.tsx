@@ -51,6 +51,8 @@ export const VideoLibrary = () => {
   const [assigningVideoId, setAssigningVideoId] = useState<string | null>(null);
   const [copiedVideoId, setCopiedVideoId] = useState<string | null>(null);
   const [generatingLinkFor, setGeneratingLinkFor] = useState<string | null>(null);
+  const [convertingId, setConvertingId] = useState<string | null>(null);
+  const [convertProgress, setConvertProgress] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
