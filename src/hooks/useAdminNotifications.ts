@@ -161,9 +161,11 @@ export const useAdminNotifications = () => {
   useEffect(() => {
     fetchNotifications();
 
-    // Subscribe to real-time notifications
+    // Subscribe to real-time notifications with a unique channel name.
+    // React StrictMode can mount this hook twice during development; reusing a
+    // subscribed channel name can throw before callbacks are attached.
     const channel = supabase
-      .channel('admin-notifications')
+      .channel(`admin-notifications-${Date.now()}-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
