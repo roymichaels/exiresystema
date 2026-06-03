@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Edit2, Video, Clock, Calendar, Play, UserPlus, Link, Check } from "lucide-react";
+import { Plus, Trash2, Edit2, Video, Clock, Calendar, Play, UserPlus, Link, Check, Headphones, Loader2 } from "lucide-react";
+import { fileToMp3 } from "@/lib/audioExtract";
 import { VideoUploadDialog } from "./VideoUploadDialog";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
@@ -50,6 +51,8 @@ export const VideoLibrary = () => {
   const [assigningVideoId, setAssigningVideoId] = useState<string | null>(null);
   const [copiedVideoId, setCopiedVideoId] = useState<string | null>(null);
   const [generatingLinkFor, setGeneratingLinkFor] = useState<string | null>(null);
+  const [convertingId, setConvertingId] = useState<string | null>(null);
+  const [convertProgress, setConvertProgress] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -155,6 +158,60 @@ export const VideoLibrary = () => {
       });
     } finally {
       setGeneratingLinkFor(null);
+    }
+  };
+
+  const convertToAudio = async (video: HypnosisVideo) => {
+    setConvertingId(video.id);
+    setConvertProgress(0);
+    try {
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("hypnosis-videos")
+        .createSignedUrl(video.file_path, 3600);
+      if (signErr || !signed) throw signErr || new Error("no url");
+
+      toast({ title: "מוריד את הסרטון...", description: video.title });
+      const resp = await fetch(signed.signedUrl);
+      const blob = await resp.blob();
+      const sourceName = video.file_path.split("/").pop() || "video.mp4";
+      const file = new File([blob], sourceName, { type: blob.type || "video/mp4" });
+
+      toast({ title: "ממיר לאודיו... זה עשוי לקחת דקה" });
+      const { blob: mp3Blob, durationSeconds } = await fileToMp3(file, (p) =>
+        setConvertProgress(Math.round(p))
+      );
+
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) throw new Error("not authenticated");
+
+      const audioPath = `${userId}/${Date.now()}-${video.title.replace(/[^\w\u0590-\u05FF]+/g, "_")}.mp3`;
+      const { error: upErr } = await supabase.storage
+        .from("hypnosis-audios")
+        .upload(audioPath, mp3Blob, { contentType: "audio/mpeg", upsert: false });
+      if (upErr) throw upErr;
+
+      const { error: insErr } = await supabase.from("hypnosis_audios").insert({
+        title: video.title,
+        description: video.description,
+        file_path: audioPath,
+        duration_seconds: durationSeconds,
+        created_by: userId,
+      });
+      if (insErr) throw insErr;
+
+      queryClient.invalidateQueries({ queryKey: ["hypnosis-audios"] });
+      toast({ title: "ההמרה הושלמה ✓", description: "ההקלטה נוספה לספריית ההקלטות" });
+    } catch (err: any) {
+      console.error("[VideoLibrary] convert error:", err);
+      toast({
+        title: "שגיאה בהמרה",
+        description: err?.message || String(err),
+        variant: "destructive",
+      });
+    } finally {
+      setConvertingId(null);
+      setConvertProgress(0);
     }
   };
 
@@ -277,6 +334,23 @@ export const VideoLibrary = () => {
                     title="הקצה למשתמש ספציפי"
                   >
                     <UserPlus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={() => convertToAudio(video)}
+                    disabled={convertingId === video.id}
+                    title="המר לקובץ אודיו"
+                  >
+                    {convertingId === video.id ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-xs">{convertProgress}%</span>
+                      </>
+                    ) : (
+                      <Headphones className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </CardContent>
