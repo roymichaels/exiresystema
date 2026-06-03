@@ -14,7 +14,7 @@ export interface AdminNotification {
   title: string;
   message: string;
   link: string | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   is_read: boolean;
   read_at: string | null;
   created_at: string;
@@ -24,7 +24,7 @@ export interface AdminNotification {
 const convertDbToNotification = (dbNotif: DbNotification): AdminNotification => ({
   ...dbNotif,
   metadata: typeof dbNotif.metadata === 'object' && dbNotif.metadata !== null 
-    ? dbNotif.metadata as Record<string, any>
+    ? dbNotif.metadata as Record<string, unknown>
     : {},
 });
 
@@ -51,10 +51,10 @@ export const useAdminNotifications = () => {
         .limit(50);
 
       if (filters?.type) {
-        query = query.eq('type', filters.type as any);
+        query = query.eq('type', filters.type as NonNullable<DbNotification['type']>);
       }
       if (filters?.priority) {
-        query = query.eq('priority', filters.priority as any);
+        query = query.eq('priority', filters.priority as NonNullable<DbNotification['priority']>);
       }
       if (filters?.is_read !== undefined) {
         query = query.eq('is_read', filters.is_read);
@@ -161,9 +161,11 @@ export const useAdminNotifications = () => {
   useEffect(() => {
     fetchNotifications();
 
-    // Subscribe to real-time notifications
+    // Subscribe to real-time notifications with a unique channel name.
+    // React StrictMode can mount this hook twice during development; reusing a
+    // subscribed channel name can throw before callbacks are attached.
     const channel = supabase
-      .channel('admin-notifications')
+      .channel(`admin-notifications-${Date.now()}-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {

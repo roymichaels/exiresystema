@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { debug } from "@/lib/debug";
 import { Loader2, Upload } from "lucide-react";
-import { fileToMp3 } from "@/lib/audioExtract";
+import { fileToMp3 } from "@/lib/videoToAudio";
 
 interface AudioUploadDialogProps {
   open: boolean;
@@ -127,11 +127,11 @@ export const AudioUploadDialog = ({
           const { blob, durationSeconds } = await fileToMp3(file, setConvertProgress);
           uploadFile = blob;
           duration = durationSeconds;
-        } catch (err: any) {
+        } catch (err: unknown) {
           debug.log("→MP3 conversion failed", err);
           toast({
             title: "המרה ל-MP3 נכשלה",
-            description: err?.message || String(err),
+            description: err instanceof Error ? err.message : String(err),
             variant: "destructive",
           });
           setConverting(false);
@@ -171,10 +171,10 @@ export const AudioUploadDialog = ({
         file_path: fileName,
         duration_seconds: duration,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: t("admin.recordingsPage.audioUploadError"),
-        description: err?.message || String(err),
+        description: err instanceof Error ? err.message : String(err),
         variant: "destructive",
       });
     } finally {
@@ -243,7 +243,7 @@ export const AudioUploadDialog = ({
               </p>
               {converting && (
                 <p className="text-xs text-primary">
-                  ממיר וידאו ל-MP3... {Math.round(convertProgress)}%
+                  ממיר ל-MP3... {Math.round(convertProgress)}%
                 </p>
               )}
             </div>
