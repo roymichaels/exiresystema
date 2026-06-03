@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { debug } from "@/lib/debug";
-import { Plus, Trash2, Edit2, Music, Clock, Calendar, Play, Pause, UserPlus, Link, Check, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Music, Clock, Calendar, Play, Pause, UserPlus, Link, Check, Loader2, Download } from "lucide-react";
 import { AudioUploadDialog } from "./AudioUploadDialog";
 import { format } from "date-fns";
 import { he, enUS } from "date-fns/locale";
