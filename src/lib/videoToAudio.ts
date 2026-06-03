@@ -29,45 +29,8 @@ export async function videoUrlToMp3(
   onProgress?: (pct: number) => void,
 ): Promise<{ blob: Blob; durationSeconds: number }> {
   const { fetchFile } = await import("@ffmpeg/util");
-  const ffmpeg = await getFFmpeg();
-
-  if (onProgress) {
-    ffmpeg.on("progress", ({ progress }: any) => {
-      onProgress(Math.min(99, Math.round(progress * 100)));
-    });
-  }
-
-  const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const inputName = `input-${id}.bin`;
-  const outputName = `output-${id}.mp3`;
-  await ffmpeg.writeFile(inputName, await fetchFile(videoUrl));
-
-  await ffmpeg.exec([
-    "-i", inputName,
-    "-vn",
-    "-acodec", "libmp3lame",
-    "-b:a", "128k",
-    outputName,
-  ]);
-
-  const data = (await ffmpeg.readFile(outputName)) as Uint8Array;
-  const blob = new Blob([data.slice().buffer], { type: "audio/mpeg" });
-
-  await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
-
-  // Probe duration via WebAudio (best effort)
-  let durationSeconds = 0;
-  try {
-    const ab = await blob.arrayBuffer();
-    const AC: typeof AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
-    const ctx = new AC();
-    const decoded = await ctx.decodeAudioData(ab.slice(0));
-    durationSeconds = Math.round(decoded.duration);
-    ctx.close();
-  } catch {}
-
-  onProgress?.(100);
-  return { blob, durationSeconds };
+  const source = await fetchFile(videoUrl);
+  return transcodeToMp3(source, "input.bin", onProgress);
 }
 
 export async function fileToMp3(
@@ -75,35 +38,49 @@ export async function fileToMp3(
   onProgress?: (pct: number) => void,
 ): Promise<{ blob: Blob; durationSeconds: number }> {
   const { fetchFile } = await import("@ffmpeg/util");
-  const ffmpeg = await getFFmpeg();
+  const ext = file.name.split(".").pop()?.replace(/[^a-z0-9]/gi, "") || "bin";
+  const source = await fetchFile(file);
+  return transcodeToMp3(source, `upload.${ext}`, onProgress);
+}
 
-  if (onProgress) {
-    ffmpeg.on("progress", ({ progress }: any) => {
-      onProgress(Math.min(99, Math.max(0, Math.round(progress * 100))));
-    });
-  }
+async function transcodeToMp3(
+  source: Uint8Array,
+  sourceName: string,
+  onProgress?: (pct: number) => void,
+): Promise<{ blob: Blob; durationSeconds: number }> {
+  const ffmpeg = await getFFmpeg();
+  const progressHandler = onProgress
+    ? ({ progress }: any) => onProgress(Math.min(99, Math.max(0, Math.round(progress * 100))))
+    : null;
+
+  if (progressHandler) ffmpeg.on("progress", progressHandler);
 
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const ext = file.name.split(".").pop()?.replace(/[^a-z0-9]/gi, "") || "bin";
-  const inputName = `upload-${id}.${ext}`;
-  const outputName = `upload-${id}.mp3`;
+  const inputName = `${id}-${sourceName}`;
+  const outputName = `${id}-output.mp3`;
 
-  await ffmpeg.writeFile(inputName, await fetchFile(file));
-  await ffmpeg.exec([
-    "-i", inputName,
-    "-vn",
-    "-acodec", "libmp3lame",
-    "-b:a", "128k",
-    outputName,
-  ]);
+  try {
+    await ffmpeg.writeFile(inputName, source);
+    const code = await ffmpeg.exec([
+      "-i", inputName,
+      "-vn",
+      "-map", "0:a:0",
+      "-acodec", "libmp3lame",
+      "-b:a", "128k",
+      outputName,
+    ]);
+    if (code !== 0) throw new Error(`ffmpeg exited with code ${code}`);
 
-  const data = (await ffmpeg.readFile(outputName)) as Uint8Array;
-  const blob = new Blob([data.slice().buffer], { type: "audio/mpeg" });
-  await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
+    const data = (await ffmpeg.readFile(outputName)) as Uint8Array;
+    const blob = new Blob([data.slice()], { type: "audio/mpeg" });
+    const durationSeconds = await probeMp3Duration(blob);
 
-  const durationSeconds = await probeMp3Duration(blob);
-  onProgress?.(100);
-  return { blob, durationSeconds };
+    onProgress?.(100);
+    return { blob, durationSeconds };
+  } finally {
+    if (progressHandler) ffmpeg.off("progress", progressHandler);
+    await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
+  }
 }
 
 async function probeMp3Duration(blob: Blob): Promise<number> {
