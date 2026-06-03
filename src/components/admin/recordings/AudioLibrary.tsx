@@ -346,6 +346,25 @@ export const AudioLibrary = () => {
                   >
                     <UserPlus className="h-4 w-4" />
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.storage
+                          .from("hypnosis-audios")
+                          .createSignedUrl(audio.file_path, 60, { download: `${audio.title}.mp3` });
+                        if (error || !data) throw error;
+                        window.location.href = data.signedUrl;
+                      } catch (e: any) {
+                        toast({ title: "שגיאה בהורדה", description: e?.message, variant: "destructive" });
+                      }
+                    }}
+                    title="הורד קובץ"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
