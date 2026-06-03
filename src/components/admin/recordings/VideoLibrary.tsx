@@ -161,6 +161,60 @@ export const VideoLibrary = () => {
     }
   };
 
+  const convertToAudio = async (video: HypnosisVideo) => {
+    setConvertingId(video.id);
+    setConvertProgress(0);
+    try {
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("hypnosis-videos")
+        .createSignedUrl(video.file_path, 3600);
+      if (signErr || !signed) throw signErr || new Error("no url");
+
+      toast({ title: "מוריד את הסרטון...", description: video.title });
+      const resp = await fetch(signed.signedUrl);
+      const blob = await resp.blob();
+      const sourceName = video.file_path.split("/").pop() || "video.mp4";
+      const file = new File([blob], sourceName, { type: blob.type || "video/mp4" });
+
+      toast({ title: "ממיר לאודיו... זה עשוי לקחת דקה" });
+      const { blob: mp3Blob, durationSeconds } = await fileToMp3(file, (p) =>
+        setConvertProgress(Math.round(p))
+      );
+
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) throw new Error("not authenticated");
+
+      const audioPath = `${userId}/${Date.now()}-${video.title.replace(/[^\w\u0590-\u05FF]+/g, "_")}.mp3`;
+      const { error: upErr } = await supabase.storage
+        .from("hypnosis-audios")
+        .upload(audioPath, mp3Blob, { contentType: "audio/mpeg", upsert: false });
+      if (upErr) throw upErr;
+
+      const { error: insErr } = await supabase.from("hypnosis_audios").insert({
+        title: video.title,
+        description: video.description,
+        file_path: audioPath,
+        duration_seconds: durationSeconds,
+        created_by: userId,
+      });
+      if (insErr) throw insErr;
+
+      queryClient.invalidateQueries({ queryKey: ["hypnosis-audios"] });
+      toast({ title: "ההמרה הושלמה ✓", description: "ההקלטה נוספה לספריית ההקלטות" });
+    } catch (err: any) {
+      console.error("[VideoLibrary] convert error:", err);
+      toast({
+        title: "שגיאה בהמרה",
+        description: err?.message || String(err),
+        variant: "destructive",
+      });
+    } finally {
+      setConvertingId(null);
+      setConvertProgress(0);
+    }
+  };
+
   const closePlayer = () => {
     setPlayingVideo(null);
     setVideoUrl(null);
