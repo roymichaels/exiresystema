@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit2, Video, Clock, Calendar, Play, UserPlus, Link, Check, Headphones, Loader2 } from "lucide-react";
-import { fileToMp3 } from "@/lib/audioExtract";
+
 import { VideoUploadDialog } from "./VideoUploadDialog";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
@@ -170,15 +170,11 @@ export const VideoLibrary = () => {
         .createSignedUrl(video.file_path, 3600);
       if (signErr || !signed) throw signErr || new Error("no url");
 
-      toast({ title: "מוריד את הסרטון...", description: video.title });
-      const resp = await fetch(signed.signedUrl);
-      const blob = await resp.blob();
-      const sourceName = video.file_path.split("/").pop() || "video.mp4";
-      const file = new File([blob], sourceName, { type: blob.type || "video/mp4" });
-
-      toast({ title: "ממיר לאודיו... זה עשוי לקחת דקה" });
-      const { blob: mp3Blob, durationSeconds } = await fileToMp3(file, (p) =>
-        setConvertProgress(Math.round(p))
+      toast({ title: "ממיר לאודיו... זה עשוי לקחת דקה", description: video.title });
+      const { videoUrlToMp3 } = await import("@/lib/videoToAudio");
+      const { blob: mp3Blob, durationSeconds } = await videoUrlToMp3(
+        signed.signedUrl,
+        (p) => setConvertProgress(p),
       );
 
       const { data: userData } = await supabase.auth.getUser();
