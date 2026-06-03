@@ -335,6 +335,23 @@ export const VideoLibrary = () => {
                   >
                     <UserPlus className="h-4 w-4" />
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={() => convertToAudio(video)}
+                    disabled={convertingId === video.id}
+                    title="המר לקובץ אודיו"
+                  >
+                    {convertingId === video.id ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-xs">{convertProgress}%</span>
+                      </>
+                    ) : (
+                      <Headphones className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
