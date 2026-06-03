@@ -13,7 +13,9 @@ async function getFFmpeg(onLog?: (msg: string) => void) {
   const ffmpeg = new FFmpeg();
   if (onLog) ffmpeg.on("log", ({ message }: any) => onLog(message));
 
-  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd";
+  // Vite loads ffmpeg-core as an ES module. The UMD build can fail with
+  // "Importing a module script failed" in the browser worker.
+  const baseURL = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
   await ffmpeg.load({
     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
     wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
