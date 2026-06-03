@@ -48,7 +48,7 @@ export async function videoUrlToMp3(
   ]);
 
   const data = (await ffmpeg.readFile(outputName)) as Uint8Array;
-  const blob = new Blob([data], { type: "audio/mpeg" });
+  const blob = new Blob([data.buffer as ArrayBuffer], { type: "audio/mpeg" });
 
   // Probe duration via WebAudio (best effort)
   let durationSeconds = 0;
