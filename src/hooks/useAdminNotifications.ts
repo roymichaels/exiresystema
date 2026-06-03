@@ -51,10 +51,10 @@ export const useAdminNotifications = () => {
         .limit(50);
 
       if (filters?.type) {
-        query = query.eq('type', filters.type);
+        query = query.eq('type', filters.type as NonNullable<DbNotification['type']>);
       }
       if (filters?.priority) {
-        query = query.eq('priority', filters.priority);
+        query = query.eq('priority', filters.priority as NonNullable<DbNotification['priority']>);
       }
       if (filters?.is_read !== undefined) {
         query = query.eq('is_read', filters.is_read);
