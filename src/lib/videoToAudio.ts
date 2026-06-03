@@ -11,9 +11,10 @@ type FFmpegLike = {
   off(event: "progress", callback: (payload: FFmpegProgressPayload) => void): void;
   load(config: { coreURL: string; wasmURL: string }): Promise<unknown>;
   writeFile(path: string, data: Uint8Array): Promise<unknown>;
-  exec(args: string[]): Promise<number>;
+  exec(args: string[], timeout?: number): Promise<number>;
   readFile(path: string): Promise<Uint8Array | string>;
   deleteFile(path: string): Promise<unknown>;
+  terminate(): void;
 };
 type WindowWithWebkitAudio = Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext };
 
@@ -30,10 +31,19 @@ async function getFFmpeg(onLog?: (msg: string) => void) {
   // Vite loads ffmpeg-core as an ES module. The UMD build can fail with
   // "Importing a module script failed" in the browser worker.
   const baseURL = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
-  });
+  try {
+    await withTimeout(
+      ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+      }),
+      90_000,
+      "טעינת מנוע ההמרה נתקעה. נסה שוב או העלה קובץ קצר יותר.",
+    );
+  } catch (error) {
+    ffmpeg.terminate();
+    throw error;
+  }
   ffmpegInstance = ffmpeg;
   return ffmpeg;
 }
