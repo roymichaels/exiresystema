@@ -11,13 +11,16 @@ type FFmpegLike = {
   off(event: "progress", callback: (payload: FFmpegProgressPayload) => void): void;
   load(config: { coreURL: string; wasmURL: string }): Promise<unknown>;
   writeFile(path: string, data: Uint8Array): Promise<unknown>;
-  exec(args: string[]): Promise<number>;
+  exec(args: string[], timeout?: number): Promise<number>;
   readFile(path: string): Promise<Uint8Array | string>;
   deleteFile(path: string): Promise<unknown>;
+  terminate(): void;
 };
 type WindowWithWebkitAudio = Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext };
 
 let ffmpegInstance: FFmpegLike | null = null;
+
+class ConversionTimeoutError extends Error {}
 
 async function getFFmpeg(onLog?: (msg: string) => void) {
   if (ffmpegInstance) return ffmpegInstance;
@@ -30,10 +33,19 @@ async function getFFmpeg(onLog?: (msg: string) => void) {
   // Vite loads ffmpeg-core as an ES module. The UMD build can fail with
   // "Importing a module script failed" in the browser worker.
   const baseURL = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
-  });
+  try {
+    await withTimeout(
+      ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+      }),
+      90_000,
+      "טעינת מנוע ההמרה נתקעה. נסה שוב או העלה קובץ קצר יותר.",
+    );
+  } catch (error) {
+    ffmpeg.terminate();
+    throw error;
+  }
   ffmpegInstance = ffmpeg;
   return ffmpeg;
 }
@@ -43,7 +55,12 @@ export async function videoUrlToMp3(
   onProgress?: (pct: number) => void,
 ): Promise<{ blob: Blob; durationSeconds: number }> {
   const { fetchFile } = await import("@ffmpeg/util");
-  const source = await fetchFile(videoUrl);
+  onProgress?.(3);
+  const source = await withTimeout(
+    fetchFile(videoUrl),
+    90_000,
+    "טעינת הסרטון להמרה נתקעה. נסה שוב עם קובץ קצר או קטן יותר.",
+  );
   return transcodeToMp3(source, "input.bin", onProgress);
 }
 
@@ -53,7 +70,12 @@ export async function fileToMp3(
 ): Promise<{ blob: Blob; durationSeconds: number }> {
   const { fetchFile } = await import("@ffmpeg/util");
   const ext = file.name.split(".").pop()?.replace(/[^a-z0-9]/gi, "") || "bin";
-  const source = await fetchFile(file);
+  onProgress?.(3);
+  const source = await withTimeout(
+    fetchFile(file),
+    90_000,
+    "טעינת הקובץ להמרה נתקעה. נסה שוב עם קובץ קצר או קטן יותר.",
+  );
   return transcodeToMp3(source, `upload.${ext}`, onProgress);
 }
 
@@ -62,9 +84,11 @@ async function transcodeToMp3(
   sourceName: string,
   onProgress?: (pct: number) => void,
 ): Promise<{ blob: Blob; durationSeconds: number }> {
+  onProgress?.(8);
   const ffmpeg = await getFFmpeg();
+  onProgress?.(15);
   const progressHandler = onProgress
-    ? ({ progress = 0 }: FFmpegProgressPayload) => onProgress(Math.min(99, Math.max(0, Math.round(progress * 100))))
+    ? ({ progress = 0 }: FFmpegProgressPayload) => onProgress(Math.min(99, Math.max(18, Math.round(progress * 100))))
     : null;
 
   if (progressHandler) ffmpeg.on("progress", progressHandler);
@@ -72,17 +96,28 @@ async function transcodeToMp3(
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const inputName = `${id}-${sourceName}`;
   const outputName = `${id}-output.mp3`;
+  let terminateWorker = false;
 
   try {
-    await ffmpeg.writeFile(inputName, source);
-    const code = await ffmpeg.exec([
-      "-i", inputName,
-      "-vn",
-      "-map", "0:a:0",
-      "-acodec", "libmp3lame",
-      "-b:a", "128k",
-      outputName,
-    ]);
+    onProgress?.(18);
+    await withTimeout(
+      ffmpeg.writeFile(inputName, source),
+      60_000,
+      "טעינת הקובץ למנוע ההמרה נתקעה. נסה קובץ קטן יותר.",
+    );
+    onProgress?.(22);
+    const code = await withTimeout(
+      ffmpeg.exec([
+        "-i", inputName,
+        "-vn",
+        "-map", "0:a:0",
+        "-acodec", "libmp3lame",
+        "-b:a", "128k",
+        outputName,
+      ], 180_000),
+      190_000,
+      "ההמרה נתקעה יותר מדי זמן. נסה סרטון קצר יותר או קובץ קטן יותר.",
+    );
     if (code !== 0) throw new Error(`ffmpeg exited with code ${code}`);
 
     const data = await ffmpeg.readFile(outputName);
@@ -92,9 +127,32 @@ async function transcodeToMp3(
 
     onProgress?.(100);
     return { blob, durationSeconds };
+  } catch (error) {
+    if (error instanceof ConversionTimeoutError) {
+      terminateWorker = true;
+      ffmpeg.terminate();
+      ffmpegInstance = null;
+    }
+    throw error;
   } finally {
     if (progressHandler) ffmpeg.off("progress", progressHandler);
-    await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
+    if (!terminateWorker) {
+      await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
+    }
+  }
+}
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new ConversionTimeoutError(message)), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 

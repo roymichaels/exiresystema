@@ -149,11 +149,11 @@ export const VideoLibrary = () => {
       setCopiedVideoId(videoId);
       toast({ title: "הקישור הועתק ללוח! 🔗" });
       setTimeout(() => setCopiedVideoId(null), 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[VideoLibrary] create link exception:", err);
       toast({
         title: "שגיאה ביצירת קישור",
-        description: err?.message || String(err),
+        description: err instanceof Error ? err.message : String(err),
         variant: "destructive",
       });
     } finally {
@@ -198,11 +198,11 @@ export const VideoLibrary = () => {
 
       queryClient.invalidateQueries({ queryKey: ["hypnosis-audios"] });
       toast({ title: "ההמרה הושלמה ✓", description: "ההקלטה נוספה לספריית ההקלטות" });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[VideoLibrary] convert error:", err);
       toast({
         title: "שגיאה בהמרה",
-        description: err?.message || String(err),
+        description: err instanceof Error ? err.message : String(err),
         variant: "destructive",
       });
     } finally {
@@ -360,8 +360,8 @@ export const VideoLibrary = () => {
                           .createSignedUrl(video.file_path, 60, { download: `${video.title}.${ext}` });
                         if (error || !data) throw error;
                         window.location.href = data.signedUrl;
-                      } catch (e: any) {
-                        toast({ title: "שגיאה בהורדה", description: e?.message, variant: "destructive" });
+                      } catch (e: unknown) {
+                        toast({ title: "שגיאה בהורדה", description: e instanceof Error ? e.message : String(e), variant: "destructive" });
                       }
                     }}
                     title="הורד קובץ"
