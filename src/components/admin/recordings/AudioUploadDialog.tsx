@@ -243,7 +243,7 @@ export const AudioUploadDialog = ({
               </p>
               {converting && (
                 <p className="text-xs text-primary">
-                  ממיר וידאו ל-MP3... {Math.round(convertProgress)}%
+                  ממיר ל-MP3... {Math.round(convertProgress)}%
                 </p>
               )}
             </div>
