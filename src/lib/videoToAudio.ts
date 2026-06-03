@@ -20,6 +20,8 @@ type WindowWithWebkitAudio = Window & typeof globalThis & { webkitAudioContext?:
 
 let ffmpegInstance: FFmpegLike | null = null;
 
+class ConversionTimeoutError extends Error {}
+
 async function getFFmpeg(onLog?: (msg: string) => void) {
   if (ffmpegInstance) return ffmpegInstance;
   const { FFmpeg } = await import("@ffmpeg/ffmpeg");
@@ -94,6 +96,7 @@ async function transcodeToMp3(
   const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const inputName = `${id}-${sourceName}`;
   const outputName = `${id}-output.mp3`;
+  let terminateWorker = false;
 
   try {
     onProgress?.(18);
@@ -124,9 +127,18 @@ async function transcodeToMp3(
 
     onProgress?.(100);
     return { blob, durationSeconds };
+  } catch (error) {
+    if (error instanceof ConversionTimeoutError) {
+      terminateWorker = true;
+      ffmpeg.terminate();
+      ffmpegInstance = null;
+    }
+    throw error;
   } finally {
     if (progressHandler) ffmpeg.off("progress", progressHandler);
-    await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
+    if (!terminateWorker) {
+      await Promise.allSettled([ffmpeg.deleteFile(inputName), ffmpeg.deleteFile(outputName)]);
+    }
   }
 }
 
@@ -136,7 +148,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, message: string):
     return await Promise.race([
       promise,
       new Promise<T>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(message)), ms);
+        timer = setTimeout(() => reject(new ConversionTimeoutError(message)), ms);
       }),
     ]);
   } finally {
