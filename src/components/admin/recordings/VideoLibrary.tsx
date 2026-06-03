@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Edit2, Video, Clock, Calendar, Play, UserPlus, Link, Check, Headphones, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Video, Clock, Calendar, Play, UserPlus, Link, Check, Headphones, Loader2, Download } from "lucide-react";
 
 import { VideoUploadDialog } from "./VideoUploadDialog";
 import { format } from "date-fns";
@@ -347,6 +347,26 @@ export const VideoLibrary = () => {
                     ) : (
                       <Headphones className="h-4 w-4" />
                     )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={async () => {
+                      try {
+                        const ext = video.file_path.split(".").pop() || "mp4";
+                        const { data, error } = await supabase.storage
+                          .from("hypnosis-videos")
+                          .createSignedUrl(video.file_path, 60, { download: `${video.title}.${ext}` });
+                        if (error || !data) throw error;
+                        window.location.href = data.signedUrl;
+                      } catch (e: any) {
+                        toast({ title: "שגיאה בהורדה", description: e?.message, variant: "destructive" });
+                      }
+                    }}
+                    title="הורד קובץ"
+                  >
+                    <Download className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>

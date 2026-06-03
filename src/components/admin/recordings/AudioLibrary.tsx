@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { debug } from "@/lib/debug";
-import { Plus, Trash2, Edit2, Music, Clock, Calendar, Play, Pause, UserPlus, Link, Check, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Music, Clock, Calendar, Play, Pause, UserPlus, Link, Check, Loader2, Download } from "lucide-react";
 import { AudioUploadDialog } from "./AudioUploadDialog";
 import { format } from "date-fns";
 import { he, enUS } from "date-fns/locale";
@@ -345,6 +345,25 @@ export const AudioLibrary = () => {
                     title="הקצה למשתמש ספציפי"
                   >
                     <UserPlus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.storage
+                          .from("hypnosis-audios")
+                          .createSignedUrl(audio.file_path, 60, { download: `${audio.title}.mp3` });
+                        if (error || !data) throw error;
+                        window.location.href = data.signedUrl;
+                      } catch (e: any) {
+                        toast({ title: "שגיאה בהורדה", description: e?.message, variant: "destructive" });
+                      }
+                    }}
+                    title="הורד קובץ"
+                  >
+                    <Download className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
