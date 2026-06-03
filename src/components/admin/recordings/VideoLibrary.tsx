@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit2, Video, Clock, Calendar, Play, UserPlus, Link, Check, Headphones, Loader2 } from "lucide-react";
-import { fileToMp3 } from "@/lib/audioExtract";
+
 import { VideoUploadDialog } from "./VideoUploadDialog";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
