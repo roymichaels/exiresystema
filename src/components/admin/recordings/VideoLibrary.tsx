@@ -348,6 +348,26 @@ export const VideoLibrary = () => {
                       <Headphones className="h-4 w-4" />
                     )}
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={async () => {
+                      try {
+                        const ext = video.file_path.split(".").pop() || "mp4";
+                        const { data, error } = await supabase.storage
+                          .from("hypnosis-videos")
+                          .createSignedUrl(video.file_path, 60, { download: `${video.title}.${ext}` });
+                        if (error || !data) throw error;
+                        window.location.href = data.signedUrl;
+                      } catch (e: any) {
+                        toast({ title: "שגיאה בהורדה", description: e?.message, variant: "destructive" });
+                      }
+                    }}
+                    title="הורד קובץ"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
