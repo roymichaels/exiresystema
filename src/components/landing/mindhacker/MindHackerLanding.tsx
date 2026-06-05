@@ -120,8 +120,8 @@ export default function MindHackerLanding() {
         <FinalCTA t={t} onStart={startIntake} />
       </main>
       <Footer t={t} />
-      <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen} />
-      {intakeLoading && (
+      <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen || chatLoading} />
+      {(intakeLoading || chatLoading) && (
         <div
           className="fixed inset-0 z-[99] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in"
           aria-live="polite"
