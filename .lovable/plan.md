@@ -1,41 +1,31 @@
-## Goal
-The Forms/Quiz admin already exists under **Admin → Content → Forms** (`/admin?tab=content&sub=forms`) — it's mounted, working, and writes to `custom_forms` + `form_fields`. I'll verify the current flow, then add an **AI Wizard** (like the landing-page AI maker) where you type what you want and AION builds the full form with all its fields automatically.
+# Fix: AION chat widget appears unresponsive on click
 
-## What I'll build
+## Diagnosis
 
-### 1. New edge function: `generate-form` (Lovable AI)
-- Auth-protected (admin only via `has_role`).
-- Input: free-text prompt (Hebrew or English) + optional intent ("quiz" / "lead form" / "intake" / "assessment").
-- Calls `google/gemini-3-flash-preview` via Lovable AI Gateway with a strict JSON schema instruction.
-- Returns structured JSON:
-  ```
-  {
-    title, description, intro_title, intro_subtitle, thank_you_message,
-    fields: [{ type, label, placeholder, is_required, options[], order_index }]
-  }
-  ```
-- `type` constrained to allowed values: `text, email, phone, textarea, select, radio, checkbox, rating, date, number` (matches DB CHECK constraint).
-- Handles 429 / 402 with clean error toasts.
+On `/` (MindHackerLanding), the floating AION widget renders correctly and clicking it does work — but only after the lazy-loaded `AionLandingChat` chunk finishes downloading. During that window (often several seconds on a fresh load), nothing on screen changes:
 
-### 2. New component: `AIFormWizard.tsx`
-- Dialog with a large textarea: "תאר לי איזה טופס/שאלון אתה רוצה" + a few quick-pick chips (Lead form, Quiz, Intake, Feedback, Assessment).
-- "Generate" button → calls `generate-form` → shows a preview of the proposed title + fields list.
-- "Edit prompt" lets you tweak and regenerate; "Looks good" creates the form + fields in one transaction (insert `custom_forms`, then bulk insert `form_fields` with order_index).
-- On success → closes wizard, refetches the list, opens the existing `FormFieldsEditor` so you can fine-tune.
+- `openChat()` in `src/components/landing/mindhacker/MindHackerLanding.tsx` only calls `setChatOpen(true)` inside `aionChatImport().finally(...)`, i.e. **after** the chunk resolves.
+- The widget's `hidden` flag is `intakeOpen || chatOpen`, so it stays visible the whole time the chunk loads.
+- `Suspense fallback={null}` means no visible fallback either.
+- Result: tap the widget → no visual feedback → user perceives "the chat isn't popping up".
 
-### 3. Wire into Forms page
-- Add a second primary button next to "טופס חדש": **"✨ צור עם AI"** (purple/primary).
-- Both buttons live in the existing `src/pages/admin/Forms.tsx` header.
+The intake flow already solves this with an `intakeLoading` spinner overlay. The AION chat path is missing the equivalent.
 
-### 4. Verification pass
-- Confirm Forms tab loads, list query works, manual create still works, fields editor still works, share-link / submissions still work — no behavior changes to existing flow.
+Confirmed in the live preview: after a click, the chat drawer does eventually render (verified via screenshot and DOM observation), just with a noticeable blank gap first.
 
-## Files
-- `supabase/functions/generate-form/index.ts` *(new)*
-- `src/components/admin/forms/AIFormWizard.tsx` *(new)*
-- `src/pages/admin/Forms.tsx` *(small edit — add button + wizard mount)*
+## Fix (frontend only, `src/components/landing/mindhacker/MindHackerLanding.tsx`)
 
-## Notes
-- No DB migration needed — schema already supports everything.
-- No new secrets — `LOVABLE_API_KEY` is already configured for the landing-page generator.
-- All UI strings in Hebrew, matching the rest of the Forms admin.
+1. Add a `chatLoading` state next to `intakeLoading`.
+2. Update `openChat` to mirror `startIntake`:
+   - `setChatLoading(true)` before `aionChatImport()`.
+   - In `.finally()` → `setChatOpen(true)` then `setChatLoading(false)`.
+3. Render the same fullscreen spinner overlay (used by `intakeLoading`) when `chatLoading` is true, with appropriate aria attributes.
+4. Also include `chatLoading` in the widget's `hidden` prop so the floating button hides as soon as the user taps it, signalling something is happening even before the chunk resolves.
+
+No backend, routing, or chat logic changes. This is purely UX feedback during the lazy-load window.
+
+## Verification
+
+- Reload `/`, click the AION widget: spinner appears immediately, then drawer mounts when the chunk finishes.
+- Closing the drawer (`onOpenChange(false)`) still restores the floating widget.
+- Intake flow remains unchanged.

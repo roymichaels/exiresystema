@@ -72,6 +72,7 @@ export default function MindHackerLanding() {
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [intakeLoading, setIntakeLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
 
   // Prefetch heavy modal chunks during idle time so first click is instant
   useEffect(() => {
@@ -99,9 +100,11 @@ export default function MindHackerLanding() {
   };
   const openChat = () => {
     void trackCTAClick('open_aion_landing_chat', 'aion_landing_chat');
+    setChatLoading(true);
     void aionChatImport().finally(() => {
       setChatOpen(true);
       void trackDialogOpen('aion_landing_chat');
+      setChatLoading(false);
     });
   };
 
@@ -117,8 +120,8 @@ export default function MindHackerLanding() {
         <FinalCTA t={t} onStart={startIntake} />
       </main>
       <Footer t={t} />
-      <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen} />
-      {intakeLoading && (
+      <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen || chatLoading} />
+      {(intakeLoading || chatLoading) && (
         <div
           className="fixed inset-0 z-[99] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in"
           aria-live="polite"
