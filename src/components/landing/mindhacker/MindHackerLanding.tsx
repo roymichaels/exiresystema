@@ -100,9 +100,11 @@ export default function MindHackerLanding() {
   };
   const openChat = () => {
     void trackCTAClick('open_aion_landing_chat', 'aion_landing_chat');
+    setChatLoading(true);
     void aionChatImport().finally(() => {
       setChatOpen(true);
       void trackDialogOpen('aion_landing_chat');
+      setChatLoading(false);
     });
   };
 
