@@ -72,6 +72,7 @@ export default function MindHackerLanding() {
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [intakeLoading, setIntakeLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
 
   // Prefetch heavy modal chunks during idle time so first click is instant
   useEffect(() => {
