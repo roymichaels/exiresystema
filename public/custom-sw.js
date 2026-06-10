@@ -86,7 +86,7 @@ self.addEventListener('push', (event) => {
     }
   }
   
-  const title = data.title || 'מיינד האקר';
+  const title = data.title || 'EXIRE SYSTEMA';
   const options = {
     body: data.body || data.message || 'יש לך התראה חדשה',
     icon: '/pwa-192x192.png',
