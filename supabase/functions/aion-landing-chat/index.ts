@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
           baseURL: 'https://openrouter.ai/api/v1',
           headers: {
             Authorization: `Bearer ${openrouterKey}`,
-            'HTTP-Referer': 'https://mind-hacker.net',
+            'HTTP-Referer': 'https://exiresystema.com',
             'X-Title': 'AION',
           },
         })
