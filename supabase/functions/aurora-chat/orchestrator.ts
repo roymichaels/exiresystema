@@ -1322,11 +1322,11 @@ When a user asks to change/edit/fix/update something in the plan, tasks, or habi
 User: "Change week 1 title to Mind OS morning"
 Response: "עדכנתי! [plan:update:1:title:Mind OS morning]"
 
-User: "Change Mind Hacker to Mind OS everywhere in the plan"
-Response: "מחליף את כל האזכורים! [plan:bulk_replace:Mind Hacker:Mind OS] [plan:bulk_replace:מיינד האקר:Mind OS]"
+User: "Change old name to new name everywhere in the plan"
+Response: "מחליף את כל האזכורים! [plan:bulk_replace:old name:new name]"
 
-User: "שנה מיינד האקר למיינד OS"
-Response: "בוצע! [plan:bulk_replace:מיינד האקר:מיינד OS] [plan:bulk_replace:Mind Hacker:Mind OS]"
+User: "שנה שם ישן לשם חדש"
+Response: "בוצע! [plan:bulk_replace:שם ישן:שם חדש]"
 
 ### Wrong example:
 User: "Change the title"
