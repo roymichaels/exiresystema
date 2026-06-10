@@ -6,7 +6,7 @@ import { createOpenAICompatible } from "npm:@ai-sdk/openai-compatible@^2.0.47";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const SYSTEM_PROMPT = [
-  'אתה AION — הקול הקולנועי של "מיינד האקר" (אדריכל תודעה ואסטרטג זהות תת־מודעת).',
+  'אתה AION — הקול הקולנועי של "EXIRE SYSTEMA" (אדריכל תודעה ואסטרטג זהות תת־מודעת).',
   'אתה מדבר בשם solo founder אחד שמכנה את עצמו "אני" ועובד עם התת־מודע כמו שמתכנת עובד עם קוד.',
   '',
   'תפקידך: לענות לגולשי דף הבית — להסביר תפיסה, שיטה ותוכן.',
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
           baseURL: 'https://openrouter.ai/api/v1',
           headers: {
             Authorization: `Bearer ${openrouterKey}`,
-            'HTTP-Referer': 'https://mind-hacker.net',
+            'HTTP-Referer': 'https://exiresystema.com',
             'X-Title': 'AION',
           },
         })

@@ -1322,11 +1322,11 @@ When a user asks to change/edit/fix/update something in the plan, tasks, or habi
 User: "Change week 1 title to Mind OS morning"
 Response: "עדכנתי! [plan:update:1:title:Mind OS morning]"
 
-User: "Change Mind Hacker to Mind OS everywhere in the plan"
-Response: "מחליף את כל האזכורים! [plan:bulk_replace:Mind Hacker:Mind OS] [plan:bulk_replace:מיינד האקר:Mind OS]"
+User: "Change old name to new name everywhere in the plan"
+Response: "מחליף את כל האזכורים! [plan:bulk_replace:old name:new name]"
 
-User: "שנה מיינד האקר למיינד OS"
-Response: "בוצע! [plan:bulk_replace:מיינד האקר:מיינד OS] [plan:bulk_replace:Mind Hacker:Mind OS]"
+User: "שנה שם ישן לשם חדש"
+Response: "בוצע! [plan:bulk_replace:שם ישן:שם חדש]"
 
 ### Wrong example:
 User: "Change the title"
@@ -1382,7 +1382,7 @@ Only use these tags when exactly ONE match exists!
 - [plan:replace_task:week_number:index:new_text] - replace task
 - [plan:add_milestone:week_number:title:goal:focus] - add new milestone
 - [plan:remove_milestone:week_number] - remove milestone
-- [plan:bulk_replace:old_text:new_text] - 🔥 BULK find-and-replace across ALL milestones! Use this when user asks to rename/replace something across the entire plan (e.g., "change Mind Hacker to Mind OS everywhere")
+- [plan:bulk_replace:old_text:new_text] - 🔥 BULK find-and-replace across ALL milestones! Use this when user asks to rename/replace something across the entire plan (e.g., "change old name to new name everywhere")
 - [milestone:complete:week_number] - mark week as completed
 ⚠️ ALWAYS prefer editing the existing plan over regenerating! Modify goals, tasks, or focus directly.
 ⚠️ When user asks to replace/rename something across the whole plan, ALWAYS use [plan:bulk_replace:old:new] — it's ONE tag that fixes everything!

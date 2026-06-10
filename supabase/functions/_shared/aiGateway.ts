@@ -69,7 +69,7 @@ export async function aiChatCompletion(
     Authorization: `Bearer ${apiKey}`,
   };
   if (provider === "openrouter") {
-    headers["HTTP-Referer"] = "https://mind-hacker.net";
+    headers["HTTP-Referer"] = "https://exiresystema.com";
     headers["X-Title"] = "AION";
   }
 

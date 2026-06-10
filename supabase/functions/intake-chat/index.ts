@@ -333,7 +333,27 @@ async function notifyFounder(lead: Record<string, unknown>, messages: UIMessage[
 
 function buildWhatsappUrl(name: string): string {
   if (!FOUNDER_WHATSAPP_NUMBER) return '';
-  const text = encodeURIComponent(`שלום, אני ${name}. סיימתי את הסריקה במיינד האקר ואני רוצה להתחיל.`);
+  const message = [
+    `היי, קיבלתי את ההודעה שלך 🙌`,
+    ``,
+    `קראתי שכתבת שסיימת את הסריקה ואתה רוצה להתחיל.`,
+    ``,
+    `רק כדי שנהיה מדויקים:`,
+    `EXIRE SYSTEMA הוא תהליך ליווי אישי, לא סריקה חד פעמית.`,
+    ``,
+    `המטרה היא להבין לעומק מה עוצר אותך היום, מה אתה רוצה לשנות או לבנות בחיים שלך, ואיך אפשר לעבוד על זה דרך המערכת הפנימית שלך.`,
+    ``,
+    `כדי שאוכל לבדוק אם יש התאמה, תכתוב לי בכמה מילים:`,
+    ``,
+    `מה האתגר המרכזי שאתה מתמודד איתו כרגע?`,
+    ``,
+    `מה היית רוצה שישתנה בחיים שלך?`,
+    ``,
+    `ומה גרם לך לפנות דווקא עכשיו?`,
+    ``,
+    `ואחזור אליך עם הכיוון הכי מתאים${name ? ` — ${name}` : ''}`,
+  ].join('\n');
+  const text = encodeURIComponent(message);
   return `https://wa.me/${FOUNDER_WHATSAPP_NUMBER}?text=${text}`;
 }
 
