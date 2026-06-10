@@ -1382,7 +1382,7 @@ Only use these tags when exactly ONE match exists!
 - [plan:replace_task:week_number:index:new_text] - replace task
 - [plan:add_milestone:week_number:title:goal:focus] - add new milestone
 - [plan:remove_milestone:week_number] - remove milestone
-- [plan:bulk_replace:old_text:new_text] - 🔥 BULK find-and-replace across ALL milestones! Use this when user asks to rename/replace something across the entire plan (e.g., "change Mind Hacker to Mind OS everywhere")
+- [plan:bulk_replace:old_text:new_text] - 🔥 BULK find-and-replace across ALL milestones! Use this when user asks to rename/replace something across the entire plan (e.g., "change old name to new name everywhere")
 - [milestone:complete:week_number] - mark week as completed
 ⚠️ ALWAYS prefer editing the existing plan over regenerating! Modify goals, tasks, or focus directly.
 ⚠️ When user asks to replace/rename something across the whole plan, ALWAYS use [plan:bulk_replace:old:new] — it's ONE tag that fixes everything!
