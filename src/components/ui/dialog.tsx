@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X, ArrowLeft, ArrowRight } from "lucide-react";
-import { useSwipeable } from "react-swipeable";
 
 import { cn } from "@/lib/utils";
 import { useChromeVisibility } from "@/contexts/ChromeVisibilityContext";
