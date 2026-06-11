@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X, ArrowLeft, ArrowRight } from "lucide-react";
-import { useSwipeable } from "react-swipeable";
 
 import { cn } from "@/lib/utils";
 import { useChromeVisibility } from "@/contexts/ChromeVisibilityContext";
@@ -45,24 +44,12 @@ const DialogContent = React.forwardRef<
       return () => chrome.showHeader();
     }
   }, [hideChrome]);
-  const swipeHandlers = useSwipeable({
-    onSwipedDown: (eventData) => {
-      if (preventClose) return;
-      if (eventData.velocity > 0.5 && window.innerWidth < 640) {
-        const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-        closeButton?.click();
-      }
-    },
-    trackMouse: false,
-    preventScrollOnSwipe: false,
-  });
 
   return (
     <DialogPortal>
       <DialogOverlay onClick={preventClose ? (e) => e.preventDefault() : undefined} />
       <DialogPrimitive.Content
         ref={ref}
-        {...swipeHandlers}
         onInteractOutside={preventClose ? (e) => e.preventDefault() : undefined}
         onPointerDownOutside={preventClose ? (e) => e.preventDefault() : undefined}
         onEscapeKeyDown={preventClose ? (e) => e.preventDefault() : undefined}
