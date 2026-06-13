@@ -223,7 +223,7 @@ export const AudioUploadDialog = ({
                 <input
                   id="file"
                   type="file"
-                  accept="audio/*,video/*"
+                  accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.aiff,.aif,.caf,.flac,.ogg,.oga,.opus,.wma,.amr,.mp4,.m4v,.mov,.qt,.webm,.mkv,.avi,.3gp,.3g2"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
