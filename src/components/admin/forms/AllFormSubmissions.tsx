@@ -590,6 +590,15 @@ const AllFormSubmissions = () => {
                   <FileText className="h-4 w-4" />
                   הורד PDF
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopyQA(selectedSubmission)}
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  העתק שאלות ותשובות
+                </Button>
                 {getAnalysisForSubmission(selectedSubmission.id) && (
                   <Button
                     variant="outline"
