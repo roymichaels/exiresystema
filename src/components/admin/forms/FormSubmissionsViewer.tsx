@@ -23,7 +23,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Download, Inbox, Trash2, ChevronDown, ChevronUp, Mail, User, Calendar, Clock, CheckCircle2, FileText, Brain, Sparkles } from "lucide-react";
+import { Download, Inbox, Trash2, ChevronDown, ChevronUp, Mail, User, Calendar, Clock, CheckCircle2, FileText, Brain, Sparkles, Copy } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { cn } from "@/lib/utils";
