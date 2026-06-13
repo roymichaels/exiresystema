@@ -38,6 +38,7 @@ import {
   Sparkles,
   Eye,
   MessageSquareText,
+  Copy,
 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
@@ -272,6 +273,24 @@ const AllFormSubmissions = () => {
     toast({ title: "PDF הורד בהצלחה!" });
   };
 
+  const handleCopyQA = async (submission: FormSubmission) => {
+    const fields = getFieldsForForm(submission.form_id);
+    const text = fields
+      .map((field, i) => {
+        const v = submission.responses[field.id];
+        const a = Array.isArray(v) ? v.join(", ") : (v || "—");
+        return `${i + 1}. ${field.label}\n${a}`;
+      })
+      .join("\n\n");
+    const header = `${getFormName(submission.form_id)}${submission.email ? ` — ${submission.email}` : ""}\n${format(new Date(submission.submitted_at), "dd/MM/yyyy HH:mm", { locale: he })}\n\n`;
+    try {
+      await navigator.clipboard.writeText(header + text);
+      toast({ title: "הועתק ללוח" });
+    } catch {
+      toast({ title: "שגיאה בהעתקה", variant: "destructive" });
+    }
+  };
+
   const filteredSubmissions = submissions.filter((sub) => {
     const matchesSearch = !searchTerm || 
       (sub.email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
@@ -436,6 +455,21 @@ const AllFormSubmissions = () => {
                           <TooltipContent>הורד PDF</TooltipContent>
                         </Tooltip>
 
+                        {/* Copy Q&A */}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleCopyQA(submission)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>העתק שאלות ותשובות</TooltipContent>
+                        </Tooltip>
+
                         {/* AI Analysis */}
                         {hasAnalysis && (
                           <Tooltip>
@@ -555,6 +589,15 @@ const AllFormSubmissions = () => {
                 >
                   <FileText className="h-4 w-4" />
                   הורד PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopyQA(selectedSubmission)}
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  העתק שאלות ותשובות
                 </Button>
                 {getAnalysisForSubmission(selectedSubmission.id) && (
                   <Button

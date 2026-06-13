@@ -23,7 +23,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Download, Inbox, Trash2, ChevronDown, ChevronUp, Mail, User, Calendar, Clock, CheckCircle2, FileText, Brain, Sparkles } from "lucide-react";
+import { Download, Inbox, Trash2, ChevronDown, ChevronUp, Mail, User, Calendar, Clock, CheckCircle2, FileText, Brain, Sparkles, Copy } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -465,6 +465,31 @@ const FormSubmissionsViewer = ({
                               >
                                 <FileText className="h-4 w-4" />
                                 הורד PDF
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  const text = fields
+                                    .map((field, i) => {
+                                      const v = submission.responses[field.id];
+                                      const a = Array.isArray(v) ? v.join(", ") : (v || "—");
+                                      return `${i + 1}. ${field.label}\n${a}`;
+                                    })
+                                    .join("\n\n");
+                                  const header = `${form?.title || "טופס"}${submission.email ? ` — ${submission.email}` : ""}\n${format(new Date(submission.submitted_at), "dd/MM/yyyy HH:mm", { locale: he })}\n\n`;
+                                  try {
+                                    await navigator.clipboard.writeText(header + text);
+                                    toast({ title: "הועתק ללוח" });
+                                  } catch {
+                                    toast({ title: "שגיאה בהעתקה", variant: "destructive" });
+                                  }
+                                }}
+                                className="gap-2"
+                              >
+                                <Copy className="h-4 w-4" />
+                                העתק שאלות ותשובות
                               </Button>
                               {/* AI Analysis Button */}
                               {getAnalysisForSubmission(submission.id) && (
