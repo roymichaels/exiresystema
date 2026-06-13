@@ -273,6 +273,24 @@ const AllFormSubmissions = () => {
     toast({ title: "PDF הורד בהצלחה!" });
   };
 
+  const handleCopyQA = async (submission: FormSubmission) => {
+    const fields = getFieldsForForm(submission.form_id);
+    const text = fields
+      .map((field, i) => {
+        const v = submission.responses[field.id];
+        const a = Array.isArray(v) ? v.join(", ") : (v || "—");
+        return `${i + 1}. ${field.label}\n${a}`;
+      })
+      .join("\n\n");
+    const header = `${getFormName(submission.form_id)}${submission.email ? ` — ${submission.email}` : ""}\n${format(new Date(submission.submitted_at), "dd/MM/yyyy HH:mm", { locale: he })}\n\n`;
+    try {
+      await navigator.clipboard.writeText(header + text);
+      toast({ title: "הועתק ללוח" });
+    } catch {
+      toast({ title: "שגיאה בהעתקה", variant: "destructive" });
+    }
+  };
+
   const filteredSubmissions = submissions.filter((sub) => {
     const matchesSearch = !searchTerm || 
       (sub.email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
