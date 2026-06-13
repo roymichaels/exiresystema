@@ -455,6 +455,21 @@ const AllFormSubmissions = () => {
                           <TooltipContent>הורד PDF</TooltipContent>
                         </Tooltip>
 
+                        {/* Copy Q&A */}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleCopyQA(submission)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>העתק שאלות ותשובות</TooltipContent>
+                        </Tooltip>
+
                         {/* AI Analysis */}
                         {hasAnalysis && (
                           <Tooltip>
