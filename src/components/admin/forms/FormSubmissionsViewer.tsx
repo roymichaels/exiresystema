@@ -490,6 +490,7 @@ const FormSubmissionsViewer = ({
                               >
                                 <Copy className="h-4 w-4" />
                                 העתק שאלות ותשובות
+                              </Button>
                               {/* AI Analysis Button */}
                               {getAnalysisForSubmission(submission.id) && (
                                 <Button
