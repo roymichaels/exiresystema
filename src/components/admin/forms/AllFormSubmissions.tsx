@@ -38,6 +38,7 @@ import {
   Sparkles,
   Eye,
   MessageSquareText,
+  Copy,
 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
