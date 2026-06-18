@@ -549,14 +549,14 @@ const AllFormSubmissions = () => {
                 const displayValue = Array.isArray(value) ? value.join(", ") : value;
 
                 return (
-                  <div key={field.id} className="p-3 rounded-lg bg-muted/50 border border-border">
+                  <div key={field.id} className="p-3 rounded-lg bg-muted/50 border border-border overflow-hidden">
                     <div className="flex items-start gap-3">
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
                         {index + 1}
                       </span>
                       <div className="flex-1 min-w-0 space-y-1">
-                        <p className="font-medium text-sm text-foreground">{field.label}</p>
-                        <p className="text-sm text-foreground whitespace-pre-wrap">
+                        <p className="font-medium text-sm text-foreground break-words">{field.label}</p>
+                        <p className="text-sm text-foreground whitespace-pre-wrap break-words">
                           {displayValue || <span className="text-muted-foreground italic">לא נענה</span>}
                         </p>
                       </div>
@@ -640,7 +640,7 @@ const AllFormSubmissions = () => {
                   <span className="w-2 h-2 rounded-full bg-purple-500" />
                   סיכום
                 </h4>
-                <p className="text-gray-800 dark:text-foreground leading-relaxed bg-purple-50 dark:bg-purple-500/10 p-4 rounded-lg border border-purple-200 dark:border-purple-500/20">
+                <p className="text-gray-800 dark:text-foreground leading-relaxed bg-purple-50 dark:bg-purple-500/10 p-4 rounded-lg border border-purple-200 dark:border-purple-500/20 break-words">
                   {selectedAnalysis.analysis_summary}
                 </p>
               </div>
@@ -661,7 +661,7 @@ const AllFormSubmissions = () => {
                         <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">
                           {index + 1}
                         </span>
-                        <span className="text-gray-800 dark:text-foreground">{pattern}</span>
+                        <span className="text-gray-800 dark:text-foreground break-words">{pattern}</span>
                       </div>
                     ))}
                   </div>
@@ -675,7 +675,7 @@ const AllFormSubmissions = () => {
                     <span className="w-2 h-2 rounded-full bg-green-500" />
                     פוטנציאל טרנספורמציה
                   </h4>
-                  <p className="text-gray-800 dark:text-foreground leading-relaxed bg-green-50 dark:bg-green-500/10 p-4 rounded-lg border border-green-200 dark:border-green-500/20">
+                  <p className="text-gray-800 dark:text-foreground leading-relaxed bg-green-50 dark:bg-green-500/10 p-4 rounded-lg border border-green-200 dark:border-green-500/20 break-words">
                     {selectedAnalysis.transformation_potential}
                   </p>
                 </div>
@@ -688,7 +688,7 @@ const AllFormSubmissions = () => {
                     <span className="w-2 h-2 rounded-full bg-amber-500" />
                     המלצה
                   </h4>
-                  <p className="text-gray-800 dark:text-foreground leading-relaxed bg-amber-50 dark:bg-amber-500/10 p-4 rounded-lg border border-amber-200 dark:border-amber-500/20">
+                  <p className="text-gray-800 dark:text-foreground leading-relaxed bg-amber-50 dark:bg-amber-500/10 p-4 rounded-lg border border-amber-200 dark:border-amber-500/20 break-words">
                     {selectedAnalysis.recommendation}
                   </p>
                 </div>
