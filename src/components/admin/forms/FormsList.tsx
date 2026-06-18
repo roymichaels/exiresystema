@@ -132,13 +132,13 @@ const FormsList = ({
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {forms.map((form) => (
-        <Card key={form.id} className="glass-panel border-white/10 hover:border-primary/30 transition-colors">
+        <Card key={form.id} className="glass-panel border-white/10 hover:border-primary/30 transition-colors overflow-hidden">
           <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1 flex-1 min-w-0">
-                <CardTitle className="text-lg truncate">{form.title}</CardTitle>
+            <div className="flex items-start justify-between gap-2">
+              <div className="space-y-1 flex-1 min-w-0 overflow-hidden">
+                <CardTitle className="text-lg line-clamp-2 break-words">{form.title}</CardTitle>
                 {form.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
+                  <p className="text-sm text-muted-foreground line-clamp-2 break-words">
                     {form.description}
                   </p>
                 )}
