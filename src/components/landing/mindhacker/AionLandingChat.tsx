@@ -246,16 +246,22 @@ export default function AionLandingChat({ open, onOpenChange, onOpenIntake }: Pr
 /* ─────────────── Sub-components ─────────────── */
 
 function EmptyState({ onPick, t }: { onPick: (s: string) => void; t: (key: string) => string }) {
-  const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3')];
+  const suggestions = [
+    t('suggestion1'),
+    t('suggestion2'),
+    t('suggestion3'),
+    t('suggestion4'),
+    t('suggestion5'),
+  ];
   return (
     <div className="flex h-full flex-col">
-      <p className="mh-serif text-2xl leading-snug text-[hsl(var(--mh-ink))]">
+      <p className="mh-serif text-xl leading-snug text-[hsl(var(--mh-ink))]">
         {t('emptyTitle')}
       </p>
-      <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--mh-mute))]">
+      <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[hsl(var(--mh-mute))]">
         {t('emptySubtitle')}
       </p>
-      <div className="mt-8 space-y-2">
+      <div className="mt-6 space-y-2">
         {suggestions.map((s) => (
           <button
             key={s}
