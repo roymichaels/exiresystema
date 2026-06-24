@@ -645,11 +645,14 @@ Deno.serve(async (req) => {
         : '';
 
     const result = streamText({
-      model: gateway('google/gemini-2.5-flash'),
+      // Model id requested by founder: "openrouter/free".
+      // (OpenRouter routes this through its free tier.)
+      model: gateway('openrouter/free'),
       system: SYSTEM_PROMPT + languageDirective,
       messages: await convertToModelMessages(body.messages),
       tools,
       stopWhen: stepCountIs(50),
+      maxOutputTokens: 1024,
     });
     return (result.toUIMessageStreamResponse as any)({
       headers: corsHeaders,
