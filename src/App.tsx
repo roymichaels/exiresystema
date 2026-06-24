@@ -88,6 +88,7 @@ const CommunityThread = lazy(() => import("./pages/CommunityThread"));
 const Go = lazy(() => import("./pages/Go"));
 const FoundingLanding = lazy(() => import("./pages/FoundingLanding"));
 const FeatureDetailPage = lazy(() => import("./pages/FeatureDetailPage"));
+const AionChatPage = lazy(() => import("./pages/AionChatPage"));
 
 // ShellV2 — Phase 1 dev preview route (`/__shellv2`).
 const ShellV2DevPage = lazy(() => import("./shellv2/dev/ShellV2DevPage"));
@@ -360,6 +361,8 @@ const App = () => {
                                               <Route path="/go" element={<Go />} />
                                               <Route path="/founding" element={<FoundingLanding />} />
                                               <Route path="/features/:slug" element={<FeatureDetailPage />} />
+                                              <Route path="/aion-chat" element={<AionChatPage />} />
+                                              <Route path="/aion" element={<AionChatPage />} />
                                               {/* ShellV2 dev preview — Phase 1 skeleton. Public, no shell wrappers. */}
                                               <Route path="/__shellv2" element={<ShellV2DevPage />} />
                                               {/* /brain is now mounted under ProtectedAppShellV2 below. */}
