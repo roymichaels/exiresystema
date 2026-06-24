@@ -52,11 +52,11 @@ import exireSigilWebp from '@/assets/exire-sigil.webp';
 
 import './theme.css';
 
-// Lazy: keep modal/chat off the critical path
+// Lazy: keep modal off the critical path.
+// NOTE: The side AION chat widget has been removed by request — the only
+// AI surface on the landing is the lead-capture intake.
 const intakeModalImport = () => import('./intake/IntakeChatModal');
-const aionChatImport = () => import('./AionLandingChat');
 const IntakeChatModal = lazy(intakeModalImport);
-const AionLandingChat = lazy(aionChatImport);
 
 
 const HERO_LQIP =
@@ -70,11 +70,9 @@ export default function MindHackerLanding() {
   const t = makeT(language);
 
   const [intakeOpen, setIntakeOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
   const [intakeLoading, setIntakeLoading] = useState(false);
-  const [chatLoading, setChatLoading] = useState(false);
 
-  // Prefetch heavy modal chunks during idle time so first click is instant
+  // Prefetch intake chunk during idle time so first click is instant
   useEffect(() => {
     const idle =
       (window as any).requestIdleCallback ??
@@ -83,7 +81,6 @@ export default function MindHackerLanding() {
       (window as any).cancelIdleCallback ?? ((id: number) => clearTimeout(id));
     const id = idle(() => {
       void intakeModalImport();
-      void aionChatImport();
     });
     return () => cancel(id);
   }, []);
@@ -91,20 +88,10 @@ export default function MindHackerLanding() {
   const startIntake = () => {
     void trackCTAClick('hero_start_intake', 'intake_chat');
     setIntakeLoading(true);
-    // Ensure chunk is loaded before flipping the state — gives instant UI feedback
     void intakeModalImport().finally(() => {
       setIntakeOpen(true);
       void trackDialogOpen('intake_chat');
       setIntakeLoading(false);
-    });
-  };
-  const openChat = () => {
-    void trackCTAClick('open_aion_landing_chat', 'aion_landing_chat');
-    setChatLoading(true);
-    void aionChatImport().finally(() => {
-      setChatOpen(true);
-      void trackDialogOpen('aion_landing_chat');
-      setChatLoading(false);
     });
   };
 
@@ -120,8 +107,7 @@ export default function MindHackerLanding() {
         <FinalCTA t={t} onStart={startIntake} />
       </main>
       <Footer t={t} />
-      <AionFloatingWidget t={t} onOpen={openChat} hidden={intakeOpen || chatOpen || chatLoading} />
-      {(intakeLoading || chatLoading) && (
+      {intakeLoading && (
         <div
           className="fixed inset-0 z-[99] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in"
           aria-live="polite"
@@ -130,27 +116,15 @@ export default function MindHackerLanding() {
           <div className="h-10 w-10 rounded-full border-2 border-[hsl(var(--mh-sand))/0.3] border-t-[hsl(var(--mh-sand))] animate-spin" />
         </div>
       )}
-      {(chatOpen || intakeOpen) && (
+      {intakeOpen && (
         <Suspense fallback={null}>
-          {chatOpen && (
-            <AionLandingChat
-              open={chatOpen}
-              onOpenChange={(o) => {
-                setChatOpen(o);
-                if (!o) void trackDialogClose('aion_landing_chat');
-              }}
-              onOpenIntake={startIntake}
-            />
-          )}
-          {intakeOpen && (
-            <IntakeChatModal
-              open={intakeOpen}
-              onOpenChange={(o) => {
-                setIntakeOpen(o);
-                if (!o) void trackDialogClose('intake_chat');
-              }}
-            />
-          )}
+          <IntakeChatModal
+            open={intakeOpen}
+            onOpenChange={(o) => {
+              setIntakeOpen(o);
+              if (!o) void trackDialogClose('intake_chat');
+            }}
+          />
         </Suspense>
       )}
     </div>
