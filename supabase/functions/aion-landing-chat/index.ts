@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
         });
 
     const modelId = useOpenRouter
-      ? 'meta-llama/llama-3.3-70b-instruct:free'
+      ? 'openrouter/free'
       : 'google/gemini-3-flash-preview';
 
     const result = streamText({
