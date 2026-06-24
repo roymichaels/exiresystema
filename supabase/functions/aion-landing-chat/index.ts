@@ -91,13 +91,16 @@ Deno.serve(async (req) => {
         });
 
     const modelId = useOpenRouter
-      ? 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free'
+      ? 'meta-llama/llama-3.3-70b-instruct:free'
       : 'google/gemini-3-flash-preview';
 
     const result = streamText({
       model: gateway(modelId),
       system: SYSTEM_PROMPT + languageDirective,
-
+      // Cap output so free-tier OpenRouter credits aren't exhausted by
+      // an unbounded max_tokens request (default would request the
+      // model's full context window).
+      maxOutputTokens: 1024,
       messages: await convertToModelMessages(messages),
     });
 
