@@ -67,6 +67,35 @@ export function useXSystemSessionNotes(sessionId: string | undefined) {
   });
 }
 
+export function useCreateXSystemSessionNote() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (input: {
+      session_id: string;
+      client_id: string;
+      kind: string;
+      body: string;
+      tags?: string[];
+    }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+      const { data, error } = await supabase
+        .from('xsystem_session_notes' as any)
+        .insert({ ...input, practitioner_id: user.id, tags: input.tags ?? [] } as any)
+        .select('*')
+        .single();
+      if (error) throw error;
+      return data as unknown as XSysSessionNote;
+    },
+    onSuccess: (row) => {
+      qc.invalidateQueries({ queryKey: ['xsystem', 'session_notes', row.session_id] });
+      toast({ title: 'נשמר' });
+    },
+    onError: (e: any) =>
+      toast({ title: 'שגיאה', description: e.message, variant: 'destructive' }),
+  });
+}
+
 // ---- Beliefs ----
 const beliefs = createClientScopedHooks<XSysBelief>({
   table: 'xsystem_beliefs',
