@@ -3,7 +3,7 @@
  * Future phases fill Sessions, Beliefs, Patterns, Inner Parts, Rooms, Audio, Check-ins.
  */
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, Mail, Phone, MessageCircle, Instagram } from 'lucide-react';
+import { ArrowRight, Mail, Phone, MessageCircle, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
