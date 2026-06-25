@@ -54,6 +54,12 @@ import {
   useXSystemFollowups,
   useXSystemOpenFollowupsCount,
 } from '@/hooks/xsystem';
+import XSystemSessionsTab from '@/components/admin/clients/xsystem/XSystemSessionsTab';
+import XSystemBeliefsTab from '@/components/admin/clients/xsystem/XSystemBeliefsTab';
+import XSystemPatternsTab from '@/components/admin/clients/xsystem/XSystemPatternsTab';
+import XSystemInnerPartsTab from '@/components/admin/clients/xsystem/XSystemInnerPartsTab';
+import XSystemRoomsTab from '@/components/admin/clients/xsystem/XSystemRoomsTab';
+import XSystemProtocolsTab from '@/components/admin/clients/xsystem/XSystemProtocolsTab';
 
 function EmptyState({ label }: { label: string }) {
   return (
