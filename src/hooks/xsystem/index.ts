@@ -282,6 +282,29 @@ const audio = createClientScopedHooks<XSysAudioAssignment>({
 export const useXSystemAudioAssignments = audio.useList;
 export const useXSystemAudioAssignmentsCount = audio.useCount;
 export const useCreateXSystemAudioAssignment = audio.useCreate;
+export const useUpdateXSystemAudioAssignment = audio.useUpdate;
+
+// Hypnosis audio library lookup (used to assign existing audios)
+export function useHypnosisAudiosLibrary() {
+  return useQuery({
+    queryKey: ['hypnosis_audios', 'library'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('hypnosis_audios' as any)
+        .select('id,title,description,duration_seconds,file_path,created_at')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as unknown as Array<{
+        id: string;
+        title: string;
+        description: string | null;
+        duration_seconds: number | null;
+        file_path: string;
+        created_at: string;
+      }>;
+    },
+  });
+}
 
 // ---- Check-ins ----
 const checkins = createClientScopedHooks<XSysCheckin>({
@@ -292,6 +315,7 @@ const checkins = createClientScopedHooks<XSysCheckin>({
 export const useXSystemCheckins = checkins.useList;
 export const useXSystemCheckinsCount = checkins.useCount;
 export const useCreateXSystemCheckin = checkins.useCreate;
+export const useUpdateXSystemCheckin = checkins.useUpdate;
 
 // ---- Follow-ups ----
 const followups = createClientScopedHooks<XSysFollowup>({
@@ -300,6 +324,7 @@ const followups = createClientScopedHooks<XSysFollowup>({
 });
 export const useXSystemFollowups = followups.useList;
 export const useCreateXSystemFollowup = followups.useCreate;
+export const useUpdateXSystemFollowup = followups.useUpdate;
 
 export function useXSystemOpenFollowupsCount(clientId: string | undefined) {
   return useQuery({
@@ -317,6 +342,63 @@ export function useXSystemOpenFollowupsCount(clientId: string | undefined) {
   });
 }
 
+// Lead-scoped follow-ups (used from Lead row)
+export function useXSystemLeadFollowups(leadId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'followups', 'lead', leadId],
+    enabled: !!leadId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('xsystem_followups' as any)
+        .select('*')
+        .eq('lead_id', leadId!)
+        .order('due_at', { ascending: true, nullsFirst: false });
+      if (error) throw error;
+      return (data || []) as unknown as XSysFollowup[];
+    },
+  });
+}
+
+export function useCreateXSystemLeadFollowup() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (input: {
+      lead_id: string;
+      title: string;
+      body?: string | null;
+      due_at?: string | null;
+      priority?: string;
+    }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+      const { data, error } = await supabase
+        .from('xsystem_followups' as any)
+        .insert({
+          practitioner_id: user.id,
+          client_id: null,
+          lead_id: input.lead_id,
+          title: input.title,
+          body: input.body ?? null,
+          due_at: input.due_at ?? null,
+          priority: input.priority ?? 'normal',
+          source: 'manual',
+          status: 'open',
+        } as any)
+        .select('*')
+        .single();
+      if (error) throw error;
+      return data as unknown as XSysFollowup;
+    },
+    onSuccess: (row) => {
+      qc.invalidateQueries({ queryKey: ['xsystem', 'followups', 'lead', row.lead_id] });
+      qc.invalidateQueries({ queryKey: ['xsystem', 'dashboard'] });
+      toast({ title: 'פולואפ נוצר' });
+    },
+    onError: (e: any) =>
+      toast({ title: 'שגיאה', description: e.message, variant: 'destructive' }),
+  });
+}
+
 // ---- Payments ----
 const payments = createClientScopedHooks<XSysPayment>({
   table: 'xsystem_payments',
@@ -326,6 +408,7 @@ const payments = createClientScopedHooks<XSysPayment>({
 export const useXSystemPayments = payments.useList;
 export const useXSystemPaymentsCount = payments.useCount;
 export const useCreateXSystemPayment = payments.useCreate;
+export const useUpdateXSystemPayment = payments.useUpdate;
 
 export function useXSystemPaymentsTotal(clientId: string | undefined) {
   return useQuery({
@@ -345,3 +428,133 @@ export function useXSystemPaymentsTotal(clientId: string | undefined) {
     },
   });
 }
+
+export function useXSystemClientPendingPayments(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'payments', 'pending', clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('xsystem_payments' as any)
+        .select('amount_cents,currency,status')
+        .eq('client_id', clientId!)
+        .eq('status', 'pending');
+      if (error) throw error;
+      const rows = (data || []) as Array<{ amount_cents: number; currency: string }>;
+      const totalCents = rows.reduce((s, r) => s + (r.amount_cents || 0), 0);
+      return { totalCents, currency: rows[0]?.currency || 'ILS', count: rows.length };
+    },
+  });
+}
+
+// ---- Next follow-up for a client ----
+export function useXSystemNextFollowup(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'followups', 'next', clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('xsystem_followups' as any)
+        .select('*')
+        .eq('client_id', clientId!)
+        .eq('status', 'open')
+        .order('due_at', { ascending: true, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data || null) as unknown as XSysFollowup | null;
+    },
+  });
+}
+
+// ---- Last check-in for client ----
+export function useXSystemLastCheckin(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'checkins', 'last', clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('xsystem_checkins' as any)
+        .select('*')
+        .eq('client_id', clientId!)
+        .order('submitted_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data || null) as unknown as XSysCheckin | null;
+    },
+  });
+}
+
+// ---- Client form submissions ----
+export function useClientFormSubmissions(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'form_submissions', 'client', clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('form_submissions' as any)
+        .select('id,form_id,responses,submitted_at,email,status,custom_forms(title)')
+        .eq('client_id', clientId!)
+        .order('submitted_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as unknown as Array<{
+        id: string;
+        form_id: string;
+        responses: Record<string, unknown>;
+        submitted_at: string;
+        email: string | null;
+        status: string;
+        custom_forms?: { title: string } | null;
+      }>;
+    },
+  });
+}
+
+export function usePractitionerUnattachedSubmissions() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['xsystem', 'form_submissions', 'unattached', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('form_submissions' as any)
+        .select('id,form_id,submitted_at,email,custom_forms(title)')
+        .is('client_id', null)
+        .order('submitted_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data || []) as unknown as Array<{
+        id: string;
+        form_id: string;
+        submitted_at: string;
+        email: string | null;
+        custom_forms?: { title: string } | null;
+      }>;
+    },
+  });
+}
+
+export function useAttachFormSubmissionToClient() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async ({ submissionId, clientId }: { submissionId: string; clientId: string }) => {
+      const patch: any = { client_id: clientId };
+      if (user?.id) patch.practitioner_id = user.id;
+      const { error } = await supabase
+        .from('form_submissions' as any)
+        .update(patch)
+        .eq('id', submissionId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ['xsystem', 'form_submissions', 'client', vars.clientId] });
+      qc.invalidateQueries({ queryKey: ['xsystem', 'form_submissions', 'unattached'] });
+      toast({ title: 'הטופס שויך' });
+    },
+    onError: (e: any) =>
+      toast({ title: 'שגיאה', description: e.message, variant: 'destructive' }),
+  });
+}
+
