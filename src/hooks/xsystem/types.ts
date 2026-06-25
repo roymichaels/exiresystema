@@ -162,9 +162,11 @@ export interface XSysFollowup {
   status: string;
   done_at: string | null;
   source: string;
+  lead_id: string | null;
   created_at: string;
   updated_at: string;
 }
+
 
 export interface XSysPayment {
   id: string;
