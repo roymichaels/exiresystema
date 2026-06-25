@@ -72,6 +72,23 @@ export function useClient(id: string | undefined) {
   });
 }
 
+/** Look up an existing client converted from a given lead (if any). */
+export function useClientByLeadId(leadId: string | undefined) {
+  return useQuery({
+    queryKey: [...KEY, 'by-lead', leadId],
+    enabled: !!leadId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('clients' as any)
+        .select('id,full_name')
+        .eq('lead_id', leadId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as unknown as { id: string; full_name: string } | null;
+    },
+  });
+}
+
 export function useClientProfile(clientId: string | undefined) {
   return useQuery({
     queryKey: [...KEY, clientId, 'profile'],

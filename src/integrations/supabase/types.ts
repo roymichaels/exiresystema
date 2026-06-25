@@ -10785,6 +10785,7 @@ export type Database = {
           done_at: string | null
           due_at: string | null
           id: string
+          lead_id: string | null
           practitioner_id: string
           priority: string
           source: string
@@ -10799,6 +10800,7 @@ export type Database = {
           done_at?: string | null
           due_at?: string | null
           id?: string
+          lead_id?: string | null
           practitioner_id: string
           priority?: string
           source?: string
@@ -10813,6 +10815,7 @@ export type Database = {
           done_at?: string | null
           due_at?: string | null
           id?: string
+          lead_id?: string | null
           practitioner_id?: string
           priority?: string
           source?: string
@@ -10826,6 +10829,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_followups_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
             referencedColumns: ["id"]
           },
         ]
@@ -10948,6 +10958,7 @@ export type Database = {
           client_id: string
           created_at: string
           currency: string
+          due_at: string | null
           external_ref: string | null
           id: string
           kind: string
@@ -10963,6 +10974,7 @@ export type Database = {
           client_id: string
           created_at?: string
           currency?: string
+          due_at?: string | null
           external_ref?: string | null
           id?: string
           kind?: string
@@ -10978,6 +10990,7 @@ export type Database = {
           client_id?: string
           created_at?: string
           currency?: string
+          due_at?: string | null
           external_ref?: string | null
           id?: string
           kind?: string
