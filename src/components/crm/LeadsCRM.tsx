@@ -367,6 +367,26 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                   <EmailDialog lead={selected} />
                   <WhatsAppDialog lead={selected} />
                   <ScheduleDialog lead={selected} />
+                  <Button
+                    size="sm"
+                    className="gap-2"
+                    disabled={convertLead.isPending}
+                    onClick={() => {
+                      const lead = selected;
+                      convertLead.mutate(
+                        { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
+                        {
+                          onSuccess: (client) => {
+                            setSelected(null);
+                            navigate(`/clients/${client.id}`);
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    <UserCheck className="h-4 w-4" />
+                    המר ללקוח XSYSTEM
+                  </Button>
                 </div>
 
                 <ActivityFeed leadId={selected.id} />
