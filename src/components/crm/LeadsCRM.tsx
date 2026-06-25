@@ -85,6 +85,8 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
   const updateLead = useUpdateLead();
   const deleteLead = useDeleteLead();
   const addLead = useAddLead();
+  const convertLead = useConvertLeadToClient();
+  const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState('all');
