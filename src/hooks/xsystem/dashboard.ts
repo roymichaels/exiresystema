@@ -71,7 +71,7 @@ export function useExireDashboard() {
           .select('amount_cents,currency,status,paid_at,due_at,client_id')
           .eq('practitioner_id', pid),
         supabase.from('leads')
-          .select('id,status,created_at,last_contact_at')
+          .select('id,status,created_at,contacted_at')
           .order('created_at', { ascending: false })
           .limit(500),
         supabase.from('clients' as any)
@@ -115,7 +115,7 @@ export function useExireDashboard() {
       const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
       const needFollowup = leads.filter(
         (l) => ['new', 'contacted'].includes(l.status) &&
-          (!l.last_contact_at || l.last_contact_at < sevenDaysAgo),
+          (!l.contacted_at || l.contacted_at < sevenDaysAgo),
       ).length;
 
       // ---- Clients ----
