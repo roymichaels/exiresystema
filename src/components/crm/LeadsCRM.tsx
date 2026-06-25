@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,11 +21,12 @@ import {
 import { Label } from '@/components/ui/label';
 import {
   Phone, Mail, MessageCircle, Search, Users, Clock, CheckCircle, Calendar,
-  Trash2, UserPlus, Sparkles, ChevronRight,
+  Trash2, UserPlus, Sparkles, ChevronRight, UserCheck,
 } from 'lucide-react';
 import {
   useLeads, useLeadStats, useUpdateLead, useDeleteLead, useAddLead, type Lead,
 } from '@/hooks/useLeads';
+import { useConvertLeadToClient } from '@/hooks/useClients';
 import { EmailDialog, WhatsAppDialog, ScheduleDialog } from '@/components/crm/LeadQuickActions';
 import { useLeadActivity } from '@/hooks/useLeadActivity';
 
