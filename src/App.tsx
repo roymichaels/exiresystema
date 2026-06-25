@@ -189,6 +189,7 @@ const ProjectsJourney = lazy(() => import("./pages/ProjectsJourney"));
 const CoachProfile = lazy(() => import("./pages/PractitionerProfile"));
 const CoachSlugRedirect = lazy(() => import("./components/careers/coach/CoachSlugRedirect"));
 const AdminLayoutWrapper = lazyWithRetry(() => import("./components/admin/AdminLayoutWrapper"), "AdminLayoutWrapper");
+const ClientDetail = lazy(() => import("./pages/ClientDetail"));
 const ProjectsLayoutWrapper = lazy(() => import("./components/projects/ProjectsLayoutWrapper"));
 const ArenaLayoutWrapper = lazy(() => import("./components/pillars/ArenaLayoutWrapper"));
 const ArenaDomainPage = lazy(() => import("./pages/ArenaDomainPage"));
@@ -427,6 +428,8 @@ const App = () => {
                                                 <Route path="/coaches/*" element={<Navigate to="/home" replace />} />
                                                 {/* Admin Hub */}
                                                 <Route path="/admin-hub" element={<AdminRoute><AdminLayoutWrapper /></AdminRoute>} />
+                                                {/* XSYSTEM client detail */}
+                                                <Route path="/clients/:id" element={<AdminRoute><ClientDetail /></AdminRoute>} />
                                                 {/* Launchpad */}
                                                 <Route path="/launchpad/complete" element={<LaunchpadComplete />} />
                                                 {/* Quests */}

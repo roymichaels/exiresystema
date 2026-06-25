@@ -16,6 +16,7 @@ const CoachClientsTab        = lazy(() => import('@/components/careers/coach/Coa
 const CoachLeadsTab          = lazy(() => import('@/components/careers/coach/CoachLeadsTab'));
 const CoachPlansTab          = lazy(() => import('@/components/careers/coach/CoachPlansTab'));
 const Analytics              = lazy(() => import('@/pages/admin/Analytics'));
+const XSystemClientsTab      = lazy(() => import('@/components/admin/clients/XSystemClientsTab'));
 
 // ─── Marketing (Campaigns + Site merged) ────────────────────────────────────
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
@@ -53,8 +54,9 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     icon: Briefcase,
     subTabs: [
       { id: 'overview',  labelHe: 'סקירה',    labelEn: 'Overview',  component: CoachDashboardOverview },
-      { id: 'clients',   labelHe: 'מתאמנים',  labelEn: 'Clients',   component: CoachClientsTab },
-      { id: 'leads',     labelHe: 'לידים',    labelEn: 'Leads',     component: CoachLeadsTab },
+      { id: 'clients',         labelHe: 'מתאמנים',         labelEn: 'Clients',         component: CoachClientsTab },
+      { id: 'xsystem-clients', labelHe: 'לקוחות XSYSTEM',  labelEn: 'XSYSTEM Clients', component: XSystemClientsTab },
+      { id: 'leads',           labelHe: 'לידים',           labelEn: 'Leads',           component: CoachLeadsTab },
       { id: 'plans',     labelHe: 'תוכניות',  labelEn: 'Plans',     component: CoachPlansTab },
       { id: 'analytics', labelHe: 'אנליטיקס', labelEn: 'Analytics', component: Analytics },
     ],

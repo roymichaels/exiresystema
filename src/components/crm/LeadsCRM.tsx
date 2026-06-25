@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,11 +21,12 @@ import {
 import { Label } from '@/components/ui/label';
 import {
   Phone, Mail, MessageCircle, Search, Users, Clock, CheckCircle, Calendar,
-  Trash2, UserPlus, Sparkles, ChevronRight,
+  Trash2, UserPlus, Sparkles, ChevronRight, UserCheck,
 } from 'lucide-react';
 import {
   useLeads, useLeadStats, useUpdateLead, useDeleteLead, useAddLead, type Lead,
 } from '@/hooks/useLeads';
+import { useConvertLeadToClient } from '@/hooks/useClients';
 import { EmailDialog, WhatsAppDialog, ScheduleDialog } from '@/components/crm/LeadQuickActions';
 import { useLeadActivity } from '@/hooks/useLeadActivity';
 
@@ -83,6 +85,8 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
   const updateLead = useUpdateLead();
   const deleteLead = useDeleteLead();
   const addLead = useAddLead();
+  const convertLead = useConvertLeadToClient();
+  const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState('all');
@@ -363,6 +367,26 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                   <EmailDialog lead={selected} />
                   <WhatsAppDialog lead={selected} />
                   <ScheduleDialog lead={selected} />
+                  <Button
+                    size="sm"
+                    className="gap-2"
+                    disabled={convertLead.isPending}
+                    onClick={() => {
+                      const lead = selected;
+                      convertLead.mutate(
+                        { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
+                        {
+                          onSuccess: (client) => {
+                            setSelected(null);
+                            navigate(`/clients/${client.id}`);
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    <UserCheck className="h-4 w-4" />
+                    המר ללקוח XSYSTEM
+                  </Button>
                 </div>
 
                 <ActivityFeed leadId={selected.id} />
