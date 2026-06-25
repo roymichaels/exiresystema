@@ -26,9 +26,10 @@ import {
 import {
   useLeads, useLeadStats, useUpdateLead, useDeleteLead, useAddLead, type Lead,
 } from '@/hooks/useLeads';
-import { useConvertLeadToClient } from '@/hooks/useClients';
+import { useConvertLeadToClient, useClientByLeadId } from '@/hooks/useClients';
 import { EmailDialog, WhatsAppDialog, ScheduleDialog } from '@/components/crm/LeadQuickActions';
 import { useLeadActivity } from '@/hooks/useLeadActivity';
+import { useCreateXSystemLeadFollowup } from '@/hooks/xsystem';
 
 interface LeadsCRMProps {
   scope?: 'admin' | 'coach';
@@ -387,7 +388,10 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                     <UserCheck className="h-4 w-4" />
                     המר ללקוח XSYSTEM
                   </Button>
+                  <LeadFollowupButton leadId={selected.id} />
                 </div>
+
+                <LeadLinkedClient leadId={selected.id} />
 
                 <ActivityFeed leadId={selected.id} />
 
@@ -539,6 +543,65 @@ const ActivityFeed = ({ leadId }: { leadId: string }) => {
         ))}
       </div>
     </details>
+  );
+};
+
+const LeadLinkedClient = ({ leadId }: { leadId: string }) => {
+  const { data: linked } = useClientByLeadId(leadId);
+  const navigate = useNavigate();
+  if (!linked) return null;
+  return (
+    <div className="rounded-lg border border-primary/30 bg-primary/5 p-2 flex items-center justify-between">
+      <div className="text-xs">
+        <span className="text-muted-foreground">לקוח מקושר: </span>
+        <span className="font-medium">{linked.full_name}</span>
+      </div>
+      <Button size="sm" variant="ghost" className="gap-1" onClick={() => navigate(`/clients/${linked.id}`)}>
+        פרופיל <ChevronRight className="h-3 w-3" />
+      </Button>
+    </div>
+  );
+};
+
+const LeadFollowupButton = ({ leadId }: { leadId: string }) => {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [due, setDue] = useState('');
+  const create = useCreateXSystemLeadFollowup();
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="gap-2">
+          <Clock className="h-4 w-4" /> פולואפ
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>פולואפ ללליד</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label>כותרת</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="לחזור אליו עם הצעה" />
+          </div>
+          <div>
+            <Label>תאריך יעד</Label>
+            <Input type="datetime-local" value={due} onChange={(e) => setDue(e.target.value)} />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setOpen(false)}>ביטול</Button>
+          <Button
+            disabled={!title || create.isPending}
+            onClick={async () => {
+              await create.mutateAsync({
+                lead_id: leadId, title,
+                due_at: due ? new Date(due).toISOString() : null,
+              });
+              setTitle(''); setDue(''); setOpen(false);
+            }}
+          >שמור</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
