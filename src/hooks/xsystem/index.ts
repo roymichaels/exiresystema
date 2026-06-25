@@ -29,6 +29,7 @@ const sessions = createClientScopedHooks<XSysSession>({
 export const useXSystemSessions = sessions.useList;
 export const useXSystemSessionsCount = sessions.useCount;
 export const useCreateXSystemSession = sessions.useCreate;
+export const useUpdateXSystemSession = sessions.useUpdate;
 
 export function useXSystemNextSession(clientId: string | undefined) {
   return useQuery({
