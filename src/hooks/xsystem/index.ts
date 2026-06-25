@@ -105,6 +105,7 @@ const beliefs = createClientScopedHooks<XSysBelief>({
 export const useXSystemBeliefs = beliefs.useList;
 export const useXSystemBeliefsCount = beliefs.useCount;
 export const useCreateXSystemBelief = beliefs.useCreate;
+export const useUpdateXSystemBelief = beliefs.useUpdate;
 
 export function useXSystemActiveBeliefsCount(clientId: string | undefined) {
   return useQuery({
@@ -130,6 +131,7 @@ const patterns = createClientScopedHooks<XSysPattern>({
 export const useXSystemPatterns = patterns.useList;
 export const useXSystemPatternsCount = patterns.useCount;
 export const useCreateXSystemPattern = patterns.useCreate;
+export const useUpdateXSystemPattern = patterns.useUpdate;
 
 // ---- Inner parts ----
 const parts = createClientScopedHooks<XSysInnerPart>({
@@ -139,6 +141,7 @@ const parts = createClientScopedHooks<XSysInnerPart>({
 export const useXSystemInnerParts = parts.useList;
 export const useXSystemInnerPartsCount = parts.useCount;
 export const useCreateXSystemInnerPart = parts.useCreate;
+export const useUpdateXSystemInnerPart = parts.useUpdate;
 
 // ---- Rooms (practitioner-scoped templates) ----
 export function useXSystemRooms() {
