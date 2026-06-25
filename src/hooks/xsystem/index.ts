@@ -440,7 +440,7 @@ export function useXSystemClientPendingPayments(clientId: string | undefined) {
         .eq('client_id', clientId!)
         .eq('status', 'pending');
       if (error) throw error;
-      const rows = (data || []) as Array<{ amount_cents: number; currency: string }>;
+      const rows = ((data || []) as unknown) as Array<{ amount_cents: number; currency: string }>;
       const totalCents = rows.reduce((s, r) => s + (r.amount_cents || 0), 0);
       return { totalCents, currency: rows[0]?.currency || 'ILS', count: rows.length };
     },
