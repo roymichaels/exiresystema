@@ -94,7 +94,7 @@ export default function ClientDetail() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Instagram className="h-4 w-4" />{client.instagram_handle}
+                  <AtSign className="h-4 w-4" />{client.instagram_handle}
                 </a>
               </Button>
             )}
