@@ -2265,6 +2265,121 @@ export type Database = {
         }
         Relationships: []
       }
+      client_profiles: {
+        Row: {
+          client_id: string
+          created_at: string
+          goals: Json
+          id: string
+          last_updated_by: string | null
+          presenting_issues: Json
+          subconscious_summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          goals?: Json
+          id?: string
+          last_updated_by?: string | null
+          presenting_issues?: Json
+          subconscious_summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          goals?: Json
+          id?: string
+          last_updated_by?: string | null
+          presenting_issues?: Json
+          subconscious_summary?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_profiles_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          birthday: string | null
+          consent: Json
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          instagram_handle: string | null
+          language: string | null
+          lead_id: string | null
+          manychat_id: string | null
+          notes: string | null
+          phone: string | null
+          practitioner_id: string
+          risk_flags: Json
+          status: string
+          tags: string[]
+          updated_at: string
+          user_id: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          birthday?: string | null
+          consent?: Json
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          instagram_handle?: string | null
+          language?: string | null
+          lead_id?: string | null
+          manychat_id?: string | null
+          notes?: string | null
+          phone?: string | null
+          practitioner_id: string
+          risk_flags?: Json
+          status?: string
+          tags?: string[]
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          birthday?: string | null
+          consent?: Json
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          instagram_handle?: string | null
+          language?: string | null
+          lead_id?: string | null
+          manychat_id?: string | null
+          notes?: string | null
+          phone?: string | null
+          practitioner_id?: string
+          risk_flags?: Json
+          status?: string
+          tags?: string[]
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_client_plans: {
         Row: {
           client_name: string | null
