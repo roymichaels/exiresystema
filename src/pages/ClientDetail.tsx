@@ -350,118 +350,35 @@ export default function ClientDetail() {
         </TabsContent>
 
         {/* ---------------- SESSIONS ---------------- */}
-        <TabsContent value="sessions" className="mt-4 space-y-2">
-          {sessions.length === 0 && <EmptyState label="עדיין אין סשנים." />}
-          {sessions.map((s) => (
-            <Card key={s.id}>
-              <CardContent className="p-3 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">
-                    סשן {s.session_number ?? ''} · {s.status}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {s.scheduled_at
-                      ? new Date(s.scheduled_at).toLocaleString('he-IL')
-                      : 'לא תוזמן'}
-                  </div>
-                </div>
-                <Badge variant="outline">{s.mode}</Badge>
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="sessions" className="mt-4">
+          <XSystemSessionsTab clientId={id!} />
         </TabsContent>
 
         {/* ---------------- BELIEFS ---------------- */}
-        <TabsContent value="beliefs" className="mt-4 space-y-2">
-          {beliefs.length === 0 && <EmptyState label="עדיין לא מופו אמונות." />}
-          {beliefs.map((b) => (
-            <Card key={b.id}>
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-medium">{b.belief}</div>
-                  <Badge variant={b.polarity === 'limiting' ? 'destructive' : 'default'}>
-                    {b.polarity}
-                  </Badge>
-                </div>
-                {b.reframe && (
-                  <p className="text-xs text-muted-foreground mt-1">↺ {b.reframe}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="beliefs" className="mt-4">
+          <XSystemBeliefsTab clientId={id!} />
         </TabsContent>
 
         {/* ---------------- PATTERNS ---------------- */}
-        <TabsContent value="patterns" className="mt-4 space-y-2">
-          {patterns.length === 0 && <EmptyState label="עדיין לא זוהו תבניות." />}
-          {patterns.map((p) => (
-            <Card key={p.id}>
-              <CardContent className="p-3">
-                <div className="text-sm font-medium">{p.name}</div>
-                {p.description && (
-                  <p className="text-xs text-muted-foreground mt-1">{p.description}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="patterns" className="mt-4">
+          <XSystemPatternsTab clientId={id!} />
         </TabsContent>
 
         {/* ---------------- INNER PARTS ---------------- */}
-        <TabsContent value="parts" className="mt-4 space-y-2">
-          {parts.length === 0 && <EmptyState label="עדיין לא תועדו חלקים פנימיים." />}
-          {parts.map((p) => (
-            <Card key={p.id}>
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-medium">{p.name}</div>
-                  <Badge variant="outline">{p.role}</Badge>
-                </div>
-                {p.intent && (
-                  <p className="text-xs text-muted-foreground mt-1">כוונה: {p.intent}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="parts" className="mt-4">
+          <XSystemInnerPartsTab clientId={id!} />
         </TabsContent>
 
         {/* ---------------- ROOMS ---------------- */}
-        <TabsContent value="rooms" className="mt-4 space-y-2">
-          {rooms.length === 0 && <EmptyState label="לא הוגדרו חדרים." />}
-          {rooms.map((room) => {
-            const cr = clientRooms.find((c) => c.room_id === room.id);
-            return (
-              <Card key={room.id}>
-                <CardContent className="p-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium">{room.name}</div>
-                    {room.description && (
-                      <p className="text-xs text-muted-foreground truncate">{room.description}</p>
-                    )}
-                  </div>
-                  <Badge variant={cr ? 'default' : 'outline'}>{cr?.state || 'locked'}</Badge>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <TabsContent value="rooms" className="mt-4">
+          <XSystemRoomsTab clientId={id!} />
         </TabsContent>
 
         {/* ---------------- PROTOCOLS ---------------- */}
-        <TabsContent value="protocols" className="mt-4 space-y-2">
-          {protocols.length === 0 && <EmptyState label="לא הוגדרו פרוטוקולים." />}
-          {protocols.map((p) => (
-            <Card key={p.id}>
-              <CardContent className="p-3 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{p.title}</div>
-                  {p.body && (
-                    <p className="text-xs text-muted-foreground truncate">{p.body}</p>
-                  )}
-                </div>
-                <Badge variant="outline">{p.category}</Badge>
-              </CardContent>
-            </Card>
-          ))}
+        <TabsContent value="protocols" className="mt-4">
+          <XSystemProtocolsTab clientId={id!} />
         </TabsContent>
+
 
         {/* ---------------- AUDIO ---------------- */}
         <TabsContent value="audio" className="mt-4 space-y-2">
