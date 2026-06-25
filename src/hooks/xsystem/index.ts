@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 import { createClientScopedHooks } from './_factory';
 import type {
   XSysBelief,
@@ -29,6 +30,7 @@ const sessions = createClientScopedHooks<XSysSession>({
 export const useXSystemSessions = sessions.useList;
 export const useXSystemSessionsCount = sessions.useCount;
 export const useCreateXSystemSession = sessions.useCreate;
+export const useUpdateXSystemSession = sessions.useUpdate;
 
 export function useXSystemNextSession(clientId: string | undefined) {
   return useQuery({
@@ -66,6 +68,35 @@ export function useXSystemSessionNotes(sessionId: string | undefined) {
   });
 }
 
+export function useCreateXSystemSessionNote() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (input: {
+      session_id: string;
+      client_id: string;
+      kind: string;
+      body: string;
+      tags?: string[];
+    }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+      const { data, error } = await supabase
+        .from('xsystem_session_notes' as any)
+        .insert({ ...input, practitioner_id: user.id, tags: input.tags ?? [] } as any)
+        .select('*')
+        .single();
+      if (error) throw error;
+      return data as unknown as XSysSessionNote;
+    },
+    onSuccess: (row) => {
+      qc.invalidateQueries({ queryKey: ['xsystem', 'session_notes', row.session_id] });
+      toast({ title: 'נשמר' });
+    },
+    onError: (e: any) =>
+      toast({ title: 'שגיאה', description: e.message, variant: 'destructive' }),
+  });
+}
+
 // ---- Beliefs ----
 const beliefs = createClientScopedHooks<XSysBelief>({
   table: 'xsystem_beliefs',
@@ -74,6 +105,7 @@ const beliefs = createClientScopedHooks<XSysBelief>({
 export const useXSystemBeliefs = beliefs.useList;
 export const useXSystemBeliefsCount = beliefs.useCount;
 export const useCreateXSystemBelief = beliefs.useCreate;
+export const useUpdateXSystemBelief = beliefs.useUpdate;
 
 export function useXSystemActiveBeliefsCount(clientId: string | undefined) {
   return useQuery({
@@ -99,6 +131,7 @@ const patterns = createClientScopedHooks<XSysPattern>({
 export const useXSystemPatterns = patterns.useList;
 export const useXSystemPatternsCount = patterns.useCount;
 export const useCreateXSystemPattern = patterns.useCreate;
+export const useUpdateXSystemPattern = patterns.useUpdate;
 
 // ---- Inner parts ----
 const parts = createClientScopedHooks<XSysInnerPart>({
@@ -108,6 +141,7 @@ const parts = createClientScopedHooks<XSysInnerPart>({
 export const useXSystemInnerParts = parts.useList;
 export const useXSystemInnerPartsCount = parts.useCount;
 export const useCreateXSystemInnerPart = parts.useCreate;
+export const useUpdateXSystemInnerPart = parts.useUpdate;
 
 // ---- Rooms (practitioner-scoped templates) ----
 export function useXSystemRooms() {
@@ -136,6 +170,89 @@ const clientRooms = createClientScopedHooks<XSysClientRoom>({
 export const useXSystemClientRooms = clientRooms.useList;
 export const useXSystemClientRoomsCount = clientRooms.useCount;
 export const useUpsertXSystemClientRoom = clientRooms.useCreate;
+export const useUpdateXSystemClientRoom = clientRooms.useUpdate;
+
+// ---- Session protocols (applying a protocol within a session) ----
+export function useXSystemSessionProtocols(sessionId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'session_protocols', 'session', sessionId],
+    enabled: !!sessionId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('xsystem_session_protocols' as any)
+        .select('*, xsystem_protocols(title, category)')
+        .eq('session_id', sessionId!)
+        .order('order_index', { ascending: true });
+      if (error) throw error;
+      return (data || []) as unknown as Array<{
+        id: string;
+        session_id: string;
+        protocol_id: string;
+        client_id: string;
+        order_index: number;
+        outcome: string | null;
+        notes: string | null;
+        xsystem_protocols?: { title: string; category: string } | null;
+      }>;
+    },
+  });
+}
+
+export function useXSystemClientProtocolApplications(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ['xsystem', 'session_protocols', 'client', clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('xsystem_session_protocols' as any)
+        .select('*, xsystem_protocols(title, category), xsystem_sessions(session_number, scheduled_at)')
+        .eq('client_id', clientId!)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as unknown as Array<{
+        id: string;
+        session_id: string;
+        protocol_id: string;
+        client_id: string;
+        outcome: string | null;
+        notes: string | null;
+        created_at: string;
+        xsystem_protocols?: { title: string; category: string } | null;
+        xsystem_sessions?: { session_number: number | null; scheduled_at: string | null } | null;
+      }>;
+    },
+  });
+}
+
+export function useApplyXSystemProtocol() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (input: {
+      session_id: string;
+      client_id: string;
+      protocol_id: string;
+      outcome?: string;
+      notes?: string;
+    }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+      const { data, error } = await supabase
+        .from('xsystem_session_protocols' as any)
+        .insert({ ...input, practitioner_id: user.id } as any)
+        .select('*')
+        .single();
+      if (error) throw error;
+      return data as any;
+    },
+    onSuccess: (row: any) => {
+      qc.invalidateQueries({ queryKey: ['xsystem', 'session_protocols', 'session', row.session_id] });
+      qc.invalidateQueries({ queryKey: ['xsystem', 'session_protocols', 'client', row.client_id] });
+      toast({ title: 'הפרוטוקול הוחל' });
+    },
+    onError: (e: any) =>
+      toast({ title: 'שגיאה', description: e.message, variant: 'destructive' }),
+  });
+}
 
 // ---- Protocols (practitioner-scoped catalog) ----
 export function useXSystemProtocols() {
