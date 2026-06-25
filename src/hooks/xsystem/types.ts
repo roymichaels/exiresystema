@@ -176,6 +176,7 @@ export interface XSysPayment {
   currency: string;
   kind: string;
   paid_at: string | null;
+  due_at: string | null;
   method: string | null;
   external_ref: string | null;
   notes: string | null;
@@ -183,3 +184,4 @@ export interface XSysPayment {
   created_at: string;
   updated_at: string;
 }
+
