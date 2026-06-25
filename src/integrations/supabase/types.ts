@@ -5249,36 +5249,49 @@ export type Database = {
       }
       form_submissions: {
         Row: {
+          client_id: string | null
           email: string | null
           form_id: string
           id: string
           metadata: Json | null
+          practitioner_id: string | null
           responses: Json
           status: string
           submitted_at: string
           user_id: string | null
         }
         Insert: {
+          client_id?: string | null
           email?: string | null
           form_id: string
           id?: string
           metadata?: Json | null
+          practitioner_id?: string | null
           responses?: Json
           status?: string
           submitted_at?: string
           user_id?: string | null
         }
         Update: {
+          client_id?: string | null
           email?: string | null
           form_id?: string
           id?: string
           metadata?: Json | null
+          practitioner_id?: string | null
           responses?: Json
           status?: string
           submitted_at?: string
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "form_submissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "form_submissions_form_id_fkey"
             columns: ["form_id"]
@@ -10526,6 +10539,734 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_audio_assignments: {
+        Row: {
+          assigned_at: string
+          audio_id: string
+          client_id: string
+          created_at: string
+          due_at: string | null
+          frequency: string
+          id: string
+          instructions: string | null
+          last_played_at: string | null
+          play_count: number
+          practitioner_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          audio_id: string
+          client_id: string
+          created_at?: string
+          due_at?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          last_played_at?: string | null
+          play_count?: number
+          practitioner_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          audio_id?: string
+          client_id?: string
+          created_at?: string
+          due_at?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          last_played_at?: string | null
+          play_count?: number
+          practitioner_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_audio_assignments_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "hypnosis_audios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_audio_assignments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_beliefs: {
+        Row: {
+          belief: string
+          client_id: string
+          created_at: string
+          evidence: Json | null
+          id: string
+          polarity: string
+          practitioner_id: string
+          reframe: string | null
+          source_session_id: string | null
+          status: string
+          strength: number | null
+          updated_at: string
+        }
+        Insert: {
+          belief: string
+          client_id: string
+          created_at?: string
+          evidence?: Json | null
+          id?: string
+          polarity?: string
+          practitioner_id: string
+          reframe?: string | null
+          source_session_id?: string | null
+          status?: string
+          strength?: number | null
+          updated_at?: string
+        }
+        Update: {
+          belief?: string
+          client_id?: string
+          created_at?: string
+          evidence?: Json | null
+          id?: string
+          polarity?: string
+          practitioner_id?: string
+          reframe?: string | null
+          source_session_id?: string | null
+          status?: string
+          strength?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_beliefs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_beliefs_source_session_id_fkey"
+            columns: ["source_session_id"]
+            isOneToOne: false
+            referencedRelation: "xsystem_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_checkins: {
+        Row: {
+          client_id: string
+          created_at: string
+          form_submission_id: string | null
+          id: string
+          kind: string
+          mood: number | null
+          notes: string | null
+          payload: Json | null
+          practitioner_id: string
+          submitted_at: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          form_submission_id?: string | null
+          id?: string
+          kind?: string
+          mood?: number | null
+          notes?: string | null
+          payload?: Json | null
+          practitioner_id: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          form_submission_id?: string | null
+          id?: string
+          kind?: string
+          mood?: number | null
+          notes?: string | null
+          payload?: Json | null
+          practitioner_id?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_checkins_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_checkins_form_submission_id_fkey"
+            columns: ["form_submission_id"]
+            isOneToOne: false
+            referencedRelation: "form_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_client_rooms: {
+        Row: {
+          client_id: string
+          completed_at: string | null
+          created_at: string
+          entered_at: string | null
+          id: string
+          notes: string | null
+          practitioner_id: string
+          room_id: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          completed_at?: string | null
+          created_at?: string
+          entered_at?: string | null
+          id?: string
+          notes?: string | null
+          practitioner_id: string
+          room_id: string
+          state?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          completed_at?: string | null
+          created_at?: string
+          entered_at?: string | null
+          id?: string
+          notes?: string | null
+          practitioner_id?: string
+          room_id?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_client_rooms_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_client_rooms_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "xsystem_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_followups: {
+        Row: {
+          body: string | null
+          client_id: string
+          created_at: string
+          done_at: string | null
+          due_at: string | null
+          id: string
+          practitioner_id: string
+          priority: string
+          source: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          client_id: string
+          created_at?: string
+          done_at?: string | null
+          due_at?: string | null
+          id?: string
+          practitioner_id: string
+          priority?: string
+          source?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          client_id?: string
+          created_at?: string
+          done_at?: string | null
+          due_at?: string | null
+          id?: string
+          practitioner_id?: string
+          priority?: string
+          source?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_followups_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_inner_parts: {
+        Row: {
+          age_origin: string | null
+          client_id: string
+          created_at: string
+          id: string
+          intent: string | null
+          name: string
+          notes: string | null
+          practitioner_id: string
+          relationship_to_self: string | null
+          role: string
+          status: string
+          updated_at: string
+          voice: string | null
+        }
+        Insert: {
+          age_origin?: string | null
+          client_id: string
+          created_at?: string
+          id?: string
+          intent?: string | null
+          name: string
+          notes?: string | null
+          practitioner_id: string
+          relationship_to_self?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          voice?: string | null
+        }
+        Update: {
+          age_origin?: string | null
+          client_id?: string
+          created_at?: string
+          id?: string
+          intent?: string | null
+          name?: string
+          notes?: string | null
+          practitioner_id?: string
+          relationship_to_self?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          voice?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_inner_parts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_patterns: {
+        Row: {
+          client_id: string
+          created_at: string
+          description: string | null
+          frequency: string | null
+          id: string
+          linked_beliefs: string[] | null
+          loop: Json | null
+          name: string
+          practitioner_id: string
+          severity: number | null
+          status: string
+          trigger: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          description?: string | null
+          frequency?: string | null
+          id?: string
+          linked_beliefs?: string[] | null
+          loop?: Json | null
+          name: string
+          practitioner_id: string
+          severity?: number | null
+          status?: string
+          trigger?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          frequency?: string | null
+          id?: string
+          linked_beliefs?: string[] | null
+          loop?: Json | null
+          name?: string
+          practitioner_id?: string
+          severity?: number | null
+          status?: string
+          trigger?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_patterns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_payments: {
+        Row: {
+          amount_cents: number
+          client_id: string
+          created_at: string
+          currency: string
+          external_ref: string | null
+          id: string
+          kind: string
+          method: string | null
+          notes: string | null
+          paid_at: string | null
+          practitioner_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          client_id: string
+          created_at?: string
+          currency?: string
+          external_ref?: string | null
+          id?: string
+          kind?: string
+          method?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          practitioner_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          client_id?: string
+          created_at?: string
+          currency?: string
+          external_ref?: string | null
+          id?: string
+          kind?: string
+          method?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          practitioner_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_protocols: {
+        Row: {
+          audio_id: string | null
+          body: string | null
+          category: string
+          created_at: string
+          default_duration_minutes: number | null
+          id: string
+          is_archived: boolean
+          practitioner_id: string
+          slug: string
+          steps: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_id?: string | null
+          body?: string | null
+          category?: string
+          created_at?: string
+          default_duration_minutes?: number | null
+          id?: string
+          is_archived?: boolean
+          practitioner_id: string
+          slug: string
+          steps?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_id?: string | null
+          body?: string | null
+          category?: string
+          created_at?: string
+          default_duration_minutes?: number | null
+          id?: string
+          is_archived?: boolean
+          practitioner_id?: string
+          slug?: string
+          steps?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_protocols_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "hypnosis_audios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_rooms: {
+        Row: {
+          created_at: string
+          default_protocol_ids: string[] | null
+          description: string | null
+          id: string
+          intent: string | null
+          is_archived: boolean
+          name: string
+          order_index: number
+          practitioner_id: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_protocol_ids?: string[] | null
+          description?: string | null
+          id?: string
+          intent?: string | null
+          is_archived?: boolean
+          name: string
+          order_index?: number
+          practitioner_id: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_protocol_ids?: string[] | null
+          description?: string | null
+          id?: string
+          intent?: string | null
+          is_archived?: boolean
+          name?: string
+          order_index?: number
+          practitioner_id?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      xsystem_session_notes: {
+        Row: {
+          body: string
+          client_id: string
+          created_at: string
+          id: string
+          kind: string
+          practitioner_id: string
+          session_id: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          client_id: string
+          created_at?: string
+          id?: string
+          kind?: string
+          practitioner_id: string
+          session_id: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          practitioner_id?: string
+          session_id?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_session_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_session_notes_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "xsystem_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_session_protocols: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          order_index: number
+          outcome: string | null
+          practitioner_id: string
+          protocol_id: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_index?: number
+          outcome?: string | null
+          practitioner_id: string
+          protocol_id: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_index?: number
+          outcome?: string | null
+          practitioner_id?: string
+          protocol_id?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_session_protocols_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_session_protocols_protocol_id_fkey"
+            columns: ["protocol_id"]
+            isOneToOne: false
+            referencedRelation: "xsystem_protocols"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_session_protocols_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "xsystem_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      xsystem_sessions: {
+        Row: {
+          client_id: string
+          created_at: string
+          duration_minutes: number | null
+          ended_at: string | null
+          id: string
+          mode: string | null
+          practitioner_id: string
+          recording_audio_id: string | null
+          scheduled_at: string | null
+          session_number: number | null
+          started_at: string | null
+          status: string
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          mode?: string | null
+          practitioner_id: string
+          recording_audio_id?: string | null
+          scheduled_at?: string | null
+          session_number?: number | null
+          started_at?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          mode?: string | null
+          practitioner_id?: string
+          recording_audio_id?: string | null
+          scheduled_at?: string | null
+          session_number?: number | null
+          started_at?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xsystem_sessions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xsystem_sessions_recording_audio_id_fkey"
+            columns: ["recording_audio_id"]
+            isOneToOne: false
+            referencedRelation: "hypnosis_audios"
             referencedColumns: ["id"]
           },
         ]
