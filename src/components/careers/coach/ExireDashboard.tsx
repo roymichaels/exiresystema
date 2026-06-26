@@ -119,6 +119,9 @@ export default function ExireDashboard() {
           ]}
         />
 
+        {/* Exire Advisor — quick access to the business brain */}
+        <AdvisorCard />
+
         {/* Today's action queue — single list */}
         <MobileSectionCard title="סשנים קרובים" flush>
           {sessions.upcomingList.length === 0 ? (
