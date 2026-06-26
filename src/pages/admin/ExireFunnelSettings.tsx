@@ -120,39 +120,40 @@ export default function ExireFunnelSettings() {
   const doneCount = checklist.filter((c) => c.ok).length;
 
   return (
-    <div dir="rtl" className="space-y-5 w-full max-w-full overflow-x-hidden">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div>
-          <h2 className="text-lg font-semibold flex items-center gap-2">
+    <div dir="rtl" className="space-y-4 w-full max-w-full overflow-x-hidden">
+      {/* Compact mobile header / wider desktop header */}
+      <div className="flex items-start justify-between flex-wrap gap-2">
+        <div className="min-w-0">
+          <h2 className="text-base md:text-lg font-semibold flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" /> הגדרות פאנל Exire
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="hidden md:block text-xs text-muted-foreground mt-1">
             ניהול וידאו, WhatsApp וטופס קבלה עבור עמוד הנחיתה.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm" className="gap-2">
-            <a href="/exire" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> פתח /exire</a>
+        <div className="flex gap-1.5 shrink-0">
+          <Button asChild variant="outline" size="sm" className="gap-1.5 h-8 px-2.5">
+            <a href="/exire" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /><span className="hidden sm:inline">פתח</span> /exire</a>
           </Button>
-          <Button asChild variant="outline" size="sm" className="gap-2">
-            <a href="/" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> פתח /</a>
+          <Button asChild variant="outline" size="sm" className="gap-1.5 h-8 px-2.5">
+            <a href="/" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /><span className="hidden sm:inline">פתח</span> /</a>
           </Button>
         </div>
       </div>
 
       {/* Landing URLs strip */}
-      <Card>
-        <CardContent className="p-3 grid gap-2 sm:grid-cols-2">
+      <Card className="border-border/40 rounded-2xl">
+        <CardContent className="p-2.5 grid gap-2 sm:grid-cols-2">
           {[
             { label: 'דף הבית', url: homeUrl },
             { label: 'אליאס', url: landingUrl },
           ].map((row) => (
-            <div key={row.url} className="flex items-center justify-between gap-2 rounded-md bg-muted/40 px-3 py-2">
-              <div className="min-w-0">
+            <div key={row.url} className="flex items-center justify-between gap-2 rounded-xl bg-muted/40 px-3 py-2 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="text-[11px] text-muted-foreground">{row.label}</div>
-                <div className="text-xs font-mono truncate" dir="ltr">{row.url}</div>
+                <div className="text-[11px] md:text-xs font-mono truncate" dir="ltr">{row.url}</div>
               </div>
-              <div className="flex gap-1 shrink-0">
+              <div className="flex gap-0.5 shrink-0">
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => copy(row.url)}>
                   <Copy className="h-3.5 w-3.5" />
                 </Button>
@@ -165,6 +166,7 @@ export default function ExireFunnelSettings() {
         </CardContent>
       </Card>
 
+      {/* KPI strip */}
       <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
         <KPI label="לידים היום" value={funnel?.leadsToday ?? 0} />
         <KPI label="החודש"      value={funnel?.leadsThisMonth ?? 0} />
@@ -172,111 +174,147 @@ export default function ExireFunnelSettings() {
         <KPI label="ממתין למענה" value={funnel?.awaitingFirstReply ?? 0} tone="warn" />
       </div>
 
-      <Card>
-        <CardHeader><CardTitle className="text-base">תצורת הדף</CardTitle></CardHeader>
-        <CardContent className="space-y-5">
+      {/* === Settings groups — each is its own card so mobile feels like a settings screen === */}
 
-          {/* VSL / Hero video */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <Label className="text-xs">VSL / Hero video — קישור (YouTube / Vimeo / Loom / mp4 / webm)</Label>
-              <div className="flex gap-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="video/mp4,video/webm,video/quicktime"
-                  className="hidden"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 h-8"
-                  disabled={uploading}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-                  העלה קובץ
+      {/* VSL / Hero video card */}
+      <details open className="md:open group rounded-2xl border border-border/40 bg-card/40">
+        <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Video className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-sm font-medium">סרטון VSL / Hero</span>
+          </div>
+          <span className="text-[11px] text-muted-foreground truncate max-w-[40%]" dir="ltr">
+            {form.exire_landing_video_url ? '✓ מוגדר' : 'לא הוגדר'}
+          </span>
+        </summary>
+        <div className="px-4 pb-4 space-y-2 border-t border-border/30 pt-3">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <Label className="text-xs">קישור (YouTube / Vimeo / Loom / mp4 / webm)</Label>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5 h-8"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                העלה קובץ
+              </Button>
+              {form.exire_landing_video_url && (
+                <Button type="button" variant="ghost" size="sm" className="h-8" onClick={() => set('exire_landing_video_url', '')}>
+                  הסר
                 </Button>
-                {form.exire_landing_video_url && (
-                  <Button type="button" variant="ghost" size="sm" className="h-8" onClick={() => set('exire_landing_video_url', '')}>
-                    הסר
-                  </Button>
-                )}
-              </div>
-            </div>
-            <Input value={form.exire_landing_video_url} dir="ltr"
-              placeholder="https://youtu.be/... או https://.../video.mp4"
-              onChange={(e) => set('exire_landing_video_url', e.target.value)} />
-            <p className="text-[11px] text-muted-foreground">
-              העלאות נשמרות בדלי <code dir="ltr">site-videos</code> (ציבורי, עד 150MB). אם ריק — הדף יציג Placeholder עיצובי.
-            </p>
-
-            {/* Preview */}
-            <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video w-full max-w-xl">
-              {video.type === 'iframe' ? (
-                <iframe src={video.src} className="w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen title="preview" />
-              ) : video.type === 'mp4' ? (
-                <video src={video.src} controls playsInline className="w-full h-full object-cover bg-black" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground gap-2">
-                  <Video className="h-4 w-4" /> אין סרטון מוגדר — Placeholder יוצג בדף
-                </div>
               )}
             </div>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label className="text-xs">מספר WhatsApp (פורמט בינלאומי, ללא +)</Label>
-              <Input value={form.exire_whatsapp_number} dir="ltr" inputMode="tel"
-                placeholder="לדוגמה: 972501234567 או 506123456"
-                onChange={(e) => set('exire_whatsapp_number', e.target.value.replace(/\D/g, ''))} />
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-                {waOk
-                  ? <><CheckCircle2 className="h-3 w-3 text-emerald-500" /> תקין — <span dir="ltr">+{waNormalized}</span></>
-                  : <><Circle className="h-3 w-3 text-amber-500" /> אם ריק/חסר — כפתורי WhatsApp בדף יוסתרו (לא ישובץ מספר fallback).</>}
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">טופס קבלה ברירת מחדל (יוצג בדף תודה)</Label>
-              <Select value={form.exire_intake_form_id || 'none'}
-                onValueChange={(v) => set('exire_intake_form_id', v === 'none' ? '' : v)}>
-                <SelectTrigger><SelectValue placeholder="בחר טופס" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">— ללא (יוסתר בדף תודה) —</SelectItem>
-                  {forms.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.title}{f.status === 'published' ? '' : ' (טיוטה)'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <Input value={form.exire_landing_video_url} dir="ltr"
+            placeholder="https://youtu.be/... או https://.../video.mp4"
+            onChange={(e) => set('exire_landing_video_url', e.target.value)}
+            className="text-xs md:text-sm" />
+          <p className="text-[11px] text-muted-foreground">
+            עד 150MB. ריק → Placeholder עיצובי בדף.
+          </p>
+          <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video w-full max-w-xl">
+            {video.type === 'iframe' ? (
+              <iframe src={video.src} className="w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen title="preview" />
+            ) : video.type === 'mp4' ? (
+              <video src={video.src} controls playsInline className="w-full h-full object-cover bg-black" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground gap-2">
+                <Video className="h-4 w-4" /> אין סרטון מוגדר
+              </div>
+            )}
           </div>
+        </div>
+      </details>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label className="text-xs">כפתור ראשי</Label>
-              <Input value={form.exire_primary_cta_label}
-                onChange={(e) => set('exire_primary_cta_label', e.target.value)} />
-            </div>
-            <div>
-              <Label className="text-xs">כפתור משני (WhatsApp)</Label>
-              <Input value={form.exire_secondary_cta_label}
-                onChange={(e) => set('exire_secondary_cta_label', e.target.value)} />
-            </div>
-          </div>
+      {/* WhatsApp card */}
+      <details open className="rounded-2xl border border-border/40 bg-card/40">
+        <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
+          <span className="text-sm font-medium">WhatsApp</span>
+          <span className="text-[11px] text-muted-foreground" dir="ltr">
+            {waOk ? `+${waNormalized}` : 'לא הוגדר'}
+          </span>
+        </summary>
+        <div className="px-4 pb-4 space-y-2 border-t border-border/30 pt-3">
+          <Label className="text-xs">מספר WhatsApp (פורמט בינלאומי, ללא +)</Label>
+          <Input value={form.exire_whatsapp_number} dir="ltr" inputMode="tel"
+            placeholder="972501234567"
+            onChange={(e) => set('exire_whatsapp_number', e.target.value.replace(/\D/g, ''))} />
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+            {waOk
+              ? <><CheckCircle2 className="h-3 w-3 text-emerald-500" /> תקין</>
+              : <><Circle className="h-3 w-3 text-amber-500" /> אם ריק — כפתורי WhatsApp בדף יוסתרו.</>}
+          </p>
+        </div>
+      </details>
 
-          <div className="flex justify-end pt-2">
-            <Button onClick={save} disabled={update.isPending} className="gap-2">
-              {update.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              שמור הגדרות
-            </Button>
+      {/* Intake form card */}
+      <details open className="rounded-2xl border border-border/40 bg-card/40">
+        <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
+          <span className="text-sm font-medium">טופס קבלה</span>
+          <span className="text-[11px] text-muted-foreground">
+            {form.exire_intake_form_id ? '✓ נבחר' : '— ללא —'}
+          </span>
+        </summary>
+        <div className="px-4 pb-4 space-y-2 border-t border-border/30 pt-3">
+          <Label className="text-xs">ברירת מחדל (יוצג בדף תודה)</Label>
+          <Select value={form.exire_intake_form_id || 'none'}
+            onValueChange={(v) => set('exire_intake_form_id', v === 'none' ? '' : v)}>
+            <SelectTrigger><SelectValue placeholder="בחר טופס" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">— ללא (יוסתר בדף תודה) —</SelectItem>
+              {forms.map((f) => (
+                <SelectItem key={f.id} value={f.id}>
+                  {f.title}{f.status === 'published' ? '' : ' (טיוטה)'}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </details>
+
+      {/* CTA labels card */}
+      <details className="rounded-2xl border border-border/40 bg-card/40">
+        <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
+          <span className="text-sm font-medium">תוויות כפתורים</span>
+          <span className="text-[11px] text-muted-foreground truncate max-w-[55%]">
+            {form.exire_primary_cta_label}
+          </span>
+        </summary>
+        <div className="px-4 pb-4 grid gap-3 md:grid-cols-2 border-t border-border/30 pt-3">
+          <div>
+            <Label className="text-xs">כפתור ראשי</Label>
+            <Input value={form.exire_primary_cta_label}
+              onChange={(e) => set('exire_primary_cta_label', e.target.value)} />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <Label className="text-xs">כפתור משני (WhatsApp)</Label>
+            <Input value={form.exire_secondary_cta_label}
+              onChange={(e) => set('exire_secondary_cta_label', e.target.value)} />
+          </div>
+        </div>
+      </details>
+
+      {/* Sticky save bar on mobile, inline on desktop */}
+      <div className="sticky bottom-[5.5rem] md:static z-10 -mx-3 md:mx-0 px-3 md:px-0 pt-2 md:pt-0">
+        <div className="md:flex md:justify-end rounded-2xl md:rounded-none bg-background/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-0 border md:border-0 border-border/40 p-2 md:p-0">
+          <Button onClick={save} disabled={update.isPending} className="gap-2 w-full md:w-auto">
+            {update.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            שמור הגדרות
+          </Button>
+        </div>
+      </div>
+
 
       {/* Setup checklist */}
       <Card className="border-primary/30 bg-primary/[0.02]">

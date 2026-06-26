@@ -259,8 +259,8 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
         ))}
       </div>
 
-      {/* Filters */}
-      <Card className="border-border/50">
+      {/* Filters — desktop card */}
+      <Card className="hidden md:block border-border/50">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
@@ -291,39 +291,122 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               </SelectContent>
             </Select>
           </div>
-          {/* Quick filter chips — horizontal scroll on mobile, wrap on desktop */}
-          <div className="-mx-1 mt-3 overflow-x-auto md:overflow-visible scrollbar-none">
-            <div className="flex md:flex-wrap gap-2 px-1 w-max md:w-auto">
-              {[
-                { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
-                { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
-                { id: 'followup', label: 'דורש פולואפ',   status: 'contacted', source: sourceFilter },
-                { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
-                { id: 'home',     label: '🏠 דף הבית',    status: statusFilter, source: 'homepage' },
-                { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
-                { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
-                { id: 'ig',       label: '📸 אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
-              ].map(c => {
-                const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
-                    className={`text-xs rounded-full px-3 py-1 border transition shrink-0 whitespace-nowrap ${
-                      active
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'border-border/50 hover:bg-muted/50'
-                    }`}
-                  >{c.label}</button>
-                );
-              })}
-            </div>
+          <div className="-mx-1 mt-3 flex flex-wrap gap-2 px-1">
+            {[
+              { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
+              { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
+              { id: 'followup', label: 'דורש פולואפ',   status: 'contacted', source: sourceFilter },
+              { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
+              { id: 'home',     label: '🏠 דף הבית',    status: statusFilter, source: 'homepage' },
+              { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
+              { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
+              { id: 'ig',       label: '📸 אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
+            ].map(c => {
+              const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
+                  className={`text-xs rounded-full px-3 py-1 border transition whitespace-nowrap ${
+                    active
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'border-border/50 hover:bg-muted/50'
+                  }`}
+                >{c.label}</button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
 
-      {/* List */}
-      <Card className="border-border/50">
+      {/* Filters — mobile (inbox-style) */}
+      <div className="md:hidden space-y-2">
+        <div className="relative">
+          <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="חיפוש שם, טלפון, אימייל…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pe-10 h-10 rounded-xl bg-card/60 border-border/40"
+          />
+        </div>
+        <div className="-mx-3 px-3 overflow-x-auto scrollbar-none">
+          <div className="flex gap-1.5 w-max">
+            {[
+              { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
+              { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
+              { id: 'followup', label: 'פולואפ',        status: 'contacted', source: sourceFilter },
+              { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
+              { id: 'home',     label: '🏠',            status: statusFilter, source: 'homepage' },
+              { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
+              { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
+              { id: 'ig',       label: '📸 IG',         status: statusFilter, source: 'exire_instagram_form' },
+            ].map(c => {
+              const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
+                  className={`text-[12px] rounded-full px-3 py-1.5 border transition shrink-0 whitespace-nowrap ${
+                    active
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'border-border/40 bg-card/40 text-muted-foreground'
+                  }`}
+                >{c.label}</button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile list — native CRM inbox */}
+      <div className="md:hidden">
+        {isLoading ? (
+          <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 rounded-2xl border border-border/30 bg-card/30">
+            <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
+            <p className="text-sm text-muted-foreground">
+              {search || sourceFilter !== 'all' || statusFilter !== 'all'
+                ? 'אין תוצאות לסינון הנוכחי'
+                : 'אין לידים להצגה'}
+            </p>
+            {(search || sourceFilter !== 'all' || statusFilter !== 'all') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-3"
+                onClick={() => { setSearch(''); setSourceFilter('all'); setStatusFilter('all'); }}
+              >נקה סינון</Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+              {filtered.length} לידים
+            </div>
+            {filtered.map(lead => (
+              <MobileLeadCard
+                key={lead.id}
+                lead={lead}
+                sourceLabel={SOURCE_LABELS[lead.source] || lead.source}
+                statusLabel={STATUS_LABELS[lead.status] || lead.status}
+                statusColor={STATUS_COLOR[lead.status] || ''}
+                onOpen={() => openLead(lead)}
+                onConvert={() => {
+                  convertLead.mutate(
+                    { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
+                    { onSuccess: (client) => navigate(`/clients/${client.id}`) },
+                  );
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* List — desktop card wrapper */}
+      <Card className="hidden md:block border-border/50">
         <CardHeader>
           <CardTitle className="text-base">
             לידים ({filtered.length})
@@ -353,28 +436,8 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
             </div>
           ) : (
             <>
-              {/* Mobile list — compact, native CRM feel */}
-              <div className="md:hidden space-y-2.5">
-                {filtered.map(lead => (
-                  <MobileLeadCard
-                    key={lead.id}
-                    lead={lead}
-                    sourceLabel={SOURCE_LABELS[lead.source] || lead.source}
-                    statusLabel={STATUS_LABELS[lead.status] || lead.status}
-                    statusColor={STATUS_COLOR[lead.status] || ''}
-                    onOpen={() => openLead(lead)}
-                    onConvert={() => {
-                      convertLead.mutate(
-                        { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
-                        { onSuccess: (client) => navigate(`/clients/${client.id}`) },
-                      );
-                    }}
-                  />
-                ))}
-              </div>
-
               {/* Desktop list */}
-              <div className="hidden md:block space-y-2">
+              <div className="space-y-2">
                 {filtered.map(lead => {
                   const wa = waLink(lead.phone);
                   return (
