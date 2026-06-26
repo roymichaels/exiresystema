@@ -8,7 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   BarChart3, Settings, Users as UsersIcon, Plug, Bell, Palette,
-  Mail, Handshake, Bug, Archive, Sparkles, ExternalLink,
+  Mail, Handshake, Bug, Archive, Sparkles, ExternalLink, Brain,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
