@@ -30,6 +30,9 @@ import {
   useExireFunnelSettings, parseVideoEmbed,
   normalizeWhatsApp, isWhatsAppConfigured,
 } from '@/hooks/xsystem/funnelSettings';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAuthModal } from '@/contexts/AuthModalContext';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 const DEFAULT_WHATSAPP_HELLO =
   'היי, ראיתי את העמוד של Exire Systema ואני רוצה לבדוק התאמה לתהליך 🙏';
