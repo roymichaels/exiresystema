@@ -215,6 +215,49 @@ export default function ExireDashboard() {
 
       {/* ============================ DESKTOP =========================== */}
       <section className="hidden md:block">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">הכנסות</h3>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
+          <Stat label="היום" value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
+          <Stat label="החודש" value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
+          <Stat label="ממתין" value={fmt(revenue.pendingCents, revenue.currency)} hint={`${revenue.pendingClientCount} לקוחות`} icon={Clock} tone="warn" />
+          <Stat label="תשלומים שולמו" value={revenue.paidCount} icon={CreditCard} />
+          <Stat label="לקוחות בחוב" value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
+        </div>
+      </section>
+
+      <section className="hidden md:block">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">לידים</h3>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
+          <Stat label="חדשים" value={leads.new} icon={Users} />
+          <Stat label="פעילים" value={leads.active} icon={Users} />
+          <Stat label="ממתינים לפולואפ" value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
+          <Stat label="הומרו" value={leads.converted} icon={Users} tone="good" />
+          <Stat label="חזרו 🔁" value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} hint="הגשה כפולה — דורש מענה אישי" />
+          <Stat label="סה״כ" value={leads.total} icon={Users} />
+        </div>
+      </section>
+
+      <section className="hidden md:block">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">לקוחות</h3>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
+          <Stat label="פעילים" value={clients.active} icon={Users} />
+          <Stat label="חדשים החודש" value={clients.newThisMonth} icon={Users} tone="good" />
+          <Stat label="עם סשן הבא" value={clients.withUpcomingSession} icon={Calendar} />
+          <Stat label="ללא סשן הבא" value={clients.withoutNextSession} icon={AlertCircle} tone={clients.withoutNextSession > 0 ? 'warn' : 'default'} />
+        </div>
+      </section>
+
+      <section className="hidden md:block">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">סשנים</h3>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
+          <Stat label="היום" value={sessions.today} icon={Calendar} tone={sessions.today > 0 ? 'good' : 'default'} />
+          <Stat label="עתידיים" value={sessions.upcoming} icon={Calendar} />
+          <Stat label="הושלמו החודש" value={sessions.completedThisMonth} icon={Calendar} tone="good" />
+          <Stat label="בוטלו/לא הופיע" value={sessions.cancelledThisMonth} icon={AlertCircle} tone={sessions.cancelledThisMonth > 0 ? 'warn' : 'default'} />
+        </div>
+      </section>
+
+      <section className="hidden md:block">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">תור פעולות להיום</h3>
         <div className="grid gap-2 grid-cols-2 md:grid-cols-4 mb-3">
           <Stat label="פולואפים באיחור" value={actions.overdueFollowups} icon={AlertCircle} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
