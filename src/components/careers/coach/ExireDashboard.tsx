@@ -69,6 +69,8 @@ export default function ExireDashboard() {
 
   return (
     <div className="space-y-5">
+      <ExireLaunchChecklist />
+
       {/* Revenue */}
       <section>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">הכנסות</h3>
