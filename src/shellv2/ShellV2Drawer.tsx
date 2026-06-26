@@ -79,35 +79,45 @@ export default function ShellV2Drawer() {
     openProfile();
   };
 
-  // Admin drawer is intentionally minimal: bottom-nav + AdminInlineNav already
-  // expose every admin group. The drawer is reserved for account/utility access.
-  const adminQuickItems: DrawerItem[] = [
+  // Admin drawer = control drawer (primary + utility shortcuts + legacy).
+  const adminPrimaryItems: DrawerItem[] = [
     {
       id: 'admin-home',
-      icon: Shield,
+      icon: HomeIcon,
       labelEn: 'Today',
       labelHe: 'היום',
       onSelect: () => go('/admin-hub?tab=today'),
     },
     {
+      id: 'admin-studio',
+      icon: Layers,
+      labelEn: 'Studio',
+      labelHe: 'סטודיו',
+      onSelect: () => go('/admin-hub?tab=studio'),
+    },
+    {
       id: 'admin-more',
       icon: SettingsIcon,
-      labelEn: 'More',
-      labelHe: 'עוד',
+      labelEn: 'More / Settings',
+      labelHe: 'עוד / הגדרות',
       onSelect: () => go('/admin-hub?tab=more&sub=more-home'),
     },
   ];
 
-  // In admin context we deliberately do NOT list Home / Courses / Community /
-  // Profile as primary surfaces — that's the legacy client app. We surface it
-  // as ONE small secondary entry.
-  const legacyAppItem: DrawerItem = {
-    id: 'legacy-app',
-    icon: Globe,
-    labelEn: 'Open legacy app',
-    labelHe: 'מעבר לאפליקציה הישנה',
-    onSelect: () => go('/home'),
-  };
+  const adminUtilityItems: DrawerItem[] = [
+    { id: 'u-landing',     icon: Rocket,          labelEn: 'Landing',           labelHe: 'דף נחיתה',         onSelect: () => go('/admin-hub?tab=studio&sub=exire-funnel') },
+    { id: 'u-forms',       icon: ClipboardList,   labelEn: 'Forms',             labelHe: 'טפסים',            onSelect: () => go('/admin-hub?tab=studio&sub=forms') },
+    { id: 'u-templates',   icon: MessageSquare,   labelEn: 'Message templates', labelHe: 'תבניות הודעה',     onSelect: () => go('/admin-hub?tab=studio&sub=templates') },
+    { id: 'u-analytics',   icon: BarChart3,       labelEn: 'Analytics',         labelHe: 'אנליטיקס',         onSelect: () => go('/admin-hub?tab=more&sub=analytics') },
+    { id: 'u-users',       icon: UsersIcon,       labelEn: 'Users & roles',     labelHe: 'משתמשים והרשאות',  onSelect: () => go('/admin-hub?tab=more&sub=users') },
+    { id: 'u-integrations',icon: Plug,            labelEn: 'Integrations',      labelHe: 'אינטגרציות',       onSelect: () => go('/admin-hub?tab=more&sub=integrations') },
+  ];
+
+  // Legacy / secondary
+  const legacyItems: DrawerItem[] = [
+    { id: 'legacy-app',     icon: Globe,    labelEn: 'Open legacy app',     labelHe: 'מעבר לאפליקציה הישנה', onSelect: () => go('/home') },
+    { id: 'legacy-archive', icon: Archive,  labelEn: 'Archive / old tools', labelHe: 'ארכיון / כלים ישנים',  onSelect: () => go('/admin-hub?tab=legacy') },
+  ];
 
   const clientItems: DrawerItem[] = CANONICAL_SURFACES.map((s) => ({
     id: s.id,
@@ -119,20 +129,24 @@ export default function ShellV2Drawer() {
 
   const sections: DrawerSection[] = isAdminContext
     ? [
-        {
-          id: 'admin-quick',
-          titleEn: 'Exire Systema',
-          titleHe: 'Exire Systema',
-          items: adminQuickItems,
-        },
-        {
-          id: 'legacy-app',
-          titleEn: 'Legacy',
-          titleHe: 'ישן',
-          items: [legacyAppItem],
-        },
+        { id: 'admin-quick',   titleEn: 'Exire Systema', titleHe: 'Exire Systema', items: adminPrimaryItems },
+        { id: 'admin-utility', titleEn: 'Shortcuts',     titleHe: 'קיצורים',       items: adminUtilityItems },
+        { id: 'legacy-app',    titleEn: 'Legacy',        titleHe: 'ישן',           items: legacyItems },
       ]
     : [
+        { id: 'surfaces', items: clientItems },
+        {
+          id: 'account',
+          titleEn: 'Account',
+          titleHe: 'חשבון',
+          items: [
+            { id: 'settings', icon: SettingsIcon, labelEn: 'Settings', labelHe: 'הגדרות', onSelect: () => go('/subscriptions') },
+            ...(isAdmin
+              ? [{ id: 'admin', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול', onSelect: () => go('/admin-hub') }]
+              : []),
+          ],
+        },
+      ];
         { id: 'surfaces', items: clientItems },
         {
           id: 'account',
