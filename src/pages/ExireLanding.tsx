@@ -635,7 +635,7 @@ export default function ExireLanding() {
             onClick={scrollToForm}
             className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition"
           >
-            בדוק התאמה לתהליך <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+            {primaryLabel} <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
           </button>
         </div>
       )}
