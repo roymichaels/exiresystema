@@ -28,6 +28,11 @@ export default function NavLayer() {
   const isHe = language === 'he';
   const { weight: chromeWeight } = useChromeDeemphasis();
 
+  // IA-6: in admin/operator mode the realm anchors and the constellation hint
+  // compete with the touch-first OS. Hide them entirely in admin routes.
+  const isAdminContext =
+    location.pathname.startsWith('/admin') || location.pathname.startsWith('/clients/');
+
   const [, bump] = useState(0);
   useEffect(() => worldResidueBus.subscribe(() => bump((n) => n + 1)), []);
 
@@ -72,6 +77,8 @@ export default function NavLayer() {
       },
     };
   });
+
+  if (isAdminContext) return null;
 
   return (
     <>
