@@ -416,7 +416,7 @@ export default function ExireDashboard() {
               ))}
             </CardContent>
           </Card>
-        </section>
+        </MobileCollapsible>
       )}
 
       {/* Launch readiness — setup support, collapsed by default on mobile */}
