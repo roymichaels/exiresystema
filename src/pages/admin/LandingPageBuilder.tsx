@@ -458,7 +458,9 @@ const LandingPageBuilder = () => {
         existingSections={sections.map(s => s.type)}
       />
     </div>
+    </>
   );
+
 };
 
 export default LandingPageBuilder;
