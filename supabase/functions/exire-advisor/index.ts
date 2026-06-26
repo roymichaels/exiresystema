@@ -256,8 +256,8 @@ Deno.serve(async (req) => {
   try {
     res = await callModel(PRIMARY_MODEL);
 
-    // Try fallback once on 4xx/5xx (except 402 credits / 429 rate-limit which we surface directly).
-    if (!res.ok && res.status !== 402 && res.status !== 429) {
+    // Try fallback once on any non-ok except credits exhaustion (workspace-level).
+    if (!res.ok && res.status !== 402) {
       const primaryErr = await safeReadOpenRouterError(res);
       console.warn("[exire-advisor] primary failed, trying fallback", {
         primary: PRIMARY_MODEL,
