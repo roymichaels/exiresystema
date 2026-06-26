@@ -14,8 +14,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
-import { useTranslation } from '@/hooks/useTranslation';
-
 interface AdminHubProps {
   activeTab?: string;
   activeSubTab?: string;
@@ -23,8 +21,6 @@ interface AdminHubProps {
 }
 
 export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChange }: AdminHubProps) {
-  const { language } = useTranslation();
-  const isHe = language === 'he';
 
   const currentTabConfig = useMemo(
     () => ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0],
