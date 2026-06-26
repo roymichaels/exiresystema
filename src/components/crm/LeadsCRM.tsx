@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,8 +91,10 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
   const convertLead = useConvertLeadToClient();
   const navigate = useNavigate();
 
+  const [urlParams] = useSearchParams();
+  const initialSource = urlParams.get('source') || 'all';
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState(initialSource);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selected, setSelected] = useState<Lead | null>(null);
   const [toDelete, setToDelete] = useState<Lead | null>(null);
