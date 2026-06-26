@@ -120,7 +120,7 @@ export default function ExireFunnelSettings() {
   const doneCount = checklist.filter((c) => c.ok).length;
 
   return (
-    <div dir="rtl" className="space-y-5">
+    <div dir="rtl" className="space-y-5 w-full max-w-full overflow-x-hidden">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
