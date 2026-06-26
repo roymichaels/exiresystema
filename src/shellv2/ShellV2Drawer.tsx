@@ -76,18 +76,29 @@ export default function ShellV2Drawer() {
     {
       id: 'admin-home',
       icon: Shield,
-      labelEn: 'Admin Home',
+      labelEn: 'Today',
       labelHe: 'היום',
       onSelect: () => go('/admin-hub?tab=today'),
     },
     {
-      id: 'admin-settings',
+      id: 'admin-more',
       icon: SettingsIcon,
-      labelEn: 'Settings',
-      labelHe: 'הגדרות',
-      onSelect: () => go('/admin-hub?tab=settings'),
+      labelEn: 'More',
+      labelHe: 'עוד',
+      onSelect: () => go('/admin-hub?tab=more&sub=more-home'),
     },
   ];
+
+  // In admin context we deliberately do NOT list Home / Courses / Community /
+  // Profile as primary surfaces — that's the legacy client app. We surface it
+  // as ONE small secondary entry.
+  const legacyAppItem: DrawerItem = {
+    id: 'legacy-app',
+    icon: Globe,
+    labelEn: 'Open legacy app',
+    labelHe: 'מעבר לאפליקציה הישנה',
+    onSelect: () => go('/home'),
+  };
 
   const clientItems: DrawerItem[] = CANONICAL_SURFACES.map((s) => ({
     id: s.id,
@@ -107,9 +118,9 @@ export default function ShellV2Drawer() {
         },
         {
           id: 'legacy-app',
-          titleEn: 'Old app',
-          titleHe: 'אפליקציה ישנה',
-          items: clientItems,
+          titleEn: 'Legacy',
+          titleHe: 'ישן',
+          items: [legacyAppItem],
         },
       ]
     : [
