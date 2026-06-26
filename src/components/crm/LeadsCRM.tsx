@@ -333,6 +333,20 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                           </a>
                         </Button>
                       )}
+                      <MessageTemplatePicker
+                        channel="whatsapp"
+                        category="lead_reply"
+                        phone={lead.phone}
+                        recipientName={lead.name}
+                        leadId={lead.id}
+                        defaultVars={{ lead_name: lead.name, first_name: (lead.name || '').split(' ')[0] }}
+                        title="WhatsApp · מענה לליד"
+                        trigger={
+                          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1" disabled={!lead.phone}>
+                            <Send className="h-3.5 w-3.5" /> שלח תבנית
+                          </Button>
+                        }
+                      />
                       <Badge variant="outline" className={STATUS_COLOR[lead.status] || ''}>
                         {STATUS_LABELS[lead.status] || lead.status}
                       </Badge>
