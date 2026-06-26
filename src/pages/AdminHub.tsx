@@ -45,13 +45,13 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
     <main
       className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-2.5 md:space-y-4"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 2.75rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3rem)',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.5rem)',
       }}
     >
-      {/* Mobile app-bar: ultra-thin. Title + tiny status chip. */}
-      <div className="md:hidden -mx-3 px-3 h-10 flex items-center justify-between gap-2 bg-background/90 backdrop-blur-md border-b border-border/30 sticky top-0 z-10">
-        <h1 className="text-[14.5px] font-semibold truncate min-w-0">
+      {/* Mobile page-context row: title + folded status chip. Compact, single line. */}
+      <div className="md:hidden flex items-center justify-between gap-2 py-1.5">
+        <h1 className="text-[15px] font-semibold truncate min-w-0 text-foreground/90">
           {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
         </h1>
         <Button
@@ -65,6 +65,7 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
           <ChevronDown className={cn('w-3 h-3 transition-transform', statsOpen && 'rotate-180')} />
         </Button>
       </div>
+
 
 
       {/* Stats bar — desktop always, mobile only when toggled */}
