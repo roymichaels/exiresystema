@@ -83,20 +83,23 @@ function CtaRow({
   onPrimary: () => void; whatsapp: string; helloText: string;
   primaryLabel: string; secondaryLabel: string; onSecondaryClick?: () => void;
 }) {
+  const hasWa = whatsapp.length >= 8;
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
       <Button size="lg" onClick={onPrimary} className="gap-2 h-12 px-7 text-base">
         {primaryLabel} <ArrowLeft className="h-4 w-4" />
       </Button>
-      <Button asChild size="lg" variant="outline" className="gap-2 h-12 px-7 text-base">
-        <a
-          href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(helloText)}`}
-          target="_blank" rel="noopener noreferrer"
-          onClick={onSecondaryClick}
-        >
-          <MessageCircle className="h-4 w-4" /> {secondaryLabel}
-        </a>
-      </Button>
+      {hasWa && (
+        <Button asChild size="lg" variant="outline" className="gap-2 h-12 px-7 text-base">
+          <a
+            href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(helloText)}`}
+            target="_blank" rel="noopener noreferrer"
+            onClick={onSecondaryClick}
+          >
+            <MessageCircle className="h-4 w-4" /> {secondaryLabel}
+          </a>
+        </Button>
+      )}
     </div>
   );
 }
