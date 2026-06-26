@@ -81,6 +81,20 @@ const normalizePhone = (phone: string | null) => {
   return p;
 };
 
+// Phase 2M — landing dedup helpers
+const leadMeta = (l: Lead): Record<string, unknown> =>
+  (l.metadata && typeof l.metadata === 'object' ? l.metadata as Record<string, unknown> : {});
+const isResubmitted = (l: Lead): boolean => {
+  const m = leadMeta(l);
+  const tags = (l as unknown as { tags?: string[] | null }).tags;
+  return !!m.latest_submission || (typeof m.resubmit_count === 'number' && (m.resubmit_count as number) > 0)
+    || (Array.isArray(tags) && tags.includes('resubmitted'));
+};
+const resubmitCount = (l: Lead): number => {
+  const m = leadMeta(l);
+  return typeof m.resubmit_count === 'number' ? (m.resubmit_count as number) : 0;
+};
+
 const waLink = (phone: string | null) => {
   const p = normalizePhone(phone);
   return p ? `https://wa.me/${p.replace(/\+/g, '')}` : null;
@@ -329,12 +343,18 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                           <Badge variant="outline" className="text-[10px] py-0 px-1.5">
                             {SOURCE_LABELS[lead.source] || lead.source}
                           </Badge>
+                          {isResubmitted(lead) && (
+                            <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-400 border-amber-500/30">
+                              🔁 חזר{resubmitCount(lead) > 1 ? ` ×${resubmitCount(lead)}` : ''}
+                            </Badge>
+                          )}
                           {typeof lead.readiness_score === 'number' && (
                             <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
                               <Sparkles className="h-3 w-3" /> {lead.readiness_score}/10
                             </span>
                           )}
                         </div>
+
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
                           {lead.phone && (
                             <span dir="ltr" className="flex items-center gap-1">
@@ -421,6 +441,11 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                 )}
 
                 <FormAnswersPreview metadata={selected.metadata} />
+
+                {isResubmitted(selected) && (
+                  <ResubmissionPanel lead={selected} />
+                )}
+
 
 
                 {/* Quick actions — integrated CRM */}
@@ -629,6 +654,43 @@ const FormAnswersPreview = ({ metadata }: { metadata: Record<string, unknown> | 
     </details>
   );
 };
+
+const ResubmissionPanel = ({ lead }: { lead: Lead }) => {
+  const meta = leadMeta(lead);
+  const latest = meta.latest_submission as Record<string, unknown> | undefined;
+  const history = Array.isArray(meta.submission_history) ? (meta.submission_history as Record<string, unknown>[]) : [];
+  const count = resubmitCount(lead);
+  if (!latest && history.length === 0 && count === 0) return null;
+  const fmt = (s: unknown) => s ? format(new Date(String(s)), 'dd MMM HH:mm', { locale: he }) : '';
+  return (
+    <details className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3" open>
+      <summary className="text-xs font-semibold text-amber-500 uppercase cursor-pointer">
+        🔁 הגשה חוזרת{count > 0 ? ` · ${count} פעמים` : ''}
+      </summary>
+      {latest && (
+        <div className="mt-2 space-y-1 text-sm" dir="auto">
+          <div className="text-[10px] text-muted-foreground">הגשה אחרונה · {fmt(latest.at)}</div>
+          {latest.main_challenge ? <div><span className="text-xs text-muted-foreground">אתגר: </span>{String(latest.main_challenge)}</div> : null}
+          {latest.desired_result ? <div><span className="text-xs text-muted-foreground">תוצאה: </span>{String(latest.desired_result)}</div> : null}
+          {latest.what_have_you_tried ? <div><span className="text-xs text-muted-foreground">ניסה: </span>{String(latest.what_have_you_tried)}</div> : null}
+          {latest.phone ? <div dir="ltr"><span className="text-xs text-muted-foreground">טלפון: </span>{String(latest.phone)}</div> : null}
+          {latest.email ? <div dir="ltr"><span className="text-xs text-muted-foreground">אימייל: </span>{String(latest.email)}</div> : null}
+        </div>
+      )}
+      {history.length > 1 && (
+        <div className="mt-3 border-t border-amber-500/20 pt-2 space-y-1 max-h-40 overflow-y-auto">
+          <div className="text-[10px] text-muted-foreground uppercase">היסטוריית הגשות ({history.length})</div>
+          {history.slice().reverse().map((h, i) => (
+            <div key={i} className="text-[11px] text-muted-foreground" dir="auto">
+              · {fmt(h.at)}{h.main_challenge ? ` — ${String(h.main_challenge).slice(0, 60)}` : ''}
+            </div>
+          ))}
+        </div>
+      )}
+    </details>
+  );
+};
+
 
 
 

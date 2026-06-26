@@ -4,3 +4,6 @@ verify_jwt = false
 
 [functions.sync-form-lead]
 verify_jwt = false
+
+[functions.submit-landing-lead]
+verify_jwt = false
