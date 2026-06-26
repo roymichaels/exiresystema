@@ -335,95 +335,132 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
           ) : filtered.length === 0 ? (
             <div className="text-center py-12">
               <Users className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground">אין לידים להצגה</p>
+              <p className="text-muted-foreground">
+                {search || sourceFilter !== 'all' || statusFilter !== 'all'
+                  ? 'אין תוצאות לסינון הנוכחי'
+                  : 'אין לידים להצגה'}
+              </p>
+              {(search || sourceFilter !== 'all' || statusFilter !== 'all') && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => { setSearch(''); setSourceFilter('all'); setStatusFilter('all'); }}
+                >
+                  נקה סינון
+                </Button>
+              )}
             </div>
           ) : (
-            <div className="space-y-2">
-              {filtered.map(lead => {
-                const wa = waLink(lead.phone);
-                return (
-                  <div
+            <>
+              {/* Mobile list — compact, native CRM feel */}
+              <div className="md:hidden space-y-2.5">
+                {filtered.map(lead => (
+                  <MobileLeadCard
                     key={lead.id}
-                    className="group flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={() => openLead(lead)}
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                        <span className="text-sm font-bold text-primary">
-                          {(lead.name || '?').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-medium text-sm">{lead.name}</h4>
-                          <Badge variant="outline" className="text-[10px] py-0 px-1.5">
-                            {SOURCE_LABELS[lead.source] || lead.source}
-                          </Badge>
-                          {isResubmitted(lead) && (
-                            <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-400 border-amber-500/30">
-                              🔁 חזר{resubmitCount(lead) > 1 ? ` ×${resubmitCount(lead)}` : ''}
-                            </Badge>
-                          )}
-                          {typeof lead.readiness_score === 'number' && (
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                              <Sparkles className="h-3 w-3" /> {lead.readiness_score}/10
-                            </span>
-                          )}
-                        </div>
+                    lead={lead}
+                    sourceLabel={SOURCE_LABELS[lead.source] || lead.source}
+                    statusLabel={STATUS_LABELS[lead.status] || lead.status}
+                    statusColor={STATUS_COLOR[lead.status] || ''}
+                    onOpen={() => openLead(lead)}
+                    onConvert={() => {
+                      convertLead.mutate(
+                        { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
+                        { onSuccess: (client) => navigate(`/clients/${client.id}`) },
+                      );
+                    }}
+                  />
+                ))}
+              </div>
 
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
-                          {lead.phone && (
-                            <span dir="ltr" className="flex items-center gap-1">
-                              <Phone className="h-3 w-3" />{lead.phone}
-                            </span>
-                          )}
-                          {lead.email && (
-                            <span className="flex items-center gap-1">
-                              <Mail className="h-3 w-3" />{lead.email}
-                            </span>
-                          )}
-                          <span>
-                            {format(new Date(lead.created_at), 'dd MMM HH:mm', { locale: he })}
+              {/* Desktop list */}
+              <div className="hidden md:block space-y-2">
+                {filtered.map(lead => {
+                  const wa = waLink(lead.phone);
+                  return (
+                    <div
+                      key={lead.id}
+                      className="group flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => openLead(lead)}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                          <span className="text-sm font-bold text-primary">
+                            {(lead.name || '?').charAt(0).toUpperCase()}
                           </span>
                         </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-medium text-sm">{lead.name}</h4>
+                            <Badge variant="outline" className="text-[10px] py-0 px-1.5">
+                              {SOURCE_LABELS[lead.source] || lead.source}
+                            </Badge>
+                            {isResubmitted(lead) && (
+                              <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-400 border-amber-500/30">
+                                🔁 חזר{resubmitCount(lead) > 1 ? ` ×${resubmitCount(lead)}` : ''}
+                              </Badge>
+                            )}
+                            {typeof lead.readiness_score === 'number' && (
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                                <Sparkles className="h-3 w-3" /> {lead.readiness_score}/10
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                            {lead.phone && (
+                              <span dir="ltr" className="flex items-center gap-1">
+                                <Phone className="h-3 w-3" />{lead.phone}
+                              </span>
+                            )}
+                            {lead.email && (
+                              <span className="flex items-center gap-1">
+                                <Mail className="h-3 w-3" />{lead.email}
+                              </span>
+                            )}
+                            <span>
+                              {format(new Date(lead.created_at), 'dd MMM HH:mm', { locale: he })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
+                        {lead.phone && (
+                          <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+                            <a href={`tel:${lead.phone}`} aria-label="חייג"><Phone className="h-4 w-4" /></a>
+                          </Button>
+                        )}
+                        {wa && (
+                          <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+                            <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="ווטסאפ">
+                              <MessageCircle className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        )}
+                        <MessageTemplatePicker
+                          channel="whatsapp"
+                          category="lead_reply"
+                          phone={lead.phone}
+                          recipientName={lead.name}
+                          leadId={lead.id}
+                          defaultVars={{ lead_name: lead.name, first_name: (lead.name || '').split(' ')[0] }}
+                          title="WhatsApp · מענה לליד"
+                          trigger={
+                            <Button size="sm" variant="ghost" className="h-8 px-2 gap-1" disabled={!lead.phone}>
+                              <Send className="h-3.5 w-3.5" /> שלח תבנית
+                            </Button>
+                          }
+                        />
+                        <Badge variant="outline" className={STATUS_COLOR[lead.status] || ''}>
+                          {STATUS_LABELS[lead.status] || lead.status}
+                        </Badge>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
-                      {lead.phone && (
-                        <Button asChild size="icon" variant="ghost" className="h-8 w-8">
-                          <a href={`tel:${lead.phone}`} aria-label="חייג"><Phone className="h-4 w-4" /></a>
-                        </Button>
-                      )}
-                      {wa && (
-                        <Button asChild size="icon" variant="ghost" className="h-8 w-8">
-                          <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="ווטסאפ">
-                            <MessageCircle className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                      <MessageTemplatePicker
-                        channel="whatsapp"
-                        category="lead_reply"
-                        phone={lead.phone}
-                        recipientName={lead.name}
-                        leadId={lead.id}
-                        defaultVars={{ lead_name: lead.name, first_name: (lead.name || '').split(' ')[0] }}
-                        title="WhatsApp · מענה לליד"
-                        trigger={
-                          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1" disabled={!lead.phone}>
-                            <Send className="h-3.5 w-3.5" /> שלח תבנית
-                          </Button>
-                        }
-                      />
-                      <Badge variant="outline" className={STATUS_COLOR[lead.status] || ''}>
-                        {STATUS_LABELS[lead.status] || lead.status}
-                      </Badge>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
