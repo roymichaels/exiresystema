@@ -147,19 +147,6 @@ export default function ShellV2Drawer() {
           ],
         },
       ];
-        { id: 'surfaces', items: clientItems },
-        {
-          id: 'account',
-          titleEn: 'Account',
-          titleHe: 'חשבון',
-          items: [
-            { id: 'settings', icon: SettingsIcon, labelEn: 'Settings', labelHe: 'הגדרות', onSelect: () => go('/subscriptions') },
-            ...(isAdmin
-              ? [{ id: 'admin', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול', onSelect: () => go('/admin-hub') }]
-              : []),
-          ],
-        },
-      ];
 
   const handleLogout = async () => {
     overlay.close();
