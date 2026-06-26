@@ -57,16 +57,18 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelEn: 'Coach',
     icon: Briefcase,
     subTabs: [
-      // Exire Systema focus mode — primary tabs first.
-      { id: 'exire-today',     labelHe: 'Exire היום',      labelEn: 'Exire Today',     component: ExireDashboard },
-      { id: 'exire-funnel',     labelHe: 'הגדרות פאנל',     labelEn: 'Funnel Settings', component: ExireFunnelSettings },
+      // Exire Systema focus mode — primary workflow, ordered for daily use.
+      { id: 'exire-today',     labelHe: 'Exire היום',      labelEn: 'Exire Today',      component: ExireDashboard },
+      { id: 'xsystem-clients', labelHe: 'לקוחות XSYSTEM',  labelEn: 'XSYSTEM Clients',  component: XSystemClientsTab },
+      { id: 'leads',           labelHe: 'לידים',           labelEn: 'Leads',            component: CoachLeadsTab },
       { id: 'exire-lead-forms', labelHe: 'טפסי לידים Exire', labelEn: 'Exire Lead Forms', component: ExireLeadForms },
-      { id: 'xsystem-clients', labelHe: 'לקוחות XSYSTEM',  labelEn: 'XSYSTEM Clients', component: XSystemClientsTab },
-      { id: 'leads',           labelHe: 'לידים',           labelEn: 'Leads',           component: CoachLeadsTab },
-      { id: 'templates',       labelHe: 'תבניות הודעות',   labelEn: 'Templates',       component: MessageTemplates },
-      { id: 'plans',           labelHe: 'תוכניות',         labelEn: 'Plans',           component: CoachPlansTab },
-      { id: 'analytics',       labelHe: 'אנליטיקס',        labelEn: 'Analytics',       component: Analytics },
-      // Legacy / secondary
+      { id: 'exire-funnel',    labelHe: 'הגדרות פאנל',     labelEn: 'Funnel Settings',  component: ExireFunnelSettings },
+      { id: 'templates',       labelHe: 'תבניות הודעות',   labelEn: 'Templates',        component: MessageTemplates },
+      { id: 'forms',           labelHe: 'טפסים',           labelEn: 'Forms',            component: Forms },
+      { id: 'recordings',      labelHe: 'הקלטות',          labelEn: 'Recordings',       component: Recordings },
+      { id: 'analytics',       labelHe: 'אנליטיקס',        labelEn: 'Analytics',        component: Analytics },
+      // Legacy / secondary — kept mounted, deprioritised in nav.
+      { id: 'plans',           labelHe: 'תוכניות (legacy)', labelEn: 'Plans (legacy)',  component: CoachPlansTab },
       { id: 'overview',        labelHe: 'סקירה ישנה',      labelEn: 'Overview (legacy)', component: CoachDashboardOverview },
       { id: 'clients',         labelHe: 'מתאמנים (legacy)', labelEn: 'Clients (legacy)', component: CoachClientsTab },
     ],

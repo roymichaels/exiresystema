@@ -263,6 +263,32 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               </SelectContent>
             </Select>
           </div>
+          {/* Quick filter chips */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            {[
+              { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
+              { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
+              { id: 'followup', label: 'דורש פולואפ',   status: 'contacted', source: sourceFilter },
+              { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
+              { id: 'home',     label: '🏠 דף הבית',    status: statusFilter, source: 'homepage' },
+              { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
+              { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
+              { id: 'ig',       label: '📸 אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
+            ].map(c => {
+              const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
+                  className={`text-xs rounded-full px-3 py-1 border transition ${
+                    active
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'border-border/50 hover:bg-muted/50'
+                  }`}
+                >{c.label}</button>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 

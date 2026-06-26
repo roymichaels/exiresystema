@@ -17,6 +17,7 @@ import { useExireDashboard } from '@/hooks/xsystem/dashboard';
 import { useOnboardingInsights } from '@/hooks/xsystem/onboardingInsights';
 import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
 import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
+import ExireLaunchChecklist from './ExireLaunchChecklist';
 
 const fmt = (cents: number, ccy: string) =>
   new Intl.NumberFormat('he-IL', { style: 'currency', currency: ccy || 'ILS', maximumFractionDigits: 0 })
@@ -68,6 +69,8 @@ export default function ExireDashboard() {
 
   return (
     <div className="space-y-5">
+      <ExireLaunchChecklist />
+
       {/* Revenue */}
       <section>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">הכנסות</h3>
