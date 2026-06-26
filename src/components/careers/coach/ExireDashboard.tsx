@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useExireDashboard } from '@/hooks/xsystem/dashboard';
 import { useOnboardingInsights } from '@/hooks/xsystem/onboardingInsights';
 import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
+import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
 
 const fmt = (cents: number, ccy: string) =>
   new Intl.NumberFormat('he-IL', { style: 'currency', currency: ccy || 'ILS', maximumFractionDigits: 0 })
@@ -52,6 +53,7 @@ export default function ExireDashboard() {
   const { data, isLoading } = useExireDashboard();
   const { data: insights } = useOnboardingInsights();
   const { data: funnel } = useExireFunnelMetrics();
+  const { data: formMetrics } = useExireFormMetrics();
 
   if (isLoading || !data) {
     return (
@@ -284,6 +286,48 @@ export default function ExireDashboard() {
           </Card>
         </section>
       )}
+
+      {formMetrics && formMetrics.formIds.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold">Exire · טפסי לידים</h2>
+            <Button size="sm" variant="ghost" className="text-xs"
+              onClick={() => navigate('/admin?tab=coach&sub=exire-lead-forms')}>
+              נהל מיפויי טפסים
+            </Button>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5 mb-3">
+            <Stat label="לידים מטפסים היום" value={formMetrics.leadsToday} icon={TrendingUp} tone={formMetrics.leadsToday > 0 ? 'good' : 'default'} />
+            <Stat label="ממתינים למענה ראשון" value={formMetrics.awaitingFirstReply} icon={AlertCircle} tone={formMetrics.awaitingFirstReply > 0 ? 'warn' : 'default'} />
+            <Stat label="הגשות לא מסונכרנות" value={formMetrics.totalUnsynced} icon={ClipboardCheck} tone={formMetrics.totalUnsynced > 0 ? 'warn' : 'default'} />
+            <Stat label="סך הגשות" value={formMetrics.totalSubmissions} icon={FileText} />
+            <Stat label="סך סונכרנו" value={formMetrics.totalSynced} icon={Users} tone="good" />
+          </div>
+          <Card>
+            <CardHeader className="py-3"><CardTitle className="text-sm">לידים אחרונים מטפסים</CardTitle></CardHeader>
+            <CardContent className="space-y-1 pt-0">
+              {formMetrics.latest.length === 0 && (
+                <p className="text-xs text-muted-foreground">עוד לא נוצרו לידים מטפסים מסומנים.</p>
+              )}
+              {formMetrics.latest.map((l) => (
+                <button key={l.id}
+                  onClick={() => navigate(`/admin?tab=coach&sub=leads&source=${encodeURIComponent(l.source)}`)}
+                  className="w-full flex items-center justify-between gap-3 text-sm hover:bg-muted/50 rounded px-2 py-1.5 text-right">
+                  <span className="min-w-0 flex-1 truncate">
+                    <span className="font-medium">{l.name}</span>
+                    {l.pain_category && <span className="text-xs text-muted-foreground mr-2">· {l.pain_category}</span>}
+                    {l.form_title && <span className="text-[10px] text-muted-foreground mr-2">[{l.form_title}]</span>}
+                  </span>
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {new Date(l.created_at).toLocaleDateString('he-IL')}
+                  </span>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
+      )}
     </div>
   );
 }
+
