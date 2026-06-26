@@ -32,6 +32,7 @@ import { useLeadActivity } from '@/hooks/useLeadActivity';
 import { useCreateXSystemLeadFollowup } from '@/hooks/xsystem';
 import { MessageTemplatePicker } from '@/components/admin/clients/xsystem/MessageTemplatePicker';
 import { Send } from 'lucide-react';
+import { MobileLeadCard } from '@/components/crm/MobileLeadCard';
 
 interface LeadsCRMProps {
   scope?: 'admin' | 'coach';
