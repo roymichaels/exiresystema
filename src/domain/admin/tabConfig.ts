@@ -166,7 +166,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
       { id: 'affiliates',    labelHe: 'שותפים',       labelEn: 'Affiliates',    component: AdminAffiliates },
       { id: 'users',         labelHe: 'משתמשים',      labelEn: 'Users',         component: UsersPage },
       { id: 'bug-reports',   labelHe: 'דיווחי באגים', labelEn: 'Bug Reports',   component: BugReports },
-      { id: 'settings',      labelHe: 'הגדרות',       labelEn: 'Settings',      component: AdminSettings },
+      { id: 'settings',      labelHe: 'כללי',         labelEn: 'General',       component: AdminSettings },
     ],
   },
   {
