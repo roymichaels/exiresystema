@@ -46,15 +46,10 @@ interface Props {
   statusColor: string;
   onOpen: () => void;
   onConvert: () => void;
-  onFollowup: () => void;
-  onSendTemplate: () => void;
-  onSendOpening: () => void;
-  onSendScheduling: () => void;
 }
 
 export const MobileLeadCard = ({
-  lead, sourceLabel, statusLabel, statusColor,
-  onOpen, onConvert, onFollowup, onSendTemplate, onSendOpening, onSendScheduling,
+  lead, sourceLabel, statusLabel, statusColor, onOpen, onConvert,
 }: Props) => {
   const wa = waLink(lead.phone);
   const primaryHref = wa || (lead.phone ? `tel:${lead.phone}` : null);
