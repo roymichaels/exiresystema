@@ -134,6 +134,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     icon: MoreHorizontal,
     subTabs: [
       { id: 'more-home',       labelHe: 'עוד',           labelEn: 'More',           component: MoreHome },
+      { id: 'advisor',         labelHe: 'המוח העסקי',    labelEn: 'Advisor',        component: Advisor },
       { id: 'analytics',       labelHe: 'אנליטיקס',      labelEn: 'Analytics',      component: Analytics },
       { id: 'aurora-insights', labelHe: 'תובנות Aurora', labelEn: 'Insights',       component: AuroraInsights },
       { id: 'settings',        labelHe: 'הגדרות',        labelEn: 'Settings',       component: AdminSettings },
