@@ -19,6 +19,7 @@ const Analytics              = lazy(() => import('@/pages/admin/Analytics'));
 const XSystemClientsTab      = lazy(() => import('@/components/admin/clients/XSystemClientsTab'));
 const ExireDashboard         = lazy(() => import('@/components/careers/coach/ExireDashboard'));
 const MessageTemplates       = lazy(() => import('@/pages/admin/MessageTemplates'));
+const ExireFunnelSettings    = lazy(() => import('@/pages/admin/ExireFunnelSettings'));
 
 // ─── Marketing (Campaigns + Site merged) ────────────────────────────────────
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
