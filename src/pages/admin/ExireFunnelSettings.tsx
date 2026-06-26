@@ -214,7 +214,7 @@ export default function ExireFunnelSettings() {
             </p>
 
             {/* Preview */}
-            <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video max-w-xl">
+            <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video w-full max-w-xl">
               {video.type === 'iframe' ? (
                 <iframe src={video.src} className="w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen title="preview" />
               ) : video.type === 'mp4' ? (
