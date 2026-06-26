@@ -41,8 +41,19 @@ export default function ExireLeadForms() {
   if (isLoading) return <Skeleton className="h-48 w-full" />;
 
   return (
-    <div className="space-y-4">
-      <Card className="border-primary/30 bg-primary/5">
+    <div className="space-y-3 md:space-y-4">
+      {/* Mobile: compact disclosure. Desktop: explainer card. */}
+      <details className="md:hidden rounded-xl border border-border/40 bg-card/40">
+        <summary className="cursor-pointer px-3 py-2 text-[12.5px] font-medium flex items-center gap-2">
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          טפסי לידים Exire — איך זה עובד
+        </summary>
+        <div className="px-3 pb-3 text-[12px] text-muted-foreground space-y-1">
+          <p>סמן טופס כ"טופס ליד Exire" כדי שכל הגשה תיווצר אוטומטית כליד ב-CRM.</p>
+          <p><strong>טופס ליד</strong> = יוצר לידים. <strong>אינטייק</strong> = מצורף ללקוח קיים.</p>
+        </div>
+      </details>
+      <Card className="hidden md:block border-primary/30 bg-primary/5">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
@@ -60,12 +71,11 @@ export default function ExireLeadForms() {
       </Card>
 
       {forms.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center text-sm text-muted-foreground">
-            אין טפסים פעילים. צור טופס בלשונית "טפסים" וחזור לכאן.
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-border/40 bg-card/40 py-8 text-center text-[13px] text-muted-foreground">
+          אין טפסים פעילים. צור טופס בלשונית "טפסים" וחזור לכאן.
+        </div>
       )}
+
 
       <div className="grid gap-3">
         {forms.map((f) => {
