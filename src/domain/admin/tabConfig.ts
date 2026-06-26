@@ -18,6 +18,7 @@ const CoachPlansTab          = lazy(() => import('@/components/careers/coach/Coa
 const Analytics              = lazy(() => import('@/pages/admin/Analytics'));
 const XSystemClientsTab      = lazy(() => import('@/components/admin/clients/XSystemClientsTab'));
 const ExireDashboard         = lazy(() => import('@/components/careers/coach/ExireDashboard'));
+const MessageTemplates       = lazy(() => import('@/pages/admin/MessageTemplates'));
 
 // ─── Marketing (Campaigns + Site merged) ────────────────────────────────────
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
@@ -54,13 +55,16 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelEn: 'Coach',
     icon: Briefcase,
     subTabs: [
-      { id: 'overview',  labelHe: 'סקירה',    labelEn: 'Overview',  component: CoachDashboardOverview },
-      { id: 'exire-today', labelHe: 'Exire היום', labelEn: 'Exire Today', component: ExireDashboard },
-      { id: 'clients',         labelHe: 'מתאמנים',         labelEn: 'Clients',         component: CoachClientsTab },
+      // Exire Systema focus mode — primary tabs first.
+      { id: 'exire-today',     labelHe: 'Exire היום',      labelEn: 'Exire Today',     component: ExireDashboard },
       { id: 'xsystem-clients', labelHe: 'לקוחות XSYSTEM',  labelEn: 'XSYSTEM Clients', component: XSystemClientsTab },
       { id: 'leads',           labelHe: 'לידים',           labelEn: 'Leads',           component: CoachLeadsTab },
-      { id: 'plans',     labelHe: 'תוכניות',  labelEn: 'Plans',     component: CoachPlansTab },
-      { id: 'analytics', labelHe: 'אנליטיקס', labelEn: 'Analytics', component: Analytics },
+      { id: 'templates',       labelHe: 'תבניות הודעות',   labelEn: 'Templates',       component: MessageTemplates },
+      { id: 'plans',           labelHe: 'תוכניות',         labelEn: 'Plans',           component: CoachPlansTab },
+      { id: 'analytics',       labelHe: 'אנליטיקס',        labelEn: 'Analytics',       component: Analytics },
+      // Legacy / secondary
+      { id: 'overview',        labelHe: 'סקירה ישנה',      labelEn: 'Overview (legacy)', component: CoachDashboardOverview },
+      { id: 'clients',         labelHe: 'מתאמנים (legacy)', labelEn: 'Clients (legacy)', component: CoachClientsTab },
     ],
   },
   {
