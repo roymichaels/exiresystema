@@ -174,6 +174,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelHe: 'ארכיון',
     labelEn: 'Legacy',
     icon: Archive,
+    hidden: true,
     subTabs: [
       { id: 'coach-overview',       labelHe: 'סקירת מאמן',         labelEn: 'Coach Overview',     component: CoachDashboardOverview },
       { id: 'coach-leads',          labelHe: 'לידים (ישן)',        labelEn: 'Coach Leads',        component: CoachLeadsTab },
