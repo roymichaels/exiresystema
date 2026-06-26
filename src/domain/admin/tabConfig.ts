@@ -19,6 +19,7 @@ const Analytics              = lazy(() => import('@/pages/admin/Analytics'));
 const XSystemClientsTab      = lazy(() => import('@/components/admin/clients/XSystemClientsTab'));
 const ExireDashboard         = lazy(() => import('@/components/careers/coach/ExireDashboard'));
 const MessageTemplates       = lazy(() => import('@/pages/admin/MessageTemplates'));
+const ExireFunnelSettings    = lazy(() => import('@/pages/admin/ExireFunnelSettings'));
 
 // ─── Marketing (Campaigns + Site merged) ────────────────────────────────────
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
@@ -57,6 +58,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     subTabs: [
       // Exire Systema focus mode — primary tabs first.
       { id: 'exire-today',     labelHe: 'Exire היום',      labelEn: 'Exire Today',     component: ExireDashboard },
+      { id: 'exire-funnel',     labelHe: 'הגדרות פאנל',     labelEn: 'Funnel Settings', component: ExireFunnelSettings },
       { id: 'xsystem-clients', labelHe: 'לקוחות XSYSTEM',  labelEn: 'XSYSTEM Clients', component: XSystemClientsTab },
       { id: 'leads',           labelHe: 'לידים',           labelEn: 'Leads',           component: CoachLeadsTab },
       { id: 'templates',       labelHe: 'תבניות הודעות',   labelEn: 'Templates',       component: MessageTemplates },

@@ -49,6 +49,8 @@ const SOURCE_LABELS: Record<string, string> = {
   exit_popup: 'פופאפ יציאה',
   floating: 'כפתור צף',
   general: 'כללי',
+  exire_landing: '🌊 Exire',
+  homepage: '🏠 דף הבית',
 };
 
 const STATUS_LABELS: Record<string, string> = {

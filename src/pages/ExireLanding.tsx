@@ -3,7 +3,7 @@
  * Hebrew-first, RTL, mobile-first, conversion-focused.
  * Inserts leads with source='exire_landing' and logs lead_activity + conversion_events.
  */
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 // Helmet not required — we set document.title in an effect to keep deps minimal
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -25,9 +25,9 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDefaultIntakeForm } from '@/hooks/xsystem/forms';
+import { useExireFunnelSettings, parseVideoEmbed } from '@/hooks/xsystem/funnelSettings';
 
-const WHATSAPP_NUMBER = '972500000000'; // overrideable via env if needed
-const WHATSAPP_HELLO =
+const DEFAULT_WHATSAPP_HELLO =
   'היי, ראיתי את העמוד של Exire Systema ואני רוצה לבדוק התאמה לתהליך 🙏';
 
 const leadSchema = z.object({
@@ -73,18 +73,24 @@ function SectionTitle({ kicker, title, subtitle }: { kicker?: string; title: str
   );
 }
 
-function CtaRow({ onPrimary }: { onPrimary: () => void }) {
+function CtaRow({
+  onPrimary, whatsapp, helloText, primaryLabel, secondaryLabel, onSecondaryClick,
+}: {
+  onPrimary: () => void; whatsapp: string; helloText: string;
+  primaryLabel: string; secondaryLabel: string; onSecondaryClick?: () => void;
+}) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
       <Button size="lg" onClick={onPrimary} className="gap-2 h-12 px-7 text-base">
-        בדוק התאמה לתהליך <ArrowLeft className="h-4 w-4" />
+        {primaryLabel} <ArrowLeft className="h-4 w-4" />
       </Button>
       <Button asChild size="lg" variant="outline" className="gap-2 h-12 px-7 text-base">
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_HELLO)}`}
+          href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(helloText)}`}
           target="_blank" rel="noopener noreferrer"
+          onClick={onSecondaryClick}
         >
-          <MessageCircle className="h-4 w-4" /> שלח לי פרטים בוואטסאפ
+          <MessageCircle className="h-4 w-4" /> {secondaryLabel}
         </a>
       </Button>
     </div>
@@ -98,6 +104,13 @@ export default function ExireLanding() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ id: string } | null>(null);
   const { data: intakeForm } = useDefaultIntakeForm();
+  const { data: settings } = useExireFunnelSettings();
+  const formStartedRef = React.useRef(false);
+
+  const whatsappNumber = (settings?.exire_whatsapp_number || '972500000000').replace(/\D/g, '');
+  const primaryLabel  = settings?.exire_primary_cta_label   || 'בדוק התאמה לתהליך';
+  const secondaryLabel = settings?.exire_secondary_cta_label || 'שלח לי פרטים בוואטסאפ';
+  const video = parseVideoEmbed(settings?.exire_landing_video_url || '');
 
   const utm = useMemo(() => ({
     utm_source: params.get('utm_source') || null,
@@ -109,37 +122,41 @@ export default function ExireLanding() {
     path: typeof window !== 'undefined' ? window.location.pathname : null,
   }), [params]);
 
+  // Lightweight tracker — fire-and-forget, never throws.
+  const track = React.useCallback((event_type: string, extra?: Record<string, unknown>) => {
+    void supabase.from('conversion_events').insert({
+      event_type,
+      event_category: 'exire_funnel',
+      source: 'exire_landing',
+      page_path: typeof window !== 'undefined' ? window.location.pathname : '/exire',
+      event_data: { ...utm, ...(extra || {}) },
+    } as never).then(() => {}, () => {});
+  }, [utm]);
+
   useEffect(() => {
     const prev = document.title;
-    document.title = 'Exire Systema — תהליך עומק לתת-מודע | חופש מדפוסים';
+    document.title = 'Exire Systema — אימון תודעתי לתת־המודע';
     const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
       let el = document.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
       if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.content = content;
     };
-    setMeta('description', 'Exire Systema · תהליך עומק לעבודה עם תת-המודע. שילוב היפנוזה, NLP ועבודה עם חלקים פנימיים.');
-    setMeta('og:title', 'Exire Systema — תהליך עומק לתת-מודע', 'property');
-    setMeta('og:description', 'שחרור דפוסים חוזרים דרך עבודה ישירה עם המקור — לא רק עם הסימפטום.', 'property');
+    setMeta('description', 'שיטת אימון תודעתי המשלבת היפנוזה, NLP ועבודה עם תת־המודע כדי לזהות ולשנות דפוסים, אמונות וחסימות שחוזרות על עצמן.');
+    setMeta('og:title', 'Exire Systema — אימון תודעתי לתת־המודע', 'property');
+    setMeta('og:description', 'שיטת אימון תודעתי המשלבת היפנוזה, NLP ועבודה עם תת־המודע.', 'property');
     setMeta('og:type', 'website', 'property');
     return () => { document.title = prev; };
   }, []);
 
-  useEffect(() => {
-    // Fire-and-forget landing view event
-    supabase.from('conversion_events').insert({
-      event_type: 'landing_view',
-      event_category: 'exire_funnel',
-      source: 'exire_landing',
-      page_path: typeof window !== 'undefined' ? window.location.pathname : '/exire',
-      event_data: utm,
-    } as never).then(() => {}, () => {});
-  }, [utm]);
+  useEffect(() => { track('landing_view'); }, [track]);
 
   const scrollToForm = () => {
+    track('cta_clicked', { target: 'lead_form' });
     document.getElementById('exire-lead-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const update = <K extends keyof LeadForm>(k: K, v: LeadForm[K]) => {
+    if (!formStartedRef.current) { formStartedRef.current = true; track('lead_form_started'); }
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
@@ -223,7 +240,7 @@ export default function ExireLanding() {
   };
 
   return (
-    <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground">
+    <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
       {/* SEO handled via useEffect below */}
 
       {/* HERO */}
@@ -241,20 +258,46 @@ export default function ExireLanding() {
             Exire Systema הוא תהליך עומק לעבודה עם המקור — לא רק עם הסימפטום.
             שילוב של היפנוזה, NLP, אימון תת-מודע ועבודה עם חלקים פנימיים.
           </p>
-          <div className="mt-8"><CtaRow onPrimary={scrollToForm} /></div>
+          <div className="mt-8"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
           <p className="mt-3 text-xs text-muted-foreground">תהליך אישי · 1-on-1 · שיחת התאמה לפני קבלה</p>
         </motion.div>
 
-        {/* VSL placeholder */}
-        <motion.div {...fade} className="mt-12 sm:mt-16 max-w-3xl mx-auto">
+        {/* VSL — configurable via Admin → Funnel Settings */}
+        <motion.div
+          {...fade}
+          className="mt-12 sm:mt-16 max-w-3xl mx-auto"
+          onViewportEnter={() => track('vsl_section_seen')}
+          viewport={{ once: true, amount: 0.3 }}
+        >
           <Card className="overflow-hidden border-primary/20">
-            <div className="aspect-video relative bg-gradient-to-br from-primary/10 via-background to-primary/5 flex items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-full bg-primary/15 backdrop-blur flex items-center justify-center mb-3">
-                  <Play className="h-7 w-7 text-primary ms-0.5" />
+            <div className="aspect-video relative bg-gradient-to-br from-primary/10 via-background to-primary/5">
+              {video.type === 'iframe' ? (
+                <iframe
+                  src={video.src}
+                  title="Exire Systema — סרטון הסבר"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full border-0"
+                />
+              ) : video.type === 'mp4' ? (
+                <video
+                  src={video.src}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="absolute inset-0 w-full h-full object-cover bg-black"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="mx-auto h-16 w-16 rounded-full bg-primary/15 backdrop-blur flex items-center justify-center mb-3">
+                      <Play className="h-7 w-7 text-primary ms-0.5" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">סרטון הסבר על התהליך · יעלה בקרוב</p>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">סרטון הסבר על התהליך · יעלה בקרוב</p>
-              </div>
+              )}
             </div>
           </Card>
         </motion.div>
@@ -286,7 +329,7 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} /></div>
+        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* NEW MECHANISM */}
@@ -345,7 +388,7 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} /></div>
+        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* FOR / NOT FOR */}
@@ -422,7 +465,7 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} /></div>
+        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* LEAD FORM */}
@@ -448,14 +491,16 @@ export default function ExireLanding() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button asChild size="lg" className="gap-2">
-                      <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_HELLO)}`}
-                        target="_blank" rel="noopener noreferrer">
+                      <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(DEFAULT_WHATSAPP_HELLO)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        onClick={() => track('whatsapp_clicked', { location: 'thank_you', lead_id: done.id })}>
                         <MessageCircle className="h-4 w-4" /> דבר איתי בוואטסאפ
                       </a>
                     </Button>
                     {intakeForm?.url && (
                       <Button asChild size="lg" variant="outline" className="gap-2">
-                        <a href={intakeForm.url} target="_blank" rel="noopener noreferrer">
+                        <a href={intakeForm.url} target="_blank" rel="noopener noreferrer"
+                          onClick={() => track('intake_clicked', { lead_id: done.id })}>
                           מילוי טופס קבלה <ArrowLeft className="h-4 w-4" />
                         </a>
                       </Button>
@@ -591,7 +636,7 @@ export default function ExireLanding() {
           <p className="text-muted-foreground mb-7 max-w-xl mx-auto">
             שיחה קצרה. בלי התחייבות. בודקים יחד אם זה הזמן והמקום הנכונים בשבילך.
           </p>
-          <CtaRow onPrimary={scrollToForm} />
+          <CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} />
         </motion.div>
       </Section>
 
