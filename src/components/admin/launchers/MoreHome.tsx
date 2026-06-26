@@ -8,7 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   BarChart3, Settings, Users as UsersIcon, Plug, Bell, Palette,
-  Mail, Handshake, Bug, Archive, Sparkles, ExternalLink,
+  Mail, Handshake, Bug, Archive, Sparkles, ExternalLink, Brain,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +22,7 @@ type Card = {
 };
 
 const PRIMARY: Card[] = [
+  { id: 'advisor',      titleHe: 'המוח העסקי',     titleEn: 'Advisor',      subtitleHe: 'אסטרטגיה ופעולות להיום', subtitleEn: 'Strategy & next actions', icon: Brain },
   { id: 'settings',     titleHe: 'הגדרות',         titleEn: 'Settings',     subtitleHe: 'כללי וחשבון',          subtitleEn: 'General & account',   icon: Settings },
   { id: 'analytics',    titleHe: 'אנליטיקס',       titleEn: 'Analytics',    subtitleHe: 'מספרים ומגמות',         subtitleEn: 'Numbers & trends',    icon: BarChart3 },
   { id: 'integrations', titleHe: 'אינטגרציות',     titleEn: 'Integrations', subtitleHe: 'WhatsApp, אימייל, תשלום', subtitleEn: 'WhatsApp, mail, pay', icon: Plug },

@@ -19,6 +19,7 @@ import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
 import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
 import { useResubmittedLeads } from '@/hooks/xsystem/resubmittedLeads';
 import ExireLaunchChecklist from './ExireLaunchChecklist';
+import AdvisorCard from '@/components/admin/advisor/AdvisorCard';
 import {
   MobileAdminScreen, MobileAdminHeader, MobileMetricSummary,
   MobileSectionCard, MobileListItem, MobileEmptyState,
@@ -118,6 +119,9 @@ export default function ExireDashboard() {
           ]}
         />
 
+        {/* Exire Advisor — quick access to the business brain */}
+        <AdvisorCard />
+
         {/* Today's action queue — single list */}
         <MobileSectionCard title="סשנים קרובים" flush>
           {sessions.upcomingList.length === 0 ? (
@@ -215,6 +219,7 @@ export default function ExireDashboard() {
 
       {/* ============================ DESKTOP =========================== */}
       <section className="hidden md:block">
+        <AdvisorCard className="mb-3" />
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">הכנסות</h3>
         <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
           <Stat label="היום" value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />

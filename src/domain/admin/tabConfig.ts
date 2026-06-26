@@ -40,6 +40,7 @@ const AdminOffers          = lazy(() => import('@/pages/admin/Offers'));
 
 // ─── More (System / management) ─────────────────────────────────────────────
 const MoreHome             = lazy(() => import('@/components/admin/launchers/MoreHome'));
+const Advisor              = lazy(() => import('@/pages/admin/Advisor'));
 const Analytics            = lazy(() => import('@/pages/admin/Analytics'));
 const AuroraInsights       = lazy(() => import('@/pages/admin/AuroraInsights'));
 const AdminSettings        = lazy(() => import('@/pages/admin/Settings'));
@@ -133,6 +134,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     icon: MoreHorizontal,
     subTabs: [
       { id: 'more-home',       labelHe: 'עוד',           labelEn: 'More',           component: MoreHome },
+      { id: 'advisor',         labelHe: 'המוח העסקי',    labelEn: 'Advisor',        component: Advisor },
       { id: 'analytics',       labelHe: 'אנליטיקס',      labelEn: 'Analytics',      component: Analytics },
       { id: 'aurora-insights', labelHe: 'תובנות Aurora', labelEn: 'Insights',       component: AuroraInsights },
       { id: 'settings',        labelHe: 'הגדרות',        labelEn: 'Settings',       component: AdminSettings },
