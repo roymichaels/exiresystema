@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExireDashboard } from '@/hooks/xsystem/dashboard';
+import { useOnboardingInsights } from '@/hooks/xsystem/onboardingInsights';
 
 const fmt = (cents: number, ccy: string) =>
   new Intl.NumberFormat('he-IL', { style: 'currency', currency: ccy || 'ILS', maximumFractionDigits: 0 })
@@ -48,6 +49,7 @@ function Stat({
 export default function ExireDashboard() {
   const navigate = useNavigate();
   const { data, isLoading } = useExireDashboard();
+  const { data: insights } = useOnboardingInsights();
 
   if (isLoading || !data) {
     return (
@@ -181,6 +183,60 @@ export default function ExireDashboard() {
           </Card>
         </div>
       </section>
+
+      {insights && (
+        <section>
+          <h2 className="text-lg font-semibold mb-2">Onboarding · משימות פתוחות</h2>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="py-3"><CardTitle className="text-sm">לידים בהמתנה למענה</CardTitle></CardHeader>
+              <CardContent className="space-y-1 pt-0">
+                {insights.leadsAwaitingReply.length === 0
+                  ? <p className="text-xs text-muted-foreground">אין לידים פתוחים.</p>
+                  : insights.leadsAwaitingReply.map((l) => (
+                    <button key={l.id} onClick={() => navigate('/admin?tab=coach&sub=leads')}
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">
+                      {l.name} <span className="text-xs text-muted-foreground">· {new Date(l.created_at).toLocaleDateString('he-IL')}</span>
+                    </button>
+                  ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="py-3"><CardTitle className="text-sm">לקוחות ללא סשן ראשון</CardTitle></CardHeader>
+              <CardContent className="space-y-1 pt-0">
+                {insights.clientsWithoutSession.length === 0
+                  ? <p className="text-xs text-muted-foreground">כולם תוזמנו.</p>
+                  : insights.clientsWithoutSession.map((c) => (
+                    <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">{c.full_name}</button>
+                  ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="py-3"><CardTitle className="text-sm">לקוחות ללא טופס קבלה</CardTitle></CardHeader>
+              <CardContent className="space-y-1 pt-0">
+                {insights.clientsWithoutIntake.length === 0
+                  ? <p className="text-xs text-muted-foreground">כל הטפסים מצורפים.</p>
+                  : insights.clientsWithoutIntake.map((c) => (
+                    <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">{c.full_name}</button>
+                  ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="py-3"><CardTitle className="text-sm">לקוחות ללא תשלום</CardTitle></CardHeader>
+              <CardContent className="space-y-1 pt-0">
+                {insights.clientsWithoutPayment.length === 0
+                  ? <p className="text-xs text-muted-foreground">כולם שילמו.</p>
+                  : insights.clientsWithoutPayment.map((c) => (
+                    <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">{c.full_name}</button>
+                  ))}
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
