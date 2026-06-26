@@ -56,6 +56,7 @@ export default function ExireDashboard() {
   const { data: insights } = useOnboardingInsights();
   const { data: funnel } = useExireFunnelMetrics();
   const { data: formMetrics } = useExireFormMetrics();
+  const { data: resub } = useResubmittedLeads();
 
   if (isLoading || !data) {
     return (
