@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useExireDashboard } from '@/hooks/xsystem/dashboard';
 import { useOnboardingInsights } from '@/hooks/xsystem/onboardingInsights';
 import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
+import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
 
 const fmt = (cents: number, ccy: string) =>
   new Intl.NumberFormat('he-IL', { style: 'currency', currency: ccy || 'ILS', maximumFractionDigits: 0 })
@@ -52,6 +53,7 @@ export default function ExireDashboard() {
   const { data, isLoading } = useExireDashboard();
   const { data: insights } = useOnboardingInsights();
   const { data: funnel } = useExireFunnelMetrics();
+  const { data: formMetrics } = useExireFormMetrics();
 
   if (isLoading || !data) {
     return (
