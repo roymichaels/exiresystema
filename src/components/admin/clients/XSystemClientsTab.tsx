@@ -76,7 +76,7 @@ export default function XSystemClientsTab() {
             <div className="text-center py-12">
               <UsersRound className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
               <p className="text-muted-foreground">
-                עדיין אין לקוחות. המר ליד ללקוח מתוך טאב "לידים".
+                {q ? 'אין תוצאות לחיפוש.' : 'עדיין אין לקוחות. המר ליד ללקוח מתוך טאב "לידים".'}
               </p>
             </div>
           ) : (
