@@ -359,6 +359,52 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
         </div>
       </div>
 
+      {/* Mobile list — native CRM inbox */}
+      <div className="md:hidden">
+        {isLoading ? (
+          <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 rounded-2xl border border-border/30 bg-card/30">
+            <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
+            <p className="text-sm text-muted-foreground">
+              {search || sourceFilter !== 'all' || statusFilter !== 'all'
+                ? 'אין תוצאות לסינון הנוכחי'
+                : 'אין לידים להצגה'}
+            </p>
+            {(search || sourceFilter !== 'all' || statusFilter !== 'all') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-3"
+                onClick={() => { setSearch(''); setSourceFilter('all'); setStatusFilter('all'); }}
+              >נקה סינון</Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+              {filtered.length} לידים
+            </div>
+            {filtered.map(lead => (
+              <MobileLeadCard
+                key={lead.id}
+                lead={lead}
+                sourceLabel={SOURCE_LABELS[lead.source] || lead.source}
+                statusLabel={STATUS_LABELS[lead.status] || lead.status}
+                statusColor={STATUS_COLOR[lead.status] || ''}
+                onOpen={() => openLead(lead)}
+                onConvert={() => {
+                  convertLead.mutate(
+                    { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
+                    { onSuccess: (client) => navigate(`/clients/${client.id}`) },
+                  );
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* List — desktop card wrapper */}
       <Card className="hidden md:block border-border/50">
         <CardHeader>
