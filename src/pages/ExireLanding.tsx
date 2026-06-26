@@ -104,6 +104,13 @@ export default function ExireLanding() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ id: string } | null>(null);
   const { data: intakeForm } = useDefaultIntakeForm();
+  const { data: settings } = useExireFunnelSettings();
+  const formStartedRef = React.useRef(false);
+
+  const whatsappNumber = (settings?.exire_whatsapp_number || '972500000000').replace(/\D/g, '');
+  const primaryLabel  = settings?.exire_primary_cta_label   || 'בדוק התאמה לתהליך';
+  const secondaryLabel = settings?.exire_secondary_cta_label || 'שלח לי פרטים בוואטסאפ';
+  const video = parseVideoEmbed(settings?.exire_landing_video_url || '');
 
   const utm = useMemo(() => ({
     utm_source: params.get('utm_source') || null,
@@ -115,37 +122,41 @@ export default function ExireLanding() {
     path: typeof window !== 'undefined' ? window.location.pathname : null,
   }), [params]);
 
+  // Lightweight tracker — fire-and-forget, never throws.
+  const track = React.useCallback((event_type: string, extra?: Record<string, unknown>) => {
+    void supabase.from('conversion_events').insert({
+      event_type,
+      event_category: 'exire_funnel',
+      source: 'exire_landing',
+      page_path: typeof window !== 'undefined' ? window.location.pathname : '/exire',
+      event_data: { ...utm, ...(extra || {}) },
+    } as never).then(() => {}, () => {});
+  }, [utm]);
+
   useEffect(() => {
     const prev = document.title;
-    document.title = 'Exire Systema — תהליך עומק לתת-מודע | חופש מדפוסים';
+    document.title = 'Exire Systema — אימון תודעתי לתת־המודע';
     const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
       let el = document.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
       if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.content = content;
     };
-    setMeta('description', 'Exire Systema · תהליך עומק לעבודה עם תת-המודע. שילוב היפנוזה, NLP ועבודה עם חלקים פנימיים.');
-    setMeta('og:title', 'Exire Systema — תהליך עומק לתת-מודע', 'property');
-    setMeta('og:description', 'שחרור דפוסים חוזרים דרך עבודה ישירה עם המקור — לא רק עם הסימפטום.', 'property');
+    setMeta('description', 'שיטת אימון תודעתי המשלבת היפנוזה, NLP ועבודה עם תת־המודע כדי לזהות ולשנות דפוסים, אמונות וחסימות שחוזרות על עצמן.');
+    setMeta('og:title', 'Exire Systema — אימון תודעתי לתת־המודע', 'property');
+    setMeta('og:description', 'שיטת אימון תודעתי המשלבת היפנוזה, NLP ועבודה עם תת־המודע.', 'property');
     setMeta('og:type', 'website', 'property');
     return () => { document.title = prev; };
   }, []);
 
-  useEffect(() => {
-    // Fire-and-forget landing view event
-    supabase.from('conversion_events').insert({
-      event_type: 'landing_view',
-      event_category: 'exire_funnel',
-      source: 'exire_landing',
-      page_path: typeof window !== 'undefined' ? window.location.pathname : '/exire',
-      event_data: utm,
-    } as never).then(() => {}, () => {});
-  }, [utm]);
+  useEffect(() => { track('landing_view'); }, [track]);
 
   const scrollToForm = () => {
+    track('cta_clicked', { target: 'lead_form' });
     document.getElementById('exire-lead-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const update = <K extends keyof LeadForm>(k: K, v: LeadForm[K]) => {
+    if (!formStartedRef.current) { formStartedRef.current = true; track('lead_form_started'); }
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
