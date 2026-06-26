@@ -32,6 +32,7 @@ import { useLeadActivity } from '@/hooks/useLeadActivity';
 import { useCreateXSystemLeadFollowup } from '@/hooks/xsystem';
 import { MessageTemplatePicker } from '@/components/admin/clients/xsystem/MessageTemplatePicker';
 import { Send } from 'lucide-react';
+import { MobileLeadCard } from '@/components/crm/MobileLeadCard';
 
 interface LeadsCRMProps {
   scope?: 'admin' | 'coach';
@@ -228,8 +229,21 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
         </Dialog>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      {/* Stats — collapsible on mobile to reduce clutter */}
+      <details className="md:hidden rounded-xl border border-border/40 bg-card/40">
+        <summary className="cursor-pointer text-xs font-medium px-3 py-2 text-muted-foreground">
+          סטטיסטיקות ({stats.total})
+        </summary>
+        <div className="grid grid-cols-2 gap-2 p-3 pt-0">
+          {statCards.map(s => (
+            <div key={s.label} className="rounded-lg border border-border/40 p-2.5">
+              <p className="text-[10.5px] text-muted-foreground">{s.label}</p>
+              <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
+            </div>
+          ))}
+        </div>
+      </details>
+      <div className="hidden md:grid grid-cols-5 gap-3">
         {statCards.map(s => (
           <Card key={s.label} className="border-border/50">
             <CardContent className="pt-6">
@@ -277,31 +291,33 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               </SelectContent>
             </Select>
           </div>
-          {/* Quick filter chips */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            {[
-              { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
-              { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
-              { id: 'followup', label: 'דורש פולואפ',   status: 'contacted', source: sourceFilter },
-              { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
-              { id: 'home',     label: '🏠 דף הבית',    status: statusFilter, source: 'homepage' },
-              { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
-              { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
-              { id: 'ig',       label: '📸 אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
-            ].map(c => {
-              const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
-                  className={`text-xs rounded-full px-3 py-1 border transition ${
-                    active
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'border-border/50 hover:bg-muted/50'
-                  }`}
-                >{c.label}</button>
-              );
-            })}
+          {/* Quick filter chips — horizontal scroll on mobile, wrap on desktop */}
+          <div className="-mx-1 mt-3 overflow-x-auto md:overflow-visible scrollbar-none">
+            <div className="flex md:flex-wrap gap-2 px-1 w-max md:w-auto">
+              {[
+                { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
+                { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
+                { id: 'followup', label: 'דורש פולואפ',   status: 'contacted', source: sourceFilter },
+                { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
+                { id: 'home',     label: '🏠 דף הבית',    status: statusFilter, source: 'homepage' },
+                { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
+                { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
+                { id: 'ig',       label: '📸 אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
+              ].map(c => {
+                const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
+                    className={`text-xs rounded-full px-3 py-1 border transition shrink-0 whitespace-nowrap ${
+                      active
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'border-border/50 hover:bg-muted/50'
+                    }`}
+                  >{c.label}</button>
+                );
+              })}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -319,95 +335,132 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
           ) : filtered.length === 0 ? (
             <div className="text-center py-12">
               <Users className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground">אין לידים להצגה</p>
+              <p className="text-muted-foreground">
+                {search || sourceFilter !== 'all' || statusFilter !== 'all'
+                  ? 'אין תוצאות לסינון הנוכחי'
+                  : 'אין לידים להצגה'}
+              </p>
+              {(search || sourceFilter !== 'all' || statusFilter !== 'all') && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => { setSearch(''); setSourceFilter('all'); setStatusFilter('all'); }}
+                >
+                  נקה סינון
+                </Button>
+              )}
             </div>
           ) : (
-            <div className="space-y-2">
-              {filtered.map(lead => {
-                const wa = waLink(lead.phone);
-                return (
-                  <div
+            <>
+              {/* Mobile list — compact, native CRM feel */}
+              <div className="md:hidden space-y-2.5">
+                {filtered.map(lead => (
+                  <MobileLeadCard
                     key={lead.id}
-                    className="group flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={() => openLead(lead)}
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                        <span className="text-sm font-bold text-primary">
-                          {(lead.name || '?').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-medium text-sm">{lead.name}</h4>
-                          <Badge variant="outline" className="text-[10px] py-0 px-1.5">
-                            {SOURCE_LABELS[lead.source] || lead.source}
-                          </Badge>
-                          {isResubmitted(lead) && (
-                            <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-400 border-amber-500/30">
-                              🔁 חזר{resubmitCount(lead) > 1 ? ` ×${resubmitCount(lead)}` : ''}
-                            </Badge>
-                          )}
-                          {typeof lead.readiness_score === 'number' && (
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                              <Sparkles className="h-3 w-3" /> {lead.readiness_score}/10
-                            </span>
-                          )}
-                        </div>
+                    lead={lead}
+                    sourceLabel={SOURCE_LABELS[lead.source] || lead.source}
+                    statusLabel={STATUS_LABELS[lead.status] || lead.status}
+                    statusColor={STATUS_COLOR[lead.status] || ''}
+                    onOpen={() => openLead(lead)}
+                    onConvert={() => {
+                      convertLead.mutate(
+                        { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, notes: lead.notes },
+                        { onSuccess: (client) => navigate(`/clients/${client.id}`) },
+                      );
+                    }}
+                  />
+                ))}
+              </div>
 
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
-                          {lead.phone && (
-                            <span dir="ltr" className="flex items-center gap-1">
-                              <Phone className="h-3 w-3" />{lead.phone}
-                            </span>
-                          )}
-                          {lead.email && (
-                            <span className="flex items-center gap-1">
-                              <Mail className="h-3 w-3" />{lead.email}
-                            </span>
-                          )}
-                          <span>
-                            {format(new Date(lead.created_at), 'dd MMM HH:mm', { locale: he })}
+              {/* Desktop list */}
+              <div className="hidden md:block space-y-2">
+                {filtered.map(lead => {
+                  const wa = waLink(lead.phone);
+                  return (
+                    <div
+                      key={lead.id}
+                      className="group flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => openLead(lead)}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                          <span className="text-sm font-bold text-primary">
+                            {(lead.name || '?').charAt(0).toUpperCase()}
                           </span>
                         </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-medium text-sm">{lead.name}</h4>
+                            <Badge variant="outline" className="text-[10px] py-0 px-1.5">
+                              {SOURCE_LABELS[lead.source] || lead.source}
+                            </Badge>
+                            {isResubmitted(lead) && (
+                              <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-400 border-amber-500/30">
+                                🔁 חזר{resubmitCount(lead) > 1 ? ` ×${resubmitCount(lead)}` : ''}
+                              </Badge>
+                            )}
+                            {typeof lead.readiness_score === 'number' && (
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                                <Sparkles className="h-3 w-3" /> {lead.readiness_score}/10
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                            {lead.phone && (
+                              <span dir="ltr" className="flex items-center gap-1">
+                                <Phone className="h-3 w-3" />{lead.phone}
+                              </span>
+                            )}
+                            {lead.email && (
+                              <span className="flex items-center gap-1">
+                                <Mail className="h-3 w-3" />{lead.email}
+                              </span>
+                            )}
+                            <span>
+                              {format(new Date(lead.created_at), 'dd MMM HH:mm', { locale: he })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
+                        {lead.phone && (
+                          <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+                            <a href={`tel:${lead.phone}`} aria-label="חייג"><Phone className="h-4 w-4" /></a>
+                          </Button>
+                        )}
+                        {wa && (
+                          <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+                            <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="ווטסאפ">
+                              <MessageCircle className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        )}
+                        <MessageTemplatePicker
+                          channel="whatsapp"
+                          category="lead_reply"
+                          phone={lead.phone}
+                          recipientName={lead.name}
+                          leadId={lead.id}
+                          defaultVars={{ lead_name: lead.name, first_name: (lead.name || '').split(' ')[0] }}
+                          title="WhatsApp · מענה לליד"
+                          trigger={
+                            <Button size="sm" variant="ghost" className="h-8 px-2 gap-1" disabled={!lead.phone}>
+                              <Send className="h-3.5 w-3.5" /> שלח תבנית
+                            </Button>
+                          }
+                        />
+                        <Badge variant="outline" className={STATUS_COLOR[lead.status] || ''}>
+                          {STATUS_LABELS[lead.status] || lead.status}
+                        </Badge>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
-                      {lead.phone && (
-                        <Button asChild size="icon" variant="ghost" className="h-8 w-8">
-                          <a href={`tel:${lead.phone}`} aria-label="חייג"><Phone className="h-4 w-4" /></a>
-                        </Button>
-                      )}
-                      {wa && (
-                        <Button asChild size="icon" variant="ghost" className="h-8 w-8">
-                          <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="ווטסאפ">
-                            <MessageCircle className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                      <MessageTemplatePicker
-                        channel="whatsapp"
-                        category="lead_reply"
-                        phone={lead.phone}
-                        recipientName={lead.name}
-                        leadId={lead.id}
-                        defaultVars={{ lead_name: lead.name, first_name: (lead.name || '').split(' ')[0] }}
-                        title="WhatsApp · מענה לליד"
-                        trigger={
-                          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1" disabled={!lead.phone}>
-                            <Send className="h-3.5 w-3.5" /> שלח תבנית
-                          </Button>
-                        }
-                      />
-                      <Badge variant="outline" className={STATUS_COLOR[lead.status] || ''}>
-                        {STATUS_LABELS[lead.status] || lead.status}
-                      </Badge>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
