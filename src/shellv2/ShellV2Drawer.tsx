@@ -186,14 +186,10 @@ export default function ShellV2Drawer() {
           </div>
 
           {/* Nav list */}
-          <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-4">
-            {sections.map((section) => (
-              <div key={section.id}>
-                {(section.titleEn || section.titleHe) && (
-                  <div className="px-3 pt-1 pb-1.5 text-[9px] tracking-[0.22em] uppercase text-foreground/35">
-                    {language === 'he' ? section.titleHe : section.titleEn}
-                  </div>
-                )}
+          <nav className="flex-1 overflow-y-auto px-2 py-1.5 space-y-2.5">
+            {sections.map((section) => {
+              const collapsible = isAdminContext && section.id === 'legacy-app';
+              const items = (
                 <div className="space-y-0.5">
                   {section.items.map((item) => {
                     const Icon = item.icon;
@@ -203,11 +199,16 @@ export default function ShellV2Drawer() {
                         type="button"
                         onClick={item.onSelect}
                         className={cn(
-                          'w-full h-11 flex items-center gap-3 px-3 rounded-2xl text-[14px]',
-                          'text-foreground/85 hover:bg-foreground/[0.04] active:bg-foreground/[0.07] transition-colors text-start',
+                          'w-full flex items-center gap-3 px-3 rounded-2xl text-start transition-colors',
+                          collapsible
+                            ? 'h-9 text-[12.5px] text-foreground/55 hover:bg-foreground/[0.04]'
+                            : 'h-11 text-[14px] text-foreground/85 hover:bg-foreground/[0.04] active:bg-foreground/[0.07]',
                         )}
                       >
-                        <Icon className="h-[17px] w-[17px] shrink-0 opacity-70" strokeWidth={1.5} />
+                        <Icon
+                          className={cn('shrink-0 opacity-60', collapsible ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]')}
+                          strokeWidth={1.5}
+                        />
                         <span className="flex-1 truncate">
                           {language === 'he' ? item.labelHe : item.labelEn}
                         </span>
@@ -215,8 +216,31 @@ export default function ShellV2Drawer() {
                     );
                   })}
                 </div>
-              </div>
-            ))}
+              );
+
+              if (collapsible) {
+                return (
+                  <details key={section.id} className="group rounded-xl">
+                    <summary className="list-none cursor-pointer px-3 py-1.5 text-[10px] tracking-[0.22em] uppercase text-foreground/30 hover:text-foreground/50 flex items-center justify-between">
+                      <span>{language === 'he' ? section.titleHe : section.titleEn}</span>
+                      <span className="text-[9px] opacity-60 group-open:rotate-180 transition-transform">▾</span>
+                    </summary>
+                    {items}
+                  </details>
+                );
+              }
+
+              return (
+                <div key={section.id}>
+                  {(section.titleEn || section.titleHe) && (
+                    <div className="px-3 pt-1 pb-1.5 text-[9px] tracking-[0.22em] uppercase text-foreground/35">
+                      {language === 'he' ? section.titleHe : section.titleEn}
+                    </div>
+                  )}
+                  {items}
+                </div>
+              );
+            })}
 
             {/* Language switcher */}
             <div>
@@ -233,7 +257,7 @@ export default function ShellV2Drawer() {
                       type="button"
                       onClick={() => setLanguage(l.code)}
                       className={cn(
-                        'flex-1 h-10 rounded-2xl text-[12px] font-medium transition-colors',
+                        'flex-1 h-9 rounded-2xl text-[12px] font-medium transition-colors',
                         active
                           ? 'bg-foreground/[0.08] text-foreground ring-1 ring-foreground/15'
                           : 'text-foreground/55 hover:bg-foreground/[0.04]',
