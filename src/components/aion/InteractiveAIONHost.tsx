@@ -130,7 +130,7 @@ export default function InteractiveAIONHost() {
       window.removeEventListener('touchend', onEnd);
       window.removeEventListener('touchcancel', onEnd);
     };
-  }, [open]);
+  }, [open, isAdminRoute]);
 
   return (
     <>
