@@ -150,17 +150,17 @@ export const MobileLeadCard = ({
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={!lead.phone} onClick={onSendOpening}>
+            <DropdownMenuItem disabled={!lead.phone} onClick={onOpen}>
               <Send className="h-4 w-4 ms-2" /> שלח הודעת פתיחה
             </DropdownMenuItem>
-            <DropdownMenuItem disabled={!lead.phone} onClick={onSendScheduling}>
+            <DropdownMenuItem disabled={!lead.phone} onClick={onOpen}>
               <Calendar className="h-4 w-4 ms-2" /> שלח קביעת שיחה
             </DropdownMenuItem>
-            <DropdownMenuItem disabled={!lead.phone} onClick={onSendTemplate}>
+            <DropdownMenuItem disabled={!lead.phone} onClick={onOpen}>
               <Send className="h-4 w-4 ms-2" /> תבנית WhatsApp
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onFollowup}>
+            <DropdownMenuItem onClick={onOpen}>
               <Clock className="h-4 w-4 ms-2" /> צור פולואפ
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onConvert}>
