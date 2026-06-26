@@ -5,12 +5,13 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 // Helmet not required — we set document.title in an effect to keep deps minimal
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import {
   Sparkles, MessageCircle, ArrowLeft, CheckCircle2, X, Play,
   Brain, HeartPulse, Users2, Clock, Waves, ChevronDown, ShieldCheck, Loader2,
+  LogIn,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,6 +30,9 @@ import {
   useExireFunnelSettings, parseVideoEmbed,
   normalizeWhatsApp, isWhatsAppConfigured,
 } from '@/hooks/xsystem/funnelSettings';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAuthModal } from '@/contexts/AuthModalContext';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 const DEFAULT_WHATSAPP_HELLO =
   'היי, ראיתי את העמוד של Exire Systema ואני רוצה לבדוק התאמה לתהליך 🙏';
@@ -82,35 +86,41 @@ function CtaRow({
   onPrimary: () => void; whatsapp: string; helloText: string;
   primaryLabel: string; secondaryLabel: string; onSecondaryClick?: () => void;
 }) {
+  const hasWa = whatsapp.length >= 8;
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
       <Button size="lg" onClick={onPrimary} className="gap-2 h-12 px-7 text-base">
         {primaryLabel} <ArrowLeft className="h-4 w-4" />
       </Button>
-      <Button asChild size="lg" variant="outline" className="gap-2 h-12 px-7 text-base">
-        <a
-          href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(helloText)}`}
-          target="_blank" rel="noopener noreferrer"
-          onClick={onSecondaryClick}
-        >
-          <MessageCircle className="h-4 w-4" /> {secondaryLabel}
-        </a>
-      </Button>
+      {hasWa && (
+        <Button asChild size="lg" variant="outline" className="gap-2 h-12 px-7 text-base">
+          <a
+            href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(helloText)}`}
+            target="_blank" rel="noopener noreferrer"
+            onClick={onSecondaryClick}
+          >
+            <MessageCircle className="h-4 w-4" /> {secondaryLabel}
+          </a>
+        </Button>
+      )}
     </div>
   );
 }
 
 export default function ExireLanding() {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const [form, setForm] = useState<LeadForm>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ id: string } | null>(null);
-  const { data: intakeForm } = useDefaultIntakeForm();
   const { data: settings } = useExireFunnelSettings();
+  // Phase 2N: respect admin-selected default intake form, fall back to latest published.
+  const { data: intakeForm } = useDefaultIntakeForm(settings?.exire_intake_form_id);
   const formStartedRef = React.useRef(false);
 
-  const whatsappNumber = (settings?.exire_whatsapp_number || '972500000000').replace(/\D/g, '');
+  const whatsappNumber = normalizeWhatsApp(settings?.exire_whatsapp_number);
+  const waConfigured = isWhatsAppConfigured(settings?.exire_whatsapp_number);
   const primaryLabel  = settings?.exire_primary_cta_label   || 'בדוק התאמה לתהליך';
   const secondaryLabel = settings?.exire_secondary_cta_label || 'שלח לי פרטים בוואטסאפ';
   const video = parseVideoEmbed(settings?.exire_landing_video_url || '');
@@ -218,6 +228,13 @@ export default function ExireLanding() {
   return (
     <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
       {/* SEO handled via useEffect below */}
+
+      {/* Minimal top bar — brand + login. Reuses the global AuthModal/admin shell. */}
+      <ExireTopBar />
+
+
+
+
 
       {/* HERO */}
       <Section className="pt-20 sm:pt-28 pb-12 relative overflow-hidden">
@@ -623,10 +640,56 @@ export default function ExireLanding() {
             onClick={scrollToForm}
             className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition"
           >
-            בדוק התאמה לתהליך <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+            {primaryLabel} <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
           </button>
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Top bar for the Exire landing — keeps the page minimal but restores the
+ * login entry point that the legacy homepage exposed. Reuses the global
+ * AuthModal (no new auth system). Logged-in users with panel access go
+ * straight to `/admin-hub`; logged-in non-admin users land on `/client-home`.
+ */
+function ExireTopBar() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const { hasPanelAccess } = useUserRoles();
+
+  const onClick = () => {
+    if (loading) return;
+    if (user) {
+      navigate(hasPanelAccess() ? '/admin-hub' : '/client-home');
+      return;
+    }
+    openAuthModal('login');
+  };
+
+  const label = user ? (hasPanelAccess() ? 'פאנל ניהול' : 'אזור אישי') : 'כניסה';
+
+  return (
+    <header className="absolute top-0 inset-x-0 z-30 px-4 sm:px-6 pt-4 sm:pt-5">
+      <div className="mx-auto max-w-6xl flex items-center justify-between gap-3">
+        <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide">
+          <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]" />
+          Exire Systema
+        </a>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClick}
+          disabled={loading}
+          className="h-9 gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          aria-label={label}
+        >
+          <LogIn className="h-4 w-4" />
+          <span>{label}</span>
+        </Button>
+      </div>
+    </header>
   );
 }
