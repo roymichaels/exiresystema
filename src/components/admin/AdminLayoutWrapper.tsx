@@ -14,7 +14,7 @@ const AdminHub = lazyWithRetry(() => import('@/pages/AdminHub'), 'AdminHub');
 export default function AdminLayoutWrapper() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab = searchParams.get('tab') || 'overview';
+  const activeTab = searchParams.get('tab') || 'today';
   const currentTabConfig = ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0];
   const activeSubTab = searchParams.get('sub') || currentTabConfig.subTabs[0]?.id || '';
 
