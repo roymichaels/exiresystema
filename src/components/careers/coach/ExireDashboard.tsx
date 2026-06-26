@@ -19,6 +19,7 @@ import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
 import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
 import { useResubmittedLeads } from '@/hooks/xsystem/resubmittedLeads';
 import ExireLaunchChecklist from './ExireLaunchChecklist';
+import AdvisorCard from '@/components/admin/advisor/AdvisorCard';
 import {
   MobileAdminScreen, MobileAdminHeader, MobileMetricSummary,
   MobileSectionCard, MobileListItem, MobileEmptyState,
