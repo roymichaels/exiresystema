@@ -113,13 +113,13 @@ export default function PublicForm() {
 
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { error } = await supabase.from("form_submissions").insert({
+    const { data: inserted, error } = await supabase.from("form_submissions").insert({
       form_id: form.id,
       responses: payload,
       email: email || null,
       user_id: user?.id || null,
       status: "new",
-    });
+    }).select("id").maybeSingle();
 
     setSubmitting(false);
 
@@ -127,6 +127,13 @@ export default function PublicForm() {
       toast({ title: "שגיאה בשליחת הטופס", description: error.message, variant: "destructive" });
       return;
     }
+
+    // Phase 2K — fire-and-forget CRM sync. Never blocks the public form.
+    if (inserted?.id) {
+      const { triggerFormSubmissionSync } = await import("@/hooks/xsystem/leadFormSync");
+      triggerFormSubmissionSync(inserted.id);
+    }
+
     setSubmitted(true);
   };
 

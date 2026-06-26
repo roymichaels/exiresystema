@@ -50,6 +50,8 @@ const SOURCE_LABELS: Record<string, string> = {
   floating: 'כפתור צף',
   general: 'כללי',
   exire_landing: '🌊 Exire',
+  exire_form: '📝 טופס Exire',
+  exire_instagram_form: '📸 טופס אינסטגרם',
   homepage: '🏠 דף הבית',
 };
 
