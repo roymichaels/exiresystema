@@ -67,13 +67,28 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
       </div>
 
 
+      {/* Desktop page-context row: title + folded status chip. */}
+      <div className="hidden md:flex items-center justify-between gap-3 pt-1">
+        <h1 className="text-xl font-semibold text-foreground/90">
+          {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
+        </h1>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setStatsOpen((v) => !v)}
+          className="h-8 px-2.5 text-xs gap-1 text-muted-foreground/80 hover:text-foreground"
+          aria-expanded={statsOpen}
+        >
+          {isHe ? 'סטטוס' : 'Status'}
+          <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', statsOpen && 'rotate-180')} />
+        </Button>
+      </div>
 
-      {/* Stats bar — desktop always, mobile only when toggled */}
+      {/* Stats bar — folded by default on every viewport. */}
       <ErrorBoundary fallback={<div className="h-12" />}>
-        <div className={cn('md:block', statsOpen ? 'block' : 'hidden')}>
-          <AdminStatsBar onNavigate={onTabChange} />
-        </div>
+        {statsOpen ? <AdminStatsBar onNavigate={onTabChange} /> : null}
       </ErrorBoundary>
+
 
       {/* Desktop inline navigation (hidden on mobile) */}
       <ErrorBoundary
