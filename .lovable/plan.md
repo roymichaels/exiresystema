@@ -1,160 +1,277 @@
 
-# XSYSTEM Pivot — Audit & Phase 2 Plan (no code)
+# Exire Systema — Admin Panel Audit & Consolidation Plan
 
-## 1. XSYSTEM Current State
+Audit only. No files will be changed, no routes removed, no data deleted. All findings reference real files in `src/domain/admin/tabConfig.ts`, `src/pages/admin/*`, `src/components/admin/*`, `src/components/careers/coach/*`, `src/components/crm/*`.
 
-**Tables (already created in Phase 1):**
-- `public.clients` — practitioner_id, lead_id, user_id, full_name, email, phone, whatsapp, instagram_handle, manychat_id, language, birthday, tags[], status, risk_flags jsonb, consent jsonb, notes.
-- `public.client_profiles` — client_id, goals jsonb, presenting_issues jsonb, subconscious_summary, last_updated_by.
+---
 
-**Files:**
-- `src/hooks/useClients.ts` — `useClients`, `useClient`, `useClientProfile`, `useCreateClient`, `useUpdateClient`, `useConvertLeadToClient` (idempotent on practitioner_id+lead_id; flips lead.status='converted').
-- `src/components/admin/clients/XSystemClientsTab.tsx` — list + search; opens `/clients/:id`.
-- `src/pages/ClientDetail.tsx` — header card + 8 tabs (only "סקירה/Overview" enabled; rest disabled placeholders).
-- `src/App.tsx` — `/clients/:id` route.
-- `src/components/crm/LeadsCRM.tsx` — "המר ללקוח XSYSTEM" button using `useConvertLeadToClient`.
-- `src/domain/admin/tabConfig.ts` — `coach > xsystem-clients` tab.
+## 1. Current Admin Map
 
-**Reused legacy systems (not XSYSTEM-native yet):**
-- Leads pipeline: `public.leads`, `public.lead_activity`, `src/hooks/useLeads.ts`, `src/hooks/useLeadActivity.ts`, `src/pages/admin/Leads.tsx`, `LeadsCRM.tsx`.
-- Forms: `public.custom_forms`, `public.form_fields`, `public.form_submissions`, `public.form_analyses`; `src/pages/admin/Forms.tsx`, `src/components/admin/forms/*`, `src/pages/PublicForm.tsx`, edge fn `generate-form`.
-- Recordings: `public.hypnosis_audios`, `public.hypnosis_videos`, `public.user_audio_access`, `public.user_video_access`; `src/components/admin/recordings/*`.
-- Practitioner legacy (separate marketplace model, do NOT use for XSYSTEM): `practitioners`, `practitioner_clients`, `practitioner_client_profiles`, `practitioner_services`, `practitioner_settings`, `bookings`, `coach_*`.
+Source of truth: `src/domain/admin/tabConfig.ts` (4 top tabs, 33 sub-tabs).
 
-## 2. Gap Analysis
-
-| Area | Status | Notes |
-|---|---|---|
-| Leads | exists | `leads` + `LeadsCRM` good as-is. |
-| Lead activity | exists | `lead_activity` + `useLeadActivity` good. |
-| Lead → client conversion | exists | `useConvertLeadToClient` works; needs visible link from lead row to created client. |
-| Client profiles | partial | `clients` + `client_profiles` exist; UI only shows header + notes. No edit form for goals/presenting issues. |
-| Intake forms | partial | `custom_forms` works standalone; no link `form_submissions.client_id` and no "attach submission to client" flow. |
-| Session notes | missing | No table, no UI. |
-| Beliefs | missing | — |
-| Patterns | missing | — |
-| Inner parts | missing | — |
-| Rooms model | missing | — |
-| Protocol library | missing | (custom_protocols exists but is legacy/unused-for-XSYSTEM — keep, don't reuse). |
-| Personalized audio assignments | partial | `hypnosis_audios` + `user_audio_access` exist but key on user_id, not client_id. Need client-scoped assignment table. |
-| Check-ins | missing | — |
-| Follow-ups | missing | — |
-| Payments/offers | partial-quarantine | `purchases`, `orders`, `offers`, `coupons` exist but tied to marketplace/courses. XSYSTEM needs a thin practitioner-scoped `xsystem_payments`. |
-| Dashboard / action queue | missing | No "today" view for practitioner across clients. |
-| Legacy AION/Aurora/Worlds/FM/Gamification | exists — should be hidden | See §6. |
-
-## 3. Recommended Core Data Model (Phase 2A)
-
-Convention: all rows owned by `practitioner_id uuid` (= `auth.uid()` of coach) and reference `client_id uuid references public.clients(id) on delete cascade`. RLS: practitioner can CRUD own rows via `practitioner_id = auth.uid()`; `service_role` full. No anon. All tables get `created_at`, `updated_at`, `update_updated_at_column` trigger, and GRANTs to `authenticated` + `service_role`.
-
-1. **xsystem_sessions** — one coaching session.
-   - Fields: `client_id`, `practitioner_id`, `session_number int`, `scheduled_at timestamptz`, `started_at`, `ended_at`, `duration_minutes int`, `mode text` (in_person|zoom|whatsapp|async), `status text` (scheduled|completed|cancelled|no_show), `summary text`, `recording_audio_id uuid → hypnosis_audios.id null`.
-   - Parent of session_notes, session_protocols.
-
-2. **xsystem_session_notes** — structured per-session entries.
-   - Fields: `session_id`, `client_id`, `practitioner_id`, `kind text` (observation|insight|homework|next_step|risk), `body text`, `tags text[]`.
-
-3. **xsystem_beliefs** — limiting/empowering beliefs surfaced.
-   - Fields: `client_id`, `practitioner_id`, `belief text`, `polarity text` (limiting|empowering|neutral), `strength int 1-10`, `source_session_id uuid null`, `status text` (active|reframed|archived), `reframe text null`, `evidence jsonb`.
-
-4. **xsystem_patterns** — recurring behavioral/emotional loops.
-   - Fields: `client_id`, `practitioner_id`, `name text`, `description text`, `trigger text`, `loop jsonb` (trigger→thought→feeling→action), `frequency text`, `severity int 1-10`, `status text`, `linked_beliefs uuid[]`.
-
-5. **xsystem_inner_parts** — IFS-style parts.
-   - Fields: `client_id`, `practitioner_id`, `name text`, `role text` (protector|exile|manager|firefighter|other), `voice text`, `intent text`, `age_origin text`, `relationship_to_self text`, `status text` (unblended|blended|integrated), `notes text`.
-
-6. **xsystem_rooms** — practitioner-defined room templates (subconscious metaphor space).
-   - Fields: `practitioner_id`, `name text`, `slug text`, `description text`, `intent text`, `default_protocol_ids uuid[]`, `order_index int`, `is_archived bool`.
-   - No `client_id` — global to practitioner.
-
-7. **xsystem_client_rooms** — per-client room state.
-   - Fields: `client_id`, `practitioner_id`, `room_id uuid → xsystem_rooms`, `state text` (locked|open|active|completed), `entered_at`, `completed_at`, `notes text`.
-   - Unique (client_id, room_id).
-
-8. **xsystem_protocols** — reusable protocol library.
-   - Fields: `practitioner_id`, `title text`, `slug text`, `category text` (induction|regression|parts_work|reframe|anchoring|integration|homework), `body text` (markdown), `steps jsonb`, `default_duration_minutes int`, `audio_id uuid → hypnosis_audios null`, `is_archived bool`.
-
-9. **xsystem_session_protocols** — protocols applied in a session.
-   - Fields: `session_id`, `protocol_id`, `client_id`, `practitioner_id`, `order_index int`, `outcome text`, `notes text`.
-
-10. **xsystem_audio_assignments** — assign hypnosis audio to client.
-    - Fields: `client_id`, `practitioner_id`, `audio_id uuid → hypnosis_audios`, `assigned_at`, `due_at`, `frequency text` (once|daily|weekly|nightly), `instructions text`, `status text` (active|paused|done), `last_played_at`, `play_count int`.
-    - Optional sync trigger: on insert, also insert into `user_audio_access` when `clients.user_id` is not null.
-
-11. **xsystem_checkins** — client self-reports between sessions.
-    - Fields: `client_id`, `practitioner_id`, `kind text` (mood|sleep|practice|free|form_submission), `payload jsonb`, `mood int 1-10`, `notes text`, `form_submission_id uuid → form_submissions null`, `submitted_at`.
-
-12. **xsystem_followups** — practitioner action queue.
-    - Fields: `client_id`, `practitioner_id`, `title text`, `body text`, `due_at timestamptz`, `priority text` (low|normal|high), `status text` (open|done|snoozed), `done_at`, `source text` (manual|session|checkin|form|payment).
-
-13. **xsystem_payments** — practitioner-scoped payment log (decoupled from marketplace).
-    - Fields: `client_id`, `practitioner_id`, `amount_cents int`, `currency text default 'ILS'`, `kind text` (session|package|upsell|deposit|refund), `paid_at timestamptz`, `method text` (cash|bit|paybox|stripe|other), `external_ref text`, `notes text`, `status text` (pending|paid|refunded|void).
-
-**Connections to existing tables:**
-- `form_submissions` — add nullable `client_id uuid` + `practitioner_id uuid` columns and an admin "attach to client" action. Surface in `xsystem_checkins.form_submission_id`.
-- `hypnosis_audios` — referenced read-only by `xsystem_audio_assignments` and `xsystem_protocols`.
-- `leads` — already linked via `clients.lead_id`.
-
-**RLS pattern (all 13 tables):**
-```
-USING  (practitioner_id = auth.uid())
-WITH CHECK (practitioner_id = auth.uid())
-```
-Plus a future-friendly read for `clients.user_id = auth.uid()` only on `xsystem_audio_assignments` and `xsystem_checkins` (so the client portal can read their own).
-
-## 4. ClientDetail Redesign (`/clients/:id`)
-
-Tabs (in order):
-
-| Tab | Reads | Writes | Coach actions | Build phase |
+### Tab: Coach (`coach`)
+| Sub-tab | Key | Component | Purpose | Classification |
 |---|---|---|---|---|
-| Overview | clients, client_profiles, latest session, open followups count, payments total | client_profiles, clients.notes | Edit notes, goals, presenting issues, status, tags | 2C/2D |
-| Intake | form_submissions WHERE client_id=… | form_submissions.client_id | Attach existing submission, send form link via WA | 2C + form FK |
-| Sessions | xsystem_sessions, xsystem_session_notes, xsystem_session_protocols | all three | New session, complete, add note, attach protocol, attach recording | 2D |
-| Beliefs | xsystem_beliefs | xsystem_beliefs | Add, reframe, archive | 2E |
-| Patterns | xsystem_patterns | xsystem_patterns | Add, link beliefs, mark resolved | 2E |
-| Inner Parts | xsystem_inner_parts | xsystem_inner_parts | Add, change status | 2E |
-| Rooms | xsystem_rooms (templates) + xsystem_client_rooms | xsystem_client_rooms | Open/complete room | 2E |
-| Protocols | xsystem_protocols (catalog) + xsystem_session_protocols history | xsystem_session_protocols | Quick-apply to last session | 2E |
-| Audio | xsystem_audio_assignments + hypnosis_audios | xsystem_audio_assignments | Assign, set frequency, pause | 2F |
-| Check-ins | xsystem_checkins | xsystem_checkins | Add manual, view chart | 2F |
-| Payments | xsystem_payments | xsystem_payments | Log payment, refund, sum | 2G |
-| Timeline | union of sessions+notes+checkins+payments+followups | — | Read-only chronological feed | 2G |
+| Exire Today | `exire-today` | `careers/coach/ExireDashboard.tsx` | Daily ops dashboard (revenue, tasks, leads, launch checklist) | **Exire-critical** |
+| XSYSTEM Clients | `xsystem-clients` | `admin/clients/XSystemClientsTab.tsx` → `ClientDetail.tsx` | Coaching client workspace (sessions, beliefs, parts, payments…) | **Exire-critical** |
+| Leads | `leads` | `careers/coach/CoachLeadsTab.tsx` | Coach-scoped leads view | **Duplicate** of CRM |
+| Exire Lead Forms | `exire-lead-forms` | `pages/admin/ExireLeadForms.tsx` | Maps form submissions → CRM leads | **Exire-critical** |
+| Funnel Settings | `exire-funnel` | `pages/admin/ExireFunnelSettings.tsx` | Landing VSL/WhatsApp/CTA/intake form | **Exire-critical** |
+| Templates | `templates` | `pages/admin/MessageTemplates.tsx` | WhatsApp/message templates | **Exire-critical** |
+| Forms | `forms` | `pages/admin/Forms.tsx` | Form builder + AI wizard | **Exire-critical** (also mounted under Content) |
+| Recordings | `recordings` | `pages/admin/Recordings.tsx` | Audio library + mp4→mp3 | **Exire-critical** (also under Content) |
+| Analytics | `analytics` | `pages/admin/Analytics.tsx` | Generic analytics | Useful |
+| Plans (legacy) | `plans` | `CoachPlansTab.tsx` | Old plans | **Legacy** |
+| Overview (legacy) | `overview` | `CoachDashboardOverview.tsx` | Old coach dashboard | **Legacy** |
+| Clients (legacy) | `clients` | `CoachClientsTab.tsx` | Old client list | **Legacy / Duplicate** of XSYSTEM |
 
-Action header (always visible): WhatsApp, Call, Email, "+ סשן חדש", "+ צ׳ק־אין", "+ תשלום", "+ משימה".
+### Tab: Marketing (`marketing`)
+| Sub-tab | File | Status |
+|---|---|---|
+| Landing Pages | `LandingPages.tsx` | Useful (separate from Exire `/` funnel) |
+| Homepage | `HomepageSections.tsx` | **Overlaps Funnel Settings** (since `/` = ExireLanding) |
+| Offers | `Offers.tsx` | Useful |
+| Affiliates | `Affiliates.tsx` | Useful |
+| Newsletter | `Newsletter.tsx` | Useful |
+| Theme | `Theme.tsx` | Settings-shaped, misplaced |
+| FAQs | `FAQs.tsx` | Useful (landing content) |
+| Testimonials | `Testimonials.tsx` | Useful (landing content) |
 
-## 5. Safe Implementation Plan
+### Tab: Content (`content`)
+| Sub-tab | File | Status |
+|---|---|---|
+| Products | `Products.tsx` | Legacy marketplace |
+| Purchases | `Purchases.tsx` | **Overlaps Exire Payments** (inside ClientDetail) |
+| Blog | `Blog.tsx` | Useful |
+| Content | `Content.tsx` | Generic CMS — overlaps Homepage/Landing |
+| Videos | `Videos.tsx` | Useful (separate from Recordings) |
+| Recordings | `recordings` | **Duplicate mount** of Coach > Recordings |
+| Forms | `forms` | **Duplicate mount** of Coach > Forms |
 
-- **2A — DB schema only.** One migration creates the 13 tables + GRANTs + RLS + update triggers; adds `client_id`, `practitioner_id` nullable to `form_submissions` with index. No app changes.
-- **2B — Types/hooks only.** `src/hooks/xsystem/` with `useSessions`, `useSessionNotes`, `useBeliefs`, `usePatterns`, `useInnerParts`, `useRooms`, `useClientRooms`, `useProtocols`, `useAudioAssignments`, `useCheckins`, `useFollowups`, `usePayments`. Pure data layer, no UI imports.
-- **2C — ClientDetail tabs with empty states.** Enable all tabs; each renders count + empty state + "Add" disabled. Add Overview edit form for client_profiles.
-- **2D — Sessions + session notes.** New/complete session sheets, notes list, attach recording from `hypnosis_audios` picker.
-- **2E — Beliefs / Patterns / Parts / Rooms / Protocols.** Inline add dialogs + list cards.
-- **2F — Check-ins + Audio assignments.** Audio assignment dialog with frequency; checkin mood chart; form-submission → checkin link.
-- **2G — Payments + Followups + Dashboard action queue.** New admin tab "XSYSTEM Today" aggregating open followups, today's sessions, overdue check-ins, unpaid balances across all clients of the practitioner.
+### Tab: System (`system`)
+| Sub-tab | File | Status |
+|---|---|---|
+| Integrations | `Integrations.tsx` | Keep |
+| Notifications | `NotificationCenter.tsx` | Keep |
+| Users | `Users.tsx` | Keep |
+| Bug Reports | `BugReports.tsx` | Keep |
+| Settings | `Settings.tsx` | Keep |
 
-Each phase = one PR-sized change, no cross-phase dependencies beyond the previous.
+### Orphan admin pages (exist on disk, not in tabConfig)
+`AuroraInsights`, `Businesses`, `CareerApplications`, `ChatAssistant`, `Coaches`, `FMBounties`, `LandingPageBuilder`, `Menu`, `WorkMonitor`, `Leads.tsx` (the CRM+transcripts page using `components/crm/LeadsCRM`).
 
-## 6. Legacy Boundary
+Notably `pages/admin/Leads.tsx` (CRM + transcripts) is **not** referenced by the tab config — the visible "Leads" tab uses `CoachLeadsTab` instead. This is the single biggest CRM duplication.
 
-Keep, do not touch, do not delete:
-- AION (`src/aion/**`, `src/identity/**`, `aion_*` tables)
-- Aurora (`src/contexts/Aurora*`, `aurora_*` tables, `aurora-chat` edge fn)
-- Worlds (`src/worlds/**`, `src/world/**`, `src/hallway/**`, `src/selfworld/**`)
-- Freemarket (`fm_*` tables, FM hub)
-- Gamification (xp_events, skills, skill_xp_events, energy_events, action_items, plan_missions, today_runs, life_plans, mission_templates)
-- Courses (learning_*, content_*, course_enrollments)
-- Marketplace (practitioners, practitioner_*, bookings, coach_*, offers, orders, purchases, products, coupons)
-- Public marketing pages (`/`, `/home`, `/landing`, `/founding`, `/blog`, etc.)
+---
 
-**Recommended hide-only (Phase 2G or later, behind `VITE_XSYSTEM_MODE=true`):**
-- Admin tabs not needed by Exire Systema internal ops: Courses, Marketplace Coaches admin, FM/Tokenomics, Worlds dev tools, AION dev/diagnostics — hide from `src/domain/admin/tabConfig.ts` only; do not unmount providers, do not drop routes.
-- User-facing nav: gate `/me`, `/worlds`, `/play`, `/career`, `/learn`, `/free-market` behind the same flag so the only end-user surface remains the optional client portal once built (Phase 3+).
+## 2. Redundancy Report
 
-Nothing in this plan deletes code, migrates legacy data, or changes any AION/Aurora/Worlds/FM/Gamification logic.
+| Area | Primary (keep) | Duplicates / overlaps | Recommendation |
+|---|---|---|---|
+| Leads / CRM | `components/crm/LeadsCRM.tsx` (rich CRM, used by `pages/admin/Leads.tsx`) | `CoachLeadsTab` (the currently-visible "Leads" sub-tab) | Swap visible sub-tab to render `LeadsCRM`; hide `CoachLeadsTab` under Legacy |
+| Clients | `XSystemClientsTab` + `ClientDetail` | `CoachClientsTab`, `ClientProfilePanel` (older) | Keep XSYSTEM as the only "Clients" entry; move legacy under Legacy |
+| Forms | `pages/admin/Forms.tsx` (with AI wizard) | Same component mounted twice (Coach + Content) | Mount once under new "Forms" group |
+| Lead-form mapping | `ExireLeadForms.tsx` | Conceptually overlaps with Forms | Keep as sibling under "Forms" group ("Mappings") |
+| Funnel settings | `ExireFunnelSettings.tsx` | `HomepageSections.tsx`, `Content.tsx` (since `/` is ExireLanding) | Make Funnel the primary; HomepageSections labelled "Legacy Homepage" |
+| Recordings | `pages/admin/Recordings.tsx` | Mounted twice; also overlaps "Audio Assignments" inside ClientDetail | Keep one mount under Assets; ClientDetail keeps its assignment UI (different scope) |
+| Payments | ClientDetail > Payments tab | `Purchases.tsx` | Keep Purchases under Legacy until Exire payments fully replaces it |
+| Coach* tabs | — | `CoachContentTab`, `CoachMarketingTab`, `CoachAnalyticsTab`, `CoachSettingsTab`, `CoachLandingPagesTab`, `CoachProductsTab`, `CoachPricingPage`, `CoachesLanding`, `CoachHudSidebar` | All Legacy in admin nav (do not delete) |
+| Today vs Analytics | `ExireDashboard` | `Analytics.tsx`, `AuroraInsights.tsx` | Today stays primary; Analytics goes under Analytics group |
 
-## What I need from you to proceed
-1. Approve §3 table list + names (esp. `xsystem_` prefix vs. shorter names like `sessions`/`beliefs` — prefix is safer given 208 existing tables).
-2. Approve §4 tab order and the 12-tab scope.
-3. Confirm payments stays decoupled (`xsystem_payments`) rather than reusing `purchases`.
-4. Confirm I should proceed phase-by-phase with explicit approval before each (start with 2A).
+---
+
+## 3. Proposed New Admin IA
+
+8 visible groups + Legacy. Every existing component stays mounted — only the tab graph changes.
+
+```
+A. היום (Today)            → ExireDashboard
+B. לידים (Sales / CRM)
+     ├─ CRM                → LeadsCRM (was hidden in pages/admin/Leads.tsx)
+     ├─ תמלילי שיחות       → LandingChatTranscripts
+     ├─ טפסי לידים          → ExireLeadForms (mapping)
+     └─ מדדי פאנל          → Analytics (funnel view)
+C. מתאמנים (Clients)
+     ├─ רשימה              → XSystemClientsTab
+     └─ פרופיל              → ClientDetail (drill-in)
+D. דף נחיתה (Funnel)
+     ├─ הגדרות             → ExireFunnelSettings
+     ├─ דפי נחיתה נוספים    → LandingPages
+     └─ Builder            → LandingPageBuilder
+E. טפסים (Forms)
+     ├─ בונה טפסים          → Forms
+     ├─ מיפוי ל-CRM        → ExireLeadForms
+     └─ הגשות              → (Forms internal)
+F. נכסים (Assets / Content)
+     ├─ הקלטות             → Recordings
+     ├─ סרטונים            → Videos
+     ├─ תבניות הודעה       → MessageTemplates
+     ├─ בלוג               → Blog
+     ├─ FAQ                → FAQs
+     ├─ המלצות             → Testimonials
+     └─ הצעות              → Offers
+G. אנליטיקס (Analytics)
+     ├─ סקירה              → Analytics
+     └─ Aurora             → AuroraInsights
+H. הגדרות (Settings)
+     ├─ אינטגרציות         → Integrations
+     ├─ התראות             → NotificationCenter
+     ├─ ערכת נושא          → Theme
+     ├─ ניוזלטר            → Newsletter
+     ├─ שותפים             → Affiliates
+     ├─ משתמשים            → Users
+     ├─ באגים              → BugReports
+     └─ כללי               → Settings
+I. ארכיון (Legacy — collapsed, off main bar)
+     CoachLeadsTab, CoachClientsTab, CoachPlansTab, CoachDashboardOverview,
+     CoachContentTab, CoachMarketingTab, CoachAnalyticsTab, CoachSettingsTab,
+     CoachLandingPagesTab, CoachProductsTab, CoachPricingPage, Products,
+     Purchases, Content (CMS), HomepageSections, Businesses, CareerApplications,
+     Coaches, ChatAssistant, FMBounties, WorkMonitor, Menu
+```
+
+Drops top tabs from 4 noisy buckets (Coach/Marketing/Content/System) to 8 named-by-purpose groups; lowers max visible chip count and matches the user's spec exactly.
+
+---
+
+## 4. Mobile UX Issues (per page)
+
+Driven by `AdminInlineNav` (two horizontal scroll rows), `AdminStatsBar` (large card grid), `AdminHub` paddings.
+
+| Page | Problem | Fix direction |
+|---|---|---|
+| `AdminInlineNav` | 4 primary chips + up to 12 sub-chips, both horizontally scrolling | Convert to: bottom drawer "section switcher" + sticky bottom nav of 5 groups (Today/Leads/Clients/Funnel/More) |
+| `AdminStatsBar` | Wide multi-card row; wraps awkwardly | 2-col grid on `sm`, single horizontal swipe carousel only above `md` |
+| `ExireDashboard` | Many KPI cards + tasks + checklist on one screen | Collapse into sections: KPI (1 hero card + collapsible grid), Tasks (list), Checklist (collapsible) |
+| `LeadsCRM` / `CoachLeadsTab` | Lead rows show too many badges; actions inline | New mobile lead card (see §6) with one primary + kebab |
+| `XSystemClientsTab` | Client cards bulky, status/notes cramped | Avatar+name+next-action card; details on tap → bottom sheet |
+| `ClientDetail` | 12-tab horizontal strip | Replace with bottom-sheet section picker + breadcrumbed deep-link |
+| `ExireFunnelSettings` | Long form, video upload + preview + checklist all stacked | Split into accordion sections (Video / WhatsApp / CTA / Intake / Checklist) |
+| `Forms` | Builder cramped, AI button competes with list | Sticky FAB for "צור עם AI"; list rows simpler (title + 1 meta + chevron) |
+| `Recordings` | Video card grid w/ multiple buttons | 1 thumbnail + 1 title + kebab (Convert / Download / Edit / Delete) |
+| `MessageTemplates` | Long preview text in card | Title + first 40 chars + send-test FAB |
+| `ExireLeadForms` | Mapping UI is table-shaped | Card per form with field-mapping bottom sheet |
+| Safe-area | `AdminHub` already pads top/bottom, but stats bar pushes content below fold | Hide stats bar by default on mobile; reveal via pull-down |
+
+---
+
+## 5. Mobile App Shell — Recommended Pattern
+
+```
+┌─────────────────────────────────────┐
+│  Top bar: section title + ⋯ menu    │ ← swaps per group
+├─────────────────────────────────────┤
+│                                     │
+│  Page content (single column)       │
+│  Sticky primary action (FAB or bar) │
+│                                     │
+├─────────────────────────────────────┤
+│  Bottom nav: Today · Leads · Clients · Funnel · More │
+└─────────────────────────────────────┘
+```
+
+"More" opens a bottom sheet listing Funnel/Forms/Assets/Analytics/Settings/Legacy. Sub-tabs become a horizontal segmented control **only when ≤4**, otherwise a dropdown.
+
+---
+
+## 6. Mobile Card Patterns
+
+**Lead card (LeadsCRM redesign)**
+```
+┌──────────────────────────────────────────┐
+│  שם הליד                  [מקור] [סטטוס]  │
+│  ★ ציון 78                                │
+│  אתגר עיקרי: …תצוגה מקדימה קצרה…          │
+│  פעולה הבאה: התקשרות מחר                  │
+│  [שלח הודעה  ▸]                    [ ⋯ ] │
+└──────────────────────────────────────────┘
+   ⋯ menu: Call · WhatsApp template · Follow-up · Convert · View answers
+```
+
+**Client card (XSystemClientsTab)**
+```
+┌──────────────────────────────────────────┐
+│  Avatar  שם המתאמן       [שלב התהליך]    │
+│  סשן אחרון: לפני 3 ימים                  │
+│  משימה פתוחה: שליחת הקלטה                 │
+│  [פתח פרופיל ▸]                    [ ⋯ ] │
+└──────────────────────────────────────────┘
+```
+
+**Dashboard hero card** — single revenue + delta number, then collapsible KPI grid.
+
+**Empty states** — illustration + 1 sentence + 1 primary CTA, no secondary noise.
+
+---
+
+## 7. Naming Cleanup Map
+
+| Old EN | Old HE | New EN | New HE |
+|---|---|---|---|
+| Exire Today | Exire היום | Today | היום |
+| XSYSTEM Clients | לקוחות XSYSTEM | Clients | מתאמנים |
+| Leads | לידים | Leads | לידים |
+| Exire Lead Forms | טפסי לידים Exire | Form → Lead Mapping | מיפוי טפסים |
+| Funnel Settings | הגדרות פאנל | Landing Settings | הגדרות דף נחיתה |
+| Forms | טפסים | Forms | טפסים |
+| Recordings | הקלטות | Recordings | הקלטות |
+| Message Templates | תבניות הודעות | Templates | תבניות הודעה |
+| Plans (legacy) | תוכניות (legacy) | — | — (under Legacy) |
+| Coach | מאמן | (removed top-tab) | — |
+
+---
+
+## 8. Exire-critical vs Legacy Table
+
+| Decision | Items |
+|---|---|
+| **Keep visible (primary)** | ExireDashboard, XSystemClientsTab, ClientDetail, LeadsCRM, ExireLeadForms, ExireFunnelSettings, Forms, Recordings, Videos, MessageTemplates, Analytics, Integrations, Settings, Users, NotificationCenter |
+| **Move under "More"** | Theme, Newsletter, Affiliates, Offers, FAQs, Testimonials, Blog, LandingPages, LandingPageBuilder, AuroraInsights, BugReports |
+| **Move under "Legacy"** | CoachLeadsTab, CoachClientsTab, CoachPlansTab, CoachDashboardOverview, CoachContentTab, CoachMarketingTab, CoachAnalyticsTab, CoachSettingsTab, CoachLandingPagesTab, CoachProductsTab, CoachPricingPage, Products, Purchases, Content (CMS), HomepageSections, Businesses, CareerApplications, Coaches, ChatAssistant, FMBounties, WorkMonitor, Menu |
+| **Keep but rename** | "XSYSTEM Clients" → "מתאמנים"; "Funnel Settings" → "הגדרות דף נחיתה"; "Exire Today" → "היום" |
+| **Merge visually** | Forms + ExireLeadForms into a "Forms" group; ExireFunnelSettings + LandingPages into a "Funnel" group |
+| **Never delete / do not touch** | AION, Aurora, Worlds, FM, gamification, courses, marketplace logic, all public funnel routes (`/`, `/exire`, `/form/:token`), edge functions |
+
+---
+
+## 9. Safe Phased Implementation Plan
+
+### Phase A — Navigation cleanup (low risk)
+- Files: `src/domain/admin/tabConfig.ts` only.
+- Reorder + rename + regroup into the 8-group IA. Move duplicates/legacy under an `id: 'legacy'` tab. Replace visible "Leads" sub-tab to render `LeadsCRM` instead of `CoachLeadsTab` (mount `CoachLeadsTab` under Legacy).
+- Result: same routes, same components, cleaner structure.
+- Do not touch: any component file, any route in `App.tsx`, any edge function.
+
+### Phase B — Mobile admin shell (medium risk)
+- Files: `src/components/admin/AdminInlineNav.tsx`, `src/components/admin/AdminLayoutWrapper.tsx`, new `AdminMobileBottomNav.tsx`, new `AdminSectionSheet.tsx`.
+- Add bottom-nav (5 groups) + "More" bottom sheet for ≥md hidden, mobile only. Desktop keeps current inline tabs.
+- Hide `AdminStatsBar` by default on mobile (collapsible).
+- Result: mobile admin feels app-like. Desktop unchanged.
+
+### Phase C — Merge duplicate entry points (medium risk, visual only)
+- Files: tabConfig already groups them in Phase A. Add light wrappers in `src/pages/admin/groups/` (FormsGroup, FunnelGroup) that render sub-segmented controls.
+- No component logic changes.
+
+### Phase D — Visual polish (medium risk, presentational)
+- Redesign lead card (`LeadsCRM` row), client card (`XSystemClientsTab` row), dashboard KPI block (`ExireDashboard`), empty states.
+- All changes confined to presentation; data hooks unchanged.
+
+### Phase E — Optional deeper cleanup (high risk — gated on approval)
+- Replace `ClientDetail` 12-tab strip with bottom-sheet section picker.
+- Collapse stats cards into a single hero metric.
+- Only after Phases A–D have shipped and been validated.
+
+For every phase: **do not touch** `src/pages/ExireLanding.tsx`, `PublicForm.tsx`, edge functions, AION/Aurora/Worlds/FM directories, `App.tsx` routing, Supabase migrations.
+
+---
+
+## 10. Highest-Value First Implementation Prompt
+
+> Execute Phase A only. Rewrite `src/domain/admin/tabConfig.ts` to expose 8 top tabs (`today`, `leads`, `clients`, `funnel`, `forms`, `assets`, `analytics`, `settings`) plus a final `legacy` tab. Map every component currently in the file to one of those groups per §3 of the audit. Replace the visible "Leads" sub-tab so it renders `LeadsCRM` (from `src/pages/admin/Leads.tsx`) instead of `CoachLeadsTab`; mount `CoachLeadsTab` under `legacy`. Apply Hebrew labels from the naming map (§7). Do not modify any other file. Do not change routes in `App.tsx`. Do not delete components. Verify the build is green and that every previously-mounted sub-tab is still reachable via the new structure.
+
+---
+
+**Assumptions I flagged rather than guessed**
+- `pages/admin/Leads.tsx` (LeadsCRM + transcripts) appears unused by the tab config; I assumed this is unintentional and propose promoting it.
+- `Purchases.tsx` overlaps `ClientDetail > Payments` — I assumed Payments is the forward-looking SSOT; Legacy classification is reversible.
+- `Content.tsx` and `HomepageSections.tsx` are still useful for non-Exire surfaces; I marked them Legacy in *admin nav* only — components stay mounted.
