@@ -1,3 +1,6 @@
 project_id = "rdbdkvuqntohusfbkezh"
 [functions.intake-chat]
 verify_jwt = false
+
+[functions.sync-form-lead]
+verify_jwt = false
