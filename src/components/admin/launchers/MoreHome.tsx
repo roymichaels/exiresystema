@@ -22,6 +22,7 @@ type Card = {
 };
 
 const PRIMARY: Card[] = [
+  { id: 'advisor',      titleHe: 'המוח העסקי',     titleEn: 'Advisor',      subtitleHe: 'אסטרטגיה ופעולות להיום', subtitleEn: 'Strategy & next actions', icon: Brain },
   { id: 'settings',     titleHe: 'הגדרות',         titleEn: 'Settings',     subtitleHe: 'כללי וחשבון',          subtitleEn: 'General & account',   icon: Settings },
   { id: 'analytics',    titleHe: 'אנליטיקס',       titleEn: 'Analytics',    subtitleHe: 'מספרים ומגמות',         subtitleEn: 'Numbers & trends',    icon: BarChart3 },
   { id: 'integrations', titleHe: 'אינטגרציות',     titleEn: 'Integrations', subtitleHe: 'WhatsApp, אימייל, תשלום', subtitleEn: 'WhatsApp, mail, pay', icon: Plug },
