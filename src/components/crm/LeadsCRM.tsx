@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,8 +91,10 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
   const convertLead = useConvertLeadToClient();
   const navigate = useNavigate();
 
+  const [urlParams] = useSearchParams();
+  const initialSource = urlParams.get('source') || 'all';
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState(initialSource);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selected, setSelected] = useState<Lead | null>(null);
   const [toDelete, setToDelete] = useState<Lead | null>(null);
@@ -374,6 +376,20 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               </DialogHeader>
 
               <div className="space-y-4">
+                {(selected.pain_category || selected.desired_outcome || selected.source === 'exire_landing') && (
+                  <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1.5 text-sm">
+                    {selected.pain_category && (
+                      <div><span className="text-xs text-muted-foreground">אתגר עיקרי: </span>{selected.pain_category}</div>
+                    )}
+                    {selected.desired_outcome && (
+                      <div><span className="text-xs text-muted-foreground">תוצאה רצויה: </span>{selected.desired_outcome}</div>
+                    )}
+                    {Array.isArray(selected.prior_attempts) && selected.prior_attempts.length > 0 && (
+                      <div><span className="text-xs text-muted-foreground">ניסה כבר: </span>{selected.prior_attempts.join(' · ')}</div>
+                    )}
+                  </div>
+                )}
+
                 {/* Quick actions — integrated CRM */}
                 <div className="flex flex-wrap gap-2">
                   {selected.phone && (

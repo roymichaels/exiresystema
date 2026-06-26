@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExireDashboard } from '@/hooks/xsystem/dashboard';
 import { useOnboardingInsights } from '@/hooks/xsystem/onboardingInsights';
+import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
 
 const fmt = (cents: number, ccy: string) =>
   new Intl.NumberFormat('he-IL', { style: 'currency', currency: ccy || 'ILS', maximumFractionDigits: 0 })
@@ -50,6 +51,7 @@ export default function ExireDashboard() {
   const navigate = useNavigate();
   const { data, isLoading } = useExireDashboard();
   const { data: insights } = useOnboardingInsights();
+  const { data: funnel } = useExireFunnelMetrics();
 
   if (isLoading || !data) {
     return (
@@ -235,6 +237,51 @@ export default function ExireDashboard() {
               </CardContent>
             </Card>
           </div>
+        </section>
+      )}
+
+      {funnel && (
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold">Exire Landing · משפך</h2>
+            <div className="flex gap-2">
+              <Button asChild size="sm" variant="ghost" className="text-xs gap-1">
+                <a href="/exire" target="_blank" rel="noopener noreferrer">פתח עמוד נחיתה<ChevronLeft className="h-3 w-3" /></a>
+              </Button>
+              <Button size="sm" variant="ghost" className="text-xs"
+                onClick={() => navigate('/admin?tab=coach&sub=leads&source=exire_landing')}>
+                לידים במשפך
+              </Button>
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5 mb-3">
+            <Stat label="לידים היום"      value={funnel.leadsToday}        icon={TrendingUp} tone={funnel.leadsToday > 0 ? 'good' : 'default'} />
+            <Stat label="לידים החודש"     value={funnel.leadsThisMonth}    icon={Calendar} />
+            <Stat label="ממתינים למענה"   value={funnel.awaitingFirstReply} icon={AlertCircle} tone={funnel.awaitingFirstReply > 0 ? 'warn' : 'default'} />
+            <Stat label="ללא פולואפ"       value={funnel.withoutFollowup}   icon={ClipboardCheck} tone={funnel.withoutFollowup > 0 ? 'warn' : 'default'} />
+            <Stat label="הומרו ללקוחות"   value={funnel.converted}         icon={Users} tone="good" />
+          </div>
+          <Card>
+            <CardHeader className="py-3"><CardTitle className="text-sm">לידים אחרונים מהמשפך</CardTitle></CardHeader>
+            <CardContent className="space-y-1 pt-0">
+              {funnel.latest.length === 0 && (
+                <p className="text-xs text-muted-foreground">עדיין אין לידים מעמוד הנחיתה.</p>
+              )}
+              {funnel.latest.map((l) => (
+                <button key={l.id}
+                  onClick={() => navigate('/admin?tab=coach&sub=leads&source=exire_landing')}
+                  className="w-full flex items-center justify-between gap-3 text-sm hover:bg-muted/50 rounded px-2 py-1.5 text-right">
+                  <span className="min-w-0 flex-1 truncate">
+                    <span className="font-medium">{l.name}</span>
+                    {l.pain_category && <span className="text-xs text-muted-foreground mr-2">· {l.pain_category}</span>}
+                  </span>
+                  <span className="text-xs text-muted-foreground shrink-0">
+                    {new Date(l.created_at).toLocaleDateString('he-IL')}
+                  </span>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
         </section>
       )}
     </div>
