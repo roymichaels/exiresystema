@@ -20,6 +20,7 @@ const XSystemClientsTab      = lazy(() => import('@/components/admin/clients/XSy
 const ExireDashboard         = lazy(() => import('@/components/careers/coach/ExireDashboard'));
 const MessageTemplates       = lazy(() => import('@/pages/admin/MessageTemplates'));
 const ExireFunnelSettings    = lazy(() => import('@/pages/admin/ExireFunnelSettings'));
+const ExireLeadForms         = lazy(() => import('@/pages/admin/ExireLeadForms'));
 
 // ─── Marketing (Campaigns + Site merged) ────────────────────────────────────
 const AdminAffiliates   = lazy(() => import('@/pages/admin/Affiliates'));
@@ -59,6 +60,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
       // Exire Systema focus mode — primary tabs first.
       { id: 'exire-today',     labelHe: 'Exire היום',      labelEn: 'Exire Today',     component: ExireDashboard },
       { id: 'exire-funnel',     labelHe: 'הגדרות פאנל',     labelEn: 'Funnel Settings', component: ExireFunnelSettings },
+      { id: 'exire-lead-forms', labelHe: 'טפסי לידים Exire', labelEn: 'Exire Lead Forms', component: ExireLeadForms },
       { id: 'xsystem-clients', labelHe: 'לקוחות XSYSTEM',  labelEn: 'XSYSTEM Clients', component: XSystemClientsTab },
       { id: 'leads',           labelHe: 'לידים',           labelEn: 'Leads',           component: CoachLeadsTab },
       { id: 'templates',       labelHe: 'תבניות הודעות',   labelEn: 'Templates',       component: MessageTemplates },
