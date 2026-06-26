@@ -334,7 +334,20 @@ export default function ExireDashboard() {
           </Card>
         </section>
       )}
+
+      {/* Launch readiness — setup support, collapsed by default on mobile */}
+      <details className="group rounded-2xl border border-border/50 bg-card/40 [&_summary::-webkit-details-marker]:hidden md:open" >
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-muted-foreground flex items-center justify-between">
+          <span>הכנה להשקה · רשימת בדיקות</span>
+          <span className="text-xs opacity-60 group-open:hidden">הצג</span>
+          <span className="text-xs opacity-60 hidden group-open:inline">הסתר</span>
+        </summary>
+        <div className="px-3 pb-3">
+          <ExireLaunchChecklist />
+        </div>
+      </details>
     </div>
   );
 }
+
 
