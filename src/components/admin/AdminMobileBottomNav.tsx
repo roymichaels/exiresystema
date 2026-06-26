@@ -94,7 +94,7 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
         >
           <SheetHeader>
             <SheetTitle className="text-start">
-              {isHe ? 'בחר מסך' : 'Choose section'}
+              {isHe ? 'בחר אזור' : 'Choose area'}
             </SheetTitle>
           </SheetHeader>
           <ul className="mt-4 grid grid-cols-2 gap-2">
