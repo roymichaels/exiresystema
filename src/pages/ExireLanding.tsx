@@ -25,9 +25,9 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useDefaultIntakeForm } from '@/hooks/xsystem/forms';
+import { useExireFunnelSettings, parseVideoEmbed } from '@/hooks/xsystem/funnelSettings';
 
-const WHATSAPP_NUMBER = '972500000000'; // overrideable via env if needed
-const WHATSAPP_HELLO =
+const DEFAULT_WHATSAPP_HELLO =
   'היי, ראיתי את העמוד של Exire Systema ואני רוצה לבדוק התאמה לתהליך 🙏';
 
 const leadSchema = z.object({
