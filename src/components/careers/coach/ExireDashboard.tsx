@@ -379,7 +379,7 @@ export default function ExireDashboard() {
       )}
 
       {formMetrics && formMetrics.formIds.length > 0 && (
-        <section>
+        <MobileCollapsible title="Exire · טפסי לידים">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold">Exire · טפסי לידים</h2>
             <Button size="sm" variant="ghost" className="text-xs"
