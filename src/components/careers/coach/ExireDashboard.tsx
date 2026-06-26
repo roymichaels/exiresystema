@@ -88,14 +88,16 @@ export default function ExireDashboard() {
       {/* Leads */}
       <section>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">לידים</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
           <Stat label="חדשים" value={leads.new} icon={Users} />
           <Stat label="פעילים" value={leads.active} icon={Users} />
           <Stat label="ממתינים לפולואפ" value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
           <Stat label="הומרו" value={leads.converted} icon={Users} tone="good" />
+          <Stat label="חזרו 🔁" value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} hint="הגשה כפולה — דורש מענה אישי" />
           <Stat label="סה״כ" value={leads.total} icon={Users} />
         </div>
       </section>
+
 
       {/* Clients */}
       <section>
