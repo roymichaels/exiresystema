@@ -73,18 +73,24 @@ function SectionTitle({ kicker, title, subtitle }: { kicker?: string; title: str
   );
 }
 
-function CtaRow({ onPrimary }: { onPrimary: () => void }) {
+function CtaRow({
+  onPrimary, whatsapp, helloText, primaryLabel, secondaryLabel, onSecondaryClick,
+}: {
+  onPrimary: () => void; whatsapp: string; helloText: string;
+  primaryLabel: string; secondaryLabel: string; onSecondaryClick?: () => void;
+}) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
       <Button size="lg" onClick={onPrimary} className="gap-2 h-12 px-7 text-base">
-        בדוק התאמה לתהליך <ArrowLeft className="h-4 w-4" />
+        {primaryLabel} <ArrowLeft className="h-4 w-4" />
       </Button>
       <Button asChild size="lg" variant="outline" className="gap-2 h-12 px-7 text-base">
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_HELLO)}`}
+          href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(helloText)}`}
           target="_blank" rel="noopener noreferrer"
+          onClick={onSecondaryClick}
         >
-          <MessageCircle className="h-4 w-4" /> שלח לי פרטים בוואטסאפ
+          <MessageCircle className="h-4 w-4" /> {secondaryLabel}
         </a>
       </Button>
     </div>
