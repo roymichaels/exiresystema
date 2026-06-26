@@ -334,7 +334,7 @@ export default function ExireDashboard() {
       )}
 
       {funnel && (
-        <section>
+        <MobileCollapsible title="Exire Landing · משפך">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold">Exire Landing · משפך</h2>
             <div className="flex gap-2">
