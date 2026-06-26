@@ -262,16 +262,42 @@ export default function ExireLanding() {
           <p className="mt-3 text-xs text-muted-foreground">תהליך אישי · 1-on-1 · שיחת התאמה לפני קבלה</p>
         </motion.div>
 
-        {/* VSL placeholder */}
-        <motion.div {...fade} className="mt-12 sm:mt-16 max-w-3xl mx-auto">
+        {/* VSL — configurable via Admin → Funnel Settings */}
+        <motion.div
+          {...fade}
+          className="mt-12 sm:mt-16 max-w-3xl mx-auto"
+          onViewportEnter={() => track('vsl_section_seen')}
+          viewport={{ once: true, amount: 0.3 }}
+        >
           <Card className="overflow-hidden border-primary/20">
-            <div className="aspect-video relative bg-gradient-to-br from-primary/10 via-background to-primary/5 flex items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-full bg-primary/15 backdrop-blur flex items-center justify-center mb-3">
-                  <Play className="h-7 w-7 text-primary ms-0.5" />
+            <div className="aspect-video relative bg-gradient-to-br from-primary/10 via-background to-primary/5">
+              {video.type === 'iframe' ? (
+                <iframe
+                  src={video.src}
+                  title="Exire Systema — סרטון הסבר"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full border-0"
+                />
+              ) : video.type === 'mp4' ? (
+                <video
+                  src={video.src}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="absolute inset-0 w-full h-full object-cover bg-black"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="mx-auto h-16 w-16 rounded-full bg-primary/15 backdrop-blur flex items-center justify-center mb-3">
+                      <Play className="h-7 w-7 text-primary ms-0.5" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">סרטון הסבר על התהליך · יעלה בקרוב</p>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">סרטון הסבר על התהליך · יעלה בקרוב</p>
-              </div>
+              )}
             </div>
           </Card>
         </motion.div>
