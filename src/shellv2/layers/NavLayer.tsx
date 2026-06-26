@@ -78,6 +78,8 @@ export default function NavLayer() {
     };
   });
 
+  if (isAdminContext) return null;
+
   return (
     <>
       {/* Constellation hint — three tiny dots above the composer.
