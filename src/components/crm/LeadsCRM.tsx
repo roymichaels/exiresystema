@@ -81,6 +81,20 @@ const normalizePhone = (phone: string | null) => {
   return p;
 };
 
+// Phase 2M — landing dedup helpers
+const leadMeta = (l: Lead): Record<string, unknown> =>
+  (l.metadata && typeof l.metadata === 'object' ? l.metadata as Record<string, unknown> : {});
+const isResubmitted = (l: Lead): boolean => {
+  const m = leadMeta(l);
+  const tags = (l as unknown as { tags?: string[] | null }).tags;
+  return !!m.latest_submission || (typeof m.resubmit_count === 'number' && (m.resubmit_count as number) > 0)
+    || (Array.isArray(tags) && tags.includes('resubmitted'));
+};
+const resubmitCount = (l: Lead): number => {
+  const m = leadMeta(l);
+  return typeof m.resubmit_count === 'number' ? (m.resubmit_count as number) : 0;
+};
+
 const waLink = (phone: string | null) => {
   const p = normalizePhone(phone);
   return p ? `https://wa.me/${p.replace(/\+/g, '')}` : null;
