@@ -110,6 +110,21 @@ export default function ExireLanding() {
   }), [params]);
 
   useEffect(() => {
+    const prev = document.title;
+    document.title = 'Exire Systema — תהליך עומק לתת-מודע | חופש מדפוסים';
+    const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
+      let el = document.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+      if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
+      el.content = content;
+    };
+    setMeta('description', 'Exire Systema · תהליך עומק לעבודה עם תת-המודע. שילוב היפנוזה, NLP ועבודה עם חלקים פנימיים.');
+    setMeta('og:title', 'Exire Systema — תהליך עומק לתת-מודע', 'property');
+    setMeta('og:description', 'שחרור דפוסים חוזרים דרך עבודה ישירה עם המקור — לא רק עם הסימפטום.', 'property');
+    setMeta('og:type', 'website', 'property');
+    return () => { document.title = prev; };
+  }, []);
+
+  useEffect(() => {
     // Fire-and-forget landing view event
     supabase.from('conversion_events').insert({
       event_type: 'landing_view',
@@ -209,14 +224,7 @@ export default function ExireLanding() {
 
   return (
     <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground">
-      <Helmet>
-        <title>Exire Systema — תהליך עומק לתת-מודע | חופש מדפוסים</title>
-        <meta name="description" content="Exire Systema · תהליך עומק לעבודה עם תת-המודע. שילוב היפנוזה, NLP ועבודה עם חלקים פנימיים לשחרור דפוסים חוזרים בכסף, בטחון, מערכות יחסים ופרודוקטיביות." />
-        <meta property="og:title" content="Exire Systema — תהליך עומק לתת-מודע" />
-        <meta property="og:description" content="שחרור דפוסים חוזרים דרך עבודה ישירה עם המקור — לא רק עם הסימפטום." />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://exiresystema.com/exire" />
-      </Helmet>
+      {/* SEO handled via useEffect below */}
 
       {/* HERO */}
       <Section className="pt-20 sm:pt-28 pb-12 relative overflow-hidden">
