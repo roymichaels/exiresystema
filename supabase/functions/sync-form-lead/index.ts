@@ -390,12 +390,19 @@ serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ ok: true, processed, created, skipped, results }), {
+    // Public (single-submission) callers get a minimal status payload — no
+    // lead_id, no answers, no per-row details. Authenticated bulk callers
+    // (form_id path) get the detailed results for admin UX.
+    const payload = isBulk
+      ? { ok: true, processed, created, skipped, results }
+      : { ok: true, processed, created, skipped };
+    return new Response(JSON.stringify(payload), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    return new Response(JSON.stringify({ error: msg }), {
+    console.error("[sync-form-lead]", msg);
+    return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
