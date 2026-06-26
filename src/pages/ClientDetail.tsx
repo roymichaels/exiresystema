@@ -43,6 +43,10 @@ import XSystemPaymentsTab from '@/components/admin/clients/xsystem/XSystemPaymen
 import XSystemFollowupsTab from '@/components/admin/clients/xsystem/XSystemFollowupsTab';
 import XSystemTimelineTab from '@/components/admin/clients/xsystem/XSystemTimelineTab';
 import XSystemIntakeTab from '@/components/admin/clients/xsystem/XSystemIntakeTab';
+import WhatsAppQuickActions from '@/components/admin/clients/xsystem/WhatsAppQuickActions';
+import OnboardingChecklist from '@/components/admin/clients/xsystem/OnboardingChecklist';
+import { useDefaultIntakeForm } from '@/hooks/xsystem/forms';
+import { useClientFormSubmissions } from '@/hooks/xsystem';
 
 function EmptyState({ label }: { label: string }) {
   return (
@@ -95,6 +99,8 @@ export default function ClientDetail() {
   const { data: paymentsCount = 0 } = useXSystemPaymentsCount(id);
   const { data: paymentsTotal } = useXSystemPaymentsTotal(id);
   const { data: paymentsPending } = useXSystemClientPendingPayments(id);
+  const { data: intakeForm } = useDefaultIntakeForm();
+  const { data: clientSubmissions = [] } = useClientFormSubmissions(id);
 
   if (isLoading) {
     return (
