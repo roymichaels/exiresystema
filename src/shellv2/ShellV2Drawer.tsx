@@ -22,7 +22,7 @@ import { useProfileModal } from '@/contexts/ProfileModalContext';
 import { cn } from '@/lib/utils';
 import { CANONICAL_SURFACES } from '@/navigation/canonicalSurfaces';
 import { AionOrb } from '@/components/aion/ui';
-import { ADMIN_TABS } from '@/domain/admin';
+
 import { useEffect } from 'react';
 import { useChamberIdle } from '@/shellv2/hooks/useChamberIdle';
 
