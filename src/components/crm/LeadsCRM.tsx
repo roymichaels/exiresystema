@@ -394,6 +394,9 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                   </div>
                 )}
 
+                <FormAnswersPreview metadata={selected.metadata} />
+
+
                 {/* Quick actions — integrated CRM */}
                 <div className="flex flex-wrap gap-2">
                   {selected.phone && (
@@ -578,6 +581,30 @@ const Field = ({ label, value }: { label: string; value: string }) => (
     <span dir="auto">{value}</span>
   </div>
 );
+
+const FormAnswersPreview = ({ metadata }: { metadata: Record<string, unknown> | null }) => {
+  if (!metadata) return null;
+  const answers = (metadata as { form_answers?: Record<string, unknown> }).form_answers;
+  const formTitle = (metadata as { form_title?: string }).form_title;
+  if (!answers || typeof answers !== 'object' || Object.keys(answers).length === 0) return null;
+  return (
+    <details className="rounded-lg border border-border/50 p-3" open>
+      <summary className="text-xs font-semibold text-muted-foreground uppercase cursor-pointer">
+        תשובות מקוריות מהטופס{formTitle ? ` · ${formTitle}` : ''}
+      </summary>
+      <div className="mt-2 space-y-1.5 text-sm">
+        {Object.entries(answers).map(([label, value]) => (
+          <div key={label} dir="auto">
+            <span className="text-xs text-muted-foreground">{label}: </span>
+            <span>{Array.isArray(value) ? value.join(', ') : String(value ?? '')}</span>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+};
+
+
 
 const ActivityFeed = ({ leadId }: { leadId: string }) => {
   const { data: activity = [], isLoading } = useLeadActivity(leadId);
