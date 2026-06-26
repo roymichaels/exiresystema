@@ -226,6 +226,11 @@ export default function ExireLanding() {
     <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
       {/* SEO handled via useEffect below */}
 
+      {/* Minimal top bar — brand + login. Reuses the global AuthModal/admin shell. */}
+      <ExireTopBar onLoginClick={() => handleLoginClick(navigate)} />
+
+
+
       {/* HERO */}
       <Section className="pt-20 sm:pt-28 pb-12 relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.15),transparent_60%)]" />
