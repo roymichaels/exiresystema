@@ -442,6 +442,11 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
 
                 <FormAnswersPreview metadata={selected.metadata} />
 
+                {isResubmitted(selected) && (
+                  <ResubmissionPanel lead={selected} />
+                )}
+
+
 
                 {/* Quick actions — integrated CRM */}
                 <div className="flex flex-wrap gap-2">
