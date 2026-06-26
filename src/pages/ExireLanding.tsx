@@ -240,7 +240,7 @@ export default function ExireLanding() {
   };
 
   return (
-    <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground">
+    <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
       {/* SEO handled via useEffect below */}
 
       {/* HERO */}
