@@ -43,9 +43,9 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
 
   return (
     <main
-      className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain touch-pan-y px-4 space-y-4"
+      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-4"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.75rem)',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.5rem)',
       }}
     >
