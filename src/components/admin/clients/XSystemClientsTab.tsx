@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, UsersRound, Phone, Mail, ChevronLeft } from 'lucide-react';
 import { useClients } from '@/hooks/useClients';
+import { MobileClientCard } from './MobileClientCard';
 
 const STATUS_LABEL: Record<string, string> = {
   active: 'פעיל',
