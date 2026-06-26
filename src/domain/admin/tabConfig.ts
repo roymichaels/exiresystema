@@ -97,7 +97,6 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     subTabs: [
       { id: 'crm',              labelHe: 'CRM',           labelEn: 'CRM',           component: Leads },
       { id: 'exire-lead-forms', labelHe: 'מיפוי טפסים',   labelEn: 'Form Mapping',  component: ExireLeadForms },
-      { id: 'templates',        labelHe: 'תבניות הודעה',  labelEn: 'Message Templates', component: MessageTemplates },
     ],
   },
   {
