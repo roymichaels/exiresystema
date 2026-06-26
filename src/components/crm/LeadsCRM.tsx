@@ -655,6 +655,43 @@ const FormAnswersPreview = ({ metadata }: { metadata: Record<string, unknown> | 
   );
 };
 
+const ResubmissionPanel = ({ lead }: { lead: Lead }) => {
+  const meta = leadMeta(lead);
+  const latest = meta.latest_submission as Record<string, unknown> | undefined;
+  const history = Array.isArray(meta.submission_history) ? (meta.submission_history as Record<string, unknown>[]) : [];
+  const count = resubmitCount(lead);
+  if (!latest && history.length === 0 && count === 0) return null;
+  const fmt = (s: unknown) => s ? format(new Date(String(s)), 'dd MMM HH:mm', { locale: he }) : '';
+  return (
+    <details className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3" open>
+      <summary className="text-xs font-semibold text-amber-500 uppercase cursor-pointer">
+        🔁 הגשה חוזרת{count > 0 ? ` · ${count} פעמים` : ''}
+      </summary>
+      {latest && (
+        <div className="mt-2 space-y-1 text-sm" dir="auto">
+          <div className="text-[10px] text-muted-foreground">הגשה אחרונה · {fmt(latest.at)}</div>
+          {latest.main_challenge ? <div><span className="text-xs text-muted-foreground">אתגר: </span>{String(latest.main_challenge)}</div> : null}
+          {latest.desired_result ? <div><span className="text-xs text-muted-foreground">תוצאה: </span>{String(latest.desired_result)}</div> : null}
+          {latest.what_have_you_tried ? <div><span className="text-xs text-muted-foreground">ניסה: </span>{String(latest.what_have_you_tried)}</div> : null}
+          {latest.phone ? <div dir="ltr"><span className="text-xs text-muted-foreground">טלפון: </span>{String(latest.phone)}</div> : null}
+          {latest.email ? <div dir="ltr"><span className="text-xs text-muted-foreground">אימייל: </span>{String(latest.email)}</div> : null}
+        </div>
+      )}
+      {history.length > 1 && (
+        <div className="mt-3 border-t border-amber-500/20 pt-2 space-y-1 max-h-40 overflow-y-auto">
+          <div className="text-[10px] text-muted-foreground uppercase">היסטוריית הגשות ({history.length})</div>
+          {history.slice().reverse().map((h, i) => (
+            <div key={i} className="text-[11px] text-muted-foreground" dir="auto">
+              · {fmt(h.at)}{h.main_challenge ? ` — ${String(h.main_challenge).slice(0, 60)}` : ''}
+            </div>
+          ))}
+        </div>
+      )}
+    </details>
+  );
+};
+
+
 
 
 const ActivityFeed = ({ leadId }: { leadId: string }) => {
