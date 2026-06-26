@@ -17,14 +17,16 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
   const isHe = language === 'he';
 
   const currentTabConfig = ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0];
+  const visibleTabs = ADMIN_TABS.filter(t => !t.hidden);
+  const archivedTabs = ADMIN_TABS.filter(t => t.hidden);
 
   return (
     <div className="hidden md:block space-y-2">
 
       {/* Primary tabs */}
       <ScrollArea className="w-full">
-        <div className="flex gap-2 px-1 pb-1">
-          {ADMIN_TABS.map((tab) => {
+        <div className="flex items-center gap-2 px-1 pb-1">
+          {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -43,6 +45,31 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
               </button>
             );
           })}
+          {archivedTabs.length > 0 && (
+            <>
+              <div className="mx-1 h-6 w-px bg-border/50 shrink-0" aria-hidden />
+              {archivedTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => onTabChange?.(tab.id, tab.subTabs[0]?.id)}
+                    title={isHe ? 'ארכיון — כלים ישנים' : 'Archive — legacy tools'}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0",
+                      isActive
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground/70 hover:bg-muted/40 hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5 opacity-70" />
+                    {isHe ? tab.labelHe : tab.labelEn}
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
