@@ -22,7 +22,7 @@ import { useProfileModal } from '@/contexts/ProfileModalContext';
 import { cn } from '@/lib/utils';
 import { CANONICAL_SURFACES } from '@/navigation/canonicalSurfaces';
 import { AionOrb } from '@/components/aion/ui';
-import { ADMIN_TABS } from '@/domain/admin';
+
 import { useEffect } from 'react';
 import { useChamberIdle } from '@/shellv2/hooks/useChamberIdle';
 
@@ -70,14 +70,24 @@ export default function ShellV2Drawer() {
     openProfile();
   };
 
-  // Admin sections sourced from ADMIN_TABS — single source of truth.
-  const adminItems: DrawerItem[] = ADMIN_TABS.map((tab) => ({
-    id: tab.id,
-    icon: tab.icon,
-    labelEn: tab.labelEn,
-    labelHe: tab.labelHe,
-    onSelect: () => go(`/admin-hub?tab=${tab.id}`),
-  }));
+  // Admin drawer is intentionally minimal: bottom-nav + AdminInlineNav already
+  // expose every admin group. The drawer is reserved for account/utility access.
+  const adminQuickItems: DrawerItem[] = [
+    {
+      id: 'admin-home',
+      icon: Shield,
+      labelEn: 'Admin Home',
+      labelHe: 'היום',
+      onSelect: () => go('/admin-hub?tab=today'),
+    },
+    {
+      id: 'admin-settings',
+      icon: SettingsIcon,
+      labelEn: 'Settings',
+      labelHe: 'הגדרות',
+      onSelect: () => go('/admin-hub?tab=settings'),
+    },
+  ];
 
   const clientItems: DrawerItem[] = CANONICAL_SURFACES.map((s) => ({
     id: s.id,
@@ -90,10 +100,10 @@ export default function ShellV2Drawer() {
   const sections: DrawerSection[] = isAdminContext
     ? [
         {
-          id: 'admin-nav',
+          id: 'admin-quick',
           titleEn: 'Exire Systema',
           titleHe: 'Exire Systema',
-          items: adminItems,
+          items: adminQuickItems,
         },
         {
           id: 'legacy-app',

@@ -28,4 +28,10 @@ export interface AdminTabConfig {
   labelEn: string;
   icon: LucideIcon;
   subTabs: AdminSubTabConfig[];
+  /**
+   * If true, the group is hidden from the primary navigation surfaces
+   * (mobile bottom-nav "More" grid + desktop inline-nav group row) but
+   * remains routable and reachable through the secondary "Archive" link.
+   */
+  hidden?: boolean;
 }

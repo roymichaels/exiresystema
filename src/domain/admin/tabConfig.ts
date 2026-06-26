@@ -95,8 +95,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelEn: 'Leads',
     icon: Users,
     subTabs: [
-      { id: 'crm',              labelHe: 'CRM',           labelEn: 'CRM',           component: Leads },
-      { id: 'exire-lead-forms', labelHe: 'מיפוי טפסים',   labelEn: 'Form Mapping',  component: ExireLeadForms },
+      { id: 'crm', labelHe: 'CRM', labelEn: 'CRM', component: Leads },
     ],
   },
   {
@@ -167,7 +166,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
       { id: 'affiliates',    labelHe: 'שותפים',       labelEn: 'Affiliates',    component: AdminAffiliates },
       { id: 'users',         labelHe: 'משתמשים',      labelEn: 'Users',         component: UsersPage },
       { id: 'bug-reports',   labelHe: 'דיווחי באגים', labelEn: 'Bug Reports',   component: BugReports },
-      { id: 'settings',      labelHe: 'הגדרות',       labelEn: 'Settings',      component: AdminSettings },
+      { id: 'settings',      labelHe: 'כללי',         labelEn: 'General',       component: AdminSettings },
     ],
   },
   {
@@ -175,6 +174,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     labelHe: 'ארכיון',
     labelEn: 'Legacy',
     icon: Archive,
+    hidden: true,
     subTabs: [
       { id: 'coach-overview',       labelHe: 'סקירת מאמן',         labelEn: 'Coach Overview',     component: CoachDashboardOverview },
       { id: 'coach-leads',          labelHe: 'לידים (ישן)',        labelEn: 'Coach Leads',        component: CoachLeadsTab },
