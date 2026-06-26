@@ -120,7 +120,7 @@ export default function ExireFunnelSettings() {
   const doneCount = checklist.filter((c) => c.ok).length;
 
   return (
-    <div dir="rtl" className="space-y-5">
+    <div dir="rtl" className="space-y-5 w-full max-w-full overflow-x-hidden">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -165,7 +165,7 @@ export default function ExireFunnelSettings() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
         <KPI label="לידים היום" value={funnel?.leadsToday ?? 0} />
         <KPI label="החודש"      value={funnel?.leadsThisMonth ?? 0} />
         <KPI label="הומרו"      value={funnel?.converted ?? 0} />
@@ -214,7 +214,7 @@ export default function ExireFunnelSettings() {
             </p>
 
             {/* Preview */}
-            <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video max-w-xl">
+            <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video w-full max-w-xl">
               {video.type === 'iframe' ? (
                 <iframe src={video.src} className="w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen title="preview" />
               ) : video.type === 'mp4' ? (

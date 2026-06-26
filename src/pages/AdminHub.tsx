@@ -43,18 +43,18 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
 
   return (
     <main
-      className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain touch-pan-y px-4 space-y-4"
+      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-4"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.75rem)',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.5rem)',
       }}
     >
       {/* Mobile compact header: section title + stats toggle + bell */}
-      <div className="md:hidden flex items-center justify-between gap-2">
-        <h1 className="text-base font-semibold truncate">
+      <div className="md:hidden -mx-3 px-3 py-2 flex items-center justify-between gap-2 bg-background/85 backdrop-blur-md border-b border-border/40 sticky top-0 z-10">
+        <h1 className="text-base font-semibold truncate min-w-0">
           {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
         </h1>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <Button
             size="sm"
             variant="ghost"
@@ -65,7 +65,6 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
             {isHe ? 'סטטוס' : 'Status'}
             <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', statsOpen && 'rotate-180')} />
           </Button>
-          <NotificationBell />
         </div>
       </div>
 
