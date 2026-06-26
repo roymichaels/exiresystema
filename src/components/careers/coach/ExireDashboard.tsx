@@ -67,6 +67,9 @@ function MobileCollapsible({ title, defaultOpen = false, children }: { title: st
       </section>
     </>
   );
+}
+
+
 
 export default function ExireDashboard() {
   const navigate = useNavigate();
