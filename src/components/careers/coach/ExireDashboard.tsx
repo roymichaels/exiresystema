@@ -50,6 +50,24 @@ function Stat({
   );
 }
 
+/** Renders as <details> on mobile (collapsed), inline section on desktop. */
+function MobileCollapsible({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  return (
+    <>
+      <details open={defaultOpen} className="md:hidden group rounded-2xl border border-border/50 bg-card/40 [&_summary::-webkit-details-marker]:hidden">
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium flex items-center justify-between">
+          <span className="truncate">{title}</span>
+          <ChevronLeft className="h-4 w-4 opacity-60 shrink-0 transition-transform group-open:-rotate-90" />
+        </summary>
+        <div className="px-3 pb-3">{children}</div>
+      </details>
+      <section className="hidden md:block">
+        <h2 className="text-lg font-semibold mb-2">{title}</h2>
+        {children}
+      </section>
+    </>
+  );
+
 export default function ExireDashboard() {
   const navigate = useNavigate();
   const { data, isLoading } = useExireDashboard();
