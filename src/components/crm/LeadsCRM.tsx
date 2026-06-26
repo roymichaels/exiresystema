@@ -384,6 +384,28 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                   <EmailDialog lead={selected} />
                   <WhatsAppDialog lead={selected} />
                   <ScheduleDialog lead={selected} />
+                  <MessageTemplatePicker
+                    channel="whatsapp" category="lead_reply"
+                    phone={selected.phone} recipientName={selected.name} leadId={selected.id}
+                    defaultVars={{ lead_name: selected.name, first_name: (selected.name || '').split(' ')[0] }}
+                    title="שלח הודעת פתיחה"
+                    trigger={
+                      <Button size="sm" variant="outline" className="gap-2" disabled={!selected.phone}>
+                        <Send className="h-4 w-4" /> שלח הודעת פתיחה
+                      </Button>
+                    }
+                  />
+                  <MessageTemplatePicker
+                    channel="whatsapp" category="lead_reply"
+                    phone={selected.phone} recipientName={selected.name} leadId={selected.id}
+                    defaultVars={{ lead_name: selected.name, first_name: (selected.name || '').split(' ')[0] }}
+                    title="שלח קביעת שיחה"
+                    trigger={
+                      <Button size="sm" variant="outline" className="gap-2" disabled={!selected.phone}>
+                        <Calendar className="h-4 w-4" /> שלח קביעת שיחה
+                      </Button>
+                    }
+                  />
                   <Button
                     size="sm"
                     className="gap-2"
