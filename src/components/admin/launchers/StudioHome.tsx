@@ -120,7 +120,7 @@ export default function StudioHome() {
                     {isHe ? c.titleHe : c.titleEn}
                   </div>
                   <div className="text-[10.5px] text-muted-foreground truncate">
-                    {isHe ? c.subtitleHe : ((c as any).subtitleEn ?? (c as any).subtitseEn ?? '')}
+                    {isHe ? c.subtitleHe : c.subtitleEn}
                   </div>
                 </div>
               </button>
