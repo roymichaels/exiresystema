@@ -375,7 +375,7 @@ export default function ExireDashboard() {
               ))}
             </CardContent>
           </Card>
-        </section>
+        </MobileCollapsible>
       )}
 
       {formMetrics && formMetrics.formIds.length > 0 && (
