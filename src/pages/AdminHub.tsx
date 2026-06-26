@@ -14,7 +14,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react';
-import { NotificationBell } from '@/components/admin/NotificationBell';
+
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
 
