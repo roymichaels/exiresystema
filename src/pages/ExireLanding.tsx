@@ -5,12 +5,13 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 // Helmet not required — we set document.title in an effect to keep deps minimal
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import {
   Sparkles, MessageCircle, ArrowLeft, CheckCircle2, X, Play,
   Brain, HeartPulse, Users2, Clock, Waves, ChevronDown, ShieldCheck, Loader2,
+  LogIn,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
