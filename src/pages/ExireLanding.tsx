@@ -492,13 +492,15 @@ export default function ExireLanding() {
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button asChild size="lg" className="gap-2">
                       <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(DEFAULT_WHATSAPP_HELLO)}`}
-                        target="_blank" rel="noopener noreferrer">
+                        target="_blank" rel="noopener noreferrer"
+                        onClick={() => track('whatsapp_clicked', { location: 'thank_you', lead_id: done.id })}>
                         <MessageCircle className="h-4 w-4" /> דבר איתי בוואטסאפ
                       </a>
                     </Button>
                     {intakeForm?.url && (
                       <Button asChild size="lg" variant="outline" className="gap-2">
-                        <a href={intakeForm.url} target="_blank" rel="noopener noreferrer">
+                        <a href={intakeForm.url} target="_blank" rel="noopener noreferrer"
+                          onClick={() => track('intake_clicked', { lead_id: done.id })}>
                           מילוי טופס קבלה <ArrowLeft className="h-4 w-4" />
                         </a>
                       </Button>
