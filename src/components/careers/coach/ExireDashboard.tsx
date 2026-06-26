@@ -281,8 +281,7 @@ export default function ExireDashboard() {
       </section>
 
       {insights && (
-        <section>
-          <h2 className="text-lg font-semibold mb-2">Onboarding · משימות פתוחות</h2>
+        <MobileCollapsible title="Onboarding · משימות פתוחות">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="py-3"><CardTitle className="text-sm">לידים בהמתנה למענה</CardTitle></CardHeader>
@@ -291,7 +290,7 @@ export default function ExireDashboard() {
                   ? <p className="text-xs text-muted-foreground">אין לידים פתוחים.</p>
                   : insights.leadsAwaitingReply.map((l) => (
                     <button key={l.id} onClick={() => navigate('/admin?tab=coach&sub=leads')}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">
                       {l.name} <span className="text-xs text-muted-foreground">· {new Date(l.created_at).toLocaleDateString('he-IL')}</span>
                     </button>
                   ))}
@@ -304,7 +303,7 @@ export default function ExireDashboard() {
                   ? <p className="text-xs text-muted-foreground">כולם תוזמנו.</p>
                   : insights.clientsWithoutSession.map((c) => (
                     <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">{c.full_name}</button>
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">{c.full_name}</button>
                   ))}
               </CardContent>
             </Card>
@@ -315,7 +314,7 @@ export default function ExireDashboard() {
                   ? <p className="text-xs text-muted-foreground">כל הטפסים מצורפים.</p>
                   : insights.clientsWithoutIntake.map((c) => (
                     <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">{c.full_name}</button>
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">{c.full_name}</button>
                   ))}
               </CardContent>
             </Card>
@@ -326,12 +325,12 @@ export default function ExireDashboard() {
                   ? <p className="text-xs text-muted-foreground">כולם שילמו.</p>
                   : insights.clientsWithoutPayment.map((c) => (
                     <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1">{c.full_name}</button>
+                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">{c.full_name}</button>
                   ))}
               </CardContent>
             </Card>
           </div>
-        </section>
+        </MobileCollapsible>
       )}
 
       {funnel && (
