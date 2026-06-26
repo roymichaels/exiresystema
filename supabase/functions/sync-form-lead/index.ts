@@ -225,8 +225,16 @@ async function syncOne(
   return { leadId, created };
 }
 
+// UUID v4-ish guard. Cheap input validation for public surface.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "method_not_allowed" }), {
+      status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
     const admin = createClient(
@@ -237,6 +245,58 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({} as Record<string, unknown>));
     const submissionId = (body as Record<string, unknown>).submission_id as string | undefined;
     const formId = (body as Record<string, unknown>).form_id as string | undefined;
+
+    if (submissionId && !UUID_RE.test(submissionId)) {
+      return new Response(JSON.stringify({ ok: false, skipped: true }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (formId && !UUID_RE.test(formId)) {
+      return new Response(JSON.stringify({ error: "invalid_form_id" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Bulk import by form_id requires an authenticated admin/practitioner.
+    // Single-submission sync (the public path) stays anonymous but is heavily
+    // constrained: it only runs against submissions that map to an active
+    // xsystem_lead_form_mappings row and the response never leaks answers.
+    const isBulk = !!formId && !submissionId;
+    if (isBulk) {
+      const authHeader = req.headers.get("Authorization") || "";
+      if (!authHeader.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const token = authHeader.slice(7);
+      const authed = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const { data: claims, error: claimsErr } = await authed.auth.getClaims(token);
+      const uid = claims?.claims?.sub as string | undefined;
+      if (claimsErr || !uid) {
+        return new Response(JSON.stringify({ error: "unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Must own an active mapping for this form (RLS on user_roles via has_role
+      // is not required here — ownership of the mapping IS the practitioner check).
+      const { data: ownMap } = await admin
+        .from("xsystem_lead_form_mappings")
+        .select("id")
+        .eq("form_id", formId!)
+        .eq("practitioner_id", uid)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (!ownMap) {
+        return new Response(JSON.stringify({ error: "forbidden_or_no_active_mapping" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     // Collect submissions to process
     let submissions: Submission[] = [];
