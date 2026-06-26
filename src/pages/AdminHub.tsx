@@ -24,7 +24,7 @@ interface AdminHubProps {
   onTabChange?: (tab: string, sub?: string) => void;
 }
 
-export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabChange }: AdminHubProps) {
+export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChange }: AdminHubProps) {
   const { language } = useTranslation();
   const isHe = language === 'he';
   const [statsOpen, setStatsOpen] = useState(false);
