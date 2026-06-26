@@ -124,6 +124,37 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
               );
             })}
           </ul>
+
+          {archived.length > 0 && (
+            <div className="mt-5 pt-3 border-t border-border/40">
+              <div className="px-1 pb-2 text-[10px] tracking-[0.18em] uppercase text-muted-foreground/70">
+                {isHe ? 'ארכיון' : 'Archive'}
+              </div>
+              <ul className="flex flex-col gap-1">
+                {archived.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <li key={tab.id}>
+                      <button
+                        type="button"
+                        onClick={() => handlePick(tab.id, tab.subTabs[0]?.id)}
+                        className={cn(
+                          'w-full flex items-center gap-3 rounded-lg px-3 py-2 text-start text-xs transition-colors',
+                          isActive
+                            ? 'bg-muted/60 text-foreground'
+                            : 'text-muted-foreground hover:bg-muted/40',
+                        )}
+                      >
+                        <Icon className="w-4 h-4 shrink-0 opacity-70" />
+                        <span className="truncate">{isHe ? tab.labelHe : tab.labelEn}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </>
