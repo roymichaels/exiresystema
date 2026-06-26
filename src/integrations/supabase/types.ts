@@ -5253,11 +5253,13 @@ export type Database = {
           email: string | null
           form_id: string
           id: string
+          lead_id: string | null
           metadata: Json | null
           practitioner_id: string | null
           responses: Json
           status: string
           submitted_at: string
+          synced_to_lead_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -5265,11 +5267,13 @@ export type Database = {
           email?: string | null
           form_id: string
           id?: string
+          lead_id?: string | null
           metadata?: Json | null
           practitioner_id?: string | null
           responses?: Json
           status?: string
           submitted_at?: string
+          synced_to_lead_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -5277,11 +5281,13 @@ export type Database = {
           email?: string | null
           form_id?: string
           id?: string
+          lead_id?: string | null
           metadata?: Json | null
           practitioner_id?: string | null
           responses?: Json
           status?: string
           submitted_at?: string
+          synced_to_lead_at?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -10895,6 +10901,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      xsystem_lead_form_mappings: {
+        Row: {
+          auto_sync: boolean
+          create_followup: boolean
+          created_at: string
+          field_mapping: Json
+          form_id: string
+          id: string
+          is_active: boolean
+          practitioner_id: string
+          source_key: string
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          auto_sync?: boolean
+          create_followup?: boolean
+          created_at?: string
+          field_mapping?: Json
+          form_id: string
+          id?: string
+          is_active?: boolean
+          practitioner_id: string
+          source_key?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          auto_sync?: boolean
+          create_followup?: boolean
+          created_at?: string
+          field_mapping?: Json
+          form_id?: string
+          id?: string
+          is_active?: boolean
+          practitioner_id?: string
+          source_key?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
       }
       xsystem_message_templates: {
         Row: {
