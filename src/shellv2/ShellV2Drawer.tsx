@@ -1,21 +1,20 @@
 /**
- * ShellV2Drawer — the only top-level drawer in ShellV2.
- *
- * Visual source: copied from `src/components/shell/OSDrawer.tsx` (right-side
- * Sheet, MINDOS brand row, button list, profile + settings + sign-out
- * footer). Architecture: zero legacy deps — no HubModalContext, no OS_TABS,
- * no ProfileModalContext. Wired to OverlayController via `kind: 'drawer'`
- * so the "one overlay at a time" rule from the shell spec holds.
+ * ShellV2Drawer — top-level drawer.
+ * Context-aware: in /admin and /admin-hub it renders the Exire Systema admin
+ * navigation; elsewhere it renders the canonical client surfaces.
+ * Includes language switcher (he / en / es) in the Account footer.
  */
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Settings as SettingsIcon,
   User,
   LogOut,
   Shield,
+  Globe,
 } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOverlay, useOverlayBinding } from '@/shell/overlay/OverlayController';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +22,7 @@ import { useProfileModal } from '@/contexts/ProfileModalContext';
 import { cn } from '@/lib/utils';
 import { CANONICAL_SURFACES } from '@/navigation/canonicalSurfaces';
 import { AionOrb } from '@/components/aion/ui';
+import { ADMIN_TABS } from '@/domain/admin';
 import { useEffect } from 'react';
 import { useChamberIdle } from '@/shellv2/hooks/useChamberIdle';
 
@@ -33,6 +33,7 @@ interface DrawerItem {
   labelEn: string;
   labelHe: string;
   onSelect: () => void | Promise<void>;
+  active?: boolean;
 }
 
 interface DrawerSection {
@@ -44,15 +45,17 @@ interface DrawerSection {
 
 export default function ShellV2Drawer() {
   const { language, isRTL } = useTranslation();
+  const { setLanguage } = useLanguage();
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const overlay = useOverlay();
   const binding = useOverlayBinding('drawer');
   const { openProfile } = useProfileModal();
   const { hideNav } = useChamberIdle();
 
-  // When the drawer opens, recede the bottom chamber UI so the sheet
-  // doesn't visually collide with the composer / nav dock.
+  const isAdminContext = location.pathname.startsWith('/admin');
+
   useEffect(() => {
     if (binding.open) hideNav();
   }, [binding.open, hideNav]);
@@ -67,31 +70,52 @@ export default function ShellV2Drawer() {
     openProfile();
   };
 
-  const sections: DrawerSection[] = [
-    {
-      // Phase C — only the 5 canonical surfaces remain in user-facing nav.
-      // Everything else is summoned by AION as artifact / overlay / room.
-      id: 'surfaces',
-      items: CANONICAL_SURFACES.map((s) => ({
-        id: s.id,
-        icon: s.icon,
-        labelEn: s.labelEn,
-        labelHe: s.labelHe,
-        onSelect: s.id === 'profile' ? goProfile : () => go(s.path),
-      })),
-    },
-    {
-      id: 'account',
-      titleEn: 'Account',
-      titleHe: 'חשבון',
-      items: [
-        { id: 'settings', icon: SettingsIcon, labelEn: 'Settings', labelHe: 'הגדרות', onSelect: () => go('/subscriptions') },
-        ...(isAdmin
-          ? [{ id: 'admin', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול', onSelect: () => go('/admin') }]
-          : []),
-      ],
-    },
-  ];
+  // Admin sections sourced from ADMIN_TABS — single source of truth.
+  const adminItems: DrawerItem[] = ADMIN_TABS.map((tab) => ({
+    id: tab.id,
+    icon: tab.icon,
+    labelEn: tab.labelEn,
+    labelHe: tab.labelHe,
+    onSelect: () => go(`/admin-hub?tab=${tab.id}`),
+  }));
+
+  const clientItems: DrawerItem[] = CANONICAL_SURFACES.map((s) => ({
+    id: s.id,
+    icon: s.icon,
+    labelEn: s.labelEn,
+    labelHe: s.labelHe,
+    onSelect: s.id === 'profile' ? goProfile : () => go(s.path),
+  }));
+
+  const sections: DrawerSection[] = isAdminContext
+    ? [
+        {
+          id: 'admin-nav',
+          titleEn: 'Exire Systema',
+          titleHe: 'Exire Systema',
+          items: adminItems,
+        },
+        {
+          id: 'legacy-app',
+          titleEn: 'Old app',
+          titleHe: 'אפליקציה ישנה',
+          items: clientItems,
+        },
+      ]
+    : [
+        { id: 'surfaces', items: clientItems },
+        {
+          id: 'account',
+          titleEn: 'Account',
+          titleHe: 'חשבון',
+          items: [
+            { id: 'settings', icon: SettingsIcon, labelEn: 'Settings', labelHe: 'הגדרות', onSelect: () => go('/subscriptions') },
+            ...(isAdmin
+              ? [{ id: 'admin', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול', onSelect: () => go('/admin-hub') }]
+              : []),
+          ],
+        },
+      ];
 
   const handleLogout = async () => {
     overlay.close();
@@ -105,6 +129,13 @@ export default function ShellV2Drawer() {
     user?.email?.split('@')[0] ||
     (language === 'he' ? 'אורח' : 'Guest');
 
+  const brandLabel = isAdminContext ? 'EXIRE SYSTEMA' : 'AION';
+  const languages: { code: 'he' | 'en' | 'es'; label: string }[] = [
+    { code: 'he', label: 'עברית' },
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+  ];
+
   return (
     <Sheet open={binding.open} onOpenChange={binding.onOpenChange}>
       <SheetContent
@@ -112,7 +143,6 @@ export default function ShellV2Drawer() {
         className="w-[300px] sm:w-[320px] p-0 bg-background/55 backdrop-blur-2xl border-0 shadow-none overflow-hidden"
         style={{ height: '100dvh' }}
       >
-        {/* Portal bloom — soft violet→cyan radial in the top corner */}
         <div
           aria-hidden
           className="pointer-events-none absolute -top-16 h-56 w-56"
@@ -135,13 +165,13 @@ export default function ShellV2Drawer() {
           <div className="flex items-center gap-3 px-4 pt-2 pb-4">
             <AionOrb size="md" />
             <div
-              className="aion-text-hero text-[15px] font-semibold tracking-[0.32em] leading-none"
+              className="aion-text-hero text-[13px] font-semibold tracking-[0.28em] leading-none truncate"
               style={{
                 textShadow:
                   '0 0 14px hsl(var(--aion-violet) / 0.35), 0 0 32px hsl(var(--aion-cyan) / 0.12)',
               }}
             >
-              AION
+              {brandLabel}
             </div>
           </div>
 
@@ -177,9 +207,37 @@ export default function ShellV2Drawer() {
                 </div>
               </div>
             ))}
+
+            {/* Language switcher */}
+            <div>
+              <div className="px-3 pt-1 pb-1.5 text-[9px] tracking-[0.22em] uppercase text-foreground/35 flex items-center gap-2">
+                <Globe className="h-3 w-3" />
+                {language === 'he' ? 'שפה' : language === 'es' ? 'Idioma' : 'Language'}
+              </div>
+              <div className="px-2 flex gap-1.5">
+                {languages.map((l) => {
+                  const active = l.code === language;
+                  return (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => setLanguage(l.code)}
+                      className={cn(
+                        'flex-1 h-10 rounded-2xl text-[12px] font-medium transition-colors',
+                        active
+                          ? 'bg-foreground/[0.08] text-foreground ring-1 ring-foreground/15'
+                          : 'text-foreground/55 hover:bg-foreground/[0.04]',
+                      )}
+                    >
+                      {l.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </nav>
 
-          {/* Identity / footer */}
+          {/* Footer */}
           <div className="relative p-3 space-y-1">
             <div
               aria-hidden
