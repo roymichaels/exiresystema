@@ -17,11 +17,23 @@ export type ExireFunnelSettings = Record<ExireKey, string>;
 
 const DEFAULTS: ExireFunnelSettings = {
   exire_landing_video_url: '',
-  exire_whatsapp_number: '972500000000',
+  // Phase 2N — no hardcoded fallback number. Landing hides the WhatsApp CTA
+  // until the admin configures a real number (see isWhatsAppConfigured).
+  exire_whatsapp_number: '',
   exire_primary_cta_label: 'בדוק התאמה לתהליך',
   exire_secondary_cta_label: 'שלח לי פרטים בוואטסאפ',
   exire_intake_form_id: '',
 };
+
+/** Normalize a WhatsApp number to digits only (E.164 without "+"). */
+export function normalizeWhatsApp(raw: string | null | undefined): string {
+  return (raw || '').replace(/\D/g, '');
+}
+
+/** True when admin has set a usable WhatsApp number (>= 8 digits). */
+export function isWhatsAppConfigured(raw: string | null | undefined): boolean {
+  return normalizeWhatsApp(raw).length >= 8;
+}
 
 export function useExireFunnelSettings() {
   return useQuery({
