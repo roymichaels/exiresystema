@@ -87,6 +87,7 @@ const CommunityLayoutWrapper = lazy(() => import("./components/community/Communi
 const CommunityThread = lazy(() => import("./pages/CommunityThread"));
 const Go = lazy(() => import("./pages/Go"));
 const FoundingLanding = lazy(() => import("./pages/FoundingLanding"));
+const ExireLanding = lazy(() => import("./pages/ExireLanding"));
 const FeatureDetailPage = lazy(() => import("./pages/FeatureDetailPage"));
 const AionChatPage = lazy(() => import("./pages/AionChatPage"));
 
@@ -361,6 +362,7 @@ const App = () => {
                                               <Route path="/ceremony" element={<OnboardingCeremony />} />
                                               <Route path="/go" element={<Go />} />
                                               <Route path="/founding" element={<FoundingLanding />} />
+                                              <Route path="/exire" element={<ExireLanding />} />
                                               <Route path="/features/:slug" element={<FeatureDetailPage />} />
                                               <Route path="/aion-chat" element={<AionChatPage />} />
                                               <Route path="/aion" element={<AionChatPage />} />
