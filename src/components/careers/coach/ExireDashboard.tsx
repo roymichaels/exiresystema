@@ -219,6 +219,7 @@ export default function ExireDashboard() {
 
       {/* ============================ DESKTOP =========================== */}
       <section className="hidden md:block">
+        <AdvisorCard className="mb-3" />
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">הכנסות</h3>
         <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
           <Stat label="היום" value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
