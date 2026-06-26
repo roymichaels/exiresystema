@@ -106,15 +106,18 @@ function CtaRow({
 
 export default function ExireLanding() {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const [form, setForm] = useState<LeadForm>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ id: string } | null>(null);
-  const { data: intakeForm } = useDefaultIntakeForm();
   const { data: settings } = useExireFunnelSettings();
+  // Phase 2N: respect admin-selected default intake form, fall back to latest published.
+  const { data: intakeForm } = useDefaultIntakeForm(settings?.exire_intake_form_id);
   const formStartedRef = React.useRef(false);
 
-  const whatsappNumber = (settings?.exire_whatsapp_number || '972500000000').replace(/\D/g, '');
+  const whatsappNumber = normalizeWhatsApp(settings?.exire_whatsapp_number);
+  const waConfigured = isWhatsAppConfigured(settings?.exire_whatsapp_number);
   const primaryLabel  = settings?.exire_primary_cta_label   || 'בדוק התאמה לתהליך';
   const secondaryLabel = settings?.exire_secondary_cta_label || 'שלח לי פרטים בוואטסאפ';
   const video = parseVideoEmbed(settings?.exire_landing_video_url || '');
