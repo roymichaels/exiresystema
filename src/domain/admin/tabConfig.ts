@@ -40,6 +40,7 @@ const AdminOffers          = lazy(() => import('@/pages/admin/Offers'));
 
 // ─── More (System / management) ─────────────────────────────────────────────
 const MoreHome             = lazy(() => import('@/components/admin/launchers/MoreHome'));
+const Advisor              = lazy(() => import('@/pages/admin/Advisor'));
 const Analytics            = lazy(() => import('@/pages/admin/Analytics'));
 const AuroraInsights       = lazy(() => import('@/pages/admin/AuroraInsights'));
 const AdminSettings        = lazy(() => import('@/pages/admin/Settings'));
