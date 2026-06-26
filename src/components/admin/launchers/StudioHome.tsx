@@ -30,7 +30,7 @@ const PRIMARY: Card[] = [
 
 const SECONDARY: Card[] = [
   { id: 'exire-lead-forms', titleHe: 'מיפוי לידים',    titleEn: 'Lead Mapping',  subtitleHe: 'חיבור ל־CRM',     subtitleEn: 'Map to CRM',     icon: FileText },
-  { id: 'landing-pages',    titleHe: 'דפי נחיתה',      titleEn: 'Landing Pages', subtitleHe: 'ניהול דפים',      subtitseEn: 'Pages',          icon: Layers } as any,
+  { id: 'landing-pages',    titleHe: 'דפי נחיתה',      titleEn: 'Landing Pages', subtitleHe: 'ניהול דפים',      subtitleEn: 'Pages',          icon: Layers },
   { id: 'landing-builder',  titleHe: 'בונה דפים',      titleEn: 'Page Builder',  subtitleHe: 'בנייה עם AI',     subtitleEn: 'Build with AI',  icon: Wand2 },
   { id: 'videos',           titleHe: 'סרטונים',        titleEn: 'Videos',        subtitleHe: 'ספריית וידאו',     subtitleEn: 'Video library',  icon: Mic },
   { id: 'blog',             titleHe: 'בלוג',           titleEn: 'Blog',          subtitleHe: 'תוכן ציבורי',     subtitleEn: 'Public posts',    icon: BookOpen },
