@@ -258,7 +258,7 @@ export default function ExireLanding() {
             Exire Systema הוא תהליך עומק לעבודה עם המקור — לא רק עם הסימפטום.
             שילוב של היפנוזה, NLP, אימון תת-מודע ועבודה עם חלקים פנימיים.
           </p>
-          <div className="mt-8"><CtaRow onPrimary={scrollToForm} /></div>
+          <div className="mt-8"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
           <p className="mt-3 text-xs text-muted-foreground">תהליך אישי · 1-on-1 · שיחת התאמה לפני קבלה</p>
         </motion.div>
 
@@ -303,7 +303,7 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} /></div>
+        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* NEW MECHANISM */}
@@ -362,7 +362,7 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} /></div>
+        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* FOR / NOT FOR */}
@@ -439,7 +439,7 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} /></div>
+        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* LEAD FORM */}
@@ -465,7 +465,7 @@ export default function ExireLanding() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button asChild size="lg" className="gap-2">
-                      <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_HELLO)}`}
+                      <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(DEFAULT_WHATSAPP_HELLO)}`}
                         target="_blank" rel="noopener noreferrer">
                         <MessageCircle className="h-4 w-4" /> דבר איתי בוואטסאפ
                       </a>
@@ -608,7 +608,7 @@ export default function ExireLanding() {
           <p className="text-muted-foreground mb-7 max-w-xl mx-auto">
             שיחה קצרה. בלי התחייבות. בודקים יחד אם זה הזמן והמקום הנכונים בשבילך.
           </p>
-          <CtaRow onPrimary={scrollToForm} />
+          <CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} />
         </motion.div>
       </Section>
 
