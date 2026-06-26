@@ -24,8 +24,10 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
   const primary = PRIMARY_IDS
     .map((id) => ADMIN_TABS.find((t) => t.id === id))
     .filter(Boolean) as typeof ADMIN_TABS;
-  const overflow = ADMIN_TABS.filter((t) => !PRIMARY_IDS.includes(t.id));
-  const isMoreActive = overflow.some((t) => t.id === activeTab);
+  const overflow = ADMIN_TABS.filter((t) => !PRIMARY_IDS.includes(t.id) && !t.hidden);
+  const archived = ADMIN_TABS.filter((t) => t.hidden);
+  const isMoreActive =
+    overflow.some((t) => t.id === activeTab) || archived.some((t) => t.id === activeTab);
 
   const handlePick = (tabId: string, subId?: string) => {
     setMoreOpen(false);
