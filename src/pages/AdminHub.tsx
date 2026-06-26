@@ -65,7 +65,6 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
             {isHe ? 'סטטוס' : 'Status'}
             <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', statsOpen && 'rotate-180')} />
           </Button>
-          <NotificationBell />
         </div>
       </div>
 
