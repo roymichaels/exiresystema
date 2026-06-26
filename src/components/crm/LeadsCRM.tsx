@@ -30,6 +30,8 @@ import { useConvertLeadToClient, useClientByLeadId } from '@/hooks/useClients';
 import { EmailDialog, WhatsAppDialog, ScheduleDialog } from '@/components/crm/LeadQuickActions';
 import { useLeadActivity } from '@/hooks/useLeadActivity';
 import { useCreateXSystemLeadFollowup } from '@/hooks/xsystem';
+import { MessageTemplatePicker } from '@/components/admin/clients/xsystem/MessageTemplatePicker';
+import { Sparkles as TplIcon, Send } from 'lucide-react';
 
 interface LeadsCRMProps {
   scope?: 'admin' | 'coach';
