@@ -80,47 +80,63 @@ export default function XSystemClientsTab() {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {filtered.map(c => (
-                <button
-                  key={c.id}
-                  onClick={() => navigate(`/clients/${c.id}`)}
-                  className="group w-full flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors text-start"
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                      <span className="text-sm font-bold text-primary">
-                        {(c.full_name || '?').charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-medium text-sm break-words">{c.full_name}</h4>
+            <>
+              {/* Mobile list */}
+              <div className="md:hidden space-y-2">
+                {filtered.map(c => (
+                  <MobileClientCard
+                    key={c.id}
+                    client={c}
+                    statusLabel={STATUS_LABEL[c.status] || c.status}
+                    statusColor={STATUS_COLOR[c.status] || ''}
+                    onOpen={() => navigate(`/clients/${c.id}`)}
+                  />
+                ))}
+              </div>
+
+              {/* Desktop list */}
+              <div className="hidden md:block space-y-2">
+                {filtered.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => navigate(`/clients/${c.id}`)}
+                    className="group w-full flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors text-start"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-bold text-primary">
+                          {(c.full_name || '?').charAt(0).toUpperCase()}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
-                        {c.phone && (
-                          <span dir="ltr" className="flex items-center gap-1">
-                            <Phone className="h-3 w-3" />{c.phone}
-                          </span>
-                        )}
-                        {c.email && (
-                          <span className="flex items-center gap-1">
-                            <Mail className="h-3 w-3" />{c.email}
-                          </span>
-                        )}
-                        <span>{format(new Date(c.created_at), 'dd MMM yyyy')}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-medium text-sm break-words">{c.full_name}</h4>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                          {c.phone && (
+                            <span dir="ltr" className="flex items-center gap-1">
+                              <Phone className="h-3 w-3" />{c.phone}
+                            </span>
+                          )}
+                          {c.email && (
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-3 w-3" />{c.email}
+                            </span>
+                          )}
+                          <span>{format(new Date(c.created_at), 'dd MMM yyyy')}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge variant="outline" className={STATUS_COLOR[c.status] || ''}>
-                      {STATUS_LABEL[c.status] || c.status}
-                    </Badge>
-                    <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </button>
-              ))}
-            </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge variant="outline" className={STATUS_COLOR[c.status] || ''}>
+                        {STATUS_LABEL[c.status] || c.status}
+                      </Badge>
+                      <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
