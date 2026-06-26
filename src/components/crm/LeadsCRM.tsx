@@ -329,12 +329,18 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                           <Badge variant="outline" className="text-[10px] py-0 px-1.5">
                             {SOURCE_LABELS[lead.source] || lead.source}
                           </Badge>
+                          {isResubmitted(lead) && (
+                            <Badge variant="outline" className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-400 border-amber-500/30">
+                              🔁 חזר{resubmitCount(lead) > 1 ? ` ×${resubmitCount(lead)}` : ''}
+                            </Badge>
+                          )}
                           {typeof lead.readiness_score === 'number' && (
                             <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
                               <Sparkles className="h-3 w-3" /> {lead.readiness_score}/10
                             </span>
                           )}
                         </div>
+
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
                           {lead.phone && (
                             <span dir="ltr" className="flex items-center gap-1">
