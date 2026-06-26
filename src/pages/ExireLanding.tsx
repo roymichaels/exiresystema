@@ -4,7 +4,7 @@
  * Inserts leads with source='exire_landing' and logs lead_activity + conversion_events.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+// Helmet not required — we set document.title in an effect to keep deps minimal
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
