@@ -230,7 +230,9 @@ export default function ExireLanding() {
       {/* SEO handled via useEffect below */}
 
       {/* Minimal top bar — brand + login. Reuses the global AuthModal/admin shell. */}
-      <ExireTopBar onLoginClick={() => handleLoginClick(navigate)} />
+      <ExireTopBar />
+
+
 
 
 
