@@ -97,123 +97,126 @@ export default function ExireDashboard() {
   return (
     <div className="space-y-5 w-full max-w-full overflow-x-hidden">
 
-      {/* MOBILE HERO — primary daily summary */}
-      <section className="md:hidden">
-        <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-transparent">
-          <CardContent className="p-4 space-y-3">
+      {/* ============================ MOBILE ============================ */}
+      <MobileAdminScreen>
+        <MobileAdminHeader
+          title="היום"
+          subtitle={`${new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'short' })}`}
+        />
+
+        {/* Daily summary — one compact card */}
+        <MobileMetricSummary
+          hero={{
+            label: 'הכנסות היום',
+            value: fmt(revenue.todayCents, revenue.currency),
+            hint: `החודש: ${fmt(revenue.monthCents, revenue.currency)}`,
+          }}
+          metrics={[
+            { label: 'סשנים', value: sessions.today },
+            { label: 'באיחור', value: actions.overdueFollowups, tone: actions.overdueFollowups > 0 ? 'warn' : 'default' },
+            { label: 'לידים פתוחים', value: leads.needFollowup, tone: leads.needFollowup > 0 ? 'warn' : 'default' },
+          ]}
+        />
+
+        {/* Today's action queue — single list */}
+        <MobileSectionCard title="סשנים קרובים" flush>
+          {sessions.upcomingList.length === 0 ? (
+            <MobileEmptyState icon={Calendar} title="אין סשנים מתוכננים" />
+          ) : (
+            <div className="divide-y divide-border/30">
+              {sessions.upcomingList.map((s) => (
+                <MobileListItem
+                  key={s.id}
+                  title={new Date(s.scheduled_at).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' })}
+                  subtitle="פתח כרטיס לקוח"
+                  trailing={<ChevronLeft className="h-4 w-4 text-muted-foreground/60" />}
+                  onClick={() => navigate(`/clients/${s.client_id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </MobileSectionCard>
+
+        <MobileSectionCard
+          title="פולואפים באיחור"
+          hint={actions.overdueFollowups > 0 ? `${actions.overdueFollowups} משימות דורשות מענה` : undefined}
+          flush
+        >
+          {actions.overdueFollowupList.length === 0 ? (
+            <MobileEmptyState icon={ClipboardCheck} title="אין משימות באיחור" />
+          ) : (
+            <div className="divide-y divide-border/30">
+              {actions.overdueFollowupList.map((f) => (
+                <MobileListItem
+                  key={f.id}
+                  title={f.title}
+                  meta={f.due_at ? new Date(f.due_at).toLocaleDateString('he-IL') : undefined}
+                  onClick={() => f.client_id && navigate(`/clients/${f.client_id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </MobileSectionCard>
+
+        <MobileSectionCard title="תשלומים ממתינים" flush>
+          {actions.pendingPaymentList.length === 0 ? (
+            <MobileEmptyState icon={CreditCard} title="אין תשלומים ממתינים" />
+          ) : (
+            <div className="divide-y divide-border/30">
+              {actions.pendingPaymentList.map((p) => (
+                <MobileListItem
+                  key={p.id}
+                  title={fmt(p.amount_cents, p.currency)}
+                  subtitle={p.due_at ? `יעד ${new Date(p.due_at).toLocaleDateString('he-IL')}` : '—'}
+                  onClick={() => navigate(`/clients/${p.client_id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </MobileSectionCard>
+
+        {/* All metrics — folded deeper */}
+        <details className="group rounded-2xl border border-border/40 bg-card/40 [&_summary::-webkit-details-marker]:hidden">
+          <summary className="cursor-pointer list-none px-4 py-3 text-[13px] font-medium flex items-center justify-between min-h-[44px]">
+            <span>כל המדדים · הכנסות, לידים, לקוחות, סשנים</span>
+            <ChevronLeft className="h-4 w-4 opacity-60 transition-transform group-open:-rotate-90" />
+          </summary>
+          <div className="px-3 pb-3 space-y-3">
             <div>
-              <div className="text-[11px] text-muted-foreground">הכנסות היום</div>
-              <div className="text-3xl font-bold leading-tight">{fmt(revenue.todayCents, revenue.currency)}</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">
-                החודש: {fmt(revenue.monthCents, revenue.currency)}
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">הכנסות</h4>
+              <div className="grid gap-2 grid-cols-2">
+                <Stat label="היום" value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
+                <Stat label="החודש" value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
+                <Stat label="ממתין" value={fmt(revenue.pendingCents, revenue.currency)} icon={Clock} tone="warn" />
+                <Stat label="לקוחות בחוב" value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/40">
-              <div className="text-center">
-                <div className="text-lg font-semibold">{sessions.today}</div>
-                <div className="text-[10px] text-muted-foreground">סשנים היום</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-amber-500">{actions.overdueFollowups}</div>
-                <div className="text-[10px] text-muted-foreground">באיחור</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-teal-500">{leads.needFollowup}</div>
-                <div className="text-[10px] text-muted-foreground">לידים פתוחים</div>
+            <div>
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">לידים</h4>
+              <div className="grid gap-2 grid-cols-2">
+                <Stat label="חדשים" value={leads.new} icon={Users} />
+                <Stat label="פעילים" value={leads.active} icon={Users} />
+                <Stat label="הומרו" value={leads.converted} icon={Users} tone="good" />
+                <Stat label="חזרו 🔁" value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} />
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Revenue — full grid (desktop default; collapsed on mobile) */}
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">הכנסות</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
-          <Stat label="היום" value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
-          <Stat label="החודש" value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
-          <Stat label="ממתין" value={fmt(revenue.pendingCents, revenue.currency)} hint={`${revenue.pendingClientCount} לקוחות`} icon={Clock} tone="warn" />
-          <Stat label="תשלומים שולמו" value={revenue.paidCount} icon={CreditCard} />
-          <Stat label="לקוחות בחוב" value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
-        </div>
-      </section>
-
-      {/* Leads */}
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">לידים</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
-          <Stat label="חדשים" value={leads.new} icon={Users} />
-          <Stat label="פעילים" value={leads.active} icon={Users} />
-          <Stat label="ממתינים לפולואפ" value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
-          <Stat label="הומרו" value={leads.converted} icon={Users} tone="good" />
-          <Stat label="חזרו 🔁" value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} hint="הגשה כפולה — דורש מענה אישי" />
-          <Stat label="סה״כ" value={leads.total} icon={Users} />
-        </div>
-      </section>
-
-      {/* Clients */}
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">לקוחות</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <Stat label="פעילים" value={clients.active} icon={Users} />
-          <Stat label="חדשים החודש" value={clients.newThisMonth} icon={Users} tone="good" />
-          <Stat label="עם סשן הבא" value={clients.withUpcomingSession} icon={Calendar} />
-          <Stat label="ללא סשן הבא" value={clients.withoutNextSession} icon={AlertCircle} tone={clients.withoutNextSession > 0 ? 'warn' : 'default'} />
-        </div>
-      </section>
-
-      {/* Sessions */}
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">סשנים</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <Stat label="היום" value={sessions.today} icon={Calendar} tone={sessions.today > 0 ? 'good' : 'default'} />
-          <Stat label="עתידיים" value={sessions.upcoming} icon={Calendar} />
-          <Stat label="הושלמו החודש" value={sessions.completedThisMonth} icon={Calendar} tone="good" />
-          <Stat label="בוטלו/לא הופיע" value={sessions.cancelledThisMonth} icon={AlertCircle} tone={sessions.cancelledThisMonth > 0 ? 'warn' : 'default'} />
-        </div>
-      </section>
-
-      {/* Mobile: full KPI grid collapsible */}
-      <details className="md:hidden group rounded-2xl border border-border/50 bg-card/40 [&_summary::-webkit-details-marker]:hidden">
-        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium flex items-center justify-between">
-          <span>כל המדדים · הכנסות, לידים, לקוחות, סשנים</span>
-          <ChevronLeft className="h-4 w-4 opacity-60 transition-transform group-open:-rotate-90" />
-        </summary>
-        <div className="px-3 pb-3 space-y-4">
-          <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">הכנסות</h4>
-            <div className="grid gap-2 grid-cols-2">
-              <Stat label="היום" value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
-              <Stat label="החודש" value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
-              <Stat label="ממתין" value={fmt(revenue.pendingCents, revenue.currency)} icon={Clock} tone="warn" />
-              <Stat label="לקוחות בחוב" value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
+            <div>
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">לקוחות וסשנים</h4>
+              <div className="grid gap-2 grid-cols-2">
+                <Stat label="לקוחות פעילים" value={clients.active} icon={Users} />
+                <Stat label="חדשים החודש" value={clients.newThisMonth} icon={Users} tone="good" />
+                <Stat label="סשנים עתידיים" value={sessions.upcoming} icon={Calendar} />
+                <Stat label="הושלמו החודש" value={sessions.completedThisMonth} icon={Calendar} tone="good" />
+              </div>
             </div>
           </div>
-          <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">לידים</h4>
-            <div className="grid gap-2 grid-cols-2">
-              <Stat label="חדשים" value={leads.new} icon={Users} />
-              <Stat label="פעילים" value={leads.active} icon={Users} />
-              <Stat label="הומרו" value={leads.converted} icon={Users} tone="good" />
-              <Stat label="חזרו 🔁" value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} />
-            </div>
-          </div>
-          <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">לקוחות וסשנים</h4>
-            <div className="grid gap-2 grid-cols-2">
-              <Stat label="לקוחות פעילים" value={clients.active} icon={Users} />
-              <Stat label="חדשים החודש" value={clients.newThisMonth} icon={Users} tone="good" />
-              <Stat label="סשנים עתידיים" value={sessions.upcoming} icon={Calendar} />
-              <Stat label="הושלמו החודש" value={sessions.completedThisMonth} icon={Calendar} tone="good" />
-            </div>
-          </div>
-        </div>
-      </details>
+        </details>
+      </MobileAdminScreen>
 
-      {/* Action Queue */}
-      <section>
+      {/* ============================ DESKTOP =========================== */}
+      <section className="hidden md:block">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">תור פעולות להיום</h3>
-        <div className="hidden md:grid gap-2 grid-cols-2 md:grid-cols-4 mb-3">
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-4 mb-3">
           <Stat label="פולואפים באיחור" value={actions.overdueFollowups} icon={AlertCircle} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
           <Stat label="פולואפים להיום" value={actions.followupsDueToday} icon={FileText} />
           <Stat label="תשלומים ממתינים" value={actions.pendingPayments} icon={CreditCard} tone={actions.pendingPayments > 0 ? 'warn' : 'default'} />
