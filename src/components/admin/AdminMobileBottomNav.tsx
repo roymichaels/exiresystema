@@ -32,17 +32,16 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
     <nav
       className={cn(
         'md:hidden fixed inset-x-0 bottom-0 z-[60]',
-        'bg-background/95 backdrop-blur-xl border-t border-border/60',
+        'bg-background/92 backdrop-blur-xl border-t border-border/40',
         'pb-[env(safe-area-inset-bottom,0px)]',
       )}
       aria-label={isHe ? 'ניווט תחתון' : 'Bottom navigation'}
     >
-      <ul className="flex items-stretch justify-around px-1 pt-1.5">
+      <ul className="flex items-stretch justify-around px-1 pt-1">
         {primary.map((tab) => {
           const Icon = tab.icon;
           const isActive =
             activeTab === tab.id ||
-            // "more" is also visually active when an archived (legacy) screen is open
             (tab.id === 'more' && activeTab === 'legacy');
           return (
             <li key={tab.id} className="flex-1">
@@ -50,15 +49,18 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
                 type="button"
                 onClick={() => handlePick(tab.id)}
                 className={cn(
-                  'w-full flex flex-col items-center gap-0.5 py-1.5 rounded-xl transition-colors',
+                  'w-full flex flex-col items-center gap-0.5 py-1 rounded-lg transition-colors',
                   isActive
-                    ? 'text-emerald-500 dark:text-emerald-400'
-                    : 'text-muted-foreground',
+                    ? 'text-foreground'
+                    : 'text-muted-foreground/70',
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">
+                <Icon
+                  className={cn('w-[18px] h-[18px]', isActive && 'text-primary')}
+                  strokeWidth={isActive ? 2 : 1.5}
+                />
+                <span className={cn('text-[10px] leading-none', isActive ? 'font-semibold' : 'font-medium')}>
                   {isHe ? tab.labelHe : tab.labelEn}
                 </span>
               </button>
