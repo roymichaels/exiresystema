@@ -19,7 +19,8 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
   const currentTabConfig = ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0];
 
   return (
-    <div className="space-y-2">
+    <div className="hidden md:block space-y-2">
+
       {/* Primary tabs */}
       <ScrollArea className="w-full">
         <div className="flex gap-2 px-1 pb-1">

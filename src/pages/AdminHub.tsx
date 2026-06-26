@@ -3,15 +3,20 @@
  * @purpose Unified admin control center — sidebar-less, everything inline
  */
 
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { PageSkeleton } from '@/components/ui/skeleton';
 import { ADMIN_TABS } from '@/domain/admin';
 import { AdminInlineNav } from '@/components/admin/AdminInlineNav';
 import { AdminStatsBar } from '@/components/admin/AdminStatsBar';
+import { AdminMobileBottomNav } from '@/components/admin/AdminMobileBottomNav';
+import { AdminMobileSubNav } from '@/components/admin/AdminMobileSubNav';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react';
+import { NotificationBell } from '@/components/admin/NotificationBell';
+import { useTranslation } from '@/hooks/useTranslation';
+import { cn } from '@/lib/utils';
 
 interface AdminHubProps {
   activeTab?: string;
@@ -20,6 +25,10 @@ interface AdminHubProps {
 }
 
 export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabChange }: AdminHubProps) {
+  const { language } = useTranslation();
+  const isHe = language === 'he';
+  const [statsOpen, setStatsOpen] = useState(false);
+
   const currentTabConfig = useMemo(
     () => ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0],
     [activeTab]
@@ -40,12 +49,34 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.5rem)',
       }}
     >
-      {/* Stats bar — isolated so a stats failure can't take down the whole admin */}
+      {/* Mobile compact header: section title + stats toggle + bell */}
+      <div className="md:hidden flex items-center justify-between gap-2">
+        <h1 className="text-base font-semibold truncate">
+          {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
+        </h1>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setStatsOpen((v) => !v)}
+            className="h-8 px-2 text-xs gap-1"
+            aria-expanded={statsOpen}
+          >
+            {isHe ? 'סטטוס' : 'Status'}
+            <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', statsOpen && 'rotate-180')} />
+          </Button>
+          <NotificationBell />
+        </div>
+      </div>
+
+      {/* Stats bar — collapsed by default on mobile, always visible on desktop */}
       <ErrorBoundary fallback={<div className="h-12" />}>
-        <AdminStatsBar onNavigate={onTabChange} />
+        <div className={cn('md:block', statsOpen ? 'block' : 'hidden')}>
+          <AdminStatsBar onNavigate={onTabChange} />
+        </div>
       </ErrorBoundary>
 
-      {/* Inline navigation — also isolated */}
+      {/* Desktop inline navigation (hidden on mobile) */}
       <ErrorBoundary
         fallback={
           <Card className="p-4 border-destructive/30 bg-destructive/5 text-sm">
@@ -54,6 +85,15 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
         }
       >
         <AdminInlineNav
+          activeTab={activeTab}
+          activeSubTab={currentSubTab}
+          onTabChange={onTabChange}
+        />
+      </ErrorBoundary>
+
+      {/* Mobile sub-tab switcher */}
+      <ErrorBoundary fallback={null}>
+        <AdminMobileSubNav
           activeTab={activeTab}
           activeSubTab={currentSubTab}
           onTabChange={onTabChange}
@@ -90,6 +130,9 @@ export default function AdminHub({ activeTab = 'overview', activeSubTab, onTabCh
           {ActiveSubComponent && <ActiveSubComponent />}
         </Suspense>
       </ErrorBoundary>
+
+      {/* Mobile bottom navigation */}
+      <AdminMobileBottomNav activeTab={activeTab} onTabChange={onTabChange} />
     </main>
   );
 }
