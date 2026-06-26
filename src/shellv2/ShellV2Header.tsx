@@ -55,20 +55,20 @@ export default function ShellV2Header() {
           )}
           data-aion-header="admin-slim"
         >
-          <div className="mx-auto flex h-11 w-full max-w-screen-lg items-center justify-between gap-2 px-2 sm:px-4">
+          <div className="mx-auto flex h-9 w-full max-w-screen-lg items-center justify-between gap-1.5 px-2 sm:px-3">
             <button
               type="button"
               aria-label={isHe ? 'תפריט' : 'Menu'}
               onClick={() => overlay.open('drawer')}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
             >
-              <Menu className="h-[18px] w-[18px]" strokeWidth={1.6} />
+              <Menu className="h-[17px] w-[17px]" strokeWidth={1.6} />
             </button>
 
             <button
               type="button"
               onClick={() => setBrandOpen(true)}
-              className="select-none px-2 py-1 text-[13px] font-semibold tracking-[0.18em] text-foreground/80 active:scale-[0.97] transition"
+              className="select-none px-1.5 py-0.5 text-[11.5px] font-semibold tracking-[0.16em] text-foreground/75 active:scale-[0.97] transition"
               aria-label={isHe ? 'אודות' : 'About'}
             >
               EXIRE SYSTEMA

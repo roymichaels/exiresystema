@@ -28,10 +28,15 @@ const PRIMARY: Card[] = [
   { id: 'recordings',   titleHe: 'מדיה',         titleEn: 'Media',            subtitleHe: 'הקלטות וסרטונים',   subtitleEn: 'Audio & video',      icon: Library },
 ];
 
+// Landing-related sub-actions exposed UNDER the main "דף נחיתה" card,
+// so we don't have 3 equal-weight cards (דף נחיתה / דפי נחיתה / בונה דף נחיתה).
+const LANDING_ACTIONS: { id: string; labelHe: string; labelEn: string; icon: typeof Rocket }[] = [
+  { id: 'landing-pages',    labelHe: 'דפי נחיתה',  labelEn: 'Pages',   icon: Layers },
+  { id: 'landing-builder',  labelHe: 'בונה דפים',  labelEn: 'Builder', icon: Wand2  },
+  { id: 'exire-lead-forms', labelHe: 'מיפוי לידים',labelEn: 'Mapping', icon: FileText },
+];
+
 const SECONDARY: Card[] = [
-  { id: 'exire-lead-forms', titleHe: 'מיפוי לידים',    titleEn: 'Lead Mapping',  subtitleHe: 'חיבור ל־CRM',     subtitleEn: 'Map to CRM',     icon: FileText },
-  { id: 'landing-pages',    titleHe: 'דפי נחיתה',      titleEn: 'Landing Pages', subtitleHe: 'ניהול דפים',      subtitleEn: 'Pages',          icon: Layers },
-  { id: 'landing-builder',  titleHe: 'בונה דפים',      titleEn: 'Page Builder',  subtitleHe: 'בנייה עם AI',     subtitleEn: 'Build with AI',  icon: Wand2 },
   { id: 'videos',           titleHe: 'סרטונים',        titleEn: 'Videos',        subtitleHe: 'ספריית וידאו',     subtitleEn: 'Video library',  icon: Mic },
   { id: 'blog',             titleHe: 'בלוג',           titleEn: 'Blog',          subtitleHe: 'תוכן ציבורי',     subtitleEn: 'Public posts',    icon: BookOpen },
   { id: 'faqs',             titleHe: 'שאלות נפוצות',   titleEn: 'FAQs',          subtitleHe: 'תשובות לפאנל',    subtitleEn: 'Landing FAQ',     icon: HelpCircle },
@@ -93,6 +98,25 @@ export default function StudioHome() {
           );
         })}
       </div>
+
+      {/* Landing sub-actions — quiet pills under the main Landing card */}
+      <div className="-mt-2 flex flex-wrap gap-1.5 px-1">
+        {LANDING_ACTIONS.map((a) => {
+          const Icon = a.icon;
+          return (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => go(a.id)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/40 bg-card/30 px-2.5 py-1 text-[11px] text-foreground/70 hover:bg-card/60 hover:text-foreground transition-colors"
+            >
+              <Icon className="h-3 w-3 opacity-70" strokeWidth={1.6} />
+              {isHe ? a.labelHe : a.labelEn}
+            </button>
+          );
+        })}
+      </div>
+
 
       {/* Secondary — quieter, smaller */}
       <div>

@@ -37,7 +37,7 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
       )}
       aria-label={isHe ? 'ניווט תחתון' : 'Bottom navigation'}
     >
-      <ul className="flex items-stretch justify-around px-1 pt-1">
+      <ul className="flex items-stretch justify-around px-1 pt-0.5">
         {primary.map((tab) => {
           const Icon = tab.icon;
           const isActive =
@@ -49,18 +49,18 @@ export function AdminMobileBottomNav({ activeTab, onTabChange }: Props) {
                 type="button"
                 onClick={() => handlePick(tab.id)}
                 className={cn(
-                  'w-full flex flex-col items-center gap-0.5 py-1 rounded-lg transition-colors',
+                  'w-full flex flex-col items-center gap-px py-0.5 rounded-md transition-colors',
                   isActive
                     ? 'text-foreground'
-                    : 'text-muted-foreground/70',
+                    : 'text-muted-foreground/65',
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >
                 <Icon
-                  className={cn('w-[18px] h-[18px]', isActive && 'text-primary')}
+                  className={cn('w-[16px] h-[16px]', isActive && 'text-primary')}
                   strokeWidth={isActive ? 2 : 1.5}
                 />
-                <span className={cn('text-[10px] leading-none', isActive ? 'font-semibold' : 'font-medium')}>
+                <span className={cn('text-[9.5px] leading-none', isActive ? 'font-semibold' : 'font-medium')}>
                   {isHe ? tab.labelHe : tab.labelEn}
                 </span>
               </button>
