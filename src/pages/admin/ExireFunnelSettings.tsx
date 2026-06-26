@@ -165,7 +165,7 @@ export default function ExireFunnelSettings() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
         <KPI label="לידים היום" value={funnel?.leadsToday ?? 0} />
         <KPI label="החודש"      value={funnel?.leadsThisMonth ?? 0} />
         <KPI label="הומרו"      value={funnel?.converted ?? 0} />
