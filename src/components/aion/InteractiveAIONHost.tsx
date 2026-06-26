@@ -95,9 +95,9 @@ export default function InteractiveAIONHost() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  // Edge swipe from left → right opens.
+  // Edge swipe from left → right opens (disabled in admin).
   useEffect(() => {
-    if (open) return;
+    if (open || isAdminRoute) return;
     function onStart(e: TouchEvent) {
       const t = e.touches[0];
       if (!t) return;
