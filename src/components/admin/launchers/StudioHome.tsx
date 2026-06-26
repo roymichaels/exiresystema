@@ -99,6 +99,25 @@ export default function StudioHome() {
         })}
       </div>
 
+      {/* Landing sub-actions — quiet pills under the main Landing card */}
+      <div className="-mt-2 flex flex-wrap gap-1.5 px-1">
+        {LANDING_ACTIONS.map((a) => {
+          const Icon = a.icon;
+          return (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => go(a.id)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/40 bg-card/30 px-2.5 py-1 text-[11px] text-foreground/70 hover:bg-card/60 hover:text-foreground transition-colors"
+            >
+              <Icon className="h-3 w-3 opacity-70" strokeWidth={1.6} />
+              {isHe ? a.labelHe : a.labelEn}
+            </button>
+          );
+        })}
+      </div>
+
+
       {/* Secondary — quieter, smaller */}
       <div>
         <div className="px-1 pb-2 text-[10px] tracking-[0.22em] uppercase text-muted-foreground/70">
