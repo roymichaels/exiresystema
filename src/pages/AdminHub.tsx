@@ -1,22 +1,20 @@
 /**
  * @tab Admin
- * @purpose Unified admin control center — sidebar-less, everything inline
+ * @purpose Unified admin control center — slim shell, no stats noise.
  */
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useMemo } from 'react';
 import { PageSkeleton } from '@/components/ui/skeleton';
 import { ADMIN_TABS } from '@/domain/admin';
 import { AdminInlineNav } from '@/components/admin/AdminInlineNav';
-import { AdminStatsBar } from '@/components/admin/AdminStatsBar';
 import { AdminMobileBottomNav } from '@/components/admin/AdminMobileBottomNav';
 import { AdminMobileSubNav } from '@/components/admin/AdminMobileSubNav';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 import { useTranslation } from '@/hooks/useTranslation';
-import { cn } from '@/lib/utils';
 
 interface AdminHubProps {
   activeTab?: string;
@@ -27,7 +25,6 @@ interface AdminHubProps {
 export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChange }: AdminHubProps) {
   const { language } = useTranslation();
   const isHe = language === 'he';
-  const [statsOpen, setStatsOpen] = useState(false);
 
   const currentTabConfig = useMemo(
     () => ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0],
@@ -43,52 +40,25 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
 
   return (
     <main
-      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-2.5 md:space-y-4"
+      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-2 md:space-y-3"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.5rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 2.5rem)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)',
       }}
     >
-      {/* Mobile page-context row: title + folded status chip. Compact, single line. */}
-      <div className="md:hidden flex items-center justify-between gap-2 py-1.5">
-        <h1 className="text-[15px] font-semibold truncate min-w-0 text-foreground/90">
+      {/* Mobile page-context row: title only. */}
+      <div className="md:hidden flex items-center justify-between gap-2 pt-1 pb-0.5">
+        <h1 className="text-[14px] font-semibold truncate min-w-0 text-foreground/85">
           {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
         </h1>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setStatsOpen((v) => !v)}
-          className="h-7 px-2 text-[11px] gap-1 text-muted-foreground/80 hover:text-foreground"
-          aria-expanded={statsOpen}
-        >
-          {isHe ? 'סטטוס' : 'Status'}
-          <ChevronDown className={cn('w-3 h-3 transition-transform', statsOpen && 'rotate-180')} />
-        </Button>
       </div>
 
-
-      {/* Desktop page-context row: title + folded status chip. */}
+      {/* Desktop page-context row: title only. */}
       <div className="hidden md:flex items-center justify-between gap-3 pt-1">
-        <h1 className="text-xl font-semibold text-foreground/90">
+        <h1 className="text-lg font-semibold text-foreground/85">
           {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
         </h1>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setStatsOpen((v) => !v)}
-          className="h-8 px-2.5 text-xs gap-1 text-muted-foreground/80 hover:text-foreground"
-          aria-expanded={statsOpen}
-        >
-          {isHe ? 'סטטוס' : 'Status'}
-          <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', statsOpen && 'rotate-180')} />
-        </Button>
       </div>
-
-      {/* Stats bar — folded by default on every viewport. */}
-      <ErrorBoundary fallback={<div className="h-12" />}>
-        {statsOpen ? <AdminStatsBar onNavigate={onTabChange} /> : null}
-      </ErrorBoundary>
-
 
       {/* Desktop inline navigation (hidden on mobile) */}
       <ErrorBoundary
