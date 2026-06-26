@@ -101,6 +101,10 @@ export function MessageTemplatePicker({
 
   const sendEmail = async () => {
     if (!email) { toast({ title: 'אין אימייל', variant: 'destructive' }); return; }
+    const ok = typeof window !== 'undefined'
+      ? window.confirm(`לשלוח אימייל אל ${email}?\n\nנושא: ${renderedSubject || '(ללא נושא)'}`)
+      : true;
+    if (!ok) return;
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-coach-email', {
