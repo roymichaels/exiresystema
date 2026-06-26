@@ -647,3 +647,49 @@ export default function ExireLanding() {
     </div>
   );
 }
+
+/**
+ * Top bar for the Exire landing — keeps the page minimal but restores the
+ * login entry point that the legacy homepage exposed. Reuses the global
+ * AuthModal (no new auth system). Logged-in users with panel access go
+ * straight to `/admin-hub`; logged-in non-admin users land on `/client-home`.
+ */
+function ExireTopBar() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const { hasPanelAccess } = useUserRoles();
+
+  const onClick = () => {
+    if (loading) return;
+    if (user) {
+      navigate(hasPanelAccess() ? '/admin-hub' : '/client-home');
+      return;
+    }
+    openAuthModal('login');
+  };
+
+  const label = user ? (hasPanelAccess() ? 'פאנל ניהול' : 'אזור אישי') : 'כניסה';
+
+  return (
+    <header className="absolute top-0 inset-x-0 z-30 px-4 sm:px-6 pt-4 sm:pt-5">
+      <div className="mx-auto max-w-6xl flex items-center justify-between gap-3">
+        <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide">
+          <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]" />
+          Exire Systema
+        </a>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClick}
+          disabled={loading}
+          className="h-9 gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          aria-label={label}
+        >
+          <LogIn className="h-4 w-4" />
+          <span>{label}</span>
+        </Button>
+      </div>
+    </header>
+  );
+}
