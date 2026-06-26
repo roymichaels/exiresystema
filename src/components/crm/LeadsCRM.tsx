@@ -229,8 +229,21 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
         </Dialog>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      {/* Stats — collapsible on mobile to reduce clutter */}
+      <details className="md:hidden rounded-xl border border-border/40 bg-card/40">
+        <summary className="cursor-pointer text-xs font-medium px-3 py-2 text-muted-foreground">
+          סטטיסטיקות ({stats.total})
+        </summary>
+        <div className="grid grid-cols-2 gap-2 p-3 pt-0">
+          {statCards.map(s => (
+            <div key={s.label} className="rounded-lg border border-border/40 p-2.5">
+              <p className="text-[10.5px] text-muted-foreground">{s.label}</p>
+              <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
+            </div>
+          ))}
+        </div>
+      </details>
+      <div className="hidden md:grid grid-cols-5 gap-3">
         {statCards.map(s => (
           <Card key={s.label} className="border-border/50">
             <CardContent className="pt-6">
