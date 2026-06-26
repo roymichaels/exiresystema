@@ -261,7 +261,51 @@ const LandingPageBuilder = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <>
+      {/* Mobile fallback — full builder is desktop-only */}
+      <div className="md:hidden min-h-screen flex flex-col bg-background px-4 pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-[calc(env(safe-area-inset-bottom,0px)+6rem)]">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/admin/landing-pages')}
+          className="gap-2 self-start mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+          {isRTL ? 'חזרה' : 'Back'}
+        </Button>
+        <div className="rounded-2xl border border-border/40 bg-card/50 p-5 space-y-3 text-center">
+          <Settings className="w-8 h-8 mx-auto text-muted-foreground/60" />
+          <h2 className="text-base font-semibold">{isRTL ? 'בונה דף נחיתה' : 'Landing page builder'}</h2>
+          <p className="text-[13px] text-muted-foreground leading-relaxed">
+            {isRTL
+              ? 'העריכה המלאה מומלצת ממחשב. במובייל ניתן רק לצפות ולפתוח הגדרות.'
+              : 'Full editing is recommended on desktop. On mobile you can only preview or open settings.'}
+          </p>
+          <div className="grid gap-2 pt-2">
+            {pageData?.slug && (
+              <Button
+                variant="outline"
+                onClick={() => window.open(`/${pageData.slug}`, '_blank')}
+                className="gap-2 justify-center"
+              >
+                <Eye className="w-4 h-4" />
+                {isRTL ? 'תצוגה מקדימה' : 'Preview'}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/admin/landing-pages')}
+              className="gap-2 justify-center text-muted-foreground"
+            >
+              {isRTL ? 'חזרה לרשימה' : 'Back to list'}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop builder (unchanged) */}
+      <div className="hidden md:flex h-screen flex-col bg-background">
+
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
         <div className="flex items-center gap-4">
@@ -414,7 +458,9 @@ const LandingPageBuilder = () => {
         existingSections={sections.map(s => s.type)}
       />
     </div>
+    </>
   );
+
 };
 
 export default LandingPageBuilder;
