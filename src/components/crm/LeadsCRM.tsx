@@ -30,6 +30,8 @@ import { useConvertLeadToClient, useClientByLeadId } from '@/hooks/useClients';
 import { EmailDialog, WhatsAppDialog, ScheduleDialog } from '@/components/crm/LeadQuickActions';
 import { useLeadActivity } from '@/hooks/useLeadActivity';
 import { useCreateXSystemLeadFollowup } from '@/hooks/xsystem';
+import { MessageTemplatePicker } from '@/components/admin/clients/xsystem/MessageTemplatePicker';
+import { Send } from 'lucide-react';
 
 interface LeadsCRMProps {
   scope?: 'admin' | 'coach';
@@ -331,6 +333,20 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                           </a>
                         </Button>
                       )}
+                      <MessageTemplatePicker
+                        channel="whatsapp"
+                        category="lead_reply"
+                        phone={lead.phone}
+                        recipientName={lead.name}
+                        leadId={lead.id}
+                        defaultVars={{ lead_name: lead.name, first_name: (lead.name || '').split(' ')[0] }}
+                        title="WhatsApp · מענה לליד"
+                        trigger={
+                          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1" disabled={!lead.phone}>
+                            <Send className="h-3.5 w-3.5" /> שלח תבנית
+                          </Button>
+                        }
+                      />
                       <Badge variant="outline" className={STATUS_COLOR[lead.status] || ''}>
                         {STATUS_LABELS[lead.status] || lead.status}
                       </Badge>
@@ -368,6 +384,28 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
                   <EmailDialog lead={selected} />
                   <WhatsAppDialog lead={selected} />
                   <ScheduleDialog lead={selected} />
+                  <MessageTemplatePicker
+                    channel="whatsapp" category="lead_reply"
+                    phone={selected.phone} recipientName={selected.name} leadId={selected.id}
+                    defaultVars={{ lead_name: selected.name, first_name: (selected.name || '').split(' ')[0] }}
+                    title="שלח הודעת פתיחה"
+                    trigger={
+                      <Button size="sm" variant="outline" className="gap-2" disabled={!selected.phone}>
+                        <Send className="h-4 w-4" /> שלח הודעת פתיחה
+                      </Button>
+                    }
+                  />
+                  <MessageTemplatePicker
+                    channel="whatsapp" category="lead_reply"
+                    phone={selected.phone} recipientName={selected.name} leadId={selected.id}
+                    defaultVars={{ lead_name: selected.name, first_name: (selected.name || '').split(' ')[0] }}
+                    title="שלח קביעת שיחה"
+                    trigger={
+                      <Button size="sm" variant="outline" className="gap-2" disabled={!selected.phone}>
+                        <Calendar className="h-4 w-4" /> שלח קביעת שיחה
+                      </Button>
+                    }
+                  />
                   <Button
                     size="sm"
                     className="gap-2"

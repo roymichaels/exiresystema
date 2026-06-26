@@ -10896,6 +10896,51 @@ export type Database = {
           },
         ]
       }
+      xsystem_message_templates: {
+        Row: {
+          body: string
+          category: string
+          channel: string
+          created_at: string
+          id: string
+          is_archived: boolean
+          is_default: boolean
+          name: string
+          practitioner_id: string
+          subject: string | null
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          body: string
+          category: string
+          channel: string
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          is_default?: boolean
+          name: string
+          practitioner_id: string
+          subject?: string | null
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          body?: string
+          category?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          is_default?: boolean
+          name?: string
+          practitioner_id?: string
+          subject?: string | null
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
       xsystem_patterns: {
         Row: {
           client_id: string

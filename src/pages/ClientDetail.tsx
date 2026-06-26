@@ -43,6 +43,10 @@ import XSystemPaymentsTab from '@/components/admin/clients/xsystem/XSystemPaymen
 import XSystemFollowupsTab from '@/components/admin/clients/xsystem/XSystemFollowupsTab';
 import XSystemTimelineTab from '@/components/admin/clients/xsystem/XSystemTimelineTab';
 import XSystemIntakeTab from '@/components/admin/clients/xsystem/XSystemIntakeTab';
+import WhatsAppQuickActions from '@/components/admin/clients/xsystem/WhatsAppQuickActions';
+import OnboardingChecklist from '@/components/admin/clients/xsystem/OnboardingChecklist';
+import { useDefaultIntakeForm } from '@/hooks/xsystem/forms';
+import { useClientFormSubmissions } from '@/hooks/xsystem';
 
 function EmptyState({ label }: { label: string }) {
   return (
@@ -95,6 +99,8 @@ export default function ClientDetail() {
   const { data: paymentsCount = 0 } = useXSystemPaymentsCount(id);
   const { data: paymentsTotal } = useXSystemPaymentsTotal(id);
   const { data: paymentsPending } = useXSystemClientPendingPayments(id);
+  const { data: intakeForm } = useDefaultIntakeForm();
+  const { data: clientSubmissions = [] } = useClientFormSubmissions(id);
 
   if (isLoading) {
     return (
@@ -222,36 +228,54 @@ export default function ClientDetail() {
               hint={lastAudio ? new Date(lastAudio.assigned_at).toLocaleDateString('he-IL') : ''} />
           </div>
 
-          <Card>
-            <CardHeader><CardTitle className="text-base">פעולות מהירות</CardTitle></CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" className="gap-2"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="sessions"]')?.click()}>
-                <Plus className="h-4 w-4" /> סשן חדש
-              </Button>
-              <Button size="sm" variant="outline" className="gap-2"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="followups"]')?.click()}>
-                <Plus className="h-4 w-4" /> פולואפ
-              </Button>
-              <Button size="sm" variant="outline" className="gap-2"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="payments"]')?.click()}>
-                <Plus className="h-4 w-4" /> תשלום
-              </Button>
-              <Button size="sm" variant="outline" className="gap-2"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="checkins"]')?.click()}>
-                <Plus className="h-4 w-4" /> צ׳ק-אין
-              </Button>
-              <Button size="sm" variant="outline" className="gap-2"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="audio"]')?.click()}>
-                <Plus className="h-4 w-4" /> שייך הקלטה
-              </Button>
-              {waNumber && (
-                <Button asChild size="sm" variant="outline" className="gap-2">
-                  <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="h-4 w-4" /> WhatsApp
-                  </a>
+          <div className="grid gap-3 md:grid-cols-2">
+            <OnboardingChecklist
+              contactInfoOk={!!(client.phone || client.whatsapp || client.email)}
+              hasIntake={clientSubmissions.length > 0}
+              hasFirstSession={sessionsCount > 0 || !!nextSession}
+              hasPayment={paymentsCount > 0}
+              hasAudio={audioCount > 0}
+            />
+            <Card>
+              <CardHeader className="py-3"><CardTitle className="text-base">פעולות מהירות</CardTitle></CardHeader>
+              <CardContent className="flex flex-wrap gap-2 pt-0">
+                <Button size="sm" variant="outline" className="gap-2"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="sessions"]')?.click()}>
+                  <Plus className="h-4 w-4" /> סשן חדש
                 </Button>
-              )}
+                <Button size="sm" variant="outline" className="gap-2"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="followups"]')?.click()}>
+                  <Plus className="h-4 w-4" /> פולואפ
+                </Button>
+                <Button size="sm" variant="outline" className="gap-2"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="payments"]')?.click()}>
+                  <Plus className="h-4 w-4" /> תשלום
+                </Button>
+                <Button size="sm" variant="outline" className="gap-2"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="checkins"]')?.click()}>
+                  <Plus className="h-4 w-4" /> צ׳ק-אין
+                </Button>
+                <Button size="sm" variant="outline" className="gap-2"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-state][value="audio"]')?.click()}>
+                  <Plus className="h-4 w-4" /> שייך הקלטה
+                </Button>
+                {waNumber && (
+                  <Button asChild size="sm" variant="outline" className="gap-2">
+                    <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="h-4 w-4" /> WhatsApp ישיר
+                    </a>
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader className="py-3">
+              <CardTitle className="text-base">תבניות WhatsApp / אימייל</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <WhatsAppQuickActions client={client} intakeLink={intakeForm?.url} />
             </CardContent>
           </Card>
 

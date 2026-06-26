@@ -1,8 +1,8 @@
 /**
- * XSYSTEM Intake tab — attached form submissions + attach existing ones.
+ * XSYSTEM Intake tab — attached form submissions + attach existing + intake link tools.
  */
 import { useState } from 'react';
-import { FileText, Link2 } from 'lucide-react';
+import { FileText, Link2, Copy, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -16,6 +16,10 @@ import {
   usePractitionerUnattachedSubmissions,
   useAttachFormSubmissionToClient,
 } from '@/hooks/xsystem';
+import { useDefaultIntakeForm, useAllPublishedForms } from '@/hooks/xsystem/forms';
+import { useClient } from '@/hooks/useClients';
+import { MessageTemplatePicker } from './MessageTemplatePicker';
+import { toast } from '@/hooks/use-toast';
 import { EmptyState, Row } from './_shared';
 
 export default function XSystemIntakeTab({
@@ -23,9 +27,26 @@ export default function XSystemIntakeTab({
 }: { clientId: string; subconsciousSummary?: string | null }) {
   const { data: submissions = [] } = useClientFormSubmissions(clientId);
   const { data: unattached = [] } = usePractitionerUnattachedSubmissions();
+  const { data: client } = useClient(clientId);
+  const { data: defaultForm } = useDefaultIntakeForm();
+  const { data: allForms = [] } = useAllPublishedForms();
   const attach = useAttachFormSubmissionToClient();
   const [open, setOpen] = useState(false);
   const [pick, setPick] = useState('');
+  const [selectedFormId, setSelectedFormId] = useState<string>('');
+
+  const activeForm = selectedFormId
+    ? allForms.find((f) => f.id === selectedFormId) || defaultForm
+    : defaultForm;
+  const intakeLink = activeForm?.url || null;
+  const phone = client?.whatsapp || client?.phone || '';
+  const firstName = (client?.full_name || '').split(' ')[0] || '';
+
+  const copyLink = async () => {
+    if (!intakeLink) return;
+    try { await navigator.clipboard.writeText(intakeLink); toast({ title: 'הקישור הועתק' }); }
+    catch { toast({ title: 'העתקה נכשלה', variant: 'destructive' }); }
+  };
 
   return (
     <div className="space-y-3">
@@ -35,6 +56,43 @@ export default function XSystemIntakeTab({
           <p className="text-sm whitespace-pre-wrap">{subconsciousSummary}</p>
         </Row>
       )}
+
+      <Row>
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div className="text-sm font-medium">קישור טופס קבלה</div>
+          {allForms.length > 1 && (
+            <Select value={activeForm?.id || ''} onValueChange={setSelectedFormId}>
+              <SelectTrigger className="w-56 h-8 text-xs"><SelectValue placeholder="בחר טופס" /></SelectTrigger>
+              <SelectContent>
+                {allForms.map((f) => <SelectItem key={f.id} value={f.id}>{f.title}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+        {intakeLink ? (
+          <>
+            <div className="text-xs text-muted-foreground mb-2 break-all" dir="ltr">{intakeLink}</div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" className="gap-1.5" onClick={copyLink}>
+                <Copy className="h-3.5 w-3.5" /> העתק קישור
+              </Button>
+              <MessageTemplatePicker
+                channel="whatsapp" category="onboarding"
+                phone={phone} recipientName={client?.full_name}
+                defaultVars={{ first_name: firstName, client_name: client?.full_name || '', intake_link: intakeLink }}
+                title="שלח טופס קבלה ב-WhatsApp"
+                trigger={
+                  <Button size="sm" className="gap-1.5" disabled={!phone}>
+                    <MessageCircle className="h-3.5 w-3.5" /> שלח ב-WhatsApp
+                  </Button>
+                }
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-xs text-muted-foreground">לא נבחר טופס. צור טופס מפורסם בלשונית "טפסים".</div>
+        )}
+      </Row>
 
       <div className="flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
