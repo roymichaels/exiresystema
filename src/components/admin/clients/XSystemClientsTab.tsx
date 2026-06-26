@@ -41,15 +41,25 @@ export default function XSystemClientsTab() {
   }, [clients, q]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">לקוחות XSYSTEM</h2>
-        <p className="text-sm text-muted-foreground">
-          לקוחות פעילים בליווי. הוספה דרך המרה מליד.
+        <h2 className="text-lg md:text-2xl font-bold">מתאמנים</h2>
+        <p className="hidden md:block text-sm text-muted-foreground">
+          לקוחות Exire פעילים בליווי. הוספה דרך המרה מליד.
         </p>
       </div>
 
-      <Card className="border-border/50">
+      {/* Search — compact on mobile, card on desktop */}
+      <div className="md:hidden relative">
+        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="חיפוש שם, טלפון, אימייל…"
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          className="pe-10 h-10 rounded-xl bg-card/60 border-border/40"
+        />
+      </div>
+      <Card className="hidden md:block border-border/50">
         <CardContent className="pt-6">
           <div className="relative">
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -63,7 +73,36 @@ export default function XSystemClientsTab() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/50">
+      {/* Mobile list (outside card chrome) */}
+      <div className="md:hidden">
+        {isLoading ? (
+          <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-border/30 bg-card/30 py-8 text-center">
+            <UsersRound className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
+            <p className="text-[13px] text-muted-foreground">
+              {q ? 'אין תוצאות לחיפוש.' : 'עדיין אין מתאמנים. המר ליד מתוך "לידים".'}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+              {filtered.length} מתאמנים
+            </div>
+            {filtered.map(c => (
+              <MobileClientCard
+                key={c.id}
+                client={c}
+                statusLabel={STATUS_LABEL[c.status] || c.status}
+                statusColor={STATUS_COLOR[c.status] || ''}
+                onOpen={() => navigate(`/clients/${c.id}`)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Card className="hidden md:block border-border/50">
         <CardHeader>
           <CardTitle className="text-base">לקוחות ({filtered.length})</CardTitle>
         </CardHeader>
@@ -80,6 +119,7 @@ export default function XSystemClientsTab() {
               </p>
             </div>
           ) : (
+
             <>
               {/* Mobile list */}
               <div className="md:hidden space-y-2">
