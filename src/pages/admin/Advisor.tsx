@@ -45,12 +45,24 @@ export default function Advisor() {
       const { data, error: fnErr } = await supabase.functions.invoke('exire-advisor', {
         body: { messages: next },
       });
-      if (fnErr) throw fnErr;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      // Edge function returned a structured error body (FunctionsHttpError on non-2xx).
+      const ctx: any = fnErr ? (fnErr as any).context : null;
+      if (ctx && typeof ctx === 'object' && 'json' in ctx && typeof ctx.json === 'function') {
+        try {
+          const errBody = await ctx.json();
+          if (errBody?.error) {
+            throw new Error(errBody.message || errBody.details || 'שגיאת שרת');
+          }
+        } catch (_) { /* fall through */ }
+      }
+      if (fnErr) throw new Error(fnErr.message || 'שגיאת שרת');
+      if ((data as any)?.error) {
+        throw new Error((data as any).message || (data as any).details || 'שגיאה לא צפויה');
+      }
       const reply = (data as any)?.reply || 'לא התקבלה תשובה.';
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
     } catch (e: any) {
-      setError(e?.message || 'שגיאה לא צפויה');
+      setError(e?.message || 'שגיאה לא צפויה — נסה שוב בעוד רגע');
     } finally {
       setLoading(false);
       setTimeout(() => inputRef.current?.focus(), 50);

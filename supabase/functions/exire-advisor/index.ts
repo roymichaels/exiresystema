@@ -13,7 +13,38 @@ import { corsHeaders, handleCorsPreFlight } from "../_shared/cors.ts";
 import { requireAdmin } from "../_shared/auth.ts";
 import { aiChatCompletion } from "../_shared/aiGateway.ts";
 
-const MODEL = "google/gemini-3-flash-preview";
+const PRIMARY_MODEL =
+  Deno.env.get("EXIRE_ADVISOR_MODEL") || "nousresearch/hermes-3-llama-3.1-405b:free";
+const DEEP_MODEL =
+  Deno.env.get("EXIRE_ADVISOR_DEEP_MODEL") || "nousresearch/hermes-3-llama-3.1-405b:free";
+const FALLBACK_MODEL =
+  Deno.env.get("EXIRE_ADVISOR_FALLBACK_MODEL") || "meta-llama/llama-3.3-70b-instruct:free";
+
+function errJSON(
+  code: string,
+  message: string,
+  details: string,
+  status = 500,
+) {
+  return new Response(
+    JSON.stringify({ error: true, code, message, details }),
+    { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+  );
+}
+
+async function safeReadOpenRouterError(res: Response): Promise<string> {
+  try {
+    const text = await res.text();
+    try {
+      const j = JSON.parse(text);
+      return j?.error?.message?.toString().slice(0, 300) || text.slice(0, 300);
+    } catch {
+      return text.slice(0, 300);
+    }
+  } catch {
+    return "";
+  }
+}
 
 const SYSTEM_PROMPT = `אתה "המוח העסקי" של Exire Systema — יועץ עסקי, מנטור מכירות ומפעיל טקטי של המאמן.
 תפקידך לתת סדר עדיפויות, פעולות הבאות, וחשיבה מעשית לבעלת/בעל העסק.
@@ -158,23 +189,39 @@ async function buildContext(adminUserId: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return handleCorsPreFlight();
 
+  if (!Deno.env.get("OPENROUTER_API_KEY") && !Deno.env.get("LOVABLE_API_KEY")) {
+    console.error("[exire-advisor] no AI key configured");
+    return errJSON(
+      "MISSING_AI_KEY",
+      "חסר OpenRouter API key",
+      "לא הוגדר מפתח של ספק ה-AI בשרת.",
+      500,
+    );
+  }
+
   const auth = await requireAdmin(req);
-  if (auth instanceof Response) return auth;
+  if (auth instanceof Response) {
+    console.warn("[exire-advisor] admin check failed", auth.status);
+    return errJSON(
+      "FORBIDDEN",
+      "אין הרשאת אדמין",
+      "המוח העסקי זמין רק למפעיל מאומת.",
+      auth.status || 403,
+    );
+  }
 
   let body: { messages?: Array<{ role: string; content: string }> } = {};
   try { body = await req.json(); } catch (_) { /* empty */ }
   const messages = Array.isArray(body.messages) ? body.messages : [];
   if (!messages.length) {
-    return new Response(JSON.stringify({ error: "messages חסר" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return errJSON("BAD_REQUEST", "messages חסר", "לא נשלחו הודעות.", 400);
   }
 
   let context: any;
   try {
     context = await buildContext(auth.userId);
   } catch (e) {
+    console.error("[exire-advisor] context build failed", e);
     context = { error: "context_build_failed", detail: String((e as Error).message || e) };
   }
 
@@ -190,39 +237,100 @@ Deno.serve(async (req) => {
     })),
   ];
 
-  try {
+  async function callModel(model: string) {
+    console.log("[exire-advisor] calling model", model);
     const res = await aiChatCompletion({
-      model: MODEL,
+      model,
       messages: aiMessages,
       temperature: 0.4,
       stream: false,
     });
+    console.log("[exire-advisor] model response", { model, status: res.status });
+    return res;
+  }
 
-    if (!res.ok) {
-      const text = await res.text();
-      if (res.status === 402) {
-        return new Response(JSON.stringify({ error: "נגמרו הקרדיטים של AI" }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (res.status === 429) {
-        return new Response(JSON.stringify({ error: "יותר מדי בקשות, נסה שוב בעוד רגע" }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify({ error: "AI gateway error", detail: text }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  let res: Response;
+  let usedModel = PRIMARY_MODEL;
+  let fallbackTried = false;
+
+  try {
+    res = await callModel(PRIMARY_MODEL);
+
+    // Try fallback once on 4xx/5xx (except 402 credits / 429 rate-limit which we surface directly).
+    if (!res.ok && res.status !== 402 && res.status !== 429) {
+      const primaryErr = await safeReadOpenRouterError(res);
+      console.warn("[exire-advisor] primary failed, trying fallback", {
+        primary: PRIMARY_MODEL,
+        status: res.status,
+        body: primaryErr,
       });
+      fallbackTried = true;
+      usedModel = FALLBACK_MODEL;
+      res = await callModel(FALLBACK_MODEL);
     }
+  } catch (e) {
+    console.error("[exire-advisor] network error on primary", e);
+    try {
+      fallbackTried = true;
+      usedModel = FALLBACK_MODEL;
+      res = await callModel(FALLBACK_MODEL);
+    } catch (e2) {
+      console.error("[exire-advisor] network error on fallback", e2);
+      return errJSON(
+        "UPSTREAM_NETWORK",
+        "שגיאת שרת",
+        "לא הצלחנו לפנות לספק ה-AI. נסה שוב בעוד רגע.",
+        502,
+      );
+    }
+  }
 
+  if (!res.ok) {
+    const detail = await safeReadOpenRouterError(res);
+    console.error("[exire-advisor] final non-ok", {
+      usedModel,
+      fallbackTried,
+      status: res.status,
+      detail,
+    });
+    if (res.status === 402) {
+      return errJSON("CREDITS", "נגמרו הקרדיטים של AI", "טען קרדיטים נוספים בהגדרות.", 402);
+    }
+    if (res.status === 429) {
+      return errJSON("RATE_LIMIT", "יותר מדי בקשות", "נסה שוב בעוד רגע.", 429);
+    }
+    if (res.status === 401 || res.status === 403) {
+      return errJSON("UPSTREAM_AUTH", "שגיאת OpenRouter", "המפתח נדחה על ידי OpenRouter.", 502);
+    }
+    if (res.status === 404 || res.status === 410) {
+      return errJSON(
+        "MODEL_UNAVAILABLE",
+        "מודל Hermes לא זמין כרגע",
+        "המודל לא נמצא או הוצא משירות.",
+        503,
+      );
+    }
+    return errJSON(
+      "UPSTREAM_ERROR",
+      "שגיאת שרת",
+      "ספק ה-AI החזיר שגיאה. נסה שוב בעוד רגע.",
+      502,
+    );
+  }
+
+  try {
     const data = await res.json();
     const reply =
       data?.choices?.[0]?.message?.content?.toString().trim() ||
       "לא הצלחתי לייצר תשובה כרגע.";
 
+    console.log("[exire-advisor] success", { usedModel, fallbackTried });
+
     return new Response(
       JSON.stringify({
         reply,
+        model_used: usedModel,
+        fallback_used: fallbackTried,
         context_summary: {
           open_leads: context?.openLeadsCount ?? 0,
           newest_leads: context?.newestLeads?.length ?? 0,
@@ -235,9 +343,15 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    return new Response(
-      JSON.stringify({ error: "advisor_failed", detail: String((e as Error).message || e) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    console.error("[exire-advisor] parse failed", e);
+    return errJSON(
+      "PARSE_FAILED",
+      "שגיאת שרת",
+      "תגובת ה-AI לא הייתה תקינה.",
+      502,
     );
   }
 });
+
+// Keep DEEP_MODEL referenced so it's not pruned (used in upcoming deep mode).
+export const __exire_models = { PRIMARY_MODEL, DEEP_MODEL, FALLBACK_MODEL };
