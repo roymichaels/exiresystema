@@ -14,8 +14,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
-import { useTranslation } from '@/hooks/useTranslation';
-
 interface AdminHubProps {
   activeTab?: string;
   activeSubTab?: string;
@@ -23,8 +21,6 @@ interface AdminHubProps {
 }
 
 export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChange }: AdminHubProps) {
-  const { language } = useTranslation();
-  const isHe = language === 'he';
 
   const currentTabConfig = useMemo(
     () => ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0],
@@ -42,23 +38,12 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
     <main
       className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-2 md:space-y-3"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 2.5rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 2.25rem)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.25rem)',
       }}
     >
-      {/* Mobile page-context row: title only. */}
-      <div className="md:hidden flex items-center justify-between gap-2 pt-1 pb-0.5">
-        <h1 className="text-[14px] font-semibold truncate min-w-0 text-foreground/85">
-          {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
-        </h1>
-      </div>
-
-      {/* Desktop page-context row: title only. */}
-      <div className="hidden md:flex items-center justify-between gap-3 pt-1">
-        <h1 className="text-lg font-semibold text-foreground/85">
-          {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
-        </h1>
-      </div>
+      {/* One-title rule: launcher pages (Studio/More) render their own H2.
+          We only show the compact title row on desktop, as a small breadcrumb. */}
 
       {/* Desktop inline navigation (hidden on mobile) */}
       <ErrorBoundary
