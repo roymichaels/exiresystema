@@ -7,7 +7,7 @@
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar, CreditCard, Users, AlertCircle, ClipboardCheck, FileText,
-  TrendingUp, Clock, ChevronLeft,
+  TrendingUp, Clock, ChevronLeft, ExternalLink,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,10 @@ import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
 import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
 import { useResubmittedLeads } from '@/hooks/xsystem/resubmittedLeads';
 import ExireLaunchChecklist from './ExireLaunchChecklist';
+import {
+  MobileAdminScreen, MobileAdminHeader, MobileMetricSummary,
+  MobileSectionCard, MobileListItem, MobileEmptyState,
+} from '@/components/admin/mobile';
 
 const fmt = (cents: number, ccy: string) =>
   new Intl.NumberFormat('he-IL', { style: 'currency', currency: ccy || 'ILS', maximumFractionDigits: 0 })
