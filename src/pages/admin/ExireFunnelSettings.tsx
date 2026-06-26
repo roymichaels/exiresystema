@@ -124,7 +124,7 @@ export default function ExireFunnelSettings() {
                   <SelectItem value="none">— ללא —</SelectItem>
                   {forms.map((f) => (
                     <SelectItem key={f.id} value={f.id}>
-                      {f.title}{f.published ? '' : ' (טיוטה)'}
+                      {f.title}{f.status === 'published' ? '' : ' (טיוטה)'}
                     </SelectItem>
                   ))}
                 </SelectContent>
