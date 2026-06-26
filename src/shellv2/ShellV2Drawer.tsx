@@ -11,6 +11,15 @@ import {
   LogOut,
   Shield,
   Globe,
+  Rocket,
+  ClipboardList,
+  MessageSquare,
+  BarChart3,
+  Users as UsersIcon,
+  Plug,
+  Home as HomeIcon,
+  Layers,
+  Archive,
 } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useTranslation } from '@/hooks/useTranslation';
