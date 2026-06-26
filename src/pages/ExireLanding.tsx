@@ -177,60 +177,32 @@ export default function ExireLanding() {
     const v = parsed.data;
     setSubmitting(true);
     try {
-      const noteParts = [
-        `אתגר עיקרי: ${v.main_challenge}`,
-        `תוצאה רצויה: ${v.desired_result}`,
-        v.what_have_you_tried ? `מה ניסה כבר: ${v.what_have_you_tried}` : '',
-        v.instagram_handle ? `אינסטגרם: ${v.instagram_handle}` : '',
-      ].filter(Boolean).join('\n');
-
-      const insertPayload = {
-        name: v.full_name,
-        phone: v.phone,
-        email: v.email || null,
-        source: 'exire_landing',
-        status: 'new',
-        notes: noteParts,
-        pain_category: v.main_challenge.slice(0, 120),
-        desired_outcome: v.desired_result,
-        prior_attempts: v.what_have_you_tried ? [v.what_have_you_tried] : null,
-        metadata: {
-          instagram_handle: v.instagram_handle || null,
-          language: 'he',
-          consent_at: new Date().toISOString(),
-          ...utm,
-        },
-        tags: ['exire_landing'],
-      };
-
-      const { data: lead, error } = await supabase
-        .from('leads').insert(insertPayload as never).select('id').single();
-      if (error) throw error;
-      const leadId = (lead as { id: string }).id;
-
-      await Promise.all([
-        supabase.from('lead_activity').insert({
-          lead_id: leadId,
-          kind: 'form_submission',
-          direction: 'inbound',
-          subject: 'submitted_exire_landing_form',
-          body: noteParts,
-          payload: { source: 'landing_page', form: v, utm } as never,
-          status: 'received',
-        } as never),
-        supabase.from('conversion_events').insert({
-          event_type: 'lead_submitted',
-          event_category: 'exire_funnel',
+      const { data, error } = await supabase.functions.invoke('submit-landing-lead', {
+        body: {
           source: 'exire_landing',
-          page_path: utm.path,
-          event_data: { lead_id: leadId, ...utm } as never,
-          conversion_value: 1,
-        } as never),
-      ]);
+          full_name: v.full_name,
+          phone: v.phone,
+          email: v.email || null,
+          main_challenge: v.main_challenge,
+          desired_result: v.desired_result,
+          what_have_you_tried: v.what_have_you_tried || null,
+          instagram_handle: v.instagram_handle || null,
+          utm,
+        },
+      });
+      if (error) throw error;
+      const resp = (data || {}) as { ok?: boolean; lead_id?: string; duplicate?: boolean; error?: string };
+      if (!resp.ok || !resp.lead_id) throw new Error(resp.error || 'שליחה נכשלה');
 
-      setDone({ id: leadId });
+      // Fire-and-forget tracking (do not block UX on this)
+      track(resp.duplicate ? 'lead_resubmitted' : 'lead_submitted', {
+        source: 'exire_landing',
+        duplicate: !!resp.duplicate,
+      });
+
+      setDone({ id: resp.lead_id });
       setForm(initialForm);
-      toast.success('הפרטים התקבלו ✨');
+      toast.success(resp.duplicate ? 'קיבלנו את העדכון שלך ✨' : 'הפרטים התקבלו ✨');
     } catch (err) {
       const msg = (err as Error)?.message || 'שליחה נכשלה';
       toast.error(msg);
@@ -238,6 +210,7 @@ export default function ExireLanding() {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
