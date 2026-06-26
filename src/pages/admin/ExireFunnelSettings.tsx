@@ -305,15 +305,6 @@ export default function ExireFunnelSettings() {
         </div>
       </details>
 
-      {/* Sticky save bar on mobile, inline on desktop */}
-      <div className="sticky bottom-[5.5rem] md:static z-10 -mx-3 md:mx-0 px-3 md:px-0 pt-2 md:pt-0">
-        <div className="md:flex md:justify-end rounded-2xl md:rounded-none bg-background/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-0 border md:border-0 border-border/40 p-2 md:p-0">
-          <Button onClick={save} disabled={update.isPending} className="gap-2 w-full md:w-auto">
-            {update.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            שמור הגדרות
-          </Button>
-        </div>
-      </div>
 
 
       {/* Setup checklist */}
