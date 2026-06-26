@@ -340,11 +340,10 @@ const App = () => {
                                         <SmartOnboardingProvider>
                                           <Suspense fallback={<PageSkeleton />}>
                                             <Routes>
-                                              {/* Public routes */}
-                                              {/* Phase 3.1 — `/` is state-space, not a homepage.
-                                                  SmartRoot renders PresenceShell for authed users
-                                                  and the public marketing Index otherwise. */}
-                                              <Route path="/" element={<SmartRoot />} />
+                                              {/* Phase 2J — `/` IS the Exire Systema funnel.
+                                                  Legacy SmartRoot (state-space / Index) is preserved at /legacy-home. */}
+                                              <Route path="/" element={<ExireLanding />} />
+                                              <Route path="/legacy-home" element={<SmartRoot />} />
                                               <Route path="/landing" element={<Index />} />
                                               <Route path="/blog" element={<Blog />} />
                                               <Route path="/blog/:slug" element={<BlogPost />} />
