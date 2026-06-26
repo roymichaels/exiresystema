@@ -40,16 +40,50 @@ export default function InteractiveAIONHost() {
   const [open, setOpen] = useState(false);
   const startRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
+  // IA-6 — Admin/operator routes are a focused touch-first OS. The global
+  // AION widget must NOT float over operational content. We:
+  //  - never auto-open in admin
+  //  - ignore edge-swipe in admin
+  //  - close immediately if route changes into admin while open
+  const [isAdminRoute, setIsAdminRoute] = useState(() =>
+    typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/admin') ||
+      window.location.pathname.startsWith('/clients/'))
+  );
+  useEffect(() => {
+    function check() {
+      const p = window.location.pathname;
+      const admin = p.startsWith('/admin') || p.startsWith('/clients/');
+      setIsAdminRoute(admin);
+      if (admin) setOpen(false);
+    }
+    window.addEventListener('popstate', check);
+    // React-Router uses pushState — patch once to emit a custom event.
+    const orig = window.history.pushState;
+    window.history.pushState = function (...args) {
+      const r = orig.apply(this, args as Parameters<typeof orig>);
+      window.dispatchEvent(new Event('locationchange'));
+      return r;
+    };
+    window.addEventListener('locationchange', check);
+    return () => {
+      window.removeEventListener('popstate', check);
+      window.removeEventListener('locationchange', check);
+      window.history.pushState = orig;
+    };
+  }, []);
+
   // Global open/close event
   useEffect(() => {
     function handler(e: Event) {
+      if (isAdminRoute) return; // ignore in admin mode
       const detail = (e as CustomEvent<{ open?: boolean } | undefined>).detail;
       if (detail && typeof detail.open === 'boolean') setOpen(detail.open);
       else setOpen((v) => !v);
     }
     window.addEventListener('aion:open-interactive', handler);
     return () => window.removeEventListener('aion:open-interactive', handler);
-  }, []);
+  }, [isAdminRoute]);
 
   // Escape closes
   useEffect(() => {
