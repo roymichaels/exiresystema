@@ -71,7 +71,7 @@ export default function ExireDashboard() {
 
   return (
     <div className="space-y-5">
-      <ExireLaunchChecklist />
+
 
       {/* Revenue */}
       <section>
