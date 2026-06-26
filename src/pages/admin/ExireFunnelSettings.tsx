@@ -28,10 +28,10 @@ function useAvailableForms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('custom_forms')
-        .select('id,title,published')
+        .select('id,title,status')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data || []) as Array<{ id: string; title: string; published: boolean }>;
+      return (data || []) as Array<{ id: string; title: string; status: string | null }>;
     },
   });
 }
