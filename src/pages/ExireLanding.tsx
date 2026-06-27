@@ -254,9 +254,6 @@ export default function ExireLanding() {
       <Section className="pt-16 sm:pt-24 pb-8 sm:pb-12 relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.15),transparent_60%)]" />
         <motion.div {...fade} className="text-center max-w-3xl mx-auto">
-          <Badge variant="outline" className="mb-4 gap-1.5 text-[11px]">
-            <Sparkles className="h-3 w-3" /> Exire Systema
-          </Badge>
           <h1 className="text-[28px] leading-[1.15] sm:text-5xl sm:leading-[1.1] font-bold tracking-tight">
             אתה לא תקוע כי חסר לך מידע.<br />
             <span className="text-primary">משהו בתוכך מריץ את אותו משחק שוב ושוב.</span>
