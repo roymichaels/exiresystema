@@ -3,15 +3,14 @@
  * Hebrew-first, RTL, mobile-first, conversion-focused.
  * Inserts leads with source='exire_landing' and logs lead_activity + conversion_events.
  */
-import React, { useEffect, useMemo, useState } from 'react';
-// Helmet not required — we set document.title in an effect to keep deps minimal
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import {
   Sparkles, MessageCircle, ArrowLeft, CheckCircle2, X, Play,
   Brain, HeartPulse, Users2, Clock, Waves, ChevronDown, ShieldCheck, Loader2,
-  LogIn,
+  LogIn, UserCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -60,7 +59,7 @@ const fade = { initial: { opacity: 0, y: 16 }, whileInView: { opacity: 1, y: 0 }
 
 function Section({ id, className = '', children }: { id?: string; className?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className={`w-full px-4 sm:px-6 py-14 sm:py-20 ${className}`}>
+    <section id={id} className={`w-full px-4 sm:px-6 py-12 sm:py-20 ${className}`}>
       <div className="mx-auto max-w-6xl">{children}</div>
     </section>
   );
@@ -68,27 +67,28 @@ function Section({ id, className = '', children }: { id?: string; className?: st
 
 function SectionTitle({ kicker, title, subtitle }: { kicker?: string; title: string; subtitle?: string }) {
   return (
-    <motion.div {...fade} className="text-center mb-10 sm:mb-14">
+    <motion.div {...fade} className="text-center mb-8 sm:mb-12">
       {kicker && (
-        <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary/80 mb-3">
+        <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-primary/80 mb-3">
           <Sparkles className="h-3.5 w-3.5" /> {kicker}
         </div>
       )}
-      <h2 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">{title}</h2>
-      {subtitle && <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">{subtitle}</p>}
+      <h2 className="text-2xl sm:text-4xl font-bold text-foreground leading-tight">{title}</h2>
+      {subtitle && <p className="mt-3 text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">{subtitle}</p>}
     </motion.div>
   );
 }
 
 function CtaRow({
-  onPrimary, whatsapp, helloText, primaryLabel, secondaryLabel, onSecondaryClick,
+  id, onPrimary, whatsapp, helloText, primaryLabel, secondaryLabel, onSecondaryClick,
 }: {
+  id?: string;
   onPrimary: () => void; whatsapp: string; helloText: string;
   primaryLabel: string; secondaryLabel: string; onSecondaryClick?: () => void;
 }) {
   const hasWa = whatsapp.length >= 8;
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+    <div id={id} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
       <Button size="lg" onClick={onPrimary} className="gap-2 h-12 px-7 text-base">
         {primaryLabel} <ArrowLeft className="h-4 w-4" />
       </Button>
@@ -115,14 +115,13 @@ export default function ExireLanding() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ id: string } | null>(null);
   const { data: settings } = useExireFunnelSettings();
-  // Phase 2N: respect admin-selected default intake form, fall back to latest published.
   const { data: intakeForm } = useDefaultIntakeForm(settings?.exire_intake_form_id);
-  const formStartedRef = React.useRef(false);
+  const formStartedRef = useRef(false);
 
   const whatsappNumber = normalizeWhatsApp(settings?.exire_whatsapp_number);
   const waConfigured = isWhatsAppConfigured(settings?.exire_whatsapp_number);
   const primaryLabel  = settings?.exire_primary_cta_label   || 'בדוק התאמה לתהליך';
-  const secondaryLabel = settings?.exire_secondary_cta_label || 'שלח לי פרטים בוואטסאפ';
+  const secondaryLabel = settings?.exire_secondary_cta_label || 'דבר איתי בוואטסאפ';
   const video = parseVideoEmbed(settings?.exire_landing_video_url || '');
 
   const utm = useMemo(() => ({
@@ -135,7 +134,6 @@ export default function ExireLanding() {
     path: typeof window !== 'undefined' ? window.location.pathname : null,
   }), [params]);
 
-  // Lightweight tracker — fire-and-forget, never throws.
   const track = React.useCallback((event_type: string, extra?: Record<string, unknown>) => {
     void supabase.from('conversion_events').insert({
       event_type,
@@ -148,20 +146,45 @@ export default function ExireLanding() {
 
   useEffect(() => {
     const prev = document.title;
-    document.title = 'Exire Systema — אימון תודעתי לתת־המודע';
+    document.title = 'Exire Systema — לשנות את החוקים מבפנים';
     const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
       let el = document.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
       if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.content = content;
     };
-    setMeta('description', 'שיטת אימון תודעתי המשלבת היפנוזה, NLP ועבודה עם תת־המודע כדי לזהות ולשנות דפוסים, אמונות וחסימות שחוזרות על עצמן.');
-    setMeta('og:title', 'Exire Systema — אימון תודעתי לתת־המודע', 'property');
-    setMeta('og:description', 'שיטת אימון תודעתי המשלבת היפנוזה, NLP ועבודה עם תת־המודע.', 'property');
+    setMeta('description', 'Exire Systema — תהליך עומק לזיהוי ושינוי הדפוסים שמריצים אותך מבפנים. עבודה תת-מודעת עם חלקים פנימיים, אמונות וחדרים פנימיים.');
+    setMeta('og:title', 'Exire Systema — לשנות את החוקים מבפנים', 'property');
+    setMeta('og:description', 'לא חסר לך מידע. משהו בתוכך מריץ את אותו משחק שוב ושוב. כאן מתחילים לכתוב את החוקים מחדש.', 'property');
     setMeta('og:type', 'website', 'property');
     return () => { document.title = prev; };
   }, []);
 
   useEffect(() => { track('landing_view'); }, [track]);
+
+  // Sticky CTA visibility — only when hero CTA, form, and final CTA are all off-screen.
+  const [stickyVisible, setStickyVisible] = useState(false);
+  useEffect(() => {
+    const visibility: Record<string, boolean> = { hero: true, form: false, final: false };
+    const observers: IntersectionObserver[] = [];
+    const update = () => setStickyVisible(!visibility.hero && !visibility.form && !visibility.final);
+    const observe = (id: string, key: string) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const o = new IntersectionObserver(([entry]) => {
+        visibility[key] = entry.isIntersecting;
+        update();
+      }, { threshold: 0.05 });
+      o.observe(el);
+      observers.push(o);
+    };
+    // small delay for ids to mount
+    const t = setTimeout(() => {
+      observe('hero-cta', 'hero');
+      observe('exire-lead-form', 'form');
+      observe('final-cta', 'final');
+    }, 50);
+    return () => { clearTimeout(t); observers.forEach(o => o.disconnect()); };
+  }, [done]);
 
   const scrollToForm = () => {
     track('cta_clicked', { target: 'lead_form' });
@@ -207,7 +230,6 @@ export default function ExireLanding() {
       const resp = (data || {}) as { ok?: boolean; lead_id?: string; duplicate?: boolean; error?: string };
       if (!resp.ok || !resp.lead_id) throw new Error(resp.error || 'שליחה נכשלה');
 
-      // Fire-and-forget tracking (do not block UX on this)
       track(resp.duplicate ? 'lead_resubmitted' : 'lead_submitted', {
         source: 'exire_landing',
         duplicate: !!resp.duplicate,
@@ -215,7 +237,7 @@ export default function ExireLanding() {
 
       setDone({ id: resp.lead_id });
       setForm(initialForm);
-      toast.success(resp.duplicate ? 'קיבלנו את העדכון שלך ✨' : 'הפרטים התקבלו ✨');
+      toast.success(resp.duplicate ? 'קיבלנו את העדכון שלך' : 'הפרטים התקבלו');
     } catch (err) {
       const msg = (err as Error)?.message || 'שליחה נכשלה';
       toast.error(msg);
@@ -224,127 +246,128 @@ export default function ExireLanding() {
     }
   };
 
-
   return (
-    <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
-      {/* SEO handled via useEffect below */}
-
-      {/* Minimal top bar — brand + login. Reuses the global AuthModal/admin shell. */}
-      <ExireTopBar />
-
-
-
-
+    <div dir="rtl" lang="he" className="min-h-screen bg-background text-foreground overflow-x-hidden pb-24 md:pb-0">
+      <ExireMinimalTop />
 
       {/* HERO */}
-      <Section className="pt-20 sm:pt-28 pb-12 relative overflow-hidden">
+      <Section className="pt-16 sm:pt-24 pb-8 sm:pb-12 relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.15),transparent_60%)]" />
         <motion.div {...fade} className="text-center max-w-3xl mx-auto">
-          <Badge variant="outline" className="mb-5 gap-1.5">
+          <Badge variant="outline" className="mb-4 gap-1.5 text-[11px]">
             <Sparkles className="h-3 w-3" /> Exire Systema
           </Badge>
-          <h1 className="text-4xl sm:text-6xl font-bold leading-[1.1] tracking-tight">
-            לא נתקעת כי חסר לך מידע.<br />
-            <span className="text-primary">נתקעת כי דפוס תת-מודע חוזר על עצמו.</span>
+          <h1 className="text-[28px] leading-[1.15] sm:text-5xl sm:leading-[1.1] font-bold tracking-tight">
+            אתה לא תקוע כי חסר לך מידע.<br />
+            <span className="text-primary">משהו בתוכך מריץ את אותו משחק שוב ושוב.</span>
           </h1>
-          <p className="mt-5 text-lg sm:text-xl text-muted-foreground leading-relaxed">
-            Exire Systema הוא תהליך עומק לעבודה עם המקור — לא רק עם הסימפטום.
-            שילוב של היפנוזה, NLP, אימון תת-מודע ועבודה עם חלקים פנימיים.
+          <p className="mt-4 text-sm sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
+            כוח רצון לא פותר קוד פנימי. כאן נכנסים לתת־מודע, מזהים את הדפוס שמנהל אותך, ומתחילים לכתוב את החוקים מחדש.
           </p>
-          <div className="mt-8"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
-          <p className="mt-3 text-xs text-muted-foreground">תהליך אישי · 1-on-1 · שיחת התאמה לפני קבלה</p>
-        </motion.div>
 
-        {/* VSL — configurable via Admin → Funnel Settings */}
-        <motion.div
-          {...fade}
-          className="mt-12 sm:mt-16 max-w-3xl mx-auto"
-          onViewportEnter={() => track('vsl_section_seen')}
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          <Card className="overflow-hidden border-primary/20">
-            <div className="aspect-video relative bg-gradient-to-br from-primary/10 via-background to-primary/5">
-              {video.type === 'iframe' ? (
-                <iframe
-                  src={video.src}
-                  title="Exire Systema — סרטון הסבר"
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full border-0"
-                />
-              ) : video.type === 'mp4' ? (
-                <video
-                  src={video.src}
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="absolute inset-0 w-full h-full object-cover bg-black"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="mx-auto h-16 w-16 rounded-full bg-primary/15 backdrop-blur flex items-center justify-center mb-3">
-                      <Play className="h-7 w-7 text-primary ms-0.5" />
+          {/* VSL — directly under subtitle, before CTA */}
+          <motion.div
+            {...fade}
+            className="mt-7 sm:mt-10"
+            onViewportEnter={() => track('vsl_section_seen')}
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <Card className="overflow-hidden border-primary/20">
+              <div className="aspect-video relative bg-gradient-to-br from-primary/10 via-background to-primary/5">
+                {video.type === 'iframe' ? (
+                  <iframe
+                    src={video.src}
+                    title="Exire Systema — סרטון הסבר"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full border-0"
+                  />
+                ) : video.type === 'mp4' ? (
+                  <video
+                    src={video.src}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="absolute inset-0 w-full h-full object-cover bg-black"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="mx-auto h-14 w-14 rounded-full bg-primary/15 backdrop-blur flex items-center justify-center mb-3">
+                        <Play className="h-6 w-6 text-primary ms-0.5" />
+                      </div>
+                      <p className="text-xs text-muted-foreground">סרטון הסבר על התהליך</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">סרטון הסבר על התהליך · יעלה בקרוב</p>
                   </div>
-                </div>
-              )}
-            </div>
-          </Card>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+
+          <div className="mt-6 sm:mt-8">
+            <CtaRow
+              id="hero-cta"
+              onPrimary={scrollToForm}
+              whatsapp={whatsappNumber}
+              helloText={DEFAULT_WHATSAPP_HELLO}
+              primaryLabel={primaryLabel}
+              secondaryLabel={secondaryLabel}
+              onSecondaryClick={() => track('whatsapp_clicked', { location: 'hero' })}
+            />
+          </div>
+          <p className="mt-3 text-[11px] sm:text-xs text-muted-foreground">תהליך אישי · 1 על 1 · שיחת התאמה לפני קבלה</p>
         </motion.div>
       </Section>
 
       {/* PROBLEM */}
       <Section className="bg-muted/30">
         <SectionTitle
-          kicker="הבעיה האמיתית"
-          title="אתה יודע מה לעשות. אז למה זה לא קורה?"
-          subtitle="רוב האנשים שתקועים — לא חסר להם ידע. הם נתקלים שוב ושוב באותה תקרה פנימית."
+          kicker="הבעיה"
+          title="אתה כבר יודע. אז למה זה לא זז?"
+          subtitle="עוד סרטון, עוד ספר, עוד עצה. הדפוס ממשיך לחזור כי הוא לא יושב במודע. הוא יושב עמוק יותר."
         />
         <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[
-            'דפוס חוזר בכסף — תקרה שלא נשברת',
-            'פחד, דחיינות, וקפיאה בזמני אמת',
-            'חוסר ביטחון עצמי שמלווה אותך שנים',
-            'לולאות רגשיות שחוזרות באותו תסריט',
-            'דפוסים חוזרים במערכות יחסים',
-            'הרגשה של תקיעות גם אחרי שניסית הרבה דברים',
+            'תקרה כלכלית שחוזרת בכל פעם שאתה מתקרב אליה',
+            'דחיינות, פחד או קפיאה ברגעי האמת',
+            'חוסר ביטחון שמלווה אותך כבר שנים',
+            'אותו תסריט רגשי שחוזר שוב ושוב',
+            'אותם דפוסים במערכות יחסים, רק עם אנשים אחרים',
+            'תקיעות גם אחרי הרבה ניסיונות אמיתיים לשנות',
           ].map((t) => (
             <motion.div key={t} {...fade}>
               <Card className="h-full border-border/50 hover:border-primary/40 transition">
-                <CardContent className="p-5 flex items-start gap-3">
-                  <div className="mt-0.5 h-2 w-2 rounded-full bg-primary shrink-0" />
+                <CardContent className="p-4 sm:p-5 flex items-start gap-3">
+                  <div className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />
                   <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">{t}</p>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* NEW MECHANISM */}
       <Section>
         <SectionTitle
           kicker="המנגנון"
-          title="במקום להילחם בסימפטום — לעבוד עם המבנה שמייצר אותו"
-          subtitle="Exire Systema משלב היפנוזה, NLP, אימון תת-מודע ועבודה עם חלקים פנימיים — כדי לזהות את הקוד שמפעיל את הדפוס, ולכתוב אותו מחדש מהשורש."
+          title="לא לעבוד על הסימפטום. לעבוד על המבנה שמייצר אותו."
+          subtitle="Exire Systema נכנס למערכת הפנימית שמריצה את הדפוס, מזהה את הקוד שמחזיק אותו, ומשנה אותו מהשורש."
         />
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
           {[
-            { icon: Brain, title: 'תת-מודע, לא מודע', text: 'הסיבה לדפוס לא נמצאת בלוגיקה. היא יושבת עמוק יותר — שם בדיוק נעשית העבודה.' },
-            { icon: Waves, title: 'חוויה, לא רק הבנה', text: 'אנחנו לא רק מדברים על השינוי — חווים אותו בתוך מצב תודעה מותאם.' },
-            { icon: HeartPulse, title: 'מבנה, לא מקריות', text: 'כל סשן הוא חלק מתהליך מובנה: אמונות, רגש, חלקים פנימיים, זיכרון, אנרגיה.' },
+            { icon: Brain, title: 'תת־מודע, לא רק לוגיקה', text: 'הסיבה לדפוס לא יושבת איפה שאתה מחפש אותה. אנחנו פוגשים אותה שם בדיוק.' },
+            { icon: Waves, title: 'חוויה, לא רק להבין', text: 'לא מדברים על שינוי. נכנסים למצב פנימי שבו השינוי קורה.' },
+            { icon: HeartPulse, title: 'מבנה, לא קסם', text: 'תהליך מסודר — אמונות, רגש, חלקים פנימיים, זיכרון, אנרגיה. שלב אחרי שלב.' },
           ].map(({ icon: Icon, title, text }) => (
             <motion.div key={title} {...fade}>
               <Card className="h-full bg-card/60 border-border/60">
-                <CardContent className="p-6">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <CardContent className="p-5 sm:p-6">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-1.5">{title}</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-1.5">{title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
                 </CardContent>
               </Card>
@@ -356,22 +379,22 @@ export default function ExireLanding() {
       {/* ROOMS MODEL */}
       <Section className="bg-gradient-to-b from-background via-muted/20 to-background">
         <SectionTitle
-          kicker="מודל החדרים"
-          title="חמישה חדרים פנימיים — מערכת אחת"
-          subtitle="כל חדר הוא שכבה אחרת בתת-המודע. בתהליך נכנסים אליהם בסדר מדויק."
+          kicker="החדרים הפנימיים"
+          title="חמישה חדרים. מערכת אחת."
+          subtitle="כל חדר הוא שכבה אחרת בתוכך. נכנסים אליהם בסדר שמתאים לך."
         />
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {[
-            { icon: Brain, title: 'חדר האמונות', text: 'הקוד התת-מודע שמגדיר מה אפשרי לך ומה לא.' },
-            { icon: HeartPulse, title: 'חדר הרגש והאנרגיה', text: 'המטען הרגשי שמחזיק את הדפוס יציב.' },
-            { icon: Users2, title: 'חדר החלקים הפנימיים', text: 'החלקים שמגנים, מפחדים או מנהלים אותך מבפנים.' },
-            { icon: Clock, title: 'חדר הזמן והזיכרונות', text: 'הרגעים שיצרו את ההחלטה הראשונית — ועדיין שולטים בהווה.' },
-            { icon: Waves, title: 'הים המרכזי · מרכז אנרגטי', text: 'הליבה ממנה מתחיל כל שינוי אמיתי ויציב.' },
+            { icon: Brain, title: 'חדר האמונות', text: 'הקוד הפנימי שמגדיר מה אפשרי לך ומה לא.' },
+            { icon: HeartPulse, title: 'חדר הרגש והאנרגיה', text: 'המטען שמחזיק את הדפוס יציב במקום.' },
+            { icon: Users2, title: 'חדר החלקים הפנימיים', text: 'החלקים שמגנים, מפחדים, או מנהלים אותך מבפנים בלי שתשים לב.' },
+            { icon: Clock, title: 'חדר הזמן והזיכרונות', text: 'הרגעים שבהם נחתמה ההחלטה הראשונית — וממשיכים לעבוד בהווה.' },
+            { icon: Waves, title: 'הים המרכזי', text: 'המרכז שממנו מתחיל כל שינוי שמחזיק לאורך זמן.' },
           ].map(({ icon: Icon, title, text }) => (
             <motion.div key={title} {...fade}>
               <Card className="h-full border-primary/15 hover:border-primary/40 transition group">
-                <CardContent className="p-5">
-                  <div className="h-11 w-11 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="text-base font-semibold mb-1">{title}</h3>
@@ -381,26 +404,25 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* FOR / NOT FOR */}
       <Section>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-5 md:grid-cols-2">
           <motion.div {...fade}>
             <Card className="h-full border-emerald-500/30">
-              <CardContent className="p-6 sm:p-7">
+              <CardContent className="p-5 sm:p-7">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <h3 className="text-lg font-semibold">למי זה מתאים</h3>
+                  <h3 className="text-lg font-semibold">בשבילך אם</h3>
                 </div>
                 <ul className="space-y-2.5 text-sm text-foreground/90">
                   {[
-                    'אנשים שמרגישים תקועים בנקודה שלא זזה',
-                    'אנשים שחוזרים על אותם דפוסים',
-                    'אנשים שכבר עברו טיפול / אימון / פיתוח אישי — ועדיין חוסם',
-                    'אנשים שרוצים עבודת עומק עם תת-המודע',
-                    'אנשים שמוכנים לקחת אחריות ולעשות עבודה פנימית',
+                    'אתה תקוע באותה נקודה כבר יותר מדי זמן',
+                    'אתה רואה את עצמך חוזר על אותו דפוס',
+                    'כבר ניסית טיפול, אימון, פיתוח אישי — והדפוס עוד פה',
+                    'אתה מוכן לעבודה אמיתית עם תת־המודע',
+                    'אתה לוקח אחריות ולא מחפש שמישהו אחר יציל אותך',
                   ].map((t) => (
                     <li key={t} className="flex gap-2"><span className="text-emerald-500 mt-1">•</span>{t}</li>
                   ))}
@@ -410,17 +432,17 @@ export default function ExireLanding() {
           </motion.div>
           <motion.div {...fade}>
             <Card className="h-full border-destructive/30">
-              <CardContent className="p-6 sm:p-7">
+              <CardContent className="p-5 sm:p-7">
                 <div className="flex items-center gap-2 mb-4">
                   <X className="h-5 w-5 text-destructive" />
-                  <h3 className="text-lg font-semibold">למי זה לא מתאים</h3>
+                  <h3 className="text-lg font-semibold">לא בשבילך אם</h3>
                 </div>
                 <ul className="space-y-2.5 text-sm text-foreground/90">
                   {[
-                    'מי שמחפש קסם או פתרון מיידי',
-                    'מי שרוצה שמישהו אחר יעשה את העבודה במקומו',
-                    'לא תחליף לטיפול רפואי או פסיכיאטרי',
-                    'לא מענה למצבי חירום נפשיים',
+                    'אתה מחפש קסם או כפתור שיפתור הכל ביום אחד',
+                    'אתה רוצה שמישהו אחר יעשה את העבודה במקומך',
+                    'אתה מחפש טיפול רפואי או פסיכיאטרי — זה לא זה',
+                    'אתה במצב חירום נפשי כרגע',
                   ].map((t) => (
                     <li key={t} className="flex gap-2"><span className="text-destructive mt-1">•</span>{t}</li>
                   ))}
@@ -435,21 +457,21 @@ export default function ExireLanding() {
       <Section className="bg-muted/30">
         <SectionTitle
           kicker="התהליך"
-          title="איך זה עובד · שלב אחרי שלב"
-          subtitle="תהליך מובנה, אישי, ובטוח. בלי הפתעות."
+          title="איך זה עובד, בלי קסמים"
+          subtitle="תהליך מסודר, אישי, ובטוח. אתה יודע בכל שלב איפה אתה נמצא."
         />
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {[
-            { n: '01', title: 'השארת פרטים', text: 'ממלא טופס קצר — מה האתגר, מה הרצוי, מה ניסית.' },
-            { n: '02', title: 'שיחת התאמה', text: 'שיחה קצרה לבדיקה הדדית של התאמה לתהליך.' },
+            { n: '01', title: 'משאיר פרטים', text: 'טופס קצר — מה תקוע, לאן רוצים להגיע, מה כבר ניסית.' },
+            { n: '02', title: 'שיחת התאמה', text: 'שיחה קצרה לבדוק יחד אם זה הזמן והמקום הנכונים.' },
             { n: '03', title: 'טופס קבלה', text: 'מילוי מעמיק שמכין את הסשן הראשון.' },
-            { n: '04', title: 'סשן Exire ראשון', text: 'כניסה למבנה הפנימי ועבודה עם המקור.' },
-            { n: '05', title: 'אינטגרציה אישית', text: 'הקלטות מותאמות, צ׳ק-אינים ותרגול בין סשנים.' },
-            { n: '06', title: 'מעקב והשכבה הבאה', text: 'פולואפ צמוד והעמקה לרובד הבא של התהליך.' },
+            { n: '04', title: 'סשן Exire ראשון', text: 'כניסה למבנה הפנימי, עבודה ישירה עם השורש.' },
+            { n: '05', title: 'אינטגרציה אישית', text: 'הקלטות מותאמות, צ׳ק־אינים ותרגול בין הסשנים.' },
+            { n: '06', title: 'השכבה הבאה', text: 'ממשיכים לעומק, לרובד הבא של המערכת הפנימית.' },
           ].map((s) => (
             <motion.div key={s.n} {...fade}>
               <Card className="h-full border-border/60">
-                <CardContent className="p-5">
+                <CardContent className="p-4 sm:p-5">
                   <div className="text-xs font-mono text-primary mb-2">{s.n}</div>
                   <h3 className="text-base font-semibold mb-1">{s.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{s.text}</p>
@@ -458,7 +480,6 @@ export default function ExireLanding() {
             </motion.div>
           ))}
         </div>
-        <div className="mt-10"><CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} /></div>
       </Section>
 
       {/* LEAD FORM */}
@@ -467,29 +488,30 @@ export default function ExireLanding() {
           <SectionTitle
             kicker="השארת פרטים"
             title="בדוק התאמה לתהליך"
-            subtitle="ממלאים את הפרטים — חוזרים אליך לתיאום שיחת התאמה קצרה."
+            subtitle="ממלא פרטים, אני חוזר אליך לשיחת התאמה קצרה."
           />
 
           {done ? (
             <motion.div {...fade}>
               <Card className="border-primary/40">
-                <CardContent className="p-7 text-center">
+                <CardContent className="p-6 sm:p-7 text-center">
                   <div className="mx-auto h-14 w-14 rounded-full bg-emerald-500/15 flex items-center justify-center mb-4">
                     <CheckCircle2 className="h-7 w-7 text-emerald-500" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-2">הפרטים התקבלו ✨</h3>
-                  <p className="text-muted-foreground mb-6">
-                    השלב הבא הוא שיחת התאמה קצרה. נחזור אליך בהקדם.
-                    אפשר גם לכתוב לנו ישירות בוואטסאפ כדי לקצר תהליכים.
+                  <h3 className="text-2xl font-semibold mb-2">הפרטים התקבלו</h3>
+                  <p className="text-muted-foreground mb-6 text-sm sm:text-base">
+                    אחזור אליך לשיחת התאמה קצרה. אפשר גם לכתוב לי ישירות בוואטסאפ.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button asChild size="lg" className="gap-2">
-                      <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(DEFAULT_WHATSAPP_HELLO)}`}
-                        target="_blank" rel="noopener noreferrer"
-                        onClick={() => track('whatsapp_clicked', { location: 'thank_you', lead_id: done.id })}>
-                        <MessageCircle className="h-4 w-4" /> דבר איתי בוואטסאפ
-                      </a>
-                    </Button>
+                    {waConfigured && (
+                      <Button asChild size="lg" className="gap-2">
+                        <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(DEFAULT_WHATSAPP_HELLO)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          onClick={() => track('whatsapp_clicked', { location: 'thank_you', lead_id: done.id })}>
+                          <MessageCircle className="h-4 w-4" /> דבר איתי בוואטסאפ
+                        </a>
+                      </Button>
+                    )}
                     {intakeForm?.url && (
                       <Button asChild size="lg" variant="outline" className="gap-2">
                         <a href={intakeForm.url} target="_blank" rel="noopener noreferrer"
@@ -537,19 +559,19 @@ export default function ExireLanding() {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="main_challenge">מה האתגר המרכזי שלך כרגע? *</Label>
+                    <Label htmlFor="main_challenge">מה התקיעות המרכזית שלך כרגע? *</Label>
                     <Textarea id="main_challenge" value={form.main_challenge} rows={3} maxLength={2000}
                       onChange={(e) => update('main_challenge', e.target.value)} />
                     {errors.main_challenge && <p className="text-xs text-destructive mt-1">{errors.main_challenge}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="desired_result">איך נראית התוצאה הרצויה? *</Label>
+                    <Label htmlFor="desired_result">איך נראית התוצאה שאתה רוצה? *</Label>
                     <Textarea id="desired_result" value={form.desired_result} rows={3} maxLength={2000}
                       onChange={(e) => update('desired_result', e.target.value)} />
                     {errors.desired_result && <p className="text-xs text-destructive mt-1">{errors.desired_result}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="what_have_you_tried">מה כבר ניסית עד היום? (אופציונלי)</Label>
+                    <Label htmlFor="what_have_you_tried">מה כבר ניסית? (אופציונלי)</Label>
                     <Textarea id="what_have_you_tried" value={form.what_have_you_tried} rows={2} maxLength={2000}
                       onChange={(e) => update('what_have_you_tried', e.target.value)} />
                   </div>
@@ -559,8 +581,8 @@ export default function ExireLanding() {
                       onCheckedChange={(c) => update('consent', (c === true) as LeadForm['consent'])}
                       className="mt-0.5"
                     />
-                    <span className="text-muted-foreground leading-relaxed">
-                      אני מאשר/ת שייצרו איתי קשר לבדיקת התאמה לתהליך. אני מבין/ה שמדובר באימון ועבודה תת-מודעת — לא טיפול רפואי או פסיכיאטרי.
+                    <span className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
+                      אני מאשר שייצרו איתי קשר לבדיקת התאמה לתהליך. אני מבין שמדובר באימון ועבודה תת־מודעת, לא טיפול רפואי או פסיכיאטרי.
                     </span>
                   </label>
                   {errors.consent && <p className="text-xs text-destructive">{errors.consent}</p>}
@@ -569,9 +591,9 @@ export default function ExireLanding() {
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                     שלח ובדוק התאמה
                   </Button>
-                  <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    הפרטים שלך נשמרים בצורה מאובטחת ולא מועברים לצד שלישי
+                    הפרטים שלך נשמרים מאובטח ולא עוברים לאף אחד אחר
                   </div>
                 </CardContent>
               </Card>
@@ -582,22 +604,22 @@ export default function ExireLanding() {
 
       {/* FAQ */}
       <Section className="bg-muted/30">
-        <SectionTitle kicker="שאלות נפוצות" title="שאלות שעולות לפני שמתחילים" />
+        <SectionTitle kicker="שאלות נפוצות" title="מה אנשים שואלים לפני שמתחילים" />
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="w-full">
             {[
-              ['מה זה Exire Systema?', 'תהליך עבודה תת-מודע שמשלב היפנוזה, NLP, אימון תת-מודע ועבודה עם חלקים פנימיים, במטרה לשחרר דפוסים חוזרים מהשורש.'],
-              ['זה טיפול פסיכולוגי?', 'לא. מדובר באימון ועבודת עומק תת-מודעת. זה לא תחליף לטיפול רפואי או פסיכיאטרי.'],
-              ['מה קורה בסשן עצמו?', 'אחרי שיחה קצרה נכנסים למצב תודעה מותאם ועובדים על הרובד הפנימי שמחזיק את הדפוס. הסשן בטוח, מובנה ומלווה.'],
-              ['היפנוזה זה בטוח?', 'כן. נשארים עם מודעות מלאה לאורך כל התהליך, אפשר לעצור בכל רגע, ואין שליטה חיצונית.'],
-              ['כמה סשנים בדרך כלל צריך?', 'משתנה לפי המטרה והעומק שאתה מחפש. בשיחת ההתאמה בודקים יחד מה הכי מתאים לך.'],
-              ['ואם אני לא יודע מה בדיוק הבעיה שלי?', 'זה לגמרי בסדר. חלק מהעבודה היא לזהות יחד את המבנה שמייצר את התקיעות.'],
-              ['זה מתאים לדפוסים של כסף / ביטחון / מערכות יחסים / פחד / דחיינות?', 'כן — אלה בדיוק תחומי העבודה המרכזיים של התהליך.'],
-              ['מה קורה אחרי שאני משאיר פרטים?', 'חוזרים אליך לתיאום שיחת התאמה קצרה. אם יש התאמה — קובעים סשן ראשון ושולחים טופס קבלה.'],
+              ['מה זה Exire Systema?', 'תהליך עבודה עם תת־המודע שמשלב היפנוזה, NLP ועבודה עם חלקים פנימיים, כדי לשחרר דפוסים חוזרים מהשורש ולא רק מהפני השטח.'],
+              ['זה טיפול פסיכולוגי?', 'לא. זה אימון ועבודת עומק תת־מודעת. זה לא תחליף לטיפול רפואי או פסיכיאטרי.'],
+              ['מה קורה בסשן עצמו?', 'מתחילים בשיחה קצרה, נכנסים למצב פנימי מותאם, ועובדים על הרובד שמחזיק את הדפוס במקום. אתה לגמרי מודע לאורך כל התהליך.'],
+              ['היפנוזה זה בטוח?', 'כן. אתה מודע לכל מה שקורה, אפשר לעצור בכל רגע, ואין שליטה חיצונית. אתה זה שעושה את העבודה.'],
+              ['כמה סשנים אני צריך?', 'תלוי במה אתה רוצה לפתור ועד איזה עומק. בשיחת ההתאמה בודקים יחד מה הכי מתאים לך.'],
+              ['ואם אני לא יודע איפה בדיוק הבעיה?', 'זה בסדר גמור. חלק מהעבודה היא לזהות יחד את המבנה שמייצר את התקיעות.'],
+              ['זה עוזר לכסף, ביטחון, יחסים, פחד, דחיינות?', 'כן. אלה בדיוק האזורים המרכזיים שבהם התהליך עובד בעומק.'],
+              ['מה קורה אחרי שאני משאיר פרטים?', 'אחזור אליך לשיחת התאמה קצרה. אם יש התאמה, קובעים סשן ראשון ושולחים טופס קבלה.'],
             ].map(([q, a]) => (
               <AccordionItem key={q} value={q}>
-                <AccordionTrigger className="text-right">{q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">{a}</AccordionContent>
+                <AccordionTrigger className="text-right text-sm sm:text-base">{q}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed text-sm">{a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -608,12 +630,12 @@ export default function ExireLanding() {
       <Section>
         <motion.div {...fade} className="max-w-3xl mx-auto">
           <Card className="border-border/60 bg-muted/20">
-            <CardContent className="p-6 sm:p-7">
+            <CardContent className="p-5 sm:p-7">
               <div className="flex items-start gap-3">
                 <ShieldCheck className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                <div className="text-sm text-muted-foreground leading-relaxed space-y-1.5">
-                  <p>Exire Systema הוא תהליך אימון ועבודה תת-מודעת, ואינו תחליף לטיפול רפואי או פסיכיאטרי.</p>
-                  <p>המידע האישי שאתה משאיר משמש לצורך יצירת קשר ובדיקת התאמה לתהליך בלבד.</p>
+                <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-1.5">
+                  <p>Exire Systema הוא תהליך אימון ועבודה תת־מודעת, ולא תחליף לטיפול רפואי או פסיכיאטרי.</p>
+                  <p>המידע שאתה משאיר משמש ליצירת קשר ובדיקת התאמה לתהליך בלבד.</p>
                   <p>אם אתה במצב חירום נפשי — פנה לערוץ סיוע מיידי (ער"ן 1201 / מד"א 101).</p>
                 </div>
               </div>
@@ -623,19 +645,30 @@ export default function ExireLanding() {
       </Section>
 
       {/* FINAL CTA */}
-      <Section className="text-center pb-24">
+      <Section className="text-center pb-20">
         <motion.div {...fade}>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">מוכן לבדוק התאמה?</h2>
-          <p className="text-muted-foreground mb-7 max-w-xl mx-auto">
-            שיחה קצרה. בלי התחייבות. בודקים יחד אם זה הזמן והמקום הנכונים בשבילך.
+          <h2 className="text-2xl sm:text-4xl font-bold mb-3">החיים הם משחק. רוב האנשים משחקים בחוקים שהם לא בחרו.</h2>
+          <p className="text-sm sm:text-base text-muted-foreground mb-7 max-w-xl mx-auto leading-relaxed">
+            אם הגעת עד לכאן, משהו בך כבר יודע שהגיע הזמן לבדוק את החוקים האלה ולכתוב אותם מחדש.
           </p>
-          <CtaRow onPrimary={scrollToForm} whatsapp={whatsappNumber} helloText={DEFAULT_WHATSAPP_HELLO} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onSecondaryClick={() => track("whatsapp_clicked", { location: "cta_row" })} />
+          <CtaRow
+            id="final-cta"
+            onPrimary={scrollToForm}
+            whatsapp={whatsappNumber}
+            helloText={DEFAULT_WHATSAPP_HELLO}
+            primaryLabel={primaryLabel}
+            secondaryLabel={secondaryLabel}
+            onSecondaryClick={() => track('whatsapp_clicked', { location: 'final' })}
+          />
         </motion.div>
       </Section>
 
-      {/* Sticky mobile CTA */}
-      {!done && (
-        <div className="md:hidden fixed bottom-3 inset-x-3 z-40">
+      {/* Sticky mobile CTA — only when hero CTA + form + final CTA all off-screen */}
+      {!done && stickyVisible && (
+        <div
+          className="md:hidden fixed inset-x-3 z-40"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+        >
           <button
             onClick={scrollToForm}
             className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition"
@@ -649,12 +682,10 @@ export default function ExireLanding() {
 }
 
 /**
- * Top bar for the Exire landing — keeps the page minimal but restores the
- * login entry point that the legacy homepage exposed. Reuses the global
- * AuthModal (no new auth system). Logged-in users with panel access go
- * straight to `/admin-hub`; logged-in non-admin users land on `/client-home`.
+ * Minimal top — small centered brand pill + login icon only (no text, no menu).
+ * Reuses the global AuthModal; signed-in users navigate to their workspace.
  */
-function ExireTopBar() {
+function ExireMinimalTop() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { openAuthModal } = useAuthModal();
@@ -669,27 +700,32 @@ function ExireTopBar() {
     openAuthModal('login');
   };
 
-  const label = user ? (hasPanelAccess() ? 'פאנל ניהול' : 'אזור אישי') : 'כניסה';
+  const aria = user ? (hasPanelAccess() ? 'פאנל ניהול' : 'אזור אישי') : 'כניסה';
+  const Icon = user ? UserCircle2 : LogIn;
 
   return (
-    <header className="absolute top-0 inset-x-0 z-30 px-4 sm:px-6 pt-4 sm:pt-5">
-      <div className="mx-auto max-w-6xl flex items-center justify-between gap-3">
-        <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide">
-          <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]" />
-          Exire Systema
-        </a>
-        <Button
-          variant="ghost"
-          size="sm"
+    <div className="absolute top-0 inset-x-0 z-30 px-3 pt-3 sm:pt-4">
+      <div className="mx-auto max-w-6xl relative flex items-center justify-center">
+        {/* Login icon — left side in RTL */}
+        <button
+          type="button"
           onClick={onClick}
           disabled={loading}
-          className="h-9 gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          aria-label={label}
+          aria-label={aria}
+          className="absolute start-0 inline-flex items-center justify-center h-11 w-11 rounded-full text-muted-foreground/80 hover:text-foreground hover:bg-foreground/5 transition disabled:opacity-50"
         >
-          <LogIn className="h-4 w-4" />
-          <span>{label}</span>
-        </Button>
+          <Icon className="h-5 w-5" />
+        </button>
+
+        {/* Centered brand pill */}
+        <a
+          href="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-foreground/5 backdrop-blur border border-foreground/10 text-[11px] font-semibold tracking-wide"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+          Exire Systema
+        </a>
       </div>
-    </header>
+    </div>
   );
 }
