@@ -50,26 +50,27 @@ export default function ShellV2Header() {
             paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
           className={cn(
-            'fixed inset-x-0 top-0',
-            'bg-background/95 backdrop-blur-xl',
-            'border-b border-border/40',
+            'fixed inset-x-0 top-0 w-full',
+            'bg-background/98 backdrop-blur-2xl',
+            'border-b border-border/60',
+            'shadow-[0_2px_12px_-6px_rgba(0,0,0,0.35)]',
           )}
           data-aion-header="admin-slim"
         >
-          <div className="flex h-14 w-full items-center justify-between gap-1.5 px-3 sm:px-4">
+          <div className="flex h-14 md:h-[60px] w-full items-center justify-between gap-1.5 px-3 sm:px-5">
             <button
               type="button"
               aria-label={isHe ? 'תפריט' : 'Menu'}
               onClick={() => overlay.open('drawer')}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/85 transition-colors hover:bg-muted/60 hover:text-foreground active:scale-95"
             >
-              <Menu className="h-5 w-5" strokeWidth={1.6} />
+              <Menu className="h-[22px] w-[22px]" strokeWidth={1.9} />
             </button>
 
             <button
               type="button"
               onClick={() => setBrandOpen(true)}
-              className="select-none px-3 py-1.5 text-[14px] font-semibold tracking-[0.2em] text-foreground active:scale-[0.97] transition"
+              className="select-none px-2 py-1.5 text-[15px] md:text-[16px] font-semibold tracking-[0.22em] text-foreground active:scale-[0.97] transition"
               aria-label={isHe ? 'אודות' : 'About'}
             >
               EXIRE SYSTEMA

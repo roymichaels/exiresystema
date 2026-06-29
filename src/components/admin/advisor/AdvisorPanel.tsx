@@ -193,18 +193,19 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
 
   if (variant === 'page') {
     return (
-      <div className="w-full max-w-6xl mx-auto h-full min-h-0 px-2 md:px-0" dir="rtl">
-        <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-full min-h-0 overflow-hidden p-3 md:p-4 gap-0">
-          <div className="shrink-0 pb-1">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="flex items-center gap-1 text-[12px] text-muted-foreground/60 hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              {language === 'he' ? 'חזרה לעוד' : language === 'es' ? 'Volver a Más' : 'Back to More'}
-            </button>
-          </div>
+      <div className="w-full max-w-[1100px] mx-auto h-full min-h-0 px-1 md:px-2" dir="rtl">
+        {/* One compact back chip — visible on mobile & desktop */}
+        <div className="shrink-0 pb-2">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-card/70 px-3 h-9 text-[12.5px] font-medium text-foreground/80 hover:bg-muted/60 hover:text-foreground active:scale-95 transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {language === 'he' ? 'חזרה ל"עוד"' : language === 'es' ? 'Volver a Más' : 'Back to More'}
+          </button>
+        </div>
+        <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-[calc(100%-3rem)] min-h-0 overflow-hidden p-3 md:p-4 gap-0 shadow-sm">
           {renderHeader()}
           {!hasMessages && renderCommandCards()}
           {renderConversation()}
@@ -213,6 +214,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
       </div>
     );
   }
+
 
   return (
     <div className="flex flex-col h-full min-h-0 gap-0" dir="rtl">

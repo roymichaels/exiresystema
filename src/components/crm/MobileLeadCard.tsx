@@ -58,99 +58,91 @@ export const MobileLeadCard = ({
 
   return (
     <div
-      className="rounded-2xl border border-border/40 bg-card/60 p-3 active:bg-muted/30 transition-colors"
+      className="rounded-xl border border-border/40 bg-card/60 px-3 py-2.5 active:bg-muted/30 transition-colors"
       onClick={onOpen}
     >
-      {/* Row 1: name + source */}
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start gap-2">
+        {/* Main column: name, meta, challenge */}
         <div className="min-w-0 flex-1">
-          <h4 className="font-semibold text-[14px] leading-tight truncate">{lead.name || '—'}</h4>
-          <div className="mt-0.5 flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10.5px] text-muted-foreground">{sourceLabel}</span>
-            {isResubmitted(lead) && (
-              <span className="text-[10px] text-amber-400">· חזר</span>
-            )}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <h4 className="font-semibold text-[14px] leading-tight truncate">{lead.name || '—'}</h4>
+            <Badge variant="outline" className={`${statusColor} text-[10px] px-1.5 py-0 h-4 rounded-full font-medium`}>
+              {statusLabel}
+            </Badge>
+          </div>
+          <div className="mt-0.5 flex items-center gap-1.5 flex-wrap text-[10.5px] text-muted-foreground">
+            <span>{sourceLabel}</span>
+            {isResubmitted(lead) && <span className="text-amber-400">· חזר</span>}
             {typeof lead.readiness_score === 'number' && (
-              <span className="text-[10.5px] text-muted-foreground inline-flex items-center gap-0.5">
+              <span className="inline-flex items-center gap-0.5">
                 · <Sparkles className="h-3 w-3" />{lead.readiness_score}/10
               </span>
             )}
+            <span className="ms-auto shrink-0 opacity-80">
+              {format(new Date(lead.created_at), 'dd MMM HH:mm', { locale: he })}
+            </span>
           </div>
+          {challenge && (
+            <p className="mt-1 text-[12.5px] text-foreground/75 line-clamp-1 leading-snug" dir="auto">
+              {String(challenge)}
+            </p>
+          )}
         </div>
-      </div>
 
-      {/* Row 2: challenge preview */}
-      {challenge && (
-        <p className="mt-1 text-[12.5px] text-foreground/80 line-clamp-1 leading-snug" dir="auto">
-          {String(challenge)}
-        </p>
-      )}
-
-      {/* Row 3: contact + time */}
-      <div className="mt-1.5 flex items-center gap-2 text-[10.5px] text-muted-foreground">
-        {lead.phone && <span dir="ltr" className="truncate">{lead.phone}</span>}
-        {lead.email && <span className="truncate">{lead.email}</span>}
-        <span className="shrink-0">
-          {format(new Date(lead.created_at), 'dd MMM HH:mm', { locale: he })}
-        </span>
-      </div>
-
-      {/* Bottom: primary CTA + menu */}
-      <div className="mt-2.5 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-        {primaryHref ? (
-          <Button
-            asChild
-            size="sm"
-            className="flex-1 h-8 rounded-xl gap-1 text-[12px]"
-          >
-            <a href={primaryHref} target={wa ? '_blank' : undefined} rel="noopener noreferrer">
-              {wa ? <MessageCircle className="h-3.5 w-3.5" /> : <Phone className="h-3.5 w-3.5" />}
-              שלח הודעה
-            </a>
-          </Button>
-        ) : (
-          <Button size="sm" variant="outline" className="flex-1 h-8 rounded-xl text-[12px]" onClick={onOpen}>
-            פתח
-          </Button>
-        )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="outline" className="h-8 w-8 rounded-xl shrink-0" aria-label="פעולות נוספות">
-              <MoreVertical className="h-3.5 w-3.5" />
+        {/* Compact action column */}
+        <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+          {wa ? (
+            <Button asChild size="icon" className="h-9 w-9 rounded-full" aria-label="WhatsApp">
+              <a href={wa} target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="h-4 w-4" />
+              </a>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuLabel className="text-[11px]">פעולות</DropdownMenuLabel>
-            <DropdownMenuItem onClick={onOpen} className="text-[12.5px]">
-              <ExternalLink className="h-3.5 w-3.5 ms-2" /> פתח כרטיס ליד
-            </DropdownMenuItem>
-            {lead.phone && (
-              <DropdownMenuItem asChild className="text-[12.5px]">
-                <a href={`tel:${lead.phone}`} dir="ltr">
-                  <Phone className="h-3.5 w-3.5 ms-2" /> חייג
-                </a>
+          ) : lead.phone ? (
+            <Button asChild size="icon" className="h-9 w-9 rounded-full" aria-label="חייג">
+              <a href={`tel:${lead.phone}`} dir="ltr">
+                <Phone className="h-4 w-4" />
+              </a>
+            </Button>
+          ) : null}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full" aria-label="פעולות נוספות">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel className="text-[11px]">פעולות</DropdownMenuLabel>
+              <DropdownMenuItem onClick={onOpen} className="text-[12.5px]">
+                <ExternalLink className="h-3.5 w-3.5 ms-2" /> פתח כרטיס ליד
               </DropdownMenuItem>
-            )}
-            {wa && (
-              <DropdownMenuItem asChild className="text-[12.5px]">
-                <a href={wa} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="h-3.5 w-3.5 ms-2" /> WhatsApp
-                </a>
+              {lead.phone && (
+                <DropdownMenuItem asChild className="text-[12.5px]">
+                  <a href={`tel:${lead.phone}`} dir="ltr">
+                    <Phone className="h-3.5 w-3.5 ms-2" /> חייג
+                  </a>
+                </DropdownMenuItem>
+              )}
+              {wa && (
+                <DropdownMenuItem asChild className="text-[12.5px]">
+                  <a href={wa} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="h-3.5 w-3.5 ms-2" /> WhatsApp
+                  </a>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem disabled={!lead.phone} onClick={onOpen} className="text-[12.5px]">
+                <Send className="h-3.5 w-3.5 ms-2" /> הודעת פתיחה
               </DropdownMenuItem>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={!lead.phone} onClick={onOpen} className="text-[12.5px]">
-              <Send className="h-3.5 w-3.5 ms-2" /> הודעת פתיחה
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled={!lead.phone} onClick={onOpen} className="text-[12.5px]">
-              <Calendar className="h-3.5 w-3.5 ms-2" /> קביעת שיחה
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onConvert} className="text-[12.5px]">
-              <UserCheck className="h-3.5 w-3.5 ms-2" /> המר ללקוח
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem disabled={!lead.phone} onClick={onOpen} className="text-[12.5px]">
+                <Calendar className="h-3.5 w-3.5 ms-2" /> קביעת שיחה
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onConvert} className="text-[12.5px]">
+                <UserCheck className="h-3.5 w-3.5 ms-2" /> המר ללקוח
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );
