@@ -11,7 +11,7 @@
 import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { Brain, Send, Loader2, Sparkles, AlertTriangle, Lightbulb, ArrowLeft, X } from 'lucide-react';
+import { Brain, Send, Loader2, Sparkles, Lightbulb, ArrowLeft, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -217,33 +217,32 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
 
   return (
     <div className="flex flex-col h-full min-h-0 gap-0" dir="rtl">
-      {/* Header for widget mode */}
-      <div className="shrink-0 pb-1">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-primary/10 p-1.5 md:p-2 shrink-0">
-            <Brain className="h-5 w-5 text-primary" />
+      {/* Header */}
+      <div className="shrink-0 pb-1.5">
+        <div className="flex items-center gap-2.5">
+          <div className="rounded-lg bg-primary/10 p-1.5 shrink-0">
+            <Brain className="h-4.5 w-4.5 text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-base md:text-lg font-bold leading-tight">
+            <h1 className="text-[15px] md:text-base font-bold leading-tight">
               {language === 'he' ? 'המוח העסקי' : language === 'es' ? 'Asesor de negocios' : 'Business Advisor'}
             </h1>
-            <p className="text-[11px] md:text-[12px] text-muted-foreground truncate">
-              {language === 'he' ? 'אסטרטגיה, סדר עדיפויות ופעולות להיום' : language === 'es' ? 'Estrategia, prioridades y acciones para hoy' : 'Strategy, priorities and next actions'}
+            <p className="text-[10px] md:text-[11px] text-muted-foreground truncate">
+              {language === 'he' ? 'אסטרטגיה, סדר עדיפויות' : language === 'es' ? 'Estrategia, prioridades' : 'Strategy, priorities'}
             </p>
           </div>
           {onClose && variant === 'widget' && (
             <button
               type="button"
               onClick={onClose}
-              className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors shrink-0"
+              className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/50 transition-colors shrink-0"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           )}
         </div>
         {showRateNote && (
-          <div className="mt-1 flex items-center gap-1.5 text-[11px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 rounded-xl px-3 py-1.5">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          <div className="mt-1.5 text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 rounded-lg px-2.5 py-1">
             {RATE_LIMIT_NOTE(language)}
           </div>
         )}
@@ -256,56 +255,46 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
 
   function renderCommandCards() {
     return (
-      <div className="shrink-0 pb-1">
-        <div className="rounded-xl border border-primary/15 bg-primary/[0.03] p-2.5 md:p-3">
-          <p className="text-[11px] md:text-[12px] font-semibold mb-2 flex items-center gap-1.5 text-muted-foreground/80">
-            <Sparkles className="h-3 w-3 text-primary" />
-            {language === 'he' ? 'תתחיל בשאלה' : language === 'es' ? 'Empieza con una pregunta' : 'Start with a question'}
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {SUGGESTED(language).map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => send(s)}
-                disabled={loading}
-                className={cn(
-                  'rounded-xl border border-border/50 bg-card/90',
-                  'px-3 py-3 min-h-[48px] leading-snug font-medium',
-                  'text-[13px] md:text-[14px]',
-                  'hover:border-primary/40 hover:bg-primary/[0.06] hover:shadow-sm',
-                  'active:scale-[0.97] transition-all disabled:opacity-50',
-                  'flex items-center gap-2.5 text-start w-full',
-                )}
-              >
-                <Lightbulb className="h-4 w-4 shrink-0 text-primary/50" />
-                <span className="flex-1">{s}</span>
-              </button>
-            ))}
-          </div>
+      <div className="shrink-0 pb-2">
+        <p className="text-[11px] font-semibold mb-1.5 flex items-center gap-1.5 px-1 text-muted-foreground/80">
+          <Sparkles className="h-3 w-3 text-primary" /><span>{language === 'he' ? 'תתחיל בשאלה' : language === 'es' ? 'Empieza con una pregunta' : 'Start with a question'}</span>
+        </p>
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-1.5">
+          {SUGGESTED(language).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => send(s)}
+              disabled={loading}
+              className={cn(
+                'rounded-xl border border-border/50 bg-card/90',
+                'px-2.5 py-2 min-h-[42px] font-medium',
+                'text-[12.5px] leading-tight',
+                'hover:border-primary/40 hover:bg-primary/[0.06] hover:shadow-sm',
+                'active:scale-[0.97] transition-all disabled:opacity-50',
+                'flex items-center gap-2 text-start w-full',
+              )}
+            >
+              <Lightbulb className="h-3.5 w-3.5 shrink-0 text-primary/50" />
+              <span className="flex-1">{s}</span>
+            </button>
+          ))}
         </div>
       </div>
     );
   }
 
-  function renderConversation() {
+function renderConversation() {
     return (
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
         <div className="space-y-2.5 py-0.5">
           {!hasMessages && (
-            <div className="text-center py-4 md:py-5 flex flex-col items-center gap-1.5">
-              <div className="rounded-2xl bg-primary/5 p-2">
-                <Brain className="h-6 w-6 text-primary/60" />
+            <div className="text-center py-6 flex flex-col items-center gap-2">
+              <div className="rounded-xl bg-primary/5 p-1.5">
+                <Brain className="h-5 w-5 text-primary/60" />
               </div>
-              <p className="text-[13px] md:text-[14px] font-semibold text-foreground">
+              <p className="text-[13px] font-semibold text-foreground">
                 {surfacePrompt}
-              </p>
-              <p className="text-[12px] text-muted-foreground max-w-md">
-                {language === 'he'
-                  ? 'אני יכול לעזור לך לחשוב על לידים, כסף, משפך, סשנים וסדר עדיפויות.'
-                  : language === 'es'
-                    ? 'Puedo ayudarte a pensar en leads, dinero, embudo, sesiones y prioridades.'
-                    : 'I can help you think about leads, money, funnel, sessions and priorities.'}
               </p>
             </div>
           )}
@@ -353,8 +342,8 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
 
   function renderComposer() {
     return (
-      <div className="shrink-0 pt-1">
-        <div className="rounded-xl border border-border/60 bg-card/90 backdrop-blur-xl p-2 flex items-end gap-2 shadow-sm">
+      <div className="shrink-0 pt-1.5">
+        <div className="rounded-xl border border-border/60 bg-card/90 backdrop-blur-xl p-1.5 flex items-end gap-1.5 shadow-sm">
           <Textarea
             ref={inputRef}
             value={input}
@@ -368,20 +357,20 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
             placeholder={language === 'he' ? 'שאל את המוח…' : language === 'es' ? 'Pregunta al asesor…' : 'Ask the advisor…'}
             disabled={loading}
             rows={1}
-            className="resize-none min-h-[48px] max-h-32 border-0 bg-transparent focus-visible:ring-0 text-[14px] md:text-[15px] p-3"
+            className="resize-none min-h-[42px] max-h-28 border-0 bg-transparent focus-visible:ring-0 text-[13.5px] p-2.5"
           />
           <Button
             type="button"
             size="icon"
             onClick={() => send(input)}
             disabled={loading || !input.trim()}
-            className="shrink-0 rounded-xl h-11 w-11"
+            className="shrink-0 rounded-xl h-10 w-10"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
           </Button>
         </div>
-        <div className="text-[9.5px] text-muted-foreground/40 text-center mt-0.5">
-          {language === 'he' ? 'קריאה בלבד. המוח לא שולח הודעות ולא משנה נתונים.' : language === 'es' ? 'Solo lectura. El asesor no envía mensajes ni modifica datos.' : 'Read-only. The advisor doesn\'t send messages or change data.'}
+        <div className="text-[9px] text-muted-foreground/40 text-center mt-1 px-2 pb-1">
+          {language === 'he' ? 'קריאה בלבד' : language === 'es' ? 'Solo lectura' : 'Read-only'}
         </div>
       </div>
     );

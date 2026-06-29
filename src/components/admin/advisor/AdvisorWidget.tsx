@@ -1,13 +1,13 @@
 /**
- * FloatingAdvisorWidget — floating chat widget for the advisor.
+ * FloatingAdvisorWidget — lightweight chat widget for the advisor.
  *
- * Desktop: fixed drawer on right side, below header
- * Mobile: full-screen overlay, covers app header completely
- * Resembles a typical chat bubble/fab with message icon
- * Click/tap to open/close the chat panel
+ * Closed: floating bubble bottom-right (52–56px desktop, 48–52px mobile)
+ * Open (desktop): floating chat window above bubble, 360–400px wide, 520–640px max height
+ * Open (mobile): bottom sheet, 72dvh height, top corners rounded 24px
+ * Z-index above page content but doesn't block entire screen on desktop
  */
 import { useState, useEffect } from 'react';
-import { MessageSquare, X } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import AdvisorPanel from './AdvisorPanel';
 import { cn } from '@/lib/utils';
 
@@ -33,36 +33,31 @@ const FloatingAdvisorWidget = () => {
         <button
           onClick={() => setIsOpen(true)}
           className={cn(
-            "fixed z-[94] bottom-[100px] right-4 w-14 h-14 rounded-full",
+            "fixed z-[94] bottom-[calc(88px+1rem)] right-4 rounded-full",
             "shadow-lg hover:shadow-xl",
             "bg-primary text-primary-foreground",
             "flex items-center justify-center",
             "transition-all duration-300 ease-out",
-            "hover:scale-105 active:scale-95"
+            "hover:scale-105 active:scale-95",
+            "w-13 h-13 md:w-14 md:h-14"
           )}
           aria-label="Open Advisor Chat"
         >
-          <MessageSquare className="w-6 h-6" />
-          
-          {/* Unread indicator */}
-          <div className="absolute -top-1 -right-1">
-            <div className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium text-[10px]">
-              1
-            </div>
-          </div>
+          <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />
         </button>
       )}
 
-      {/* Expanded Chat Panel */}
+      {/* Chat Window */}
       {isOpen && (
         <div 
           className={cn(
-            "fixed z-[9999] flex flex-col overflow-hidden",
+            "fixed z-[94] flex flex-col overflow-hidden",
+            "bg-card/95 backdrop-blur-xl",
+            "border border-border/50 shadow-2xl",
             isMobile
-              ? "inset-0 border-0 rounded-none"
-              : "top-[88px] right-4 bottom-6 w-[384px] max-h-[calc(100dvh-112px)] rounded-2xl border border-border/40"
+              ? "inset-x-3 bottom-[calc(88px+1rem)] max-w-[420px] h-[72dvh] max-h-[680px] rounded-t-2xl"
+              : "bottom-28 right-4 w-[380px] max-w-[400px] h-[560px] max-h-[640px] rounded-2xl"
           )}
-          style={{ backgroundColor: 'hsl(var(--background))', minHeight: isMobile ? '100dvh' : undefined }}
         >
           <AdvisorPanel 
             variant="widget"
