@@ -1,12 +1,11 @@
 /**
  * @tab Admin
- * @purpose Unified admin control center — slim shell, no stats noise.
+ * @purpose Unified admin control center — single bottom nav, no top nav row.
  */
 
 import { Suspense, useMemo } from 'react';
 import { PageSkeleton } from '@/components/ui/skeleton';
 import { ADMIN_TABS } from '@/domain/admin';
-import { AdminInlineNav } from '@/components/admin/AdminInlineNav';
 import { AdminMobileBottomNav } from '@/components/admin/AdminMobileBottomNav';
 import { AdminMobileSubNav } from '@/components/admin/AdminMobileSubNav';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -36,38 +35,22 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
 
   return (
     <main
-      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4 space-y-2 md:space-y-3"
+      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 2.25rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.25rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
       }}
     >
-      {/* One-title rule: launcher pages (Studio/More) render their own H2.
-          We only show the compact title row on desktop, as a small breadcrumb. */}
-
-      {/* Desktop inline navigation (hidden on mobile) */}
-      <ErrorBoundary
-        fallback={
-          <Card className="p-4 border-destructive/30 bg-destructive/5 text-sm">
-            Navigation failed to render — try reloading.
-          </Card>
-        }
-      >
-        <AdminInlineNav
-          activeTab={activeTab}
-          activeSubTab={currentSubTab}
-          onTabChange={onTabChange}
-        />
-      </ErrorBoundary>
-
-      {/* Mobile sub-tab switcher */}
-      <ErrorBoundary fallback={null}>
-        <AdminMobileSubNav
-          activeTab={activeTab}
-          activeSubTab={currentSubTab}
-          onTabChange={onTabChange}
-        />
-      </ErrorBoundary>
+      {/* Mobile sub-tab back pill (hidden on Advisor — AdvisorPanel has its own back button) */}
+      {!(activeTab === 'more' && currentSubTab === 'advisor') && (
+        <ErrorBoundary fallback={null}>
+          <AdminMobileSubNav
+            activeTab={activeTab}
+            activeSubTab={currentSubTab}
+            onTabChange={onTabChange}
+          />
+        </ErrorBoundary>
+      )}
 
       {/* Active sub-page */}
       <ErrorBoundary
@@ -100,7 +83,7 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
         </Suspense>
       </ErrorBoundary>
 
-      {/* Mobile bottom navigation */}
+      {/* Bottom navigation — single primary nav for all screen sizes */}
       <AdminMobileBottomNav activeTab={activeTab} onTabChange={onTabChange} />
     </main>
   );

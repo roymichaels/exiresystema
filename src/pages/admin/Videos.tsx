@@ -225,7 +225,7 @@ const VideoSettingsCard = ({ setting }: { setting: VideoSetting }) => {
       setPreviewUrl(data.publicUrl);
       setPreviewOpen(true);
     } catch (error) {
-      toast({ title: "שגיאה בטעינת הסרטון", variant: "destructive" });
+      toast({ title: t("admin.videosPage.loadError") || "שגיאה בטעינת הסרטון", variant: "destructive" });
     }
   };
 
@@ -253,7 +253,7 @@ const VideoSettingsCard = ({ setting }: { setting: VideoSetting }) => {
       clearSettingsCache();
       toast({ title: t("admin.videosPage.deleted") || "הסרטון נמחק" });
     } catch (error) {
-      toast({ title: "שגיאה במחיקה", variant: "destructive" });
+      toast({ title: t("admin.videosPage.deleteError") || "שגיאה במחיקה", variant: "destructive" });
     } finally {
       setDeleteDialogOpen(false);
     }

@@ -11,14 +11,14 @@ import {
 
 export function FMWorkActivitySidebar() {
   const [collapsed, setCollapsed] = useState(() => window.innerWidth < 1024);
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
 
   const tips = [
-    { labelEn: 'Complete your profile', labelHe: 'השלם את הפרופיל', icon: '👤' },
-    { labelEn: 'Set up your services', labelHe: 'הגדר שירותים', icon: '⚙️' },
-    { labelEn: 'Create a landing page', labelHe: 'צור דף נחיתה', icon: '📄' },
-    { labelEn: 'Share your expertise', labelHe: 'שתף את המומחיות', icon: '🎯' },
+    { labelEn: 'Complete your profile', labelHe: 'השלם את הפרופיל', labelEs: 'Completa tu perfil', icon: '👤' },
+    { labelEn: 'Set up your services', labelHe: 'הגדר שירותים', labelEs: 'Configura tus servicios', icon: '⚙️' },
+    { labelEn: 'Create a landing page', labelHe: 'צור דף נחיתה', labelEs: 'Crea una página de aterrizaje', icon: '📄' },
+    { labelEn: 'Share your expertise', labelHe: 'שתף את המומחיות', labelEs: 'Comparte tu experiencia', icon: '🎯' },
   ];
 
   return (
@@ -66,7 +66,7 @@ export function FMWorkActivitySidebar() {
               <div key={i} className="rounded-lg bg-muted/30 dark:bg-muted/15 border border-border/20 p-2.5 flex items-center gap-2">
                 <span className="text-sm">{tip.icon}</span>
                 <span className="text-[11px] text-foreground font-medium">
-                  {isHe ? tip.labelHe : tip.labelEn}
+                  {l(tip)}
                 </span>
               </div>
             ))}

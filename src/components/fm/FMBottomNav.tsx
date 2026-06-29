@@ -7,13 +7,12 @@ import { Target, Briefcase, ShoppingBag } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 const FM_TABS = [
-  { id: 'earn',   path: '/fm/earn',   icon: Target,       labelEn: 'Earn',   labelHe: 'הרוויח' },
-  { id: 'work',   path: '/fm/work',   icon: Briefcase,    labelEn: 'Career', labelHe: 'קריירה' },
+  { id: 'earn',   path: '/fm/earn',   icon: Target,       labelEn: 'Earn',   labelHe: 'הרוויח', labelEs: 'Ganar' },
+  { id: 'work',   path: '/fm/work',   icon: Briefcase,    labelEn: 'Career', labelHe: 'קריירה', labelEs: 'Carrera' },
 ] as const;
 
 export function FMBottomNav() {
-  const { language } = useTranslation();
-  const isHe = language === 'he';
+  const { l } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const activePath = location.pathname;
@@ -37,7 +36,7 @@ export function FMBottomNav() {
             >
               <tab.icon className={`w-5 h-5 ${isActive ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.3)]' : ''}`} />
               <span className="text-[10px] font-bold leading-tight tracking-wide">
-                {isHe ? tab.labelHe : tab.labelEn}
+                {l(tab)}
               </span>
               {isActive && (
                 <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-amber-500 dark:bg-amber-400 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.4)]" />

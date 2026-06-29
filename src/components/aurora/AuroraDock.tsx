@@ -25,7 +25,7 @@ const CLOSE_THRESHOLD_VH = 20;
 export function AuroraDock() {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const {
     isChatExpanded,
     setIsChatExpanded,
@@ -46,11 +46,11 @@ export function AuroraDock() {
 
   // Get pillar label if active
   const pillarDomain = activePillar ? LIFE_DOMAINS.find(d => d.id === activePillar) : null;
-  const pillarLabel = pillarDomain ? (isHe ? pillarDomain.labelHe : pillarDomain.labelEn) : null;
+  const pillarLabel = pillarDomain ? l(pillarDomain) : null;
 
   // Get assessment domain label
   const assessDomain = assessmentDomainId ? LIFE_DOMAINS.find(d => d.id === assessmentDomainId) : null;
-  const assessLabel = assessDomain ? (isHe ? assessDomain.labelHe : assessDomain.labelEn) : null;
+  const assessLabel = assessDomain ? l(assessDomain) : null;
 
   // Drag handle logic for resizing
   const handleDragStart = useCallback((clientY: number) => {

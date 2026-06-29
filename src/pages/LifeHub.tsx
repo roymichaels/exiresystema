@@ -75,7 +75,7 @@ interface PillarGroup {
 }
 
 function LifeHubImpl() {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { plan, isLoading } = useLifePlanWithMilestones();
   const hasPlan = !!plan;
@@ -376,7 +376,7 @@ function LifeHubImpl() {
                         dayProgress: `${overallPct}% · ${completedMilestones}/${totalMilestones} ${isHe ? 'אבני דרך' : 'milestones'}`,
                         pillars: pillarGroups.map(g => ({
                           pillarId: g.pillarId,
-                          pillarLabel: g.domain ? (isHe ? g.domain.labelHe : g.domain.labelEn) : g.pillarId,
+                          pillarLabel: g.domain ? l(g.domain) : g.pillarId,
                           isSelected: g.isSelected,
                           milestoneCount: g.milestoneCount,
                           completedMilestones: g.completedMilestones,
@@ -488,7 +488,7 @@ function LifeHubImpl() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-foreground">
-                            {isHe ? (domain?.labelHe || pillarId) : (domain?.labelEn || pillarId)}
+                            {domain ? l(domain) : pillarId}
                           </span>
                           {isSelected && (
                             <Shield className="w-3 h-3 text-primary shrink-0" />

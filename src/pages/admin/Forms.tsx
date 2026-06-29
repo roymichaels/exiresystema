@@ -11,8 +11,10 @@ import FormFieldsEditor from "@/components/admin/forms/FormFieldsEditor";
 import FormSubmissionsViewer from "@/components/admin/forms/FormSubmissionsViewer";
 import AllFormSubmissions from "@/components/admin/forms/AllFormSubmissions";
 import AIFormWizard from "@/components/admin/forms/AIFormWizard";
+import { useTranslation } from '@/hooks/useTranslation';
 
 const Forms = () => {
+  const { language } = useTranslation();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isAIWizardOpen, setIsAIWizardOpen] = useState(false);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
@@ -64,8 +66,8 @@ const Forms = () => {
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h1 className="text-lg md:text-2xl font-bold">טפסים</h1>
-          <p className="hidden md:block text-muted-foreground text-sm">יצירה וניהול טפסים ותשובות</p>
+          <h1 className="text-lg md:text-2xl font-bold">{language === 'he' ? 'טפסים' : language === 'es' ? 'Formularios' : 'Forms'}</h1>
+          <p className="hidden md:block text-muted-foreground text-sm">{language === 'he' ? 'יצירה וניהול טפסים ותשובות' : language === 'es' ? 'Crear y gestionar formularios y respuestas' : 'Create and manage forms and submissions'}</p>
         </div>
         <div className="flex gap-1.5 shrink-0">
           <Button
@@ -75,7 +77,7 @@ const Forms = () => {
             className="gap-1.5 h-9"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            <span className="text-[12.5px]">צור עם AI</span>
+            <span className="text-[12.5px]">{language === 'he' ? 'צור עם AI' : language === 'es' ? 'Crear con IA' : 'Create with AI'}</span>
           </Button>
           <Button
             onClick={() => setIsFormDialogOpen(true)}
@@ -84,7 +86,7 @@ const Forms = () => {
             className="gap-1.5 h-9"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span className="text-[12.5px]">טופס חדש</span>
+            <span className="text-[12.5px]">{language === 'he' ? 'טופס חדש' : language === 'es' ? 'Nuevo Formulario' : 'New Form'}</span>
           </Button>
         </div>
       </div>
@@ -92,14 +94,14 @@ const Forms = () => {
       {/* Stats — collapsible on mobile */}
       <details className="md:hidden rounded-xl border border-border/40 bg-card/40">
         <summary className="cursor-pointer text-[11.5px] px-3 py-2 text-muted-foreground">
-          סטטיסטיקות ({stats.totalForms} טפסים · {stats.totalSubmissions} תשובות)
+          {language === 'he' ? `סטטיסטיקות (${stats.totalForms} טפסים · ${stats.totalSubmissions} תשובות)` : language === 'es' ? `Estadísticas (${stats.totalForms} formularios · ${stats.totalSubmissions} respuestas)` : `Statistics (${stats.totalForms} forms · ${stats.totalSubmissions} submissions)`}
         </summary>
         <div className="grid grid-cols-2 gap-2 p-3 pt-0">
           {[
-            { label: 'סה"כ טפסים', value: stats.totalForms, color: 'text-primary' },
-            { label: 'סה"כ תשובות', value: stats.totalSubmissions, color: 'text-blue-400' },
-            { label: 'חדשות', value: stats.newSubmissions, color: 'text-yellow-400' },
-            { label: 'טופלו', value: stats.processed, color: 'text-green-400' },
+            { label: language === 'he' ? 'סה"כ טפסים' : language === 'es' ? 'Total Formularios' : 'Total Forms', value: stats.totalForms, color: 'text-primary' },
+            { label: language === 'he' ? 'סה"כ תשובות' : language === 'es' ? 'Total Respuestas' : 'Total Submissions', value: stats.totalSubmissions, color: 'text-blue-400' },
+            { label: language === 'he' ? 'חדשות' : language === 'es' ? 'Nuevas' : 'New', value: stats.newSubmissions, color: 'text-yellow-400' },
+            { label: language === 'he' ? 'טופלו' : language === 'es' ? 'Procesadas' : 'Processed', value: stats.processed, color: 'text-green-400' },
           ].map((s) => (
             <div key={s.label} className="rounded-lg border border-border/40 p-2.5">
               <p className="text-[10.5px] text-muted-foreground">{s.label}</p>
@@ -113,7 +115,7 @@ const Forms = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">סה"כ טפסים</p>
+                <p className="text-xs text-muted-foreground">{language === 'he' ? 'סה"כ טפסים' : language === 'es' ? 'Total Formularios' : 'Total Forms'}</p>
                 <p className="text-2xl font-bold text-primary">{stats.totalForms}</p>
               </div>
               <FileText className="h-6 w-6 text-primary/50" />
@@ -125,7 +127,7 @@ const Forms = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">סה"כ תשובות</p>
+                <p className="text-xs text-muted-foreground">{language === 'he' ? 'סה"כ תשובות' : language === 'es' ? 'Total Respuestas' : 'Total Submissions'}</p>
                 <p className="text-2xl font-bold text-blue-400">{stats.totalSubmissions}</p>
               </div>
               <Inbox className="h-6 w-6 text-blue-400/50" />
@@ -137,7 +139,7 @@ const Forms = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">חדשות</p>
+                <p className="text-xs text-muted-foreground">{language === 'he' ? 'חדשות' : language === 'es' ? 'Nuevas' : 'New'}</p>
                 <p className="text-2xl font-bold text-yellow-400">{stats.newSubmissions}</p>
               </div>
               <Clock className="h-6 w-6 text-yellow-400/50" />
@@ -149,7 +151,7 @@ const Forms = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">טופלו</p>
+                <p className="text-xs text-muted-foreground">{language === 'he' ? 'טופלו' : language === 'es' ? 'Procesadas' : 'Processed'}</p>
                 <p className="text-2xl font-bold text-green-400">{stats.processed}</p>
               </div>
               <CheckCircle className="h-6 w-6 text-green-400/50" />
@@ -164,11 +166,11 @@ const Forms = () => {
         <TabsList className="glass-panel">
           <TabsTrigger value="forms" className="flex items-center gap-2">
             <FileEdit className="h-4 w-4" />
-            טפסים ({stats.totalForms})
+            {language === 'he' ? `טפסים (${stats.totalForms})` : language === 'es' ? `Formularios (${stats.totalForms})` : `Forms (${stats.totalForms})`}
           </TabsTrigger>
           <TabsTrigger value="submissions" className="flex items-center gap-2">
             <Inbox className="h-4 w-4" />
-            תשובות ({stats.totalSubmissions})
+            {language === 'he' ? `תשובות (${stats.totalSubmissions})` : language === 'es' ? `Respuestas (${stats.totalSubmissions})` : `Submissions (${stats.totalSubmissions})`}
           </TabsTrigger>
         </TabsList>
 

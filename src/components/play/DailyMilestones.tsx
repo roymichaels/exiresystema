@@ -68,7 +68,7 @@ function getDayOfPlan(startDate: string): number {
 }
 
 export function DailyMilestones({ hub = 'both', hideHeader = false }: DailyMilestonesProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { corePlan, arenaPlan, generateStrategy, isGenerating, isHealing } = useStrategyPlans();
   const { statusMap, getDomain: getDomainRow } = useLifeDomains();
@@ -433,7 +433,7 @@ export function DailyMilestones({ hub = 'both', hideHeader = false }: DailyMiles
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className={cn("text-xs font-medium truncate", (locked || (completed && selected)) && "text-muted-foreground")}>
-                    {isHe ? d.labelHe : d.labelEn}
+                    {l(d)}
                   </p>
                   <p className="text-[10px] text-muted-foreground">
                     {locked
@@ -538,7 +538,7 @@ export function DailyMilestones({ hub = 'both', hideHeader = false }: DailyMiles
               >
                 <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                   <span className={cn('text-[10px] font-bold uppercase tracking-wider', domainColorMap[dm.domain.color])}>
-                    {isHe ? dm.domain.labelHe : dm.domain.labelEn}
+                    {l(dm.domain)}
                   </span>
                   {dm.traitName && (
                     <>

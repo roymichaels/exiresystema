@@ -53,10 +53,10 @@ interface UserData {
   is_onboarded?: boolean;
 }
 
-const AVAILABLE_ROLES: { role: AppRole; label: string; labelHe: string; icon: React.ElementType; color: string }[] = [
-  { role: 'admin', label: 'Admin', labelHe: 'מנהל', icon: Shield, color: 'text-red-500' },
-  { role: 'practitioner', label: 'Coach', labelHe: 'מאמן', icon: UserCog, color: 'text-blue-500' },
-  { role: 'affiliate', label: 'Affiliate', labelHe: 'שותף', icon: Link2, color: 'text-green-500' },
+const AVAILABLE_ROLES: { role: AppRole; label: string; labelHe: string; labelEs: string; icon: React.ElementType; color: string }[] = [
+  { role: 'admin', label: 'Admin', labelHe: 'מנהל', labelEs: 'Admin', icon: Shield, color: 'text-red-500' },
+  { role: 'practitioner', label: 'Coach', labelHe: 'מאמן', labelEs: 'Coach', icon: UserCog, color: 'text-blue-500' },
+  { role: 'affiliate', label: 'Affiliate', labelHe: 'שותף', labelEs: 'Afiliado', icon: Link2, color: 'text-green-500' },
 ];
 
 const Users = () => {
@@ -167,8 +167,8 @@ const Users = () => {
         if (error) throw error;
         
         toast({
-          title: language === 'he' ? 'התפקיד הוסר' : 'Role Removed',
-          description: language === 'he' ? `התפקיד ${AVAILABLE_ROLES.find(r => r.role === role)?.labelHe} הוסר` : `${role} role removed`,
+          title: language === 'he' ? 'התפקיד הוסר' : language === 'es' ? 'Rol Eliminado' : 'Role Removed',
+          description: language === 'he' ? `התפקיד ${AVAILABLE_ROLES.find(r => r.role === role)?.labelHe} הוסר` : language === 'es' ? `Rol ${role} eliminado` : `${role} role removed`,
         });
       } else {
         // Add role
@@ -179,8 +179,8 @@ const Users = () => {
         if (error) throw error;
         
         toast({
-          title: language === 'he' ? 'התפקיד נוסף' : 'Role Added',
-          description: language === 'he' ? `התפקיד ${AVAILABLE_ROLES.find(r => r.role === role)?.labelHe} נוסף` : `${role} role added`,
+          title: language === 'he' ? 'התפקיד נוסף' : language === 'es' ? 'Rol Agregado' : 'Role Added',
+          description: language === 'he' ? `התפקיד ${AVAILABLE_ROLES.find(r => r.role === role)?.labelHe} נוסף` : language === 'es' ? `Rol ${role} agregado` : `${role} role added`,
         });
       }
       
@@ -195,7 +195,7 @@ const Users = () => {
         return { ...user, user_roles: newRoles };
       }));
     } catch (error) {
-      handleError(error, language === 'he' ? 'שגיאה בעדכון תפקיד' : 'Failed to update role', 'toggleUserRole');
+      handleError(error, language === 'he' ? 'שגיאה בעדכון תפקיד' : language === 'es' ? 'Error al actualizar rol' : 'Failed to update role', 'toggleUserRole');
     } finally {
       setUpdatingRole(null);
     }
@@ -225,14 +225,16 @@ const Users = () => {
       });
       if (error) throw error;
       toast({
-        title: language === 'he' ? 'רענון הושלם' : 'Refresh Complete',
+        title: language === 'he' ? 'רענון הושלם' : language === 'es' ? 'Actualización Completa' : 'Refresh Complete',
         description: language === 'he'
           ? `אורבים: ${data.summary.orbs_created}, תוכניות: ${data.summary.plans_regenerated}, שגיאות: ${data.summary.errors}`
+          : language === 'es'
+          ? `Orbs: ${data.summary.orbs_created}, Planes: ${data.summary.plans_regenerated}, Errores: ${data.summary.errors}`
           : `Orbs: ${data.summary.orbs_created}, Plans: ${data.summary.plans_regenerated}, Errors: ${data.summary.errors}`,
       });
       fetchUsers();
     } catch (error) {
-      handleError(error, language === 'he' ? 'שגיאה ברענון' : 'Refresh failed', 'handleRefreshUsers');
+      handleError(error, language === 'he' ? 'שגיאה ברענון' : language === 'es' ? 'Error de actualización' : 'Refresh failed', 'handleRefreshUsers');
     } finally {
       setRefreshing(false);
     }
@@ -264,7 +266,7 @@ const Users = () => {
           <div>
             <h1 className="text-xl font-bold">{t('adminUsers.pageTitle')}</h1>
             <p className="text-sm text-muted-foreground">
-              {filteredUsers.length} {language === 'he' ? 'משתמשים' : 'users'}
+              {filteredUsers.length} {language === 'he' ? 'משתמשים' : language === 'es' ? 'usuarios' : 'users'}
             </p>
           </div>
         </div>
@@ -283,7 +285,7 @@ const Users = () => {
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            {language === 'he' ? 'רענון אורבים + תוכניות' : 'Refresh Orbs + Plans'}
+            {language === 'he' ? 'רענון אורבים + תוכניות' : language === 'es' ? 'Actualizar Orbs + Planes' : 'Refresh Orbs + Plans'}
           </Button>
           
           {/* Search */}
@@ -349,8 +351,8 @@ const Users = () => {
                               user.is_onboarded ? "bg-emerald-500" : "bg-amber-500"
                             )}
                             title={user.is_onboarded 
-                              ? (language === 'he' ? 'השלים אונבורדינג' : 'Onboarded') 
-                              : (language === 'he' ? 'טרם השלים אונבורדינג' : 'Not onboarded')}
+                              ? (language === 'he' ? 'השלים אונבורדינג' : language === 'es' ? 'Completado' : 'Onboarded') 
+                              : (language === 'he' ? 'טרם השלים אונבורדינג' : language === 'es' ? 'No completado' : 'Not onboarded')}
                           />
                         </div>
                         <div className="min-w-0">
@@ -381,7 +383,7 @@ const Users = () => {
                             <div className="flex gap-1 flex-wrap">
                               {userRoles.length === 0 ? (
                                 <Badge variant="outline" className="text-xs px-1.5 py-0">
-                                  User
+                                  {language === 'he' ? 'משתמש' : language === 'es' ? 'Usuario' : 'User'}
                                 </Badge>
                               ) : (
                                 userRoles.map((role) => {
@@ -395,7 +397,7 @@ const Users = () => {
                                     >
                                       <Icon className={cn("h-3 w-3", roleConfig?.color)} />
                                       <span className="hidden sm:inline">
-                                        {language === 'he' ? roleConfig?.labelHe : roleConfig?.label}
+                                        {language === 'he' ? roleConfig?.labelHe : language === 'es' ? roleConfig?.labelEs : roleConfig?.label}
                                       </span>
                                     </Badge>
                                   );
@@ -406,7 +408,7 @@ const Users = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align={isRTL ? "end" : "start"} className="w-48 bg-card border border-border z-[70]">
                           <DropdownMenuLabel className="text-xs">
-                            {language === 'he' ? 'ניהול תפקידים' : 'Manage Roles'}
+                            {language === 'he' ? 'ניהול תפקידים' : language === 'es' ? 'Gestionar Roles' : 'Manage Roles'}
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           {AVAILABLE_ROLES.map(({ role, label, labelHe, icon: Icon, color }) => {
@@ -426,7 +428,7 @@ const Users = () => {
                                 ) : (
                                   <Icon className={cn("h-4 w-4", color)} />
                                 )}
-                                {language === 'he' ? labelHe : label}
+                                {language === 'he' ? labelHe : language === 'es' ? labelEs : label}
                               </DropdownMenuCheckboxItem>
                             );
                           })}

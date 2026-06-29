@@ -20,8 +20,7 @@ interface AdminHudSidebarProps {
 
 export function AdminHudSidebar({ activeTab = 'overview', activeSubTab, onTabChange }: AdminHudSidebarProps) {
   const [collapsed, setCollapsed] = useState(() => window.innerWidth < 1024);
-  const { language, isRTL } = useTranslation();
-  const isHe = language === 'he';
+  const { isRTL } = useTranslation();
 
   const handleNav = (tabId: string, subId?: string) => {
     onTabChange?.(tabId, subId);
@@ -72,7 +71,7 @@ export function AdminHudSidebar({ activeTab = 'overview', activeSubTab, onTabCha
                       ? "bg-emerald-500/20 border-emerald-500/30"
                       : "bg-muted/30 dark:bg-muted/15 border-border/20 hover:bg-accent/10"
                   )}
-                  title={isHe ? tab.labelHe : tab.labelEn}
+                  title={tab.labelHe}
                 >
                   <Icon className={cn("w-4 h-4", isActive ? 'text-emerald-400' : 'text-muted-foreground')} />
                 </button>
@@ -98,10 +97,10 @@ export function AdminHudSidebar({ activeTab = 'overview', activeSubTab, onTabCha
           <div className="w-full rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/15 border border-emerald-500/20 p-3 flex items-center justify-between">
             <div className="text-center flex-1">
               <span className="text-sm font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                {isHe ? 'מרכז בקרה' : 'Control Center'}
+                מרכז בקרה
               </span>
               <p className="text-[10px] text-muted-foreground mt-0.5">
-                {isHe ? 'נהלו את הפלטפורמה' : 'Manage your platform'}
+                נהלו את הפלטפורמה
               </p>
             </div>
             <NotificationBell />
@@ -131,7 +130,7 @@ export function AdminHudSidebar({ activeTab = 'overview', activeSubTab, onTabCha
                   >
                     <Icon className={cn("w-4 h-4 shrink-0", isActive ? 'text-emerald-400' : 'text-muted-foreground')} />
                     <span className={cn("text-xs font-medium", isActive ? 'text-emerald-400' : 'text-foreground')}>
-                      {isHe ? tab.labelHe : tab.labelEn}
+                      {tab.labelHe}
                     </span>
                   </button>
                 );
@@ -150,7 +149,7 @@ export function AdminHudSidebar({ activeTab = 'overview', activeSubTab, onTabCha
                     >
                       <Icon className={cn("w-4 h-4 shrink-0", isActive ? 'text-emerald-400' : 'text-muted-foreground')} />
                       <span className={cn("text-xs font-medium flex-1", isActive ? 'text-emerald-400' : 'text-foreground')}>
-                        {isHe ? tab.labelHe : tab.labelEn}
+                        {tab.labelHe}
                       </span>
                       <ChevronDown className="w-3 h-3 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
                     </button>
@@ -170,7 +169,7 @@ export function AdminHudSidebar({ activeTab = 'overview', activeSubTab, onTabCha
                                 : "text-muted-foreground hover:text-foreground hover:bg-muted/40 border border-transparent"
                             )}
                           >
-                            {isHe ? sub.labelHe : sub.labelEn}
+                            {sub.labelHe}
                           </button>
                         );
                       })}

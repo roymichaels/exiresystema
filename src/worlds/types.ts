@@ -41,12 +41,14 @@ export interface WorldVerb {
   id: string;
   labelHe: string;
   labelEn: string;
+  labelEs: string;
 }
 
 export interface WorldNodeKind {
   id: string;
   labelHe: string;
   labelEn: string;
+  labelEs: string;
 }
 
 export interface WorldEdgeKind {

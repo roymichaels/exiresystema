@@ -50,7 +50,7 @@ const PILLAR_ACCENT: Record<string, string> = {
 };
 
 export function TodayScheduleCard({ schedule, onActionClick, queue }: TodayScheduleCardProps) {
-  const { isRTL } = useTranslation();
+  const { isRTL, l } = useTranslation();
 
   const allActions = useMemo(() => {
     return queue && queue.length > 0
@@ -96,7 +96,7 @@ export function TodayScheduleCard({ schedule, onActionClick, queue }: TodaySched
                 {DomainIcon && (
                   <span className={cn('inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted/60 border border-border/50', iconColor)}>
                     <DomainIcon className="h-3 w-3" />
-                    {domain ? (isRTL ? domain.labelHe : domain.labelEn) : action.pillarId}
+                    {domain ? l(domain) : action.pillarId}
                   </span>
                 )}
                 <Play className={cn(

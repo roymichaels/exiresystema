@@ -50,14 +50,14 @@ const getTemplateIcon = (type: string) => {
   }
 };
 
-const getTemplateLabel = (type: string, isRTL: boolean) => {
-  const labels: Record<string, { he: string; en: string }> = {
-    homepage: { he: 'דף בית', en: 'Homepage' },
-    product: { he: 'מוצר', en: 'Product' },
-    lead_capture: { he: 'לכידת לידים', en: 'Lead Capture' },
-    custom: { he: 'מותאם אישית', en: 'Custom' },
+const getTemplateLabel = (type: string, language: string) => {
+  const labels: Record<string, { he: string; en: string; es: string }> = {
+    homepage: { he: 'דף בית', en: 'Homepage', es: 'Página principal' },
+    product: { he: 'מוצר', en: 'Product', es: 'Producto' },
+    lead_capture: { he: 'לכידת לידים', en: 'Lead Capture', es: 'Captura de leads' },
+    custom: { he: 'מותאם אישית', en: 'Custom', es: 'Personalizado' },
   };
-  return isRTL ? labels[type]?.he : labels[type]?.en || type;
+  return language === 'he' ? labels[type]?.he : language === 'es' ? labels[type]?.es : labels[type]?.en || type;
 };
 
 const LandingPages = () => {
@@ -91,11 +91,11 @@ const LandingPages = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['landing-pages'] });
-      toast({ title: isRTL ? 'הדף נמחק בהצלחה' : 'Page deleted successfully' });
+      toast({ title: language === 'he' ? 'הדף נמחק בהצלחה' : language === 'es' ? 'Página eliminada correctamente' : 'Page deleted successfully' });
     },
     onError: () => {
       toast({ 
-        title: isRTL ? 'שגיאה במחיקת הדף' : 'Error deleting page',
+        title: language === 'he' ? 'שגיאה במחיקת הדף' : language === 'es' ? 'Error al eliminar la página' : 'Error deleting page',
         variant: 'destructive'
       });
     },
@@ -120,11 +120,11 @@ const LandingPages = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['landing-pages'] });
-      toast({ title: isRTL ? 'הדף שוכפל בהצלחה' : 'Page duplicated successfully' });
+      toast({ title: language === 'he' ? 'הדף שוכפל בהצלחה' : language === 'es' ? 'Página duplicada correctamente' : 'Page duplicated successfully' });
     },
     onError: () => {
       toast({ 
-        title: isRTL ? 'שגיאה בשכפול הדף' : 'Error duplicating page',
+        title: language === 'he' ? 'שגיאה בשכפול הדף' : language === 'es' ? 'Error al duplicar la página' : 'Error duplicating page',
         variant: 'destructive'
       });
     },
@@ -158,16 +158,16 @@ const LandingPages = () => {
           <div>
             <h1 className="text-2xl sm:text-3xl font-black cyber-glow flex items-center gap-2">
               <PanelTop className="h-6 w-6 sm:hidden text-primary" />
-              {isRTL ? "דפי נחיתה" : "Landing Pages"}
+              {language === 'he' ? "דפי נחיתה" : language === 'es' ? "Páginas de destino" : "Landing Pages"}
             </h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-              {isRTL ? "ניהול דפי נחיתה ותבניות" : "Manage landing pages and templates"}
+              {language === 'he' ? "ניהול דפי נחיתה ותבניות" : language === 'es' ? "Gestionar páginas de destino y plantillas" : "Manage landing pages and templates"}
             </p>
           </div>
         </div>
         <Button onClick={() => setShowTemplateGallery(true)} className="gap-2">
           <Plus className="w-4 h-4" />
-          {isRTL ? 'דף חדש' : 'New Page'}
+          {language === 'he' ? 'דף חדש' : language === 'es' ? 'Nueva página' : 'New Page'}
         </Button>
       </div>
 
@@ -185,7 +185,7 @@ const LandingPages = () => {
         <div className="space-y-8">
           <div>
             <h2 className="text-lg font-semibold mb-4">
-              {isRTL ? 'הדפים שלך' : 'Your Pages'}
+              {language === 'he' ? 'הדפים שלך' : language === 'es' ? 'Tus páginas' : 'Your Pages'}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {pages?.map((page, index) => {
@@ -227,12 +227,12 @@ const LandingPages = () => {
                             {page.is_published ? (
                               <>
                                 <CheckCircle className="w-3 h-3 mr-1" />
-                                {isRTL ? 'פורסם' : 'Published'}
+                                {language === 'he' ? 'פורסם' : language === 'es' ? 'Publicado' : 'Published'}
                               </>
                             ) : (
                               <>
                                 <XCircle className="w-3 h-3 mr-1" />
-                                {isRTL ? 'טיוטה' : 'Draft'}
+                                {language === 'he' ? 'טיוטה' : language === 'es' ? 'Borrador' : 'Draft'}
                               </>
                             )}
                           </Badge>
@@ -242,7 +242,7 @@ const LandingPages = () => {
                           <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
                             <Badge variant="outline" className="text-xs bg-background/80">
                               <Home className="w-3 h-3 mr-1" />
-                              {isRTL ? 'ראשי' : 'Home'}
+                              {language === 'he' ? 'ראשי' : language === 'es' ? 'Inicio' : 'Home'}
                             </Badge>
                           </div>
                         )}
@@ -255,7 +255,7 @@ const LandingPages = () => {
                             className="gap-1"
                           >
                             <Edit className="w-4 h-4" />
-                            {isRTL ? 'עריכה' : 'Edit'}
+                            {language === 'he' ? 'עריכה' : language === 'es' ? 'Editar' : 'Edit'}
                           </Button>
                           <Button
                             size="sm"
@@ -264,7 +264,7 @@ const LandingPages = () => {
                             className="gap-1"
                           >
                             <ExternalLink className="w-4 h-4" />
-                            {isRTL ? 'תצוגה' : 'Preview'}
+                            {language === 'he' ? 'תצוגה' : language === 'es' ? 'Vista previa' : 'Preview'}
                           </Button>
                         </div>
                       </div>
@@ -296,15 +296,15 @@ const LandingPages = () => {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() => handleEdit(page)}>
                                 <Edit className="w-4 h-4 mr-2" />
-                                {isRTL ? 'עריכה' : 'Edit'}
+                                {language === 'he' ? 'עריכה' : language === 'es' ? 'Editar' : 'Edit'}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handlePreview(page)}>
                                 <ExternalLink className="w-4 h-4 mr-2" />
-                                {isRTL ? 'תצוגה' : 'Preview'}
+                                {language === 'he' ? 'תצוגה' : language === 'es' ? 'Vista previa' : 'Preview'}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => duplicateMutation.mutate(page)}>
                                 <Copy className="w-4 h-4 mr-2" />
-                                {isRTL ? 'שכפל' : 'Duplicate'}
+                                {language === 'he' ? 'שכפל' : language === 'es' ? 'Duplicar' : 'Duplicate'}
                               </DropdownMenuItem>
                               {!page.is_homepage && (
                                 <DropdownMenuItem 
@@ -312,7 +312,7 @@ const LandingPages = () => {
                                   className="text-destructive"
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
-                                  {isRTL ? 'מחק' : 'Delete'}
+                                  {language === 'he' ? 'מחק' : language === 'es' ? 'Eliminar' : 'Delete'}
                                 </DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
@@ -328,10 +328,10 @@ const LandingPages = () => {
                 <Card className="col-span-full">
                   <CardContent className="p-8 text-center text-muted-foreground">
                     <Layout className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>{isRTL ? 'אין דפי נחיתה עדיין' : 'No landing pages yet'}</p>
+                    <p>{language === 'he' ? 'אין דפי נחיתה עדיין' : language === 'es' ? 'Aún no hay páginas de destino' : 'No landing pages yet'}</p>
                     <Button onClick={() => setShowTemplateGallery(true)} className="mt-4">
                       <Plus className="w-4 h-4 mr-2" />
-                      {isRTL ? 'צור דף ראשון' : 'Create First Page'}
+                      {language === 'he' ? 'צור דף ראשון' : language === 'es' ? 'Crear primera página' : 'Create First Page'}
                     </Button>
                   </CardContent>
                 </Card>
@@ -345,7 +345,7 @@ const LandingPages = () => {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              {isRTL ? 'בחר תבנית' : 'Choose a Template'}
+              {language === 'he' ? 'בחר תבנית' : language === 'es' ? 'Elige una plantilla' : 'Choose a Template'}
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4">

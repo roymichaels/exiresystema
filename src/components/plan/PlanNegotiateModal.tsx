@@ -38,14 +38,14 @@ interface PlanNegotiateModalProps {
   onApplied?: () => void;
 }
 
-const ACTION_OPTIONS: { id: NegotiateAction; iconEl: typeof ArrowRightLeft; labelHe: string; labelEn: string; descHe: string; descEn: string }[] = [
-  { id: 'swap', iconEl: ArrowRightLeft, labelHe: 'החלפה', labelEn: 'Swap', descHe: 'החלף במשימה שווה', descEn: 'Replace with equivalent task' },
-  { id: 'reschedule', iconEl: Clock, labelHe: 'דחייה', labelEn: 'Reschedule', descHe: 'דחה ליום אחר השבוע', descEn: 'Move to another day' },
-  { id: 'skip', iconEl: SkipForward, labelHe: 'דילוג', labelEn: 'Skip', descHe: 'דלג עם סיבה', descEn: 'Skip with a reason' },
+const ACTION_OPTIONS: { id: NegotiateAction; iconEl: typeof ArrowRightLeft; labelHe: string; labelEn: string; labelEs: string; descHe: string; descEn: string }[] = [
+  { id: 'swap', iconEl: ArrowRightLeft, labelHe: 'החלפה', labelEn: 'Swap', labelEs: 'Intercambiar', descHe: 'החלף במשימה שווה', descEn: 'Replace with equivalent task' },
+  { id: 'reschedule', iconEl: Clock, labelHe: 'דחייה', labelEn: 'Reschedule', labelEs: 'Reprogramar', descHe: 'דחה ליום אחר השבוע', descEn: 'Move to another day' },
+  { id: 'skip', iconEl: SkipForward, labelHe: 'דילוג', labelEn: 'Skip', labelEs: 'Saltar', descHe: 'דלג עם סיבה', descEn: 'Skip with a reason' },
 ];
 
 export function PlanNegotiateModal({ open, onOpenChange, task, onApplied }: PlanNegotiateModalProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { user } = useAuth();
 
@@ -198,7 +198,7 @@ export function PlanNegotiateModal({ open, onOpenChange, task, onApplied }: Plan
                       <Icon className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{isHe ? opt.labelHe : opt.labelEn}</p>
+                      <p className="text-sm font-semibold text-foreground">{l(opt)}</p>
                       <p className="text-[11px] text-muted-foreground">{isHe ? opt.descHe : opt.descEn}</p>
                     </div>
                   </button>

@@ -31,7 +31,7 @@ interface CommunityForumBoardProps {
 }
 
 export default function CommunityForumBoard({ onNavigate }: CommunityForumBoardProps) {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
 
   return (
@@ -40,7 +40,7 @@ export default function CommunityForumBoard({ onNavigate }: CommunityForumBoardP
         <IPhoneWidget
           key={domain.id}
           icon={domain.icon}
-          label={isHe ? domain.labelHe : domain.labelEn}
+          label={l(domain)}
           gradient={GRADIENT_MAP[domain.color] || 'from-primary to-primary/80'}
           onClick={() => onNavigate(domain.id, 'all')}
           size="sm"

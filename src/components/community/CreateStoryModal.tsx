@@ -44,7 +44,7 @@ const GRADIENT_MAP: Record<string, string> = {
 
 export default function CreateStoryModal({ open, onOpenChange }: CreateStoryModalProps) {
   const { user } = useAuth();
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const queryClient = useQueryClient();
 
@@ -220,7 +220,7 @@ export default function CreateStoryModal({ open, onOpenChange }: CreateStoryModa
                   <div className="relative">
                     <d.icon className="h-6 w-6 mb-2 text-foreground/80" />
                     <p className="text-sm font-bold text-foreground">
-                      {isHe ? d.labelHe : d.labelEn}
+                      {l(d)}
                     </p>
                   </div>
                 </button>
@@ -270,7 +270,7 @@ export default function CreateStoryModal({ open, onOpenChange }: CreateStoryModa
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
                   {LIFE_DOMAINS.find(d => d.id === selectedPillar)
-                    ? (isHe ? LIFE_DOMAINS.find(d => d.id === selectedPillar)!.labelHe : LIFE_DOMAINS.find(d => d.id === selectedPillar)!.labelEn)
+                    ? l(LIFE_DOMAINS.find(d => d.id === selectedPillar)!)
                     : selectedPillar}
                 </span>
                 <span>→</span>

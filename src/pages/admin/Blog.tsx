@@ -78,7 +78,7 @@ export default function AdminBlog() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
-      toast.success('Status updated');
+      toast.success(language === 'he' ? 'הסטטוס עודכן' : 'Status updated');
     },
   });
 
@@ -90,7 +90,7 @@ export default function AdminBlog() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
-      toast.success('Post deleted');
+      toast.success(language === 'he' ? 'המאמר נמחק' : 'Post deleted');
     },
   });
 
@@ -116,7 +116,7 @@ export default function AdminBlog() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
       setEditingPost(null);
-      toast.success('Post updated');
+      toast.success(language === 'he' ? 'המאמר עודכן' : 'Post updated');
     },
   });
 
@@ -197,8 +197,8 @@ export default function AdminBlog() {
                 className="resize-none"
               />
               <div className="flex gap-2 text-xs text-muted-foreground">
-                <span className="px-2 py-1 rounded bg-muted">SEO optimized</span>
-                <span className="px-2 py-1 rounded bg-muted">Cover image</span>
+                <span className="px-2 py-1 rounded bg-muted">{language === 'he' ? 'מותאם SEO' : 'SEO optimized'}</span>
+                <span className="px-2 py-1 rounded bg-muted">{language === 'he' ? 'תמונת כיסוי' : 'Cover image'}</span>
                 <span className="px-2 py-1 rounded bg-muted">EN + HE</span>
               </div>
               <Button
@@ -286,7 +286,7 @@ export default function AdminBlog() {
                     size="icon"
                     className="text-destructive"
                     onClick={() => {
-                      if (confirm('Delete this post?')) deleteMutation.mutate(post.id);
+                      if (confirm(language === 'he' ? 'למחוק מאמר זה?' : 'Delete this post?')) deleteMutation.mutate(post.id);
                     }}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -308,34 +308,34 @@ export default function AdminBlog() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium">Title (EN)</label>
+                  <label className="text-sm font-medium">{language === 'he' ? 'כותרת (אנגלית)' : 'Title (EN)'}</label>
                   <Input value={editingPost.title} onChange={(e) => setEditingPost({ ...editingPost, title: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Title (HE)</label>
+                  <label className="text-sm font-medium">{language === 'he' ? 'כותרת (עברית)' : 'Title (HE)'}</label>
                   <Input value={editingPost.title_he || ''} onChange={(e) => setEditingPost({ ...editingPost, title_he: e.target.value })} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium">Excerpt (EN)</label>
+                  <label className="text-sm font-medium">{language === 'he' ? 'תקציר (אנגלית)' : 'Excerpt (EN)'}</label>
                   <Textarea value={editingPost.excerpt || ''} onChange={(e) => setEditingPost({ ...editingPost, excerpt: e.target.value })} rows={2} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Excerpt (HE)</label>
+                  <label className="text-sm font-medium">{language === 'he' ? 'תקציר (עברית)' : 'Excerpt (HE)'}</label>
                   <Textarea value={editingPost.excerpt_he || ''} onChange={(e) => setEditingPost({ ...editingPost, excerpt_he: e.target.value })} rows={2} />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">Meta Title</label>
+                <label className="text-sm font-medium">{language === 'he' ? 'Meta כותרת' : 'Meta Title'}</label>
                 <Input value={editingPost.meta_title || ''} onChange={(e) => setEditingPost({ ...editingPost, meta_title: e.target.value })} />
               </div>
               <div>
-                <label className="text-sm font-medium">Meta Description</label>
+                <label className="text-sm font-medium">{language === 'he' ? 'Meta תיאור' : 'Meta Description'}</label>
                 <Input value={editingPost.meta_description || ''} onChange={(e) => setEditingPost({ ...editingPost, meta_description: e.target.value })} />
               </div>
               <div>
-                <label className="text-sm font-medium">Meta Keywords</label>
+                <label className="text-sm font-medium">{language === 'he' ? 'Meta מילות מפתח' : 'Meta Keywords'}</label>
                 <Input value={editingPost.meta_keywords || ''} onChange={(e) => setEditingPost({ ...editingPost, meta_keywords: e.target.value })} />
               </div>
               <Button onClick={() => updateMutation.mutate(editingPost)} disabled={updateMutation.isPending} className="w-full">

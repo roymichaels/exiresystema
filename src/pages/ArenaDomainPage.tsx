@@ -31,7 +31,7 @@ function ArenaDomainPageImpl() {
   const navigate = useNavigate();
   const { statusMap, isLoading } = useLifeDomains();
   const { config } = useDomainAssessment(domainId ?? '');
-  const { language, isRTL, t } = useTranslation();
+  const { language, isRTL, t, l } = useTranslation();
   const isHe = language === 'he';
 
   const domain = domainId ? getDomainById(domainId) : undefined;
@@ -89,7 +89,7 @@ function ArenaDomainPageImpl() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {isHe ? domain.labelHe : domain.labelEn}
+              {l(domain)}
             </h1>
             <p className="text-muted-foreground text-sm">{isHe ? domain.descriptionHe : domain.description}</p>
           </div>
@@ -137,7 +137,7 @@ function ArenaDomainPageImpl() {
               <Card className="p-6 bg-gradient-to-b from-primary/10 to-transparent text-center border-primary/20">
                 <p className="text-5xl font-black text-foreground">{assessment.domain_index}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {isHe ? (domain.labelHe + ' — ציון כללי') : (domain.labelEn + ' — Overall Score')}
+                  {l(domain) + ' — ' + (language === 'he' ? 'ציון כללי' : language === 'es' ? 'Puntuación General' : 'Overall Score')}
                 </p>
                 <Badge variant={assessment.confidence === 'high' ? 'default' : 'secondary'} className="mt-2">
                   {assessment.confidence === 'high' ? (isHe ? 'ביטחון גבוה' : 'High confidence') :

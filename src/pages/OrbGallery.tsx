@@ -175,7 +175,7 @@ export default function OrbGalleryPage() {
                   {TRAIT_CATEGORIES.map(cat => (
                     <div key={cat.key}>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
-                        {isHe ? cat.labelHe : cat.labelEn}
+                        {l(cat)}
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {cat.options.map(opt => {
@@ -191,7 +191,7 @@ export default function OrbGalleryPage() {
                                   : 'bg-muted/30 border-border/30 text-muted-foreground hover:border-border hover:text-foreground'
                               )}
                             >
-                              {isHe ? opt.labelHe : opt.labelEn}
+                              {l(opt)}
                             </button>
                           );
                         })}
@@ -357,19 +357,19 @@ export default function OrbGalleryPage() {
                 </button>
 
                 <h2 className="text-xl font-black text-foreground mt-4">
-                  {isHe ? selectedOrb.nameHe : selectedOrb.nameEn}
+                  {language === 'he' ? selectedOrb.nameHe : language === 'es' ? (selectedOrb.nameEs ?? selectedOrb.nameEn) : selectedOrb.nameEn}
                 </h2>
                 <p className="text-sm text-muted-foreground text-center mt-1">
-                  {isHe ? selectedOrb.descHe : selectedOrb.descEn}
+                  {language === 'he' ? selectedOrb.descHe : language === 'es' ? (selectedOrb.descEs ?? selectedOrb.descEn) : selectedOrb.descEn}
                 </p>
 
                 {/* Traits grid */}
                 <div className="grid grid-cols-2 gap-2 mt-5 w-full">
                   {Object.entries(selectedOrb.traits).map(([key, val]) => {
                     const cat = TRAIT_CATEGORIES.find(c => c.key === key);
-                    const label = cat ? (isHe ? cat.labelHe : cat.labelEn) : key;
+                    const label = cat ? l(cat) : key;
                     const displayVal = typeof val === 'boolean'
-                      ? (val ? (isHe ? 'כן' : 'Yes') : (isHe ? 'לא' : 'No'))
+                      ? (val ? (language === 'he' ? 'כן' : language === 'es' ? 'Sí' : 'Yes') : (language === 'he' ? 'לא' : language === 'es' ? 'No' : 'No'))
                       : String(val);
                     return (
                       <div key={key} className="flex flex-col items-center p-2 rounded-lg bg-muted/30 border border-border/20">

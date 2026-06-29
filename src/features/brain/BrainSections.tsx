@@ -21,7 +21,7 @@ const GROUPS: Array<{ key: string; label: string; types: string[] }> = [
 
 export default function BrainSections({ overview, onSelect }: Props) {
   const navigate = useNavigate();
-  const { isRTL } = useTranslation();
+  const { isRTL, language } = useTranslation();
   const pillarRoute = (id: string) => {
     const d = CORE_DOMAINS.find((x) => x.id === id.toLowerCase());
     return d ? `/strategy/${d.id}/assess` : null;
@@ -29,7 +29,7 @@ export default function BrainSections({ overview, onSelect }: Props) {
   const pillarLabel = (id: string) => {
     const d = CORE_DOMAINS.find((x) => x.id === id.toLowerCase());
     if (!d) return id;
-    return isRTL ? d.labelHe : d.labelEn;
+    return language === 'he' ? d.labelHe : language === 'es' ? d.labelEs : d.labelEn;
   };
   const grouped = useMemo(() => {
     const map: Record<string, BrainNode[]> = {};

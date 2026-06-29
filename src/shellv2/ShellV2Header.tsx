@@ -21,6 +21,7 @@ import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
 import { UserNotificationBell } from '@/components/UserNotificationBell';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import AdvisorWidget from '@/components/admin/advisor/AdvisorWidget';
 
 export default function ShellV2Header() {
   const overlay = useOverlay();
@@ -55,27 +56,27 @@ export default function ShellV2Header() {
           )}
           data-aion-header="admin-slim"
         >
-          <div className="mx-auto flex h-9 w-full max-w-screen-lg items-center justify-between gap-1.5 px-2 sm:px-3">
+          <div className="flex h-14 w-full items-center justify-between gap-1.5 px-3 sm:px-4">
             <button
               type="button"
               aria-label={isHe ? 'תפריט' : 'Menu'}
               onClick={() => overlay.open('drawer')}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
             >
-              <Menu className="h-[17px] w-[17px]" strokeWidth={1.6} />
+              <Menu className="h-5 w-5" strokeWidth={1.6} />
             </button>
 
             <button
               type="button"
               onClick={() => setBrandOpen(true)}
-              className="select-none px-1.5 py-0.5 text-[11.5px] font-semibold tracking-[0.16em] text-foreground/75 active:scale-[0.97] transition"
+              className="select-none px-3 py-1.5 text-[14px] font-semibold tracking-[0.2em] text-foreground active:scale-[0.97] transition"
               aria-label={isHe ? 'אודות' : 'About'}
             >
               EXIRE SYSTEMA
             </button>
 
             <div className="flex items-center gap-1">
-              {user ? <UserNotificationBell /> : null}
+              {user ? <><AdvisorWidget /><UserNotificationBell /></> : null}
             </div>
           </div>
         </header>

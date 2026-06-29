@@ -28,7 +28,7 @@ interface HomepageSection {
 }
 
 const HomepageSections = () => {
-  const { t, isRTL } = useTranslation();
+  const { t, isRTL, language } = useTranslation();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<HomepageSection | null>(null);
@@ -232,29 +232,29 @@ const HomepageSections = () => {
               
               <TabsContent value="english" className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <Label>Title (English)</Label>
+                  <Label>{language === 'he' ? 'כותרת (אנגלית)' : language === 'es' ? 'Título (Inglés)' : 'Title (English)'}</Label>
                   <Input
                     value={formData.title_en}
                     onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                    placeholder="Section title"
+                    placeholder={language === 'he' ? 'כותרת הקטע' : language === 'es' ? 'Título de la sección' : 'Section title'}
                     dir="ltr"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Subtitle (English)</Label>
+                  <Label>{language === 'he' ? 'כותרת משנה (אנגלית)' : language === 'es' ? 'Subtítulo (Inglés)' : 'Subtitle (English)'}</Label>
                   <Input
                     value={formData.subtitle_en}
                     onChange={(e) => setFormData({ ...formData, subtitle_en: e.target.value })}
-                    placeholder="Subtitle"
+                    placeholder={language === 'he' ? 'כותרת משנה' : language === 'es' ? 'Subtítulo' : 'Subtitle'}
                     dir="ltr"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Content (English)</Label>
+                  <Label>{language === 'he' ? 'תוכן (אנגלית)' : language === 'es' ? 'Contenido (Inglés)' : 'Content (English)'}</Label>
                   <Textarea
                     value={formData.content_en}
                     onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
-                    placeholder="Additional content (optional)"
+                    placeholder={language === 'he' ? 'תוכן נוסף (אופציונלי)' : language === 'es' ? 'Contenido adicional (opcional)' : 'Additional content (optional)'}
                     rows={4}
                     dir="ltr"
                   />

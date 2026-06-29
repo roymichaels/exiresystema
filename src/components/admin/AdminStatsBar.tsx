@@ -2,8 +2,7 @@
  * AdminStatsBar — Inline stats + quick actions bar (replaces ActivitySidebar).
  */
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/useTranslation';
-import { Users, Bell, UserPlus, ShoppingBag, BarChart3, Package } from 'lucide-react';
+import { Users, Bell, UserPlus, ShoppingBag } from 'lucide-react';
 import { useAdminNotifications } from '@/hooks/useAdminNotifications';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,8 +13,6 @@ interface AdminStatsBarProps {
 }
 
 export function AdminStatsBar({ onNavigate }: AdminStatsBarProps) {
-  const { language } = useTranslation();
-  const isHe = language === 'he';
   const { unreadCount } = useAdminNotifications();
 
   const { data: stats } = useQuery({
@@ -41,10 +38,10 @@ export function AdminStatsBar({ onNavigate }: AdminStatsBarProps) {
   });
 
   const statItems = [
-    { icon: Users, value: stats?.users || 0, label: isHe ? 'משתמשים' : 'Users', color: 'text-emerald-400', action: () => onNavigate?.('admin', 'users') },
-    { icon: Bell, value: unreadCount, label: isHe ? 'התראות' : 'Alerts', color: 'text-amber-400', action: () => onNavigate?.('overview', 'notifications') },
-    { icon: UserPlus, value: stats?.leads || 0, label: isHe ? 'לידים' : 'Leads', color: 'text-teal-400', action: () => onNavigate?.('admin', 'leads') },
-    { icon: ShoppingBag, value: stats?.orders || 0, label: isHe ? 'הזמנות' : 'Orders', color: 'text-indigo-400', action: () => onNavigate?.('campaigns', 'purchases') },
+    { icon: Users, value: stats?.users || 0, label: 'משתמשים', color: 'text-emerald-400', action: () => onNavigate?.('admin', 'users') },
+    { icon: Bell, value: unreadCount, label: 'התראות', color: 'text-amber-400', action: () => onNavigate?.('overview', 'notifications') },
+    { icon: UserPlus, value: stats?.leads || 0, label: 'לידים', color: 'text-teal-400', action: () => onNavigate?.('admin', 'leads') },
+    { icon: ShoppingBag, value: stats?.orders || 0, label: 'הזמנות', color: 'text-indigo-400', action: () => onNavigate?.('campaigns', 'purchases') },
   ];
 
   return (

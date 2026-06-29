@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function DomainIntakeFlow({ domainId, onComplete, onCancel }: Props) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { upsertDomain } = useLifeDomains();
   const domain = getDomainById(domainId);
@@ -180,7 +180,7 @@ export function DomainIntakeFlow({ domainId, onComplete, onCancel }: Props) {
                       : 'border-border/60 bg-card/60 text-muted-foreground hover:border-primary/40'
                   )}
                 >
-                  {isHe ? opt.labelHe : opt.labelEn}
+                  {l(opt)}
                 </button>
               ))}
             </div>
@@ -208,7 +208,7 @@ export function DomainIntakeFlow({ domainId, onComplete, onCancel }: Props) {
                     )}>
                       {selected && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
                     </div>
-                    {isHe ? opt.labelHe : opt.labelEn}
+                    {l(opt)}
                   </button>
                 );
               })}

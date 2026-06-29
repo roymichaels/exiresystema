@@ -20,7 +20,7 @@ interface SuggestTopicModalProps {
 }
 
 export default function SuggestTopicModal({ open, onOpenChange, pillar }: SuggestTopicModalProps) {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const { user } = useAuth();
   const [title, setTitle] = useState('');
@@ -28,7 +28,7 @@ export default function SuggestTopicModal({ open, onOpenChange, pillar }: Sugges
   const [submitting, setSubmitting] = useState(false);
 
   const domain = getDomainById(pillar);
-  const pillarLabel = domain ? (isHe ? domain.labelHe : domain.labelEn) : pillar;
+  const pillarLabel = domain ? l(domain) : pillar;
 
   const handleSubmit = async () => {
     if (!user || !title.trim()) return;

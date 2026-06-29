@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import { es } from "date-fns/locale";
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Form {
   id: string;
@@ -48,6 +50,7 @@ const FormsList = ({
   onViewSubmissions,
   onRefresh,
 }: FormsListProps) => {
+  const { language } = useTranslation();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyLink = async (token: string, formId: string) => {
@@ -55,11 +58,11 @@ const FormsList = ({
     try {
       await navigator.clipboard.writeText(link);
       setCopiedId(formId);
-      toast({ title: "הקישור הועתק ללוח! 🔗" });
+      toast({ title: language === 'he' ? 'הקישור הועתק ללוח! 🔗' : language === 'es' ? '¡Enlace copiado! 🔗' : 'Link copied! 🔗' });
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      prompt("הקישור נוצר בהצלחה! העתק אותו ידנית:", link);
-      toast({ title: "הקישור נוצר - העתק ידנית" });
+      prompt(language === 'he' ? 'הקישור נוצר בהצלחה! העתק אותו ידנית:' : language === 'es' ? '¡Enlace creado! Cópialo manualmente:' : 'Link created successfully! Copy it manually:', link);
+      toast({ title: language === 'he' ? 'הקישור נוצר - העתק ידנית' : language === 'es' ? 'Enlace creado - cópialo manualmente' : 'Link created - copy manually' });
     }
   };
 
@@ -71,17 +74,17 @@ const FormsList = ({
       .eq("id", formId);
 
     if (error) {
-      toast({ title: "שגיאה בעדכון סטטוס", variant: "destructive" });
+      toast({ title: language === 'he' ? 'שגיאה בעדכון סטטוס' : language === 'es' ? 'Error al actualizar estado' : 'Error updating status', variant: "destructive" });
     } else {
       toast({
-        title: newStatus === "published" ? "הטופס פורסם!" : "הטופס הוסתר",
+        title: newStatus === "published" ? (language === 'he' ? 'הטופס פורסם!' : language === 'es' ? '¡Formulario publicado!' : 'Form published!') : (language === 'he' ? 'הטופס הוסתר' : language === 'es' ? 'Formulario oculto' : 'Form hidden'),
       });
       onRefresh();
     }
   };
 
   const deleteForm = async (formId: string) => {
-    if (!confirm("האם למחוק את הטופס? כל התשובות יימחקו גם כן.")) return;
+    if (!confirm(language === 'he' ? 'האם למחוק את הטופס? כל התשובות יימחקו גם כן.' : language === 'es' ? '¿Eliminar el formulario? Todas las respuestas también se eliminarán.' : 'Delete the form? All submissions will also be deleted.')) return;
 
     const { error } = await supabase
       .from("custom_forms")
@@ -89,9 +92,9 @@ const FormsList = ({
       .eq("id", formId);
 
     if (error) {
-      toast({ title: "שגיאה במחיקה", variant: "destructive" });
+      toast({ title: language === 'he' ? 'שגיאה במחיקה' : language === 'es' ? 'Error al eliminar' : 'Error deleting', variant: "destructive" });
     } else {
-      toast({ title: "הטופס נמחק" });
+      toast({ title: language === 'he' ? 'הטופס נמחק' : language === 'es' ? 'Formulario eliminado' : 'Form deleted' });
       onRefresh();
     }
   };
@@ -102,14 +105,14 @@ const FormsList = ({
         return (
           <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
             <Globe className="h-3 w-3 ml-1" />
-            פורסם
+            {language === 'he' ? 'פורסם' : language === 'es' ? 'Publicado' : 'Published'}
           </Badge>
         );
       case "draft":
         return (
           <Badge variant="secondary">
             <Lock className="h-3 w-3 ml-1" />
-            טיוטה
+            {language === 'he' ? 'טיוטה' : language === 'es' ? 'Borrador' : 'Draft'}
           </Badge>
         );
       default:
@@ -122,8 +125,8 @@ const FormsList = ({
       <Card className="glass-panel border-white/10">
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <FileEdit className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">אין טפסים עדיין</h3>
-          <p className="text-muted-foreground">צור את הטופס הראשון שלך</p>
+          <h3 className="text-lg font-medium mb-2">{language === 'he' ? 'אין טפסים עדיין' : language === 'es' ? 'No hay formularios todavía' : 'No forms yet'}</h3>
+          <p className="text-muted-foreground">{language === 'he' ? 'צור את הטופס הראשון שלך' : language === 'es' ? 'Crea tu primer formulario' : 'Create your first form'}</p>
         </CardContent>
       </Card>
     );
@@ -152,15 +155,15 @@ const FormsList = ({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onEdit(form.id)}>
                     <Edit className="h-4 w-4 ml-2" />
-                    ערוך פרטים
+                    {language === 'he' ? 'ערוך פרטים' : language === 'es' ? 'Editar detalles' : 'Edit details'}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onEditFields(form.id)}>
                     <FileEdit className="h-4 w-4 ml-2" />
-                    ערוך שדות
+                    {language === 'he' ? 'ערוך שדות' : language === 'es' ? 'Editar campos' : 'Edit fields'}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onViewSubmissions(form.id)}>
                     <Inbox className="h-4 w-4 ml-2" />
-                    צפה בתשובות
+                    {language === 'he' ? 'צפה בתשובות' : language === 'es' ? 'Ver respuestas' : 'View submissions'}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => toggleStatus(form.id, form.status)}
@@ -168,12 +171,12 @@ const FormsList = ({
                     {form.status === "published" ? (
                       <>
                         <Lock className="h-4 w-4 ml-2" />
-                        הסתר טופס
+                        {language === 'he' ? 'הסתר טופס' : language === 'es' ? 'Ocultar formulario' : 'Hide form'}
                       </>
                     ) : (
                       <>
                         <Globe className="h-4 w-4 ml-2" />
-                        פרסם טופס
+                        {language === 'he' ? 'פרסם טופס' : language === 'es' ? 'Publicar formulario' : 'Publish form'}
                       </>
                     )}
                   </DropdownMenuItem>
@@ -182,7 +185,7 @@ const FormsList = ({
                     className="text-destructive"
                   >
                     <Trash2 className="h-4 w-4 ml-2" />
-                    מחק
+                    {language === 'he' ? 'מחק' : language === 'es' ? 'Eliminar' : 'Delete'}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -192,7 +195,7 @@ const FormsList = ({
             <div className="flex items-center justify-between">
               {getStatusBadge(form.status)}
               <span className="text-xs text-muted-foreground">
-                {format(new Date(form.created_at), "dd/MM/yyyy", { locale: he })}
+                {format(new Date(form.created_at), "dd/MM/yyyy", { locale: language === 'he' ? he : language === 'es' ? es : undefined })}
               </span>
             </div>
 
@@ -204,11 +207,11 @@ const FormsList = ({
                 onClick={() => copyLink(form.access_token, form.id)}
               >
                 {copiedId === form.id ? (
-                  "הועתק! ✓"
+                  language === 'he' ? 'הועתק! ✓' : language === 'es' ? '¡Copiado! ✓' : 'Copied! ✓'
                 ) : (
                   <>
                     <Copy className="h-4 w-4 ml-1" />
-                    העתק לינק
+                    {language === 'he' ? 'העתק לינק' : language === 'es' ? 'Copiar enlace' : 'Copy link'}
                   </>
                 )}
               </Button>

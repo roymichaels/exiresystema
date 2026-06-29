@@ -31,7 +31,7 @@ const EN_PRESENCE: Record<string, string> = {
 
 export function useWorldAion(worldId: CognitiveWorldId) {
   const presence = useAionPresence();
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const world = getWorld(worldId);
   const state = useWorldState(worldId);
@@ -71,7 +71,7 @@ export function useWorldAion(worldId: CognitiveWorldId) {
       role: world.aionRole,
       verbs: world.interaction.verbs.map((v) => ({
         id: v.id,
-        label: isHe ? v.labelHe : v.labelEn,
+        label: l(v),
       })),
       presence,
       /** Composed line: world tagline + continuity awareness + presence. */

@@ -50,10 +50,10 @@ const SOURCE_LABELS: Record<string, string> = {
   exit_popup: 'פופאפ יציאה',
   floating: 'כפתור צף',
   general: 'כללי',
-  exire_landing: '🌊 Exire',
-  exire_form: '📝 טופס Exire',
-  exire_instagram_form: '📸 טופס אינסטגרם',
-  homepage: '🏠 דף הבית',
+  exire_landing: 'דף נחיתה Exire',
+  exire_form: 'טופס Exire',
+  exire_instagram_form: 'אינסטגרם',
+  homepage: 'דף הבית',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -298,10 +298,10 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
               { id: 'followup', label: 'דורש פולואפ',   status: 'contacted', source: sourceFilter },
               { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
-              { id: 'home',     label: '🏠 דף הבית',    status: statusFilter, source: 'homepage' },
-              { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
-              { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
-              { id: 'ig',       label: '📸 אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
+              { id: 'home',     label: 'דף הבית',    status: statusFilter, source: 'homepage' },
+              { id: 'exire',    label: 'דף נחיתה',   status: statusFilter, source: 'exire_landing' },
+              { id: 'form',     label: 'טפסים',      status: statusFilter, source: 'exire_form' },
+              { id: 'ig',       label: 'אינסטגרם',   status: statusFilter, source: 'exire_instagram_form' },
             ].map(c => {
               const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
               return (
@@ -320,35 +320,39 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
         </CardContent>
       </Card>
 
-      {/* Filters — mobile (inbox-style) */}
-      <div className="md:hidden space-y-2">
+      {/* Filters — mobile (inbox-style, compact) */}
+      <div className="md:hidden space-y-1.5">
         <div className="relative">
-          <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             placeholder="חיפוש שם, טלפון, אימייל…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="pe-10 h-10 rounded-xl bg-card/60 border-border/40"
+            className="pe-9 h-9 rounded-xl bg-card/60 border-border/40 text-[13px]"
           />
         </div>
-        <div className="-mx-3 px-3 overflow-x-auto scrollbar-none">
-          <div className="flex gap-1.5 w-max">
+        <details className="group">
+          <summary className="cursor-pointer text-[11px] text-muted-foreground px-1 py-1 list-none flex items-center gap-1 [&::-webkit-details-marker]:hidden">
+            <span className="group-open:hidden">סינון · הצג</span>
+            <span className="hidden group-open:inline">סינון · הסתר</span>
+          </summary>
+          <div className="flex flex-wrap gap-1.5 pt-1">
             {[
-              { id: 'all',      label: 'הכל',           status: 'all',       source: 'all' },
-              { id: 'new',      label: 'חדשים',         status: 'new',       source: sourceFilter },
-              { id: 'followup', label: 'פולואפ',        status: 'contacted', source: sourceFilter },
-              { id: 'converted',label: 'הומרו',         status: 'converted', source: sourceFilter },
-              { id: 'home',     label: '🏠',            status: statusFilter, source: 'homepage' },
-              { id: 'exire',    label: '🌊 Exire',      status: statusFilter, source: 'exire_landing' },
-              { id: 'form',     label: '📝 טפסים',      status: statusFilter, source: 'exire_form' },
-              { id: 'ig',       label: '📸 IG',         status: statusFilter, source: 'exire_instagram_form' },
+              { id: 'all',      label: 'הכל',       status: 'all',       source: 'all' },
+              { id: 'new',      label: 'חדשים',     status: 'new',       source: sourceFilter },
+              { id: 'followup', label: 'פולואפ',    status: 'contacted', source: sourceFilter },
+              { id: 'converted',label: 'הומרו',     status: 'converted', source: sourceFilter },
+              { id: 'home',     label: 'דף הבית',   status: statusFilter, source: 'homepage' },
+              { id: 'exire',    label: 'דף נחיתה',  status: statusFilter, source: 'exire_landing' },
+              { id: 'form',     label: 'טפסים',     status: statusFilter, source: 'exire_form' },
+              { id: 'ig',       label: 'אינסטגרם',  status: statusFilter, source: 'exire_instagram_form' },
             ].map(c => {
               const active = (c.status === statusFilter || c.status === 'all') && c.source === sourceFilter;
               return (
                 <button
                   key={c.id}
                   onClick={() => { setStatusFilter(c.status); setSourceFilter(c.source); }}
-                  className={`text-[12px] rounded-full px-3 py-1.5 border transition shrink-0 whitespace-nowrap ${
+                  className={`text-[11px] rounded-full px-2.5 py-1 border transition shrink-0 whitespace-nowrap ${
                     active
                       ? 'bg-primary text-primary-foreground border-primary'
                       : 'border-border/40 bg-card/40 text-muted-foreground'
@@ -357,7 +361,7 @@ export const LeadsCRM = ({ scope = 'admin' }: LeadsCRMProps) => {
               );
             })}
           </div>
-        </div>
+        </details>
       </div>
 
       {/* Mobile list — native CRM inbox */}

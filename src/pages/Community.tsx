@@ -85,7 +85,7 @@ const Community = ({ selectedPillar = 'all', onPillarSelect, selectedTopic = nul
   const [matchOpen, setMatchOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [generatingStories, setGeneratingStories] = useState(false);
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const qc = useQC();
 
@@ -155,7 +155,7 @@ const Community = ({ selectedPillar = 'all', onPillarSelect, selectedTopic = nul
 
   const isAll = selectedPillar === 'all';
   const domain = getDomainById(selectedPillar);
-  const pillarLabel = domain ? (isHe ? domain.labelHe : domain.labelEn) : selectedPillar;
+  const pillarLabel = domain ? l(domain) : selectedPillar;
 
   return (
       <PageShell>
@@ -251,7 +251,7 @@ const Community = ({ selectedPillar = 'all', onPillarSelect, selectedTopic = nul
                     <IPhoneWidget
                       key={d.id}
                       icon={d.icon}
-                      label={isHe ? d.labelHe : d.labelEn}
+                      label={l(d)}
                       gradient={GRADIENT_MAP[d.color] || 'from-primary to-primary/80'}
                       onClick={() => onPillarSelect?.(d.id)}
                       size="sm"

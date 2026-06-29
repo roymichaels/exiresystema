@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useWalletModal } from '@/contexts/WalletModalContext';
 
 const ACTIONS = [
-  { id: 'earn',   icon: Target,  labelEn: 'Earn',    labelHe: 'הרוויח', descEn: 'Bounties, gigs & data', descHe: 'באונטיז, עבודות ונתונים', path: '/fm',   rarity: 'epic' },
-  { id: 'wallet', icon: Wallet,  labelEn: 'Wallet',  labelHe: 'ארנק',   descEn: 'Balance & withdraw',    descHe: 'יתרה ומשיכה',            path: null,     rarity: 'rare' },
+  { id: 'earn',   icon: Target,  labelEn: 'Earn',    labelHe: 'הרוויח',    labelEs: 'Ganar',    descEn: 'Bounties, gigs & data', descHe: 'באונטיז, עבודות ונתונים', path: '/fm',   rarity: 'epic' },
+  { id: 'wallet', icon: Wallet,  labelEn: 'Wallet',  labelHe: 'ארנק',      labelEs: 'Billetera', descEn: 'Balance & withdraw',    descHe: 'יתרה ומשיכה',            path: null,     rarity: 'rare' },
 ];
 
 const RARITY_STYLES: Record<string, string> = {
@@ -14,7 +14,7 @@ const RARITY_STYLES: Record<string, string> = {
 };
 
 export function FMQuickActions() {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const navigate = useNavigate();
   const { openWallet } = useWalletModal();
@@ -30,7 +30,7 @@ export function FMQuickActions() {
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/10 flex items-center justify-center mx-auto mb-2.5 border border-amber-500/20">
             <a.icon className="w-5 h-5 text-amber-400" />
           </div>
-          <p className="font-bold text-sm text-foreground">{isHe ? a.labelHe : a.labelEn}</p>
+          <p className="font-bold text-sm text-foreground">{l(a)}</p>
           <p className="text-[10px] text-muted-foreground mt-0.5">{isHe ? a.descHe : a.descEn}</p>
         </button>
       ))}

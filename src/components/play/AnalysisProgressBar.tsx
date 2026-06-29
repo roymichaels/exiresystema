@@ -15,7 +15,7 @@ import { NextActionBanner } from '@/components/dashboard/v2/NextActionBanner';
 export function AnalysisProgressBar() {
   const navigate = useNavigate();
   const { statusMap } = useLifeDomains();
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
 
   const allDomains = LIFE_DOMAINS;
@@ -97,7 +97,7 @@ export function AnalysisProgressBar() {
           onClick={() => navigate(nextRoute)}
           className="w-full mt-0.5 h-8 text-xs font-semibold border border-border/40 rounded-xl gap-1.5 transition-all hover:bg-primary/10 hover:border-primary/30 text-foreground/70 hover:text-foreground"
         >
-          {isHe ? `הבא: ${nextDomain.labelHe}` : `Next: ${nextDomain.labelEn}`}
+          {(language === 'he' ? 'הבא: ' : language === 'es' ? 'Siguiente: ' : 'Next: ') + l(nextDomain)}
           <ChevronIcon className="w-3.5 h-3.5" />
         </Button>
       )}

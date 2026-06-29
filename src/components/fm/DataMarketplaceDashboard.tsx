@@ -11,14 +11,14 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CATEGORIES = [
-  { key: 'sleep_patterns', emoji: '😴', labelEn: 'Sleep Patterns', labelHe: 'דפוסי שינה', descEn: 'Session duration, consistency scores', descHe: 'משך סשנים, ציוני עקביות' },
-  { key: 'habit_trends', emoji: '🎯', labelEn: 'Habit Trends', labelHe: 'מגמות הרגלים', descEn: 'Completion rates, streak patterns', descHe: 'שיעורי השלמה, דפוסי רצף' },
-  { key: 'mood_signals', emoji: '🧠', labelEn: 'Mood & Energy', labelHe: 'מצב רוח ואנרגיה', descEn: 'Energy distribution, daily averages', descHe: 'פיזור אנרגיה, ממוצעים יומיים' },
-  { key: 'training_results', emoji: '💪', labelEn: 'Training Data', labelHe: 'נתוני אימון', descEn: 'Lesson completions, XP metrics', descHe: 'השלמות שיעורים, מדדי XP' },
+  { key: 'sleep_patterns', emoji: '😴', labelEn: 'Sleep Patterns', labelHe: 'דפוסי שינה', labelEs: 'Patrones de Sueño', descEn: 'Session duration, consistency scores', descHe: 'משך סשנים, ציוני עקביות' },
+  { key: 'habit_trends', emoji: '🎯', labelEn: 'Habit Trends', labelHe: 'מגמות הרגלים', labelEs: 'Tendencias de Hábitos', descEn: 'Completion rates, streak patterns', descHe: 'שיעורי השלמה, דפוסי רצף' },
+  { key: 'mood_signals', emoji: '🧠', labelEn: 'Mood & Energy', labelHe: 'מצב רוח ואנרגיה', labelEs: 'Estado de Ánimo y Energía', descEn: 'Energy distribution, daily averages', descHe: 'פיזור אנרגיה, ממוצעים יומיים' },
+  { key: 'training_results', emoji: '💪', labelEn: 'Training Data', labelHe: 'נתוני אימון', labelEs: 'Datos de Entrenamiento', descEn: 'Lesson completions, XP metrics', descHe: 'השלמות שיעורים, מדדי XP' },
 ];
 
 export default function DataMarketplaceDashboard() {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const { consents, isLoading, toggleConsent } = useDataConsent();
   const { data: revenue } = useDataRevenue();
@@ -95,7 +95,7 @@ export default function DataMarketplaceDashboard() {
               <div className="flex items-center gap-3">
                 <span className="text-xl">{cat.emoji}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{isHe ? cat.labelHe : cat.labelEn}</p>
+                  <p className="text-sm font-medium text-foreground">{l(cat)}</p>
                   <p className="text-[11px] text-muted-foreground">{isHe ? cat.descHe : cat.descEn}</p>
                 </div>
                 <button

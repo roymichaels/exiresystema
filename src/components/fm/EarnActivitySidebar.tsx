@@ -13,30 +13,30 @@ import {
 import { useFMClaims } from '@/hooks/useFMWallet';
 
 const BOUNTY_CATEGORIES = [
-  { id: 'all', labelEn: 'All', labelHe: 'הכל', icon: Layers },
-  { id: 'writing', labelEn: 'Writing', labelHe: 'כתיבה', icon: PenTool },
-  { id: 'labeling', labelEn: 'Labeling', labelHe: 'תיוג', icon: Tag },
-  { id: 'feedback', labelEn: 'Feedback', labelHe: 'פידבק', icon: MessageSquare },
-  { id: 'design', labelEn: 'Design', labelHe: 'עיצוב', icon: Palette },
-  { id: 'translation', labelEn: 'Translation', labelHe: 'תרגום', icon: Languages },
+  { id: 'all', labelEn: 'All', labelHe: 'הכל', labelEs: 'Todo', icon: Layers },
+  { id: 'writing', labelEn: 'Writing', labelHe: 'כתיבה', labelEs: 'Escritura', icon: PenTool },
+  { id: 'labeling', labelEn: 'Labeling', labelHe: 'תיוג', labelEs: 'Etiquetado', icon: Tag },
+  { id: 'feedback', labelEn: 'Feedback', labelHe: 'פידבק', labelEs: 'Comentarios', icon: MessageSquare },
+  { id: 'design', labelEn: 'Design', labelHe: 'עיצוב', labelEs: 'Diseño', icon: Palette },
+  { id: 'translation', labelEn: 'Translation', labelHe: 'תרגום', labelEs: 'Traducción', icon: Languages },
 ];
 
 const GIG_CATEGORIES = [
-  { id: 'all', labelEn: 'All', labelHe: 'הכל', icon: Layers },
-  { id: 'design', labelEn: 'Design', labelHe: 'עיצוב', icon: Palette },
-  { id: 'writing', labelEn: 'Writing', labelHe: 'כתיבה', icon: PenTool },
-  { id: 'translation', labelEn: 'Translation', labelHe: 'תרגום', icon: Languages },
-  { id: 'development', labelEn: 'Development', labelHe: 'פיתוח', icon: Code },
-  { id: 'content', labelEn: 'Content', labelHe: 'תוכן', icon: MessageSquare },
-  { id: 'other', labelEn: 'Other', labelHe: 'אחר', icon: Package },
+  { id: 'all', labelEn: 'All', labelHe: 'הכל', labelEs: 'Todo', icon: Layers },
+  { id: 'design', labelEn: 'Design', labelHe: 'עיצוב', labelEs: 'Diseño', icon: Palette },
+  { id: 'writing', labelEn: 'Writing', labelHe: 'כתיבה', labelEs: 'Escritura', icon: PenTool },
+  { id: 'translation', labelEn: 'Translation', labelHe: 'תרגום', labelEs: 'Traducción', icon: Languages },
+  { id: 'development', labelEn: 'Development', labelHe: 'פיתוח', labelEs: 'Desarrollo', icon: Code },
+  { id: 'content', labelEn: 'Content', labelHe: 'תוכן', labelEs: 'Contenido', icon: MessageSquare },
+  { id: 'other', labelEn: 'Other', labelHe: 'אחר', labelEs: 'Otro', icon: Package },
 ];
 
 const DATA_CATEGORIES = [
-  { id: 'all', labelEn: 'All Types', labelHe: 'כל הסוגים', icon: Layers },
-  { id: 'sleep', labelEn: 'Sleep', labelHe: 'שינה', icon: Clock },
-  { id: 'habits', labelEn: 'Habits', labelHe: 'הרגלים', icon: CheckCircle2 },
-  { id: 'mood', labelEn: 'Mood', labelHe: 'מצב רוח', icon: MessageSquare },
-  { id: 'training', labelEn: 'Training', labelHe: 'אימון', icon: Shield },
+  { id: 'all', labelEn: 'All Types', labelHe: 'כל הסוגים', labelEs: 'Todos los Tipos', icon: Layers },
+  { id: 'sleep', labelEn: 'Sleep', labelHe: 'שינה', labelEs: 'Sueño', icon: Clock },
+  { id: 'habits', labelEn: 'Habits', labelHe: 'הרגלים', labelEs: 'Hábitos', icon: CheckCircle2 },
+  { id: 'mood', labelEn: 'Mood', labelHe: 'מצב רוח', labelEs: 'Estado de Ánimo', icon: MessageSquare },
+  { id: 'training', labelEn: 'Training', labelHe: 'אימון', labelEs: 'Entrenamiento', icon: Shield },
 ];
 
 interface EarnActivitySidebarProps {
@@ -48,7 +48,7 @@ interface EarnActivitySidebarProps {
 
 export function EarnActivitySidebar({ activeTab = 'bounties', categoryFilter = 'all', onCategoryChange, onGoToBounties }: EarnActivitySidebarProps) {
   const [collapsed, setCollapsed] = useState(() => window.innerWidth < 1024);
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { data: claims = [] } = useFMClaims();
 
@@ -117,7 +117,7 @@ export function EarnActivitySidebar({ activeTab = 'bounties', categoryFilter = '
                   ? "bg-amber-500/20 border border-amber-500/30"
                   : "bg-muted/30 border border-border/20 hover:bg-accent/10"
               )}
-              title={isHe ? cat.labelHe : cat.labelEn}
+              title={l(cat)}
             >
               <cat.icon className={cn("w-3 h-3", categoryFilter === cat.id ? "text-amber-400" : "text-muted-foreground")} />
             </button>
@@ -163,7 +163,7 @@ export function EarnActivitySidebar({ activeTab = 'bounties', categoryFilter = '
                       "text-xs font-medium",
                       categoryFilter === cat.id ? 'text-amber-400' : 'text-foreground'
                     )}>
-                      {isHe ? cat.labelHe : cat.labelEn}
+                      {l(cat)}
                     </span>
                   </button>
                 ))}

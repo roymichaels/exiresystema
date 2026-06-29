@@ -79,8 +79,10 @@ const THEME: Record<CareerPath, {
   gradientText: string;
   titleEn: string;
   titleHe: string;
+  titleEs: string;
   badgeLabelEn: string;
   badgeLabelHe: string;
+  badgeLabelEs: string;
 }> = {
   coach: {
     icon: GraduationCap,
@@ -99,8 +101,10 @@ const THEME: Record<CareerPath, {
     gradientText: 'from-purple-500 to-indigo-500',
     titleEn: 'Coach Command Center',
     titleHe: 'מרכז הפיקוד — מאמן',
+    titleEs: 'Centro de Mando — Coach',
     badgeLabelEn: 'Coach',
     badgeLabelHe: 'מאמן',
+    badgeLabelEs: 'Coach',
   },
   therapist: {
     icon: Heart,
@@ -119,8 +123,10 @@ const THEME: Record<CareerPath, {
     gradientText: 'from-rose-500 to-pink-500',
     titleEn: 'Therapy Practice Center',
     titleHe: 'מרכז הפיקוד — מטפל',
+    titleEs: 'Centro de Práctica — Terapeuta',
     badgeLabelEn: 'Therapist',
     badgeLabelHe: 'מטפל',
+    badgeLabelEs: 'Terapeuta',
   },
   freelancer: {
     icon: Code,
@@ -139,8 +145,10 @@ const THEME: Record<CareerPath, {
     gradientText: 'from-emerald-500 to-teal-500',
     titleEn: 'Freelancer Command Center',
     titleHe: 'מרכז הפיקוד — פרילנסר',
+    titleEs: 'Centro de Mando — Freelancer',
     badgeLabelEn: 'Freelancer',
     badgeLabelHe: 'פרילנסר',
+    badgeLabelEs: 'Freelancer',
   },
   creator: {
     icon: Palette,
@@ -159,8 +167,10 @@ const THEME: Record<CareerPath, {
     gradientText: 'from-sky-500 to-blue-500',
     titleEn: 'Creator Studio',
     titleHe: 'סטודיו היוצר',
+    titleEs: 'Estudio del Creador',
     badgeLabelEn: 'Creator',
     badgeLabelHe: 'יוצר',
+    badgeLabelEs: 'Creador',
   },
   business: {
     icon: Briefcase,
@@ -179,77 +189,79 @@ const THEME: Record<CareerPath, {
     gradientText: 'from-amber-500 to-yellow-500',
     titleEn: 'Business Command Center',
     titleHe: 'מרכז הפיקוד — עסק',
+    titleEs: 'Centro de Mando — Negocio',
     badgeLabelEn: 'Business',
     badgeLabelHe: 'בעל עסק',
+    badgeLabelEs: 'Negocio',
   },
 };
 
 // ── Tab definitions per career path ──
-type TabDef = { id: string; icon: typeof LayoutDashboard; labelEn: string; labelHe: string };
+type TabDef = { id: string; icon: typeof LayoutDashboard; labelEn: string; labelHe: string; labelEs: string };
 
 const SHARED_TABS: TabDef[] = [
-  { id: 'dashboard', icon: LayoutDashboard, labelEn: 'Overview', labelHe: 'סקירה' },
+  { id: 'dashboard', icon: LayoutDashboard, labelEn: 'Overview', labelHe: 'סקירה', labelEs: 'Resumen' },
 ];
 
 const TABS_BY_PATH: Record<CareerPath, TabDef[]> = {
   coach: [
     ...SHARED_TABS,
-    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'מתאמנים' },
-    { id: 'leads', icon: Star, labelEn: 'Leads', labelHe: 'לידים' },
-    { id: 'products', icon: DollarSign, labelEn: 'Products', labelHe: 'מוצרים' },
-    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן' },
-    { id: 'plans', icon: FileText, labelEn: 'Plans', labelHe: 'תוכניות' },
-    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק' },
-    { id: 'analytics', icon: ExternalLink, labelEn: 'Analytics', labelHe: 'אנליטיקס' },
-    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה' },
-    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות' },
+    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'מתאמנים', labelEs: 'Clientes' },
+    { id: 'leads', icon: Star, labelEn: 'Leads', labelHe: 'לידים', labelEs: 'Lideres' },
+    { id: 'products', icon: DollarSign, labelEn: 'Products', labelHe: 'מוצרים', labelEs: 'Productos' },
+    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן', labelEs: 'Contenido' },
+    { id: 'plans', icon: FileText, labelEn: 'Plans', labelHe: 'תוכניות', labelEs: 'Planes' },
+    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק', labelEs: 'Marketing' },
+    { id: 'analytics', icon: ExternalLink, labelEn: 'Analytics', labelHe: 'אנליטיקס', labelEs: 'Analíticas' },
+    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה', labelEs: 'Páginas de Aterrizaje' },
+    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות', labelEs: 'Ajustes' },
   ],
   therapist: [
     ...SHARED_TABS,
-    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'מטופלים' },
-    { id: 'leads', icon: Star, labelEn: 'Leads', labelHe: 'לידים' },
-    { id: 'products', icon: DollarSign, labelEn: 'Services', labelHe: 'שירותים' },
-    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן' },
-    { id: 'plans', icon: FileText, labelEn: 'Plans', labelHe: 'תוכניות' },
-    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק' },
-    { id: 'analytics', icon: ExternalLink, labelEn: 'Analytics', labelHe: 'אנליטיקס' },
-    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה' },
-    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות' },
+    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'מטופלים', labelEs: 'Pacientes' },
+    { id: 'leads', icon: Star, labelEn: 'Leads', labelHe: 'לידים', labelEs: 'Lideres' },
+    { id: 'products', icon: DollarSign, labelEn: 'Services', labelHe: 'שירותים', labelEs: 'Servicios' },
+    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן', labelEs: 'Contenido' },
+    { id: 'plans', icon: FileText, labelEn: 'Plans', labelHe: 'תוכניות', labelEs: 'Planes' },
+    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק', labelEs: 'Marketing' },
+    { id: 'analytics', icon: ExternalLink, labelEn: 'Analytics', labelHe: 'אנליטיקס', labelEs: 'Analíticas' },
+    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה', labelEs: 'Páginas de Aterrizaje' },
+    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות', labelEs: 'Ajustes' },
   ],
   freelancer: [
     ...SHARED_TABS,
-    { id: 'gigs', icon: Search, labelEn: 'Gigs', labelHe: 'הזדמנויות' },
-    { id: 'projects', icon: FolderKanban, labelEn: 'Projects', labelHe: 'פרויקטים' },
-    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'לקוחות' },
-    { id: 'portfolio', icon: Image, labelEn: 'Portfolio', labelHe: 'תיק עבודות' },
-    { id: 'products', icon: DollarSign, labelEn: 'Products', labelHe: 'מוצרים' },
-    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן' },
-    { id: 'earnings', icon: DollarSign, labelEn: 'Earnings', labelHe: 'הכנסות' },
-    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק' },
-    { id: 'analytics', icon: BarChart3, labelEn: 'Analytics', labelHe: 'אנליטיקס' },
-    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות' },
+    { id: 'gigs', icon: Search, labelEn: 'Gigs', labelHe: 'הזדמנויות', labelEs: 'Trabajos' },
+    { id: 'projects', icon: FolderKanban, labelEn: 'Projects', labelHe: 'פרויקטים', labelEs: 'Proyectos' },
+    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'לקוחות', labelEs: 'Clientes' },
+    { id: 'portfolio', icon: Image, labelEn: 'Portfolio', labelHe: 'תיק עבודות', labelEs: 'Portafolio' },
+    { id: 'products', icon: DollarSign, labelEn: 'Products', labelHe: 'מוצרים', labelEs: 'Productos' },
+    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן', labelEs: 'Contenido' },
+    { id: 'earnings', icon: DollarSign, labelEn: 'Earnings', labelHe: 'הכנסות', labelEs: 'Ganancias' },
+    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק', labelEs: 'Marketing' },
+    { id: 'analytics', icon: BarChart3, labelEn: 'Analytics', labelHe: 'אנליטיקס', labelEs: 'Analíticas' },
+    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות', labelEs: 'Ajustes' },
   ],
   creator: [
     ...SHARED_TABS,
-    { id: 'courses', icon: BookOpen, labelEn: 'Courses', labelHe: 'קורסים' },
-    { id: 'products', icon: Package, labelEn: 'Products', labelHe: 'מוצרים' },
-    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן' },
-    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'לקוחות' },
-    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק' },
-    { id: 'analytics', icon: BarChart3, labelEn: 'Analytics', labelHe: 'אנליטיקס' },
-    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה' },
-    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות' },
+    { id: 'courses', icon: BookOpen, labelEn: 'Courses', labelHe: 'קורסים', labelEs: 'Cursos' },
+    { id: 'products', icon: Package, labelEn: 'Products', labelHe: 'מוצרים', labelEs: 'Productos' },
+    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן', labelEs: 'Contenido' },
+    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'לקוחות', labelEs: 'Clientes' },
+    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק', labelEs: 'Marketing' },
+    { id: 'analytics', icon: BarChart3, labelEn: 'Analytics', labelHe: 'אנליטיקס', labelEs: 'Analíticas' },
+    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה', labelEs: 'Páginas de Aterrizaje' },
+    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות', labelEs: 'Ajustes' },
   ],
   business: [
     ...SHARED_TABS,
-    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'לקוחות' },
-    { id: 'leads', icon: Star, labelEn: 'Leads', labelHe: 'לידים' },
-    { id: 'products', icon: DollarSign, labelEn: 'Products', labelHe: 'מוצרים' },
-    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן' },
-    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק' },
-    { id: 'analytics', icon: ExternalLink, labelEn: 'Analytics', labelHe: 'אנליטיקס' },
-    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה' },
-    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות' },
+    { id: 'clients', icon: Users, labelEn: 'Clients', labelHe: 'לקוחות', labelEs: 'Clientes' },
+    { id: 'leads', icon: Star, labelEn: 'Leads', labelHe: 'לידים', labelEs: 'Lideres' },
+    { id: 'products', icon: DollarSign, labelEn: 'Products', labelHe: 'מוצרים', labelEs: 'Productos' },
+    { id: 'content', icon: FileText, labelEn: 'Content', labelHe: 'תוכן', labelEs: 'Contenido' },
+    { id: 'marketing', icon: Megaphone, labelEn: 'Marketing', labelHe: 'שיווק', labelEs: 'Marketing' },
+    { id: 'analytics', icon: ExternalLink, labelEn: 'Analytics', labelHe: 'אנליטיקס', labelEs: 'Analíticas' },
+    { id: 'landing-pages', icon: FileText, labelEn: 'Landing Pages', labelHe: 'דפי נחיתה', labelEs: 'Páginas de Aterrizaje' },
+    { id: 'settings', icon: Settings, labelEn: 'Settings', labelHe: 'הגדרות', labelEs: 'Ajustes' },
   ],
 };
 
@@ -290,7 +302,7 @@ function getStatCards(path: CareerPath, isHe: boolean, coachStats?: { active: nu
 }
 
 export default function CareerHub({ careerPath }: CareerHubProps) {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const navigate = useNavigate();
   const { data: profile } = useProfile();
@@ -444,13 +456,13 @@ export default function CareerHub({ careerPath }: CareerHubProps) {
                 {isHe ? `שלום${displayName ? `, ${displayName}` : ''}` : `Welcome${displayName ? `, ${displayName}` : ''}`}
               </h1>
               <p className="text-xs text-muted-foreground">
-                {isHe ? theme.titleHe : theme.titleEn}
+                {language === 'he' ? theme.titleHe : language === 'es' ? theme.titleEs : theme.titleEn}
               </p>
             </div>
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <Badge variant="outline" className={cn("text-[10px]", theme.badgeBg, theme.badgeText, theme.badgeBorder)}>
                 <Icon className="h-2.5 w-2.5 me-0.5" />
-                {isHe ? theme.badgeLabelHe : theme.badgeLabelEn}
+                {language === 'he' ? theme.badgeLabelHe : language === 'es' ? theme.badgeLabelEs : theme.badgeLabelEn}
               </Badge>
               {isCoachType && storeSlug && (
                 <button
@@ -491,7 +503,7 @@ export default function CareerHub({ careerPath }: CareerHubProps) {
                 )}
               >
                 <item.icon className="w-3.5 h-3.5" />
-                {isHe ? item.labelHe : item.labelEn}
+                {l(item)}
               </button>
             ))}
           </div>

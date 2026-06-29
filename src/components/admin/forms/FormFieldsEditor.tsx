@@ -20,6 +20,7 @@ import {
   Edit,
 } from "lucide-react";
 import FieldEditorDialog from "./FieldEditorDialog";
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface FormField {
   id: string;
@@ -37,20 +38,21 @@ interface FormFieldsEditorProps {
   onClose: () => void;
 }
 
-const fieldTypeLabels: Record<string, string> = {
-  text: "טקסט קצר",
-  email: "אימייל",
-  phone: "טלפון",
-  textarea: "טקסט ארוך",
-  select: "בחירה מרשימה",
-  radio: "בחירה יחידה",
-  checkbox: "תיבות סימון",
-  rating: "דירוג כוכבים",
-  date: "תאריך",
-  number: "מספר",
+const fieldTypeLabels: Record<string, { he: string; en: string; es: string }> = {
+  text: { he: "טקסט קצר", en: "Short Text", es: "Texto Corto" },
+  email: { he: "אימייל", en: "Email", es: "Correo" },
+  phone: { he: "טלפון", en: "Phone", es: "Teléfono" },
+  textarea: { he: "טקסט ארוך", en: "Long Text", es: "Texto Largo" },
+  select: { he: "בחירה מרשימה", en: "Dropdown", es: "Lista Desplegable" },
+  radio: { he: "בחירה יחידה", en: "Single Choice", es: "Opción Única" },
+  checkbox: { he: "תיבות סימון", en: "Checkboxes", es: "Casillas" },
+  rating: { he: "דירוג כוכבים", en: "Star Rating", es: "Valoración" },
+  date: { he: "תאריך", en: "Date", es: "Fecha" },
+  number: { he: "מספר", en: "Number", es: "Número" },
 };
 
 const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
+  const { language } = useTranslation();
   const [editingField, setEditingField] = useState<FormField | null>(null);
   const [isAddingField, setIsAddingField] = useState(false);
   const queryClient = useQueryClient();
@@ -90,11 +92,11 @@ const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({ title: "השדה נמחק" });
+      toast({ title: language === 'he' ? 'השדה נמחק' : language === 'es' ? 'Campo eliminado' : 'Field deleted' });
       refetch();
     },
     onError: () => {
-      toast({ title: "שגיאה במחיקה", variant: "destructive" });
+      toast({ title: language === 'he' ? 'שגיאה במחיקה' : language === 'es' ? 'Error al eliminar' : 'Error deleting', variant: "destructive" });
     },
   });
 
@@ -135,7 +137,7 @@ const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
     <Sheet open={true} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="left" className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>עריכת שדות - {form?.title}</SheetTitle>
+          <SheetTitle>{language === 'he' ? 'עריכת שדות' : language === 'es' ? 'Editar campos' : 'Edit fields'} - {form?.title}</SheetTitle>
         </SheetHeader>
 
         <div className="mt-6 space-y-4">
@@ -144,13 +146,13 @@ const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
             className="w-full gap-2"
           >
             <Plus className="h-4 w-4" />
-            הוסף שדה
+            {language === 'he' ? 'הוסף שדה' : language === 'es' ? 'Añadir campo' : 'Add field'}
           </Button>
 
           {fields.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>אין שדות עדיין</p>
-              <p className="text-sm">לחץ "הוסף שדה" כדי להתחיל</p>
+              <p>{language === 'he' ? 'אין שדות עדיין' : language === 'es' ? 'No hay campos todavía' : 'No fields yet'}</p>
+              <p className="text-sm">{language === 'he' ? 'לחץ "הוסף שדה" כדי להתחיל' : language === 'es' ? 'Haz clic en "Añadir campo" para empezar' : 'Click "Add field" to get started'}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -166,12 +168,12 @@ const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
                       <span className="font-medium truncate">{field.label}</span>
                       {field.is_required && (
                         <Badge variant="destructive" className="text-xs shrink-0">
-                          חובה
+                          {language === 'he' ? 'חובה' : language === 'es' ? 'Obligatorio' : 'Required'}
                         </Badge>
                       )}
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {fieldTypeLabels[field.type] || field.type}
+                      {fieldTypeLabels[field.type] ? (language === 'he' ? fieldTypeLabels[field.type].he : language === 'es' ? fieldTypeLabels[field.type].es : fieldTypeLabels[field.type].en) : field.type}
                     </span>
                   </div>
 
@@ -207,7 +209,7 @@ const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
                       size="icon"
                       className="h-8 w-8 text-destructive"
                       onClick={() => {
-                        if (confirm("למחוק את השדה?")) {
+                        if (confirm(language === 'he' ? 'למחוק את השדה?' : language === 'es' ? '¿Eliminar el campo?' : 'Delete this field?')) {
                           deleteMutation.mutate(field.id);
                         }
                       }}

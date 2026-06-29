@@ -8,7 +8,7 @@ import { Headphones, Users, Video } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const Recordings = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState("videos");
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -36,11 +36,11 @@ const Recordings = () => {
       <div>
         <h1 className="text-3xl font-bold cyber-glow">{t('admin.recordings')}</h1>
         <p className="text-muted-foreground mt-2">
-          {t('admin.recordingsPage.subtitle') || 'ספריית הקלטות וסרטונים'}
+          {t('admin.recordingsPage.subtitle') || (language === 'he' ? 'ספריית הקלטות וסרטונים' : language === 'es' ? 'Biblioteca de grabaciones y videos' : 'Recordings & Videos Library')}
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
+      <Tabs value={activeTab} onValueChange={setActiveTab} dir={language === 'he' ? 'rtl' : 'ltr'}>
         <TabsList className="grid w-full max-w-xl grid-cols-3">
           <TabsTrigger value="videos" className="flex items-center gap-2">
             <Video className="h-4 w-4" />
@@ -48,11 +48,11 @@ const Recordings = () => {
           </TabsTrigger>
           <TabsTrigger value="library" className="flex items-center gap-2">
             <Headphones className="h-4 w-4" />
-            {t('admin.recordingsPage.audioLibrary') || 'ספריית הקלטות'}
+            {t('admin.recordingsPage.audioLibrary') || (language === 'he' ? 'ספריית הקלטות' : language === 'es' ? 'Biblioteca de grabaciones' : 'Audio Library')}
           </TabsTrigger>
           <TabsTrigger value="assignments" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {t('admin.recordingsPage.assignments') || 'הקצאות'}
+            {t('admin.recordingsPage.assignments') || (language === 'he' ? 'הקצאות' : language === 'es' ? 'Asignaciones' : 'Assignments')}
           </TabsTrigger>
         </TabsList>
 

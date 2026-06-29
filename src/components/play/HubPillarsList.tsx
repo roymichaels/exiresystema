@@ -47,7 +47,7 @@ interface HubPillarsListProps {
 }
 
 export function HubPillarsList({ hub = 'core' }: HubPillarsListProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const navigate = useNavigate();
   const { statusMap } = useLifeDomains();
@@ -221,7 +221,7 @@ export function HubPillarsList({ hub = 'core' }: HubPillarsListProps) {
                   ? (isActive ? domainColorMap[domain.color] : 'text-foreground/80')
                   : 'text-foreground/30'
               )}>
-                {isHe ? domain.labelHe : domain.labelEn}
+                {l(domain)}
               </span>
               {selected && pillarMissions.length > 0 && (
                 <>

@@ -54,7 +54,7 @@ const activeTextMap: Record<string, string> = {
 
 export function CommunityHudSidebar({ selectedPillar, onPillarSelect, onCreateThread }: CommunityHudSidebarProps) {
   const [collapsed, setCollapsed] = useState(() => window.innerWidth < 1024);
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { user } = useAuth();
 
@@ -112,7 +112,7 @@ export function CommunityHudSidebar({ selectedPillar, onPillarSelect, onCreateTh
                   ? `${activeBgMap[domain.color] || 'bg-violet-500/20 border-violet-500/40'} border`
                   : "bg-muted/30 dark:bg-muted/15 border border-border/20 hover:bg-accent/10"
               )}
-              title={isHe ? domain.labelHe : domain.labelEn}
+              title={l(domain)}
             >
               {PILLAR_ICONS[domain.id] || '⚡'}
             </button>
@@ -164,7 +164,7 @@ export function CommunityHudSidebar({ selectedPillar, onPillarSelect, onCreateTh
                   "text-xs font-medium flex-1",
                   selectedPillar === domain.id ? (activeTextMap[domain.color] || 'text-violet-400') : 'text-foreground'
                 )}>
-                  {isHe ? domain.labelHe : domain.labelEn}
+                  {l(domain)}
                 </span>
               </button>
             ))}

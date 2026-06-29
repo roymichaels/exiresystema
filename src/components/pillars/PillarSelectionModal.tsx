@@ -47,7 +47,7 @@ interface PillarSelectionModalProps {
 }
 
 export function PillarSelectionModal({ open, onOpenChange, onComplete }: PillarSelectionModalProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { selectedPillars, limits, togglePillar, updateSelection } = usePillarAccess();
   const totalLimit = limits.core + limits.arena;
@@ -127,7 +127,7 @@ export function PillarSelectionModal({ open, onOpenChange, onComplete }: PillarS
                 'text-[10px] font-semibold leading-tight',
                 isSelected ? domainColorMap[domain.color] : 'text-foreground/50'
               )}>
-                {isHe ? domain.labelHe : domain.labelEn}
+                {l(domain)}
               </span>
             </motion.button>
           );

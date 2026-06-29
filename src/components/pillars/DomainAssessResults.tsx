@@ -49,7 +49,7 @@ interface Props {
 
 export default function DomainAssessResults({ domainId }: Props) {
   const navigate = useNavigate();
-  const { t, language, isRTL } = useTranslation();
+  const { t, language, isRTL, l } = useTranslation();
   const { config } = useDomainAssessment(domainId);
   const [showRoadmap, setShowRoadmap] = useState(false);
 
@@ -128,7 +128,7 @@ export default function DomainAssessResults({ domainId }: Props) {
             <BackIcon className="w-5 h-5" />
           </Button>
           <h1 className="text-xl font-bold text-foreground">
-            {isHe ? `תוצאות — ${domain?.labelHe}` : `Results — ${domain?.labelEn}`}
+            {(language === 'he' ? 'תוצאות — ' : language === 'es' ? 'Resultados — ' : 'Results — ') + (domain ? l(domain) : '')}
           </h1>
         </div>
 
@@ -147,7 +147,7 @@ export default function DomainAssessResults({ domainId }: Props) {
           <Card className={cn("p-6 bg-gradient-to-b to-transparent text-center", colors.bg, colors.border)}>
             <p className="text-5xl font-black text-foreground">{assessment.domain_index}</p>
             <p className="text-sm text-muted-foreground mt-1">
-              {isHe ? (domain?.labelHe ?? '') + ' — ציון כללי' : (domain?.labelEn ?? '') + ' — Overall Score'}
+              {(domain ? l(domain) : '') + ' — ' + (language === 'he' ? 'ציון כללי' : language === 'es' ? 'Puntuación General' : 'Overall Score')}
             </p>
             <Badge variant={assessment.confidence === 'high' ? 'default' : 'secondary'} className="mt-2">
               {assessment.confidence === 'high' ? (isHe ? 'ביטחון גבוה' : 'High confidence') :

@@ -20,29 +20,29 @@ interface AddProjectWizardProps {
 }
 
 const LIFE_AREAS = [
-  { id: 'business', labelEn: 'Business', labelHe: 'עסקים' },
-  { id: 'health', labelEn: 'Health', labelHe: 'בריאות' },
-  { id: 'relationships', labelEn: 'Relationships', labelHe: 'קשרים' },
-  { id: 'finances', labelEn: 'Finances', labelHe: 'פיננסים' },
-  { id: 'learning', labelEn: 'Learning', labelHe: 'למידה' },
-  { id: 'purpose', labelEn: 'Purpose', labelHe: 'ייעוד' },
-  { id: 'hobbies', labelEn: 'Hobbies', labelHe: 'תחביבים' },
-  { id: 'consciousness', labelEn: 'Consciousness', labelHe: 'תודעה' },
+  { id: 'business', labelEn: 'Business', labelHe: 'עסקים', labelEs: 'Negocios' },
+  { id: 'health', labelEn: 'Health', labelHe: 'בריאות', labelEs: 'Salud' },
+  { id: 'relationships', labelEn: 'Relationships', labelHe: 'קשרים', labelEs: 'Relaciones' },
+  { id: 'finances', labelEn: 'Finances', labelHe: 'פיננסים', labelEs: 'Finanzas' },
+  { id: 'learning', labelEn: 'Learning', labelHe: 'למידה', labelEs: 'Aprendizaje' },
+  { id: 'purpose', labelEn: 'Purpose', labelHe: 'ייעוד', labelEs: 'Propósito' },
+  { id: 'hobbies', labelEn: 'Hobbies', labelHe: 'תחביבים', labelEs: 'Pasatiempos' },
+  { id: 'consciousness', labelEn: 'Consciousness', labelHe: 'תודעה', labelEs: 'Conciencia' },
 ];
 
 const PRIORITIES = [
-  { id: 'low', labelEn: 'Low', labelHe: 'נמוכה', color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-  { id: 'medium', labelEn: 'Medium', labelHe: 'בינונית', color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
-  { id: 'high', labelEn: 'High', labelHe: 'גבוהה', color: 'bg-orange-500/20 text-orange-600 dark:text-orange-400' },
-  { id: 'critical', labelEn: 'Critical', labelHe: 'קריטית', color: 'bg-red-500/20 text-red-600 dark:text-red-400' },
+  { id: 'low', labelEn: 'Low', labelHe: 'נמוכה', labelEs: 'Baja', color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
+  { id: 'medium', labelEn: 'Medium', labelHe: 'בינונית', labelEs: 'Media', color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
+  { id: 'high', labelEn: 'High', labelHe: 'גבוהה', labelEs: 'Alta', color: 'bg-orange-500/20 text-orange-600 dark:text-orange-400' },
+  { id: 'critical', labelEn: 'Critical', labelHe: 'קריטית', labelEs: 'Crítica', color: 'bg-red-500/20 text-red-600 dark:text-red-400' },
 ];
 
 const PROJECT_TYPES = [
-  { id: 'strategic', labelEn: 'Strategic', labelHe: 'אסטרטגי', icon: Target, color: 'text-amber-500' },
-  { id: 'financial', labelEn: 'Financial', labelHe: 'פיננסי', icon: Target, color: 'text-emerald-500' },
-  { id: 'creative', labelEn: 'Creative', labelHe: 'יצירתי', icon: Sparkles, color: 'text-pink-500' },
-  { id: 'development', labelEn: 'Development', labelHe: 'פיתוח', icon: Mountain, color: 'text-sky-500' },
-  { id: 'play', labelEn: 'Play', labelHe: 'משחק / התחדשות', icon: Gamepad2, color: 'text-violet-500' },
+  { id: 'strategic', labelEn: 'Strategic', labelHe: 'אסטרטגי', labelEs: 'Estratégico', icon: Target, color: 'text-amber-500' },
+  { id: 'financial', labelEn: 'Financial', labelHe: 'פיננסי', labelEs: 'Financiero', icon: Target, color: 'text-emerald-500' },
+  { id: 'creative', labelEn: 'Creative', labelHe: 'יצירתי', labelEs: 'Creativo', icon: Sparkles, color: 'text-pink-500' },
+  { id: 'development', labelEn: 'Development', labelHe: 'פיתוח', labelEs: 'Desarrollo', icon: Mountain, color: 'text-sky-500' },
+  { id: 'play', labelEn: 'Play', labelHe: 'משחק / התחדשות', labelEs: 'Juego', icon: Gamepad2, color: 'text-violet-500' },
 ];
 
 const COLORS = [
@@ -54,7 +54,7 @@ const COLORS = [
 const TOTAL_STEPS = 6;
 
 export function AddProjectWizard({ open, onOpenChange }: AddProjectWizardProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const { createProject } = useProjects();
   const [step, setStep] = useState(1);
 
@@ -184,7 +184,7 @@ export function AddProjectWizard({ open, onOpenChange }: AddProjectWizardProps) 
                       )}
                     >
                       <pt.icon className={cn("h-3.5 w-3.5", pt.color)} />
-                      {isHe ? pt.labelHe : pt.labelEn}
+                      {l(pt)}
                     </button>
                   ))}
                 </div>
@@ -275,7 +275,7 @@ export function AddProjectWizard({ open, onOpenChange }: AddProjectWizardProps) 
                 <div className="flex gap-2 mt-1 flex-wrap">
                   {PRIORITIES.map(p => (
                     <button key={p.id} onClick={() => setPriority(p.id)} className={cn("px-3 py-1.5 rounded-full text-sm font-medium border transition-all", p.color, priority === p.id ? 'ring-2 ring-amber-400 scale-105' : 'opacity-70 hover:opacity-100')}>
-                      {isHe ? p.labelHe : p.labelEn}
+                      {l(p)}
                     </button>
                   ))}
                 </div>
@@ -314,7 +314,7 @@ export function AddProjectWizard({ open, onOpenChange }: AddProjectWizardProps) 
                       : 'border-border hover:border-amber-500/30 text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  {isHe ? area.labelHe : area.labelEn}
+                  {l(area)}
                   {linkedLifeAreas.includes(area.id) && <Check className="inline ms-2 h-4 w-4" />}
                 </button>
               ))}

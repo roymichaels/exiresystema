@@ -12,7 +12,7 @@
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ADMIN_TABS } from '@/domain/admin';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 interface Props {
   activeTab: string;
@@ -27,17 +27,13 @@ const LAUNCHER_TABS: Record<string, string> = {
 
 export function AdminMobileSubNav({ activeTab, activeSubTab, onTabChange }: Props) {
   const { language } = useTranslation();
-  const isHe = language === 'he';
-
   const tab = ADMIN_TABS.find((t) => t.id === activeTab) || ADMIN_TABS[0];
   if (tab.subTabs.length <= 1) return null;
 
   const launcherSubId = LAUNCHER_TABS[activeTab];
-  // On the launcher card-screen → render nothing.
   if (launcherSubId && (!activeSubTab || activeSubTab === launcherSubId)) return null;
 
   const activeSub = tab.subTabs.find((s) => s.id === activeSubTab) || tab.subTabs[0];
-  const BackIcon = isHe ? ChevronRight : ChevronLeft;
 
   if (launcherSubId) {
     return (
@@ -50,20 +46,15 @@ export function AdminMobileSubNav({ activeTab, activeSubTab, onTabChange }: Prop
             'hover:bg-muted/50 transition-colors',
           )}
         >
-          <BackIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-          <span className="text-muted-foreground text-[12px]">
-            {isHe ? (activeTab === 'studio' ? 'סטודיו' : 'עוד') : (activeTab === 'studio' ? 'Studio' : 'More')}
-          </span>
-          <span className="text-muted-foreground/50">/</span>
+          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
           <span className="font-medium truncate flex-1 text-start">
-            {isHe ? activeSub.labelHe : activeSub.labelEn}
+            {language === 'he' ? activeSub.labelHe : language === 'es' ? activeSub.labelEs : activeSub.labelEn}
           </span>
         </button>
       </div>
     );
   }
 
-  // Legacy / other multi-sub groups → keep an inline strip.
   return (
     <div className="md:hidden -mx-1 px-1 overflow-x-auto">
       <div className="flex gap-1.5 pb-1 min-w-max">
@@ -81,7 +72,7 @@ export function AdminMobileSubNav({ activeTab, activeSubTab, onTabChange }: Prop
                   : 'bg-muted/30 text-muted-foreground hover:text-foreground',
               )}
             >
-              {isHe ? sub.labelHe : sub.labelEn}
+              {language === 'he' ? sub.labelHe : language === 'es' ? sub.labelEs : sub.labelEn}
             </button>
           );
         })}

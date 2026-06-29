@@ -5,6 +5,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Copy, ExternalLink, Save, Sparkles, Loader2, Upload, Video, CheckCircle2, Circle,
 } from 'lucide-react';
@@ -42,6 +43,7 @@ function useAvailableForms() {
 }
 
 export default function ExireFunnelSettings() {
+  const { language } = useTranslation();
   const { data: settings, isLoading } = useExireFunnelSettings();
   const { data: forms = [] } = useAvailableForms();
   const { data: funnel } = useExireFunnelMetrics();
@@ -54,7 +56,7 @@ export default function ExireFunnelSettings() {
   useEffect(() => { if (settings && !form) setForm(settings); }, [settings, form]);
 
   if (isLoading || !form) {
-    return <div className="text-sm text-muted-foreground">טוען…</div>;
+    return <div className="text-sm text-muted-foreground">{language === 'he' ? 'טוען…' : language === 'es' ? 'Cargando…' : 'Loading…'}</div>;
   }
 
   const landingUrl = `${window.location.origin}/exire`;
@@ -67,25 +69,25 @@ export default function ExireFunnelSettings() {
   const save = async () => {
     try {
       await update.mutateAsync(form);
-      toast.success('נשמר ✨');
+      toast.success(language === 'he' ? 'נשמר ✨' : language === 'es' ? 'Guardado ✨' : 'Saved ✨');
     } catch (e) {
-      toast.error((e as Error)?.message || 'שמירה נכשלה');
+      toast.error((e as Error)?.message || (language === 'he' ? 'שמירה נכשלה' : language === 'es' ? 'Error al guardar' : 'Save failed'));
     }
   };
 
   const copy = async (text: string) => {
-    try { await navigator.clipboard.writeText(text); toast.success('הועתק'); }
-    catch { toast.error('העתקה נכשלה'); }
+    try { await navigator.clipboard.writeText(text); toast.success(language === 'he' ? 'הועתק' : language === 'es' ? 'Copiado' : 'Copied'); }
+    catch { toast.error(language === 'he' ? 'העתקה נכשלה' : language === 'es' ? 'Error al copiar' : 'Copy failed'); }
   };
 
   const handleUpload = async (file: File) => {
     if (!file) return;
     if (!/\.(mp4|webm|mov)$/i.test(file.name) && !file.type.startsWith('video/')) {
-      toast.error('יש להעלות קובץ וידאו (mp4 / webm / mov)');
+      toast.error(language === 'he' ? 'יש להעלות קובץ וידאו (mp4 / webm / mov)' : language === 'es' ? 'Debes subir un archivo de video (mp4 / webm / mov)' : 'Must upload a video file (mp4 / webm / mov)');
       return;
     }
     if (file.size > 150 * 1024 * 1024) {
-      toast.error('גודל מקסימלי: 150MB. השתמש בקישור YouTube/Vimeo עבור קבצים גדולים יותר.');
+      toast.error(language === 'he' ? 'גודל מקסימלי: 150MB. השתמש בקישור YouTube/Vimeo עבור קבצים גדולים יותר.' : language === 'es' ? 'Tamaño máximo: 150MB. Usa un enlace de YouTube/Vimeo para archivos más grandes.' : 'Max size: 150MB. Use YouTube/Vimeo link for larger files.');
       return;
     }
     setUploading(true);
@@ -97,12 +99,12 @@ export default function ExireFunnelSettings() {
         .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type || `video/${ext}` });
       if (error) throw error;
       const { data: pub } = supabase.storage.from('site-videos').getPublicUrl(path);
-      if (!pub?.publicUrl) throw new Error('כתובת ציבורית לא נוצרה');
+      if (!pub?.publicUrl) throw new Error(language === 'he' ? 'כתובת ציבורית לא נוצרה' : language === 'es' ? 'No se creó la URL pública' : 'Public URL was not created');
       set('exire_landing_video_url', pub.publicUrl);
       await update.mutateAsync({ exire_landing_video_url: pub.publicUrl });
-      toast.success('הסרטון הועלה ונשמר');
+      toast.success(language === 'he' ? 'הסרטון הועלה ונשמר' : language === 'es' ? 'Video subido y guardado' : 'Video uploaded and saved');
     } catch (e) {
-      toast.error((e as Error)?.message || 'העלאה נכשלה');
+      toast.error((e as Error)?.message || (language === 'he' ? 'העלאה נכשלה' : language === 'es' ? 'Error al subir' : 'Upload failed'));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -111,11 +113,11 @@ export default function ExireFunnelSettings() {
 
   const activeMappings = mappings.filter((m) => m.is_active).length;
   const checklist = [
-    { ok: !!form.exire_landing_video_url, label: 'סרטון VSL הוגדר' },
-    { ok: waOk, label: 'מספר WhatsApp הוגדר' },
-    { ok: !!form.exire_intake_form_id, label: 'טופס קבלה נבחר' },
-    { ok: activeMappings > 0, label: 'מיפוי טפסי לידים פעיל' },
-    { ok: (funnel?.leadsThisMonth ?? 0) > 0 || (funnel?.leadsToday ?? 0) > 0, label: 'התקבל ליד בדיקה' },
+    { ok: !!form.exire_landing_video_url, label: language === 'he' ? 'סרטון VSL הוגדר' : language === 'es' ? 'Video VSL configurado' : 'VSL Video configured' },
+    { ok: waOk, label: language === 'he' ? 'מספר WhatsApp הוגדר' : language === 'es' ? 'Número de WhatsApp configurado' : 'WhatsApp number configured' },
+    { ok: !!form.exire_intake_form_id, label: language === 'he' ? 'טופס קבלה נבחר' : language === 'es' ? 'Formulario de admisión seleccionado' : 'Intake form selected' },
+    { ok: activeMappings > 0, label: language === 'he' ? 'מיפוי טפסי לידים פעיל' : language === 'es' ? 'Mapeo de formularios de leads activo' : 'Lead form mapping active' },
+    { ok: (funnel?.leadsThisMonth ?? 0) > 0 || (funnel?.leadsToday ?? 0) > 0, label: language === 'he' ? 'התקבל ליד בדיקה' : language === 'es' ? 'Lead de prueba recibido' : 'Test lead received' },
   ];
   const doneCount = checklist.filter((c) => c.ok).length;
 
@@ -125,18 +127,18 @@ export default function ExireFunnelSettings() {
       <div className="flex items-start justify-between flex-wrap gap-2">
         <div className="min-w-0">
           <h2 className="text-base md:text-lg font-semibold flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" /> הגדרות פאנל Exire
+            <Sparkles className="h-4 w-4 text-primary" /> {language === 'he' ? 'הגדרות פאנל Exire' : language === 'es' ? 'Configuración del Panel Exire' : 'Exire Panel Settings'}
           </h2>
           <p className="hidden md:block text-xs text-muted-foreground mt-1">
-            ניהול וידאו, WhatsApp וטופס קבלה עבור עמוד הנחיתה.
+            {language === 'he' ? 'ניהול וידאו, WhatsApp וטופס קבלה עבור עמוד הנחיתה.' : language === 'es' ? 'Gestiona video, WhatsApp y formulario de admisión para la página de aterrizaje.' : 'Manage video, WhatsApp and intake form for landing page.'}
           </p>
         </div>
         <div className="flex gap-1.5 shrink-0">
           <Button asChild variant="outline" size="sm" className="gap-1.5 h-8 px-2.5">
-            <a href="/exire" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /><span className="hidden sm:inline">פתח</span> /exire</a>
+            <a href="/exire" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /><span className="hidden sm:inline">{language === 'he' ? 'פתח' : language === 'es' ? 'Abrir' : 'Open'}</span> /exire</a>
           </Button>
           <Button asChild variant="outline" size="sm" className="gap-1.5 h-8 px-2.5">
-            <a href="/" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /><span className="hidden sm:inline">פתח</span> /</a>
+            <a href="/" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /><span className="hidden sm:inline">{language === 'he' ? 'פתח' : language === 'es' ? 'Abrir' : 'Open'}</span> /</a>
           </Button>
         </div>
       </div>
@@ -145,8 +147,8 @@ export default function ExireFunnelSettings() {
       <Card className="border-border/40 rounded-2xl">
         <CardContent className="p-2.5 grid gap-2 sm:grid-cols-2">
           {[
-            { label: 'דף הבית', url: homeUrl },
-            { label: 'אליאס', url: landingUrl },
+            { label: language === 'he' ? 'דף הבית' : language === 'es' ? 'Página de inicio' : 'Home page', url: homeUrl },
+            { label: language === 'he' ? 'אליאס' : 'Elias', url: landingUrl },
           ].map((row) => (
             <div key={row.url} className="flex items-center justify-between gap-2 rounded-xl bg-muted/40 px-3 py-2 min-w-0">
               <div className="min-w-0 flex-1">
@@ -168,10 +170,10 @@ export default function ExireFunnelSettings() {
 
       {/* KPI strip */}
       <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-        <KPI label="לידים היום" value={funnel?.leadsToday ?? 0} />
-        <KPI label="החודש"      value={funnel?.leadsThisMonth ?? 0} />
-        <KPI label="הומרו"      value={funnel?.converted ?? 0} />
-        <KPI label="ממתין למענה" value={funnel?.awaitingFirstReply ?? 0} tone="warn" />
+        <KPI label={language === 'he' ? 'לידים היום' : language === 'es' ? 'Leads hoy' : 'Leads today'} value={funnel?.leadsToday ?? 0} />
+        <KPI label={language === 'he' ? 'החודש' : language === 'es' ? 'Este mes' : 'This month'}      value={funnel?.leadsThisMonth ?? 0} />
+        <KPI label={language === 'he' ? 'הומרו' : language === 'es' ? 'Convertidos' : 'Converted'}      value={funnel?.converted ?? 0} />
+        <KPI label={language === 'he' ? 'ממתין למענה' : language === 'es' ? 'Esperando respuesta' : 'Awaiting reply'} value={funnel?.awaitingFirstReply ?? 0} tone="warn" />
       </div>
 
       {/* === Settings groups — each is its own card so mobile feels like a settings screen === */}
@@ -181,15 +183,15 @@ export default function ExireFunnelSettings() {
         <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <Video className="h-4 w-4 text-primary shrink-0" />
-            <span className="text-sm font-medium">סרטון VSL / Hero</span>
+            <span className="text-sm font-medium">{language === 'he' ? 'סרטון VSL / Hero' : language === 'es' ? 'Video VSL / Hero' : 'VSL / Hero Video'}</span>
           </div>
           <span className="text-[11px] text-muted-foreground truncate max-w-[40%]" dir="ltr">
-            {form.exire_landing_video_url ? '✓ מוגדר' : 'לא הוגדר'}
+            {form.exire_landing_video_url ? (language === 'he' ? '✓ מוגדר' : language === 'es' ? '✓ Configurado' : '✓ Configured') : (language === 'he' ? 'לא הוגדר' : language === 'es' ? 'No configurado' : 'Not configured')}
           </span>
         </summary>
         <div className="px-4 pb-4 space-y-2 border-t border-border/30 pt-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <Label className="text-xs">קישור (YouTube / Vimeo / Loom / mp4 / webm)</Label>
+            <Label className="text-xs">{language === 'he' ? 'קישור (YouTube / Vimeo / Loom / mp4 / webm)' : language === 'es' ? 'Enlace (YouTube / Vimeo / Loom / mp4 / webm)' : 'Link (YouTube / Vimeo / Loom / mp4 / webm)'}</Label>
             <div className="flex gap-2">
               <input
                 ref={fileInputRef}
@@ -207,21 +209,21 @@ export default function ExireFunnelSettings() {
                 onClick={() => fileInputRef.current?.click()}
               >
                 {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-                העלה קובץ
+                {language === 'he' ? 'העלה קובץ' : language === 'es' ? 'Subir archivo' : 'Upload file'}
               </Button>
               {form.exire_landing_video_url && (
                 <Button type="button" variant="ghost" size="sm" className="h-8" onClick={() => set('exire_landing_video_url', '')}>
-                  הסר
+                  {language === 'he' ? 'הסר' : language === 'es' ? 'Eliminar' : 'Remove'}
                 </Button>
               )}
             </div>
           </div>
           <Input value={form.exire_landing_video_url} dir="ltr"
-            placeholder="https://youtu.be/... או https://.../video.mp4"
+            placeholder={language === 'he' ? 'https://youtu.be/... או https://.../video.mp4' : language === 'es' ? 'https://youtu.be/... o https://.../video.mp4' : 'https://youtu.be/... or https://.../video.mp4'}
             onChange={(e) => set('exire_landing_video_url', e.target.value)}
             className="text-xs md:text-sm" />
           <p className="text-[11px] text-muted-foreground">
-            עד 150MB. ריק → Placeholder עיצובי בדף.
+            {language === 'he' ? 'עד 150MB. ריק → Placeholder עיצובי בדף.' : language === 'es' ? 'Hasta 150MB. Vacío → Placeholder de diseño en la página.' : 'Up to 150MB. Empty → Design placeholder on page.'}
           </p>
           <div className="rounded-lg overflow-hidden border border-border/60 bg-muted/30 aspect-video w-full max-w-xl">
             {video.type === 'iframe' ? (
@@ -230,7 +232,7 @@ export default function ExireFunnelSettings() {
               <video src={video.src} controls playsInline className="w-full h-full object-cover bg-black" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground gap-2">
-                <Video className="h-4 w-4" /> אין סרטון מוגדר
+                <Video className="h-4 w-4" /> {language === 'he' ? 'אין סרטון מוגדר' : language === 'es' ? 'No hay video configurado' : 'No video configured'}
               </div>
             )}
           </div>
@@ -242,18 +244,18 @@ export default function ExireFunnelSettings() {
         <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
           <span className="text-sm font-medium">WhatsApp</span>
           <span className="text-[11px] text-muted-foreground" dir="ltr">
-            {waOk ? `+${waNormalized}` : 'לא הוגדר'}
+            {waOk ? `+${waNormalized}` : (language === 'he' ? 'לא הוגדר' : language === 'es' ? 'No configurado' : 'Not configured')}
           </span>
         </summary>
         <div className="px-4 pb-4 space-y-2 border-t border-border/30 pt-3">
-          <Label className="text-xs">מספר WhatsApp (פורמט בינלאומי, ללא +)</Label>
+          <Label className="text-xs">{language === 'he' ? 'מספר WhatsApp (פורמט בינלאומי, ללא +)' : language === 'es' ? 'Número de WhatsApp (formato internacional, sin +)' : 'WhatsApp number (international format, no +)'}</Label>
           <Input value={form.exire_whatsapp_number} dir="ltr" inputMode="tel"
             placeholder="972501234567"
             onChange={(e) => set('exire_whatsapp_number', e.target.value.replace(/\D/g, ''))} />
           <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
             {waOk
-              ? <><CheckCircle2 className="h-3 w-3 text-emerald-500" /> תקין</>
-              : <><Circle className="h-3 w-3 text-amber-500" /> אם ריק — כפתורי WhatsApp בדף יוסתרו.</>}
+              ? <><CheckCircle2 className="h-3 w-3 text-emerald-500" /> {language === 'he' ? 'תקין' : language === 'es' ? 'Válido' : 'Valid'}</>
+              : <><Circle className="h-3 w-3 text-amber-500" /> {language === 'he' ? 'אם ריק — כפתורי WhatsApp בדף יוסתרו.' : language === 'es' ? 'Si está vacío — los botones de WhatsApp se ocultarán.' : 'If empty — WhatsApp buttons will be hidden.'}</>}
           </p>
         </div>
       </details>
@@ -261,21 +263,21 @@ export default function ExireFunnelSettings() {
       {/* Intake form card */}
       <details open className="rounded-2xl border border-border/40 bg-card/40">
         <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
-          <span className="text-sm font-medium">טופס קבלה</span>
+          <span className="text-sm font-medium">{language === 'he' ? 'טופס קבלה' : language === 'es' ? 'Formulario de admisión' : 'Intake form'}</span>
           <span className="text-[11px] text-muted-foreground">
-            {form.exire_intake_form_id ? '✓ נבחר' : '— ללא —'}
+            {form.exire_intake_form_id ? (language === 'he' ? '✓ נבחר' : language === 'es' ? '✓ Seleccionado' : '✓ Selected') : (language === 'he' ? '— ללא —' : language === 'es' ? '— Sin —' : '— None —')}
           </span>
         </summary>
         <div className="px-4 pb-4 space-y-2 border-t border-border/30 pt-3">
-          <Label className="text-xs">ברירת מחדל (יוצג בדף תודה)</Label>
+          <Label className="text-xs">{language === 'he' ? 'ברירת מחדל (יוצג בדף תודה)' : language === 'es' ? 'Predeterminado (se muestra en la página de agradecimiento)' : 'Default (shown on thank you page)'}</Label>
           <Select value={form.exire_intake_form_id || 'none'}
             onValueChange={(v) => set('exire_intake_form_id', v === 'none' ? '' : v)}>
-            <SelectTrigger><SelectValue placeholder="בחר טופס" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={language === 'he' ? 'בחר טופס' : language === 'es' ? 'Seleccionar formulario' : 'Select form'} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">— ללא (יוסתר בדף תודה) —</SelectItem>
+              <SelectItem value="none">{language === 'he' ? '— ללא (יוסתר בדף תודה) —' : language === 'es' ? '— Sin (oculto en página de agradecimiento) —' : '— None (hidden on thank you page) —'}</SelectItem>
               {forms.map((f) => (
                 <SelectItem key={f.id} value={f.id}>
-                  {f.title}{f.status === 'published' ? '' : ' (טיוטה)'}
+                  {f.title}{f.status === 'published' ? '' : (language === 'he' ? ' (טיוטה)' : language === 'es' ? ' (Borrador)' : ' (Draft)')}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -286,19 +288,19 @@ export default function ExireFunnelSettings() {
       {/* CTA labels card */}
       <details className="rounded-2xl border border-border/40 bg-card/40">
         <summary className="list-none cursor-pointer px-4 py-3 flex items-center justify-between gap-2">
-          <span className="text-sm font-medium">תוויות כפתורים</span>
+          <span className="text-sm font-medium">{language === 'he' ? 'תוויות כפתורים' : language === 'es' ? 'Etiquetas de botones' : 'Button labels'}</span>
           <span className="text-[11px] text-muted-foreground truncate max-w-[55%]">
             {form.exire_primary_cta_label}
           </span>
         </summary>
         <div className="px-4 pb-4 grid gap-3 md:grid-cols-2 border-t border-border/30 pt-3">
           <div>
-            <Label className="text-xs">כפתור ראשי</Label>
+            <Label className="text-xs">{language === 'he' ? 'כפתור ראשי' : language === 'es' ? 'Botón principal' : 'Primary button'}</Label>
             <Input value={form.exire_primary_cta_label}
               onChange={(e) => set('exire_primary_cta_label', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">כפתור משני (WhatsApp)</Label>
+            <Label className="text-xs">{language === 'he' ? 'כפתור משני (WhatsApp)' : language === 'es' ? 'Botón secundario (WhatsApp)' : 'Secondary button (WhatsApp)'}</Label>
             <Input value={form.exire_secondary_cta_label}
               onChange={(e) => set('exire_secondary_cta_label', e.target.value)} />
           </div>
@@ -310,7 +312,7 @@ export default function ExireFunnelSettings() {
       {/* Setup checklist */}
       <Card className="border-primary/30 bg-primary/[0.02]">
         <CardHeader className="py-3">
-          <CardTitle className="text-sm">רשימת מוכנות ({doneCount}/{checklist.length})</CardTitle>
+          <CardTitle className="text-sm">{language === 'he' ? `רשימת מוכנות (${doneCount}/${checklist.length})` : language === 'es' ? `Lista de verificación (${doneCount}/${checklist.length})` : `Readiness checklist (${doneCount}/${checklist.length})`}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <ul className="grid gap-1.5 sm:grid-cols-2">
@@ -329,21 +331,21 @@ export default function ExireFunnelSettings() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
-            <span>לידים אחרונים מ-Exire</span>
+            <span>{language === 'he' ? 'לידים אחרונים מ-Exire' : language === 'es' ? 'Últimos leads de Exire' : 'Recent leads from Exire'}</span>
             <Button asChild variant="ghost" size="sm">
-              <Link to="/admin?tab=coach&sub=leads&source=exire_landing">לכל הלידים</Link>
+              <Link to="/admin?tab=coach&sub=leads&source=exire_landing">{language === 'he' ? 'לכל הלידים' : language === 'es' ? 'Todos los leads' : 'All leads'}</Link>
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {!funnel?.latest?.length ? (
-            <p className="text-sm text-muted-foreground">אין עדיין לידים מהפאנל.</p>
+            <p className="text-sm text-muted-foreground">{language === 'he' ? 'אין עדיין לידים מהפאנל.' : language === 'es' ? 'Aún no hay leads del panel.' : 'No leads from the panel yet.'}</p>
           ) : (
             <ul className="divide-y divide-border/40">
               {funnel.latest.map((l) => (
                 <li key={l.id} className="py-2 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{l.name || 'ללא שם'}</div>
+                    <div className="text-sm font-medium truncate">{l.name || (language === 'he' ? 'ללא שם' : language === 'es' ? 'Sin nombre' : 'No name')}</div>
                     <div className="text-[11px] text-muted-foreground truncate">
                       {l.pain_category || '—'}
                     </div>
@@ -361,7 +363,7 @@ export default function ExireFunnelSettings() {
         <div className="md:flex md:justify-end rounded-2xl md:rounded-none bg-background/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-0 border md:border-0 border-border/40 p-2 md:p-0">
           <Button onClick={save} disabled={update.isPending} className="gap-2 w-full md:w-auto">
             {update.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            שמור הגדרות
+            {language === 'he' ? 'שמור הגדרות' : language === 'es' ? 'Guardar configuración' : 'Save settings'}
           </Button>
         </div>
       </div>

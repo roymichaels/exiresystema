@@ -36,6 +36,7 @@ interface DrawerItem {
   icon: LucideIcon;
   labelEn: string;
   labelHe: string;
+  labelEs: string;
   onSelect: () => void | Promise<void>;
 }
 
@@ -80,6 +81,7 @@ export default function ShellV2Drawer() {
       icon: SettingsIcon,
       labelEn: 'System settings',
       labelHe: 'הגדרות מערכת',
+      labelEs: 'Ajustes del sistema',
       onSelect: () => go('/admin-hub?tab=more&sub=settings'),
     },
     {
@@ -87,6 +89,7 @@ export default function ShellV2Drawer() {
       icon: ExternalLink,
       labelEn: 'Open legacy app',
       labelHe: 'מעבר לאפליקציה הישנה',
+      labelEs: 'Abrir app antigua',
       onSelect: () => go('/home'),
     },
   ];
@@ -193,7 +196,7 @@ export default function ShellV2Drawer() {
                       >
                         <Icon className="shrink-0 opacity-60 h-[16px] w-[16px]" strokeWidth={1.5} />
                         <span className="flex-1 truncate">
-                          {language === 'he' ? item.labelHe : item.labelEn}
+                          {language === 'he' ? item.labelHe : language === 'es' ? item.labelEs : item.labelEn}
                         </span>
                       </button>
                     );

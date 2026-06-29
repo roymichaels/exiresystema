@@ -9,9 +9,9 @@
  *  - Legacy/archive shows a tiny ghost link, never as a peer group.
  */
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/useTranslation';
 import { ADMIN_TABS } from '@/domain/admin';
-import { ChevronRight, ChevronLeft, Archive } from 'lucide-react';
+import { ChevronRight, Archive } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AdminInlineNavProps {
   activeTab: string;
@@ -25,21 +25,19 @@ const LAUNCHER_TABS: Record<string, string> = {
 };
 
 export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminInlineNavProps) {
-  const { language, isRTL } = useTranslation();
-  const isHe = language === 'he';
-
+  const { language } = useTranslation();
   const currentTabConfig = ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0];
   const visibleTabs = ADMIN_TABS.filter(t => !t.hidden);
   const archivedTabs = ADMIN_TABS.filter(t => t.hidden);
   const launcherSubId = LAUNCHER_TABS[activeTab];
   const onLauncher = launcherSubId && (!activeSubTab || activeSubTab === launcherSubId);
+  const onMoreLauncher = activeTab === 'more' && onLauncher;
   const activeSub = currentTabConfig.subTabs.find((s) => s.id === activeSubTab);
-  const BackIcon = isRTL ? ChevronRight : ChevronLeft;
 
   return (
-    <div className="hidden md:block space-y-3">
-      {/* Primary group cards */}
-      <div className="grid grid-cols-5 gap-2">
+    <div className="hidden md:block space-y-2">
+      {/* Primary group cards — compact */}
+      <div className="grid grid-cols-5 gap-1.5">
         {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive =
@@ -50,7 +48,7 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
               key={tab.id}
               onClick={() => onTabChange?.(tab.id, tab.subTabs[0]?.id)}
               className={cn(
-                'group flex items-center gap-3 px-4 py-3 rounded-2xl border text-start transition-all',
+                'flex items-center gap-2 px-3 py-2.5 rounded-xl border text-start transition-all',
                 'active:scale-[0.98]',
                 isActive
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-foreground shadow-sm'
@@ -59,15 +57,15 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
             >
               <div
                 className={cn(
-                  'rounded-xl p-2 shrink-0',
+                  'rounded-lg p-1.5 shrink-0',
                   isActive ? 'bg-emerald-500/15' : 'bg-muted/60',
                 )}
               >
-                <Icon className="w-5 h-5" strokeWidth={1.6} />
+                <Icon className="w-4.5 h-4.5" strokeWidth={1.6} />
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-semibold truncate">
-                  {isHe ? tab.labelHe : tab.labelEn}
+                <div className="text-xs font-semibold truncate">
+                  {language === 'he' ? tab.labelHe : language === 'es' ? tab.labelEs : tab.labelEn}
                 </div>
               </div>
             </button>
@@ -75,26 +73,22 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
         })}
       </div>
 
-      {/* Sub-screen breadcrumb (only for studio/more when drilled in) */}
+      {/* Sub-screen back pill (only for studio/more when drilled in) */}
       {launcherSubId && !onLauncher && activeSub && (
         <button
           type="button"
           onClick={() => onTabChange?.(activeTab, launcherSubId)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/40 bg-card/40 text-sm hover:bg-muted/40 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/40 bg-card/40 text-sm hover:bg-muted/40 transition-colors w-full"
         >
-          <BackIcon className="w-4 h-4 text-muted-foreground" />
-          <span className="text-muted-foreground text-xs">
-            {isHe ? currentTabConfig.labelHe : currentTabConfig.labelEn}
-          </span>
-          <span className="text-muted-foreground/50">/</span>
-          <span className="font-medium">
-            {isHe ? activeSub.labelHe : activeSub.labelEn}
+          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          <span className="font-medium truncate">
+            {language === 'he' ? activeSub.labelHe : language === 'es' ? activeSub.labelEs : activeSub.labelEn}
           </span>
         </button>
       )}
 
-      {/* Archive ghost (legacy) */}
-      {archivedTabs.length > 0 && (
+      {/* Archive ghost — only on More launcher */}
+      {onMoreLauncher && archivedTabs.length > 0 && (
         <div className="flex items-center gap-2 pt-1">
           {archivedTabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -102,7 +96,7 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
               <button
                 key={tab.id}
                 onClick={() => onTabChange?.(tab.id, tab.subTabs[0]?.id)}
-                title={isHe ? 'ארכיון — כלים ישנים' : 'Archive — legacy tools'}
+                title={language === 'he' ? 'ארכיון — כלים ישנים' : language === 'es' ? 'Archivo — herramientas antiguas' : 'Archive — legacy tools'}
                 className={cn(
                   'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] tracking-wide transition-colors',
                   isActive
@@ -111,7 +105,7 @@ export function AdminInlineNav({ activeTab, activeSubTab, onTabChange }: AdminIn
                 )}
               >
                 <Archive className="w-3 h-3 opacity-70" />
-                {isHe ? tab.labelHe : tab.labelEn}
+                {language === 'he' ? tab.labelHe : language === 'es' ? tab.labelEs : tab.labelEn}
               </button>
             );
           })}

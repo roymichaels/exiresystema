@@ -26,7 +26,7 @@ interface FAQ {
 }
 
 const FAQs = () => {
-  const { t, isRTL } = useTranslation();
+  const { t, isRTL, language } = useTranslation();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -199,10 +199,10 @@ const FAQs = () => {
             <Tabs defaultValue="hebrew" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-4">
                 <TabsTrigger value="hebrew" className="gap-2">
-                  🇮🇱 {t('admin.hebrew') || 'עברית'}
+                  🇮🇱 {t('admin.hebrew') || (language === 'he' ? 'עברית' : language === 'es' ? 'Hebreo' : 'Hebrew')}
                 </TabsTrigger>
                 <TabsTrigger value="english" className="gap-2">
-                  🇺🇸 {t('admin.english') || 'English'}
+                  🇺🇸 {t('admin.english') || (language === 'he' ? 'אנגלית' : language === 'es' ? 'Inglés' : 'English')}
                 </TabsTrigger>
               </TabsList>
 
@@ -229,21 +229,21 @@ const FAQs = () => {
 
               <TabsContent value="english" className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Question (English)</Label>
+                  <Label>{language === 'he' ? 'שאלה (אנגלית)' : language === 'es' ? 'Pregunta (Inglés)' : 'Question (English)'}</Label>
                   <Textarea
                     value={formData.question_en}
                     onChange={(e) => setFormData({ ...formData, question_en: e.target.value })}
-                    placeholder="Enter the question in English..."
+                    placeholder={language === 'he' ? 'הכנס שאלה באנגלית...' : language === 'es' ? 'Ingrese la pregunta en inglés...' : 'Enter the question in English...'}
                     className="text-left"
                     dir="ltr"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Answer (English)</Label>
+                  <Label>{language === 'he' ? 'תשובה (אנגלית)' : language === 'es' ? 'Respuesta (Inglés)' : 'Answer (English)'}</Label>
                   <Textarea
                     value={formData.answer_en}
                     onChange={(e) => setFormData({ ...formData, answer_en: e.target.value })}
-                    placeholder="Enter the answer in English..."
+                    placeholder={language === 'he' ? 'הכנס תשובה באנגלית...' : language === 'es' ? 'Ingrese la respuesta en inglés...' : 'Enter the answer in English...'}
                     className="text-left min-h-32"
                     dir="ltr"
                   />
@@ -272,7 +272,7 @@ const FAQs = () => {
           <TableHeader>
             <TableRow>
               <TableHead className={isRTL ? "text-right" : "text-left"}>{t('adminFaqs.question')}</TableHead>
-              <TableHead className={isRTL ? "text-right" : "text-left"}>{t('admin.translation') || 'תרגום'}</TableHead>
+              <TableHead className={isRTL ? "text-right" : "text-left"}>{t('admin.translation') || (language === 'he' ? 'תרגום' : language === 'es' ? 'Traducción' : 'Translation')}</TableHead>
               <TableHead className={isRTL ? "text-right" : "text-left"}>{t('adminFaqs.status')}</TableHead>
               <TableHead className={isRTL ? "text-right" : "text-left"}>{t('adminFaqs.order')}</TableHead>
               <TableHead className={isRTL ? "text-right" : "text-left"}>{t('adminFaqs.actions')}</TableHead>
@@ -286,10 +286,10 @@ const FAQs = () => {
                   {hasEnglishTranslation(faq) ? (
                     <span className="flex items-center gap-1 text-green-500">
                       <Globe className="h-4 w-4" />
-                      <span className="text-xs">{t('admin.hasEnglish') || 'EN'}</span>
+                      <span className="text-xs">{t('admin.hasEnglish') || (language === 'he' ? 'אנ' : language === 'es' ? 'EN' : 'EN')}</span>
                     </span>
                   ) : (
-                    <span className="text-xs text-muted-foreground">{t('admin.noEnglish') || 'חסר'}</span>
+                    <span className="text-xs text-muted-foreground">{t('admin.noEnglish') || (language === 'he' ? 'חסר' : language === 'es' ? 'Falta' : 'Missing')}</span>
                   )}
                 </TableCell>
                 <TableCell className={isRTL ? "text-right" : "text-left"}>
@@ -304,7 +304,7 @@ const FAQs = () => {
                       variant="ghost"
                       onClick={() => handleReorder(faq.id, "up")}
                       disabled={index === 0}
-                      aria-label="Move up"
+                      aria-label={language === 'he' ? 'הזז למעלה' : language === 'es' ? 'Mover arriba' : 'Move up'}
                     >
                       <ArrowUp className="h-4 w-4" />
                     </Button>
@@ -313,7 +313,7 @@ const FAQs = () => {
                       variant="ghost"
                       onClick={() => handleReorder(faq.id, "down")}
                       disabled={index === faqs.length - 1}
-                      aria-label="Move down"
+                      aria-label={language === 'he' ? 'הזז למטה' : language === 'es' ? 'Mover abajo' : 'Move down'}
                     >
                       <ArrowDown className="h-4 w-4" />
                     </Button>

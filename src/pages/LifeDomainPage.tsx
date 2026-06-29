@@ -62,7 +62,7 @@ function LifeDomainPageImpl() {
               <Icon className="w-5 h-5 text-primary" />
             </div>
             <h2 className="text-lg font-bold text-foreground">
-              {isHebrew ? domain.labelHe : domain.labelEn}
+              {language === 'he' ? domain.labelHe : language === 'es' ? domain.labelEs : domain.labelEn}
             </h2>
           </div>
           <DomainIntakeFlow
@@ -94,9 +94,9 @@ function LifeDomainPageImpl() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {isHebrew ? domain.labelHe : domain.labelEn}
+              {language === 'he' ? domain.labelHe : language === 'es' ? domain.labelEs : domain.labelEn}
             </h1>
-            <p className="text-muted-foreground text-sm">{isHebrew ? domain.descriptionHe : domain.description}</p>
+            <p className="text-muted-foreground text-sm">{language === 'he' ? domain.descriptionHe : language === 'es' ? domain.descriptionEs : domain.description}</p>
           </div>
           <Badge variant={status === 'active' ? 'default' : status === 'configured' ? 'secondary' : 'outline'} className="ms-auto">
             {status === 'active' ? t('lifeDomain.statusActive') :

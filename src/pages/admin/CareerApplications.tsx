@@ -30,6 +30,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AdminCareerApplications() {
   const { language } = useTranslation();
   const isHe = language === 'he';
+  const isEs = language === 'es';
   const { user } = useAuth();
   const qc = useQueryClient();
   const [selectedApp, setSelectedApp] = useState<any>(null);
@@ -62,23 +63,23 @@ export default function AdminCareerApplications() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-career-apps'] });
-      toast.success(isHe ? 'עודכן בהצלחה' : 'Updated successfully');
+      toast.success(isHe ? 'עודכן בהצלחה' : isEs ? 'Actualizado correctamente' : 'Updated successfully');
       setSelectedApp(null);
       setAdminNotes('');
     },
   });
 
   const filters = [
-    { id: 'pending', label: isHe ? 'ממתין' : 'Pending' },
-    { id: 'approved', label: isHe ? 'מאושר' : 'Approved' },
-    { id: 'rejected', label: isHe ? 'נדחה' : 'Rejected' },
-    { id: 'all', label: isHe ? 'הכל' : 'All' },
+    { id: 'pending', label: isHe ? 'ממתין' : isEs ? 'Pendiente' : 'Pending' },
+    { id: 'approved', label: isHe ? 'מאושר' : isEs ? 'Aprobado' : 'Approved' },
+    { id: 'rejected', label: isHe ? 'נדחה' : isEs ? 'Rechazado' : 'Rejected' },
+    { id: 'all', label: isHe ? 'הכל' : isEs ? 'Todos' : 'All' },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">{isHe ? 'בקשות קריירה' : 'Career Applications'}</h2>
+        <h2 className="text-lg font-bold text-foreground">{isHe ? 'בקשות קריירה' : isEs ? 'Solicitudes de carrera' : 'Career Applications'}</h2>
         <Button variant="ghost" size="sm" onClick={() => refetch()}>
           <RefreshCw className="w-4 h-4" />
         </Button>
@@ -97,7 +98,7 @@ export default function AdminCareerApplications() {
       {isLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
       ) : apps.length === 0 ? (
-        <p className="text-center text-muted-foreground py-12">{isHe ? 'אין בקשות' : 'No applications'}</p>
+        <p className="text-center text-muted-foreground py-12">{isHe ? 'אין בקשות' : isEs ? 'No hay solicitudes' : 'No applications'}</p>
       ) : (
         <div className="space-y-3">
           {(apps as any[]).map((app) => {
@@ -138,7 +139,7 @@ export default function AdminCareerApplications() {
 
               {/* Structured Answers */}
               <div className="space-y-2">
-                <h3 className="text-sm font-bold text-foreground">{isHe ? 'תשובות מובנות' : 'Structured Answers'}</h3>
+                <h3 className="text-sm font-bold text-foreground">{isHe ? 'תשובות מובנות' : isEs ? 'Respuestas estructuradas' : 'Structured Answers'}</h3>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1">
                   {Object.entries(selectedApp.structured_answers || {}).map(([k, v]) => (
                     <div key={k} className="flex justify-between text-xs">
@@ -151,7 +152,7 @@ export default function AdminCareerApplications() {
 
               {/* AI Conversation */}
               <div className="space-y-2">
-                <h3 className="text-sm font-bold text-foreground">{isHe ? 'שיחת AI' : 'AI Conversation'}</h3>
+                <h3 className="text-sm font-bold text-foreground">{isHe ? 'שיחת AI' : isEs ? 'Conversación con IA' : 'AI Conversation'}</h3>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
                   {((selectedApp.ai_conversation || []) as any[]).filter((m: any) => m.role !== 'system').map((msg: any, i: number) => (
                     <div key={i} className={`text-xs ${msg.role === 'user' ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
@@ -165,18 +166,18 @@ export default function AdminCareerApplications() {
               {/* AI Summary */}
               {selectedApp.ai_summary && (
                 <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-foreground">{isHe ? 'סיכום AI' : 'AI Summary'}</h3>
+                  <h3 className="text-sm font-bold text-foreground">{isHe ? 'סיכום AI' : isEs ? 'Resumen de IA' : 'AI Summary'}</h3>
                   <p className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">{selectedApp.ai_summary}</p>
                 </div>
               )}
 
               {/* Admin Notes */}
               <div className="space-y-1">
-                <h3 className="text-sm font-bold text-foreground">{isHe ? 'הערות אדמין' : 'Admin Notes'}</h3>
+                <h3 className="text-sm font-bold text-foreground">{isHe ? 'הערות אדמין' : isEs ? 'Notas de administración' : 'Admin Notes'}</h3>
                 <Textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
-                  placeholder={isHe ? 'הוסף הערות...' : 'Add notes...'}
+                  placeholder={isHe ? 'הוסף הערות...' : isEs ? 'Añadir notas...' : 'Add notes...'}
                   className="text-sm"
                   rows={3}
                 />
@@ -187,17 +188,17 @@ export default function AdminCareerApplications() {
                 <Button className="flex-1 gap-1.5 bg-green-600 hover:bg-green-700"
                   onClick={() => updateMutation.mutate({ id: selectedApp.id, status: 'approved' })}
                   disabled={updateMutation.isPending}>
-                  <CheckCircle2 className="w-4 h-4" /> {isHe ? 'אשר' : 'Approve'}
+                  <CheckCircle2 className="w-4 h-4" /> {isHe ? 'אשר' : isEs ? 'Aprobar' : 'Approve'}
                 </Button>
                 <Button variant="destructive" className="flex-1 gap-1.5"
                   onClick={() => updateMutation.mutate({ id: selectedApp.id, status: 'rejected' })}
                   disabled={updateMutation.isPending}>
-                  <XCircle className="w-4 h-4" /> {isHe ? 'דחה' : 'Reject'}
+                  <XCircle className="w-4 h-4" /> {isHe ? 'דחה' : isEs ? 'Rechazar' : 'Reject'}
                 </Button>
                 <Button variant="outline" className="gap-1.5"
                   onClick={() => updateMutation.mutate({ id: selectedApp.id, status: 'revision_requested' })}
                   disabled={updateMutation.isPending}>
-                  <Clock className="w-4 h-4" /> {isHe ? 'תיקון' : 'Revise'}
+                  <Clock className="w-4 h-4" /> {isHe ? 'תיקון' : isEs ? 'Revisar' : 'Revise'}
                 </Button>
               </div>
             </>

@@ -190,9 +190,9 @@ export default function FMMarket() {
   };
 
   const marketTabs = [
-    { id: 'services' as const, icon: Briefcase, labelEn: 'Services', labelHe: 'שירותים' },
-    { id: 'bounties' as const, icon: Target, labelEn: 'Bounties', labelHe: 'באונטיז' },
-    { id: 'marketplace' as const, icon: ShoppingBag, labelEn: 'Marketplace', labelHe: 'מרקטפלייס' },
+    { id: 'services' as const, icon: Briefcase, labelEn: 'Services', labelHe: 'שירותים', labelEs: 'Servicios' },
+    { id: 'bounties' as const, icon: Target, labelEn: 'Bounties', labelHe: 'באונטיז', labelEs: 'Encargos' },
+    { id: 'marketplace' as const, icon: ShoppingBag, labelEn: 'Marketplace', labelHe: 'מרקטפלייס', labelEs: 'Mercado' },
   ];
 
   return (
@@ -248,7 +248,7 @@ export default function FMMarket() {
               }`}
             >
               <tab.icon className="w-4 h-4" />
-              <span>{isHe ? tab.labelHe : tab.labelEn}</span>
+              <span>{language === 'he' ? tab.labelHe : language === 'es' ? tab.labelEs : tab.labelEn}</span>
             </button>
           );
         })}

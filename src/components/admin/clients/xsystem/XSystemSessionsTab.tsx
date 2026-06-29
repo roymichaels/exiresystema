@@ -29,6 +29,7 @@ import {
   type XSysSession,
 } from '@/hooks/xsystem';
 import { EmptyState, Row, SESSION_STATUSES, SESSION_MODES, NOTE_KINDS } from './_shared';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Props {
   clientId: string;
@@ -64,6 +65,7 @@ function SessionDialog({
   session?: XSysSession;
   trigger: React.ReactNode;
 }) {
+  const { language } = useTranslation();
   const [open, setOpen] = useState(false);
   const create = useCreateXSystemSession();
   const update = useUpdateXSystemSession();
@@ -116,12 +118,12 @@ function SessionDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editing ? 'עריכת סשן' : 'סשן חדש'}</DialogTitle>
+          <DialogTitle>{editing ? (language === 'he' ? 'עריכת סשן' : language === 'es' ? 'Editar Sesión' : 'Edit Session') : (language === 'he' ? 'סשן חדש' : language === 'es' ? 'Nueva Sesión' : 'New Session')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label>מספר סשן</Label>
+              <Label>{language === 'he' ? 'מספר סשן' : language === 'es' ? 'Nº de Sesión' : 'Session #'}</Label>
               <Input
                 type="number"
                 value={form.session_number ?? ''}
@@ -134,7 +136,7 @@ function SessionDialog({
               />
             </div>
             <div>
-              <Label>משך (דק׳)</Label>
+              <Label>{language === 'he' ? 'משך (דק׳)' : language === 'es' ? 'Duración (min)' : 'Duration (min)'}</Label>
               <Input
                 type="number"
                 value={form.duration_minutes ?? ''}
@@ -148,7 +150,7 @@ function SessionDialog({
             </div>
           </div>
           <div>
-            <Label>מועד</Label>
+            <Label>{language === 'he' ? 'מועד' : language === 'es' ? 'Fecha' : 'Date'}</Label>
             <Input
               type="datetime-local"
               value={form.scheduled_at}
@@ -157,7 +159,7 @@ function SessionDialog({
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label>סוג מפגש</Label>
+              <Label>{language === 'he' ? 'סוג מפגש' : language === 'es' ? 'Tipo de Reunión' : 'Session Mode'}</Label>
               <Select
                 value={form.mode}
                 onValueChange={(v) => setForm((f) => ({ ...f, mode: v }))}
@@ -171,7 +173,7 @@ function SessionDialog({
               </Select>
             </div>
             <div>
-              <Label>סטטוס</Label>
+              <Label>{language === 'he' ? 'סטטוס' : language === 'es' ? 'Estado' : 'Status'}</Label>
               <Select
                 value={form.status}
                 onValueChange={(v) => setForm((f) => ({ ...f, status: v }))}
@@ -186,14 +188,14 @@ function SessionDialog({
             </div>
           </div>
           <div>
-            <Label>פוקוס</Label>
+            <Label>{language === 'he' ? 'פוקוס' : language === 'es' ? 'Enfoque' : 'Focus'}</Label>
             <Input
               value={form.focus}
               onChange={(e) => setForm((f) => ({ ...f, focus: e.target.value }))}
             />
           </div>
           <div>
-            <Label>כוונה</Label>
+            <Label>{language === 'he' ? 'כוונה' : language === 'es' ? 'Intención' : 'Intention'}</Label>
             <Input
               value={form.intention}
               onChange={(e) => setForm((f) => ({ ...f, intention: e.target.value }))}

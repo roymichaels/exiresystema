@@ -8,5 +8,11 @@ export const useTranslation = () => {
     return getTranslation(language, key);
   };
 
-  return { t, language, isRTL };
+  const l = (labels: { labelHe: string; labelEn: string; labelEs?: string }): string => {
+    if (language === 'he') return labels.labelHe;
+    if (language === 'es') return labels.labelEs ?? labels.labelEn;
+    return labels.labelEn;
+  };
+
+  return { t, l, language, isRTL };
 };

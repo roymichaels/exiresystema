@@ -116,7 +116,7 @@ interface Props {
 
 export default function DomainAssessChat({ domainId, asModal, asDock, dockHeightVh, hideHeader, onClose }: Props) {
   const navigate = useNavigate();
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const { setLanguage } = useLanguage();
   const { saveAssessment } = useDomainAssessment(domainId);
   const { user } = useAuth();
@@ -555,7 +555,7 @@ export default function DomainAssessChat({ domainId, asModal, asDock, dockHeight
           <AuroraHoloOrb size={32} glow="subtle" />
           <div className="flex-1">
             <h1 className="text-sm font-bold text-foreground">
-              {isHe ? 'AION' : 'AION'} — {isHe ? 'סריקת' : 'Scanning'} {isHe ? (domain?.labelHe ?? domainId) : (domain?.labelEn ?? domainId)}
+              {isHe ? 'AION' : 'AION'} — {language === 'he' ? 'סריקת' : language === 'es' ? 'Escaneando' : 'Scanning'} {domain ? l(domain) : domainId}
             </h1>
             <p className="text-[10px] text-muted-foreground">
               {isHe ? 'ענה על השאלות כדי ש-AION יבנה לך פרופיל מדויק' : 'Answer the questions so AION can build your accurate profile'}

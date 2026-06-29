@@ -34,7 +34,7 @@ const activeBgMap: Record<string, string> = {
 };
 
 export default function PillarTabs({ selected, onSelect }: PillarTabsProps) {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
 
   return (
@@ -52,7 +52,7 @@ export default function PillarTabs({ selected, onSelect }: PillarTabsProps) {
             )}
           >
             <span className="text-xs">{PILLAR_ICONS[domain.id] || '⚡'}</span>
-            <span>{isHe ? domain.labelHe : domain.labelEn}</span>
+            <span>{l(domain)}</span>
           </button>
         ))}
       </div>

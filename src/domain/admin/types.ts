@@ -19,6 +19,7 @@ export interface AdminSubTabConfig {
   id: string;
   labelHe: string;
   labelEn: string;
+  labelEs: string;
   component: React.LazyExoticComponent<any>;
 }
 
@@ -26,6 +27,7 @@ export interface AdminTabConfig {
   id: string;
   labelHe: string;
   labelEn: string;
+  labelEs: string;
   icon: LucideIcon;
   subTabs: AdminSubTabConfig[];
   /**

@@ -14,6 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import {
   Bell,
@@ -24,6 +25,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTranslation } from '@/hooks/useTranslation';
 
 const getPriorityColor = (priority: string) => {
   switch (priority) {
@@ -34,39 +36,44 @@ const getPriorityColor = (priority: string) => {
   }
 };
 
-const getPriorityLabel = (priority: string) => {
+const getPriorityLabel = (priority: string, language: string) => {
   switch (priority) {
-    case 'urgent': return 'דחוף';
-    case 'high': return 'גבוה';
-    case 'medium': return 'בינוני';
-    default: return 'נמוך';
+    case 'urgent': return language === 'he' ? 'דחוף' : language === 'es' ? 'Urgente' : 'Urgent';
+    case 'high': return language === 'he' ? 'גבוה' : language === 'es' ? 'Alto' : 'High';
+    case 'medium': return language === 'he' ? 'בינוני' : language === 'es' ? 'Medio' : 'Medium';
+    default: return language === 'he' ? 'נמוך' : language === 'es' ? 'Bajo' : 'Low';
   }
 };
 
-const getTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    new_user: 'משתמש חדש',
-    new_purchase: 'רכישה',
-    new_subscription: 'מנוי חדש',
-    subscription_cancelled: 'ביטול מנוי',
-    new_enrollment: 'הרשמה',
-    course_completed: 'קורס הושלם',
-    new_review: 'ביקורת',
-    high_value_purchase: 'רכישה גבוהה',
-    payment_failed: 'תשלום נכשל',
-    content_uploaded: 'תוכן חדש',
-    onboarding_completed: 'השלמת כיול',
-    new_lead: 'ליד חדש',
-    journey_completion: 'השלמת מסע',
-    user_milestone: 'אבן דרך',
-    new_consciousness_leap_application: 'בקשת קפיצת תודעה',
-    new_personal_hypnosis_order: 'הזמנת היפנוזה',
-    affiliate_referral: 'הפניית שותף',
+const getTypeLabel = (type: string, language: string) => {
+  const labels: Record<string, { he: string; en: string; es: string }> = {
+    new_user: { he: 'משתמש חדש', en: 'New User', es: 'Nuevo usuario' },
+    new_purchase: { he: 'רכישה', en: 'Purchase', es: 'Compra' },
+    new_subscription: { he: 'מנוי חדש', en: 'New Subscription', es: 'Nueva suscripción' },
+    subscription_cancelled: { he: 'ביטול מנוי', en: 'Subscription Cancelled', es: 'Suscripción cancelada' },
+    new_enrollment: { he: 'הרשמה', en: 'Enrollment', es: 'Inscripción' },
+    course_completed: { he: 'קורס הושלם', en: 'Course Completed', es: 'Curso completado' },
+    new_review: { he: 'ביקורת', en: 'Review', es: 'Reseña' },
+    high_value_purchase: { he: 'רכישה גבוהה', en: 'High Value Purchase', es: 'Compra de alto valor' },
+    payment_failed: { he: 'תשלום נכשל', en: 'Payment Failed', es: 'Pago fallido' },
+    content_uploaded: { he: 'תוכן חדש', en: 'New Content', es: 'Contenido nuevo' },
+    onboarding_completed: { he: 'השלמת כיול', en: 'Onboarding Completed', es: 'Incorporación completada' },
+    new_lead: { he: 'ליד חדש', en: 'New Lead', es: 'Nuevo lead' },
+    journey_completion: { he: 'השלמת מסע', en: 'Journey Completion', es: 'Viaje completado' },
+    user_milestone: { he: 'אבן דרך', en: 'Milestone', es: 'Hito' },
+    new_consciousness_leap_application: { he: 'בקשת קפיצת תודעה', en: 'Consciousness Leap Application', es: 'Solicitud de salto de conciencia' },
+    new_personal_hypnosis_order: { he: 'הזמנת היפנוזה', en: 'Hypnosis Order', es: 'Pedido de hipnosis' },
+    affiliate_referral: { he: 'הפניית שותף', en: 'Affiliate Referral', es: 'Referido de afiliado' },
   };
-  return labels[type] || type;
+  const entry = labels[type];
+  if (!entry) return type;
+  if (language === 'he') return entry.he;
+  if (language === 'es') return entry.es;
+  return entry.en;
 };
 
 const NotificationCenter = () => {
+  const { language } = useTranslation();
   const navigate = useNavigate();
   const {
     notifications,
@@ -108,6 +115,8 @@ const NotificationCenter = () => {
     return true;
   });
 
+  const dateLocale = language === 'he' ? he : language === 'es' ? es : enUS;
+
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
@@ -115,16 +124,16 @@ const NotificationCenter = () => {
         <div>
           <h1 className="text-3xl font-bold cyber-glow flex items-center gap-2">
             <Bell className="h-8 w-8" />
-            מרכז התראות
+            {language === 'he' ? 'מרכז התראות' : language === 'es' ? 'Centro de Notificaciones' : 'Notification Center'}
           </h1>
           <p className="text-muted-foreground mt-1">
-            נהל את כל ההתראות שלך במקום אחד
+            {language === 'he' ? 'נהל את כל ההתראות שלך במקום אחד' : language === 'es' ? 'Gestiona todas tus notificaciones en un solo lugar' : 'Manage all your notifications in one place'}
           </p>
         </div>
         {unreadCount > 0 && (
           <Button onClick={markAllAsRead} variant="outline" className="gap-2">
             <CheckCheck className="h-4 w-4" />
-            סמן הכל כנקרא ({unreadCount})
+            {language === 'he' ? `סמן הכל כנקרא (${unreadCount})` : language === 'es' ? `Marcar todo como leído (${unreadCount})` : `Mark All as Read (${unreadCount})`}
           </Button>
         )}
       </div>
@@ -132,21 +141,29 @@ const NotificationCenter = () => {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">סה"כ התראות</div>
+          <div className="text-sm text-muted-foreground">
+            {language === 'he' ? 'סה"כ התראות' : language === 'es' ? 'Total notificaciones' : 'Total Notifications'}
+          </div>
           <div className="text-2xl font-bold mt-1">{notifications.length}</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">לא נקראו</div>
+          <div className="text-sm text-muted-foreground">
+            {language === 'he' ? 'לא נקראו' : language === 'es' ? 'No leídas' : 'Unread'}
+          </div>
           <div className="text-2xl font-bold mt-1 text-primary">{unreadCount}</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">התראות דחופות</div>
+          <div className="text-sm text-muted-foreground">
+            {language === 'he' ? 'התראות דחופות' : language === 'es' ? 'Notificaciones urgentes' : 'Urgent Notifications'}
+          </div>
           <div className="text-2xl font-bold mt-1 text-destructive">
             {notifications.filter(n => n.priority === 'urgent' && !n.is_read).length}
           </div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">היום</div>
+          <div className="text-sm text-muted-foreground">
+            {language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'}
+          </div>
           <div className="text-2xl font-bold mt-1">
             {notifications.filter(n => {
               const today = new Date();
@@ -161,13 +178,15 @@ const NotificationCenter = () => {
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium text-sm">סינון</span>
+          <span className="font-medium text-sm">
+            {language === 'he' ? 'סינון' : language === 'es' ? 'Filtrar' : 'Filter'}
+          </span>
         </div>
         <div className="grid gap-3 md:grid-cols-4">
           <div className="relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="חיפוש..."
+              placeholder={language === 'he' ? 'חיפוש...' : language === 'es' ? 'Buscar...' : 'Search...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -176,35 +195,63 @@ const NotificationCenter = () => {
           </div>
           <Select value={selectedType} onValueChange={setSelectedType}>
             <SelectTrigger>
-              <SelectValue placeholder="סוג התראה" />
+              <SelectValue placeholder={language === 'he' ? 'סוג התראה' : language === 'es' ? 'Tipo de notificación' : 'Notification Type'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">כל הסוגים</SelectItem>
-              <SelectItem value="new_user">משתמש חדש</SelectItem>
-              <SelectItem value="onboarding_completed">השלמת כיול</SelectItem>
-              <SelectItem value="new_lead">ליד חדש</SelectItem>
-              <SelectItem value="new_purchase">רכישה</SelectItem>
-              <SelectItem value="new_subscription">מנוי חדש</SelectItem>
-              <SelectItem value="subscription_cancelled">ביטול מנוי</SelectItem>
-              <SelectItem value="new_review">ביקורת</SelectItem>
-              <SelectItem value="payment_failed">תשלום נכשל</SelectItem>
+              <SelectItem value="all">
+                {language === 'he' ? 'כל הסוגים' : language === 'es' ? 'Todos los tipos' : 'All Types'}
+              </SelectItem>
+              <SelectItem value="new_user">
+                {language === 'he' ? 'משתמש חדש' : language === 'es' ? 'Nuevo usuario' : 'New User'}
+              </SelectItem>
+              <SelectItem value="onboarding_completed">
+                {language === 'he' ? 'השלמת כיול' : language === 'es' ? 'Incorporación completada' : 'Onboarding Completed'}
+              </SelectItem>
+              <SelectItem value="new_lead">
+                {language === 'he' ? 'ליד חדש' : language === 'es' ? 'Nuevo lead' : 'New Lead'}
+              </SelectItem>
+              <SelectItem value="new_purchase">
+                {language === 'he' ? 'רכישה' : language === 'es' ? 'Compra' : 'Purchase'}
+              </SelectItem>
+              <SelectItem value="new_subscription">
+                {language === 'he' ? 'מנוי חדש' : language === 'es' ? 'Nueva suscripción' : 'New Subscription'}
+              </SelectItem>
+              <SelectItem value="subscription_cancelled">
+                {language === 'he' ? 'ביטול מנוי' : language === 'es' ? 'Suscripción cancelada' : 'Subscription Cancelled'}
+              </SelectItem>
+              <SelectItem value="new_review">
+                {language === 'he' ? 'ביקורת' : language === 'es' ? 'Reseña' : 'Review'}
+              </SelectItem>
+              <SelectItem value="payment_failed">
+                {language === 'he' ? 'תשלום נכשל' : language === 'es' ? 'Pago fallido' : 'Payment Failed'}
+              </SelectItem>
             </SelectContent>
           </Select>
           <Select value={selectedPriority} onValueChange={setSelectedPriority}>
             <SelectTrigger>
-              <SelectValue placeholder="עדיפות" />
+              <SelectValue placeholder={language === 'he' ? 'עדיפות' : language === 'es' ? 'Prioridad' : 'Priority'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">כל העדיפויות</SelectItem>
-              <SelectItem value="urgent">דחוף</SelectItem>
-              <SelectItem value="high">גבוה</SelectItem>
-              <SelectItem value="medium">בינוני</SelectItem>
-              <SelectItem value="low">נמוך</SelectItem>
+              <SelectItem value="all">
+                {language === 'he' ? 'כל העדיפויות' : language === 'es' ? 'Todas las prioridades' : 'All Priorities'}
+              </SelectItem>
+              <SelectItem value="urgent">
+                {language === 'he' ? 'דחוף' : language === 'es' ? 'Urgente' : 'Urgent'}
+              </SelectItem>
+              <SelectItem value="high">
+                {language === 'he' ? 'גבוה' : language === 'es' ? 'Alto' : 'High'}
+              </SelectItem>
+              <SelectItem value="medium">
+                {language === 'he' ? 'בינוני' : language === 'es' ? 'Medio' : 'Medium'}
+              </SelectItem>
+              <SelectItem value="low">
+                {language === 'he' ? 'נמוך' : language === 'es' ? 'Bajo' : 'Low'}
+              </SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={handleSearch} className="gap-2">
             <Search className="h-4 w-4" />
-            חפש
+            {language === 'he' ? 'חפש' : language === 'es' ? 'Buscar' : 'Search'}
           </Button>
         </div>
       </Card>
@@ -212,9 +259,15 @@ const NotificationCenter = () => {
       {/* Notifications List */}
       <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
         <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="all">הכל ({notifications.length})</TabsTrigger>
-          <TabsTrigger value="unread">לא נקראו ({unreadCount})</TabsTrigger>
-          <TabsTrigger value="read">נקראו ({notifications.length - unreadCount})</TabsTrigger>
+          <TabsTrigger value="all">
+            {language === 'he' ? `הכל (${notifications.length})` : language === 'es' ? `Todo (${notifications.length})` : `All (${notifications.length})`}
+          </TabsTrigger>
+          <TabsTrigger value="unread">
+            {language === 'he' ? `לא נקראו (${unreadCount})` : language === 'es' ? `No leídas (${unreadCount})` : `Unread (${unreadCount})`}
+          </TabsTrigger>
+          <TabsTrigger value="read">
+            {language === 'he' ? `נקראו (${notifications.length - unreadCount})` : language === 'es' ? `Leídas (${notifications.length - unreadCount})` : `Read (${notifications.length - unreadCount})`}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-4">
@@ -222,12 +275,16 @@ const NotificationCenter = () => {
             <ScrollArea className="h-[600px]">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-muted-foreground">טוען...</div>
+                  <div className="text-muted-foreground">
+                    {language === 'he' ? 'טוען...' : language === 'es' ? 'Cargando...' : 'Loading...'}
+                  </div>
                 </div>
               ) : filteredNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                   <Bell className="h-16 w-16 text-muted-foreground mb-4 opacity-50" />
-                  <p className="text-muted-foreground">אין התראות להצגה</p>
+                  <p className="text-muted-foreground">
+                    {language === 'he' ? 'אין התראות להצגה' : language === 'es' ? 'No hay notificaciones para mostrar' : 'No notifications to display'}
+                  </p>
                 </div>
               ) : (
                 <div className="divide-y">
@@ -252,13 +309,13 @@ const NotificationCenter = () => {
                                 {notification.title}
                               </h3>
                               <Badge variant="outline" className="text-xs">
-                                {getTypeLabel(notification.type)}
+                                {getTypeLabel(notification.type, language)}
                               </Badge>
                               <Badge
                                 variant="outline"
                                 className={`text-xs ${getPriorityColor(notification.priority)}`}
                               >
-                                {getPriorityLabel(notification.priority)}
+                                {getPriorityLabel(notification.priority, language)}
                               </Badge>
                             </div>
                             <div className="flex items-center gap-2">
@@ -293,7 +350,7 @@ const NotificationCenter = () => {
                             <span>
                               {formatDistanceToNow(new Date(notification.created_at), {
                                 addSuffix: true,
-                                locale: he,
+                                locale: dateLocale,
                               })}
                             </span>
                             {!notification.is_read && (
@@ -303,7 +360,7 @@ const NotificationCenter = () => {
                                 className="h-auto p-0 text-xs"
                                 onClick={() => markAsRead(notification.id)}
                               >
-                                סמן כנקרא
+                                {language === 'he' ? 'סמן כנקרא' : language === 'es' ? 'Marcar como leído' : 'Mark as Read'}
                               </Button>
                             )}
                           </div>

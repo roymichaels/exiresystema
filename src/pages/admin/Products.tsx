@@ -107,11 +107,14 @@ const statusColors: Record<string, string> = {
   rejected: "bg-red-500/20 text-red-400",
 };
 
-const statusLabels: Record<string, string> = {
-  pending: "ממתין",
-  reviewed: "נבדק",
-  approved: "אושר",
-  rejected: "נדחה",
+const getStatusLabel = (status: string, language: string) => {
+  const labels: Record<string, Record<string, string>> = {
+    pending: { he: 'ממתין', es: 'Pendiente', en: 'Pending' },
+    reviewed: { he: 'נבדק', es: 'Revisado', en: 'Reviewed' },
+    approved: { he: 'אושר', es: 'Aprobado', en: 'Approved' },
+    rejected: { he: 'נדחה', es: 'Rechazado', en: 'Rejected' },
+  };
+  return labels[status]?.[language] || labels[status]?.en || status;
 };
 
 const Products = () => {
@@ -227,7 +230,7 @@ const Products = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      toast({ title: t('common.success'), description: "המוצר עודכן בהצלחה" });
+      toast({ title: t('common.success'), description: language === 'he' ? 'המוצר עודכן בהצלחה' : language === 'es' ? 'Producto actualizado exitosamente' : 'Product updated successfully' });
       setEditingProduct(null);
     },
     onError: (error: Error) => {
@@ -250,7 +253,7 @@ const Products = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-orders-pending-payments"] });
       queryClient.invalidateQueries({ queryKey: ["admin-orders-pending-fulfillment"] });
-      toast({ title: t('admin.paymentApproved'), description: "ההזמנה הועברה לטיפול" });
+      toast({ title: t('admin.paymentApproved'), description: language === 'he' ? 'ההזמנה הועברה לטיפול' : language === 'es' ? 'Pedido enviado para procesamiento' : 'Order moved to fulfillment' });
       setConfirmDialog(null);
     },
     onError: (error: Error) => {
@@ -269,7 +272,7 @@ const Products = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-orders-pending-payments"] });
-      toast({ title: t('admin.orderCancelled'), description: "ההזמנה בוטלה" });
+      toast({ title: t('admin.orderCancelled'), description: language === 'he' ? 'ההזמנה בוטלה' : language === 'es' ? 'Pedido cancelado' : 'Order cancelled' });
       setConfirmDialog(null);
     },
     onError: (error: Error) => {
@@ -293,11 +296,11 @@ const Products = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consciousness-leap-applications"] });
-      toast({ title: t('common.success'), description: "הבקשה עודכנה בהצלחה" });
+      toast({ title: t('common.success'), description: language === 'he' ? 'הבקשה עודכנה בהצלחה' : language === 'es' ? 'Solicitud actualizada exitosamente' : 'Application updated successfully' });
       setSelectedApplication(null);
     },
     onError: () => {
-      toast({ title: t('common.error'), description: "שגיאה בעדכון הבקשה", variant: "destructive" });
+      toast({ title: t('common.error'), description: language === 'he' ? 'שגיאה בעדכון הבקשה' : language === 'es' ? 'Error al actualizar la solicitud' : 'Error updating application', variant: "destructive" });
     },
   });
 
@@ -516,7 +519,7 @@ const Products = () => {
                                 </span>
                               <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
-                                  לפני {daysSince} {daysSince === 1 ? "יום" : "ימים"}
+                                  {language === 'he' ? `לפני ${daysSince} ${daysSince === 1 ? 'יום' : 'ימים'}` : language === 'es' ? `Hace ${daysSince} ${daysSince === 1 ? 'día' : 'días'}` : `${daysSince} ${daysSince === 1 ? 'day' : 'days'} ago`}
                                 </span>
                                 <span>₪{order.amount}</span>
                               </div>
@@ -566,7 +569,7 @@ const Products = () => {
                           <div className="flex items-center gap-3 mb-1">
                             <span className="font-medium">{app.lead?.name}</span>
                             <Badge className={statusColors[app.status]}>
-                              {statusLabels[app.status]}
+                              {getStatusLabel(app.status, language)}
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
@@ -738,9 +741,19 @@ const Products = () => {
               {confirmDialog?.action === 'approve' ? t('admin.approvePaymentTitle') : t('admin.cancelOrderTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmDialog?.action === 'approve' 
-                ? `האם לאשר את התשלום עבור ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}? לאחר האישור ההזמנה תעבור לטיפול.`
-                : `האם לבטל את ההזמנה של ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}?`
+              {confirmDialog?.action === 'approve'
+                ? (language === 'he'
+                  ? `האם לאשר את התשלום עבור ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}? לאחר האישור ההזמנה תעבור לטיפול.`
+                  : language === 'es'
+                  ? `¿Aprobar el pago de ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}? Después de la aprobación, el pedido pasará a procesamiento.`
+                  : `Approve payment for ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}? After approval the order moves to fulfillment.`
+                )
+                : (language === 'he'
+                  ? `האם לבטל את ההזמנה של ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}?`
+                  : language === 'es'
+                  ? `¿Cancelar el pedido de ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}?`
+                  : `Cancel order for ${confirmDialog?.order.profiles?.full_name || t('common.unknown')}?`
+                )
               }
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -850,10 +863,10 @@ const Products = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">{statusLabels.pending}</SelectItem>
-                      <SelectItem value="reviewed">{statusLabels.reviewed}</SelectItem>
-                      <SelectItem value="approved">{statusLabels.approved}</SelectItem>
-                      <SelectItem value="rejected">{statusLabels.rejected}</SelectItem>
+                      <SelectItem value="pending">{getStatusLabel('pending', language)}</SelectItem>
+                      <SelectItem value="reviewed">{getStatusLabel('reviewed', language)}</SelectItem>
+                      <SelectItem value="approved">{getStatusLabel('approved', language)}</SelectItem>
+                      <SelectItem value="rejected">{getStatusLabel('rejected', language)}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

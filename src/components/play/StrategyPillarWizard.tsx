@@ -114,7 +114,7 @@ function PlanGenerationProgress({ isHe, isRTL, onError }: {
 }
 
 export function StrategyPillarWizard({ open, onOpenChange, onPlanGenerated }: StrategyPillarWizardProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { user } = useAuth();
   const { selectedPillars, togglePillar, totalLimit, isApex, isPillarSelected } = usePillarAccess();
@@ -279,7 +279,7 @@ export function StrategyPillarWizard({ open, onOpenChange, onPlanGenerated }: St
                         'text-[10px] font-semibold leading-tight',
                         isSelected ? domainColorMap[domain.color] : 'text-foreground/50'
                       )}>
-                        {isHe ? domain.labelHe : domain.labelEn}
+                        {l(domain)}
                       </span>
                       {isSelected && isAssessed && (
                         <span className="text-[8px] text-emerald-400 font-medium">

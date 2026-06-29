@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,11 +27,12 @@ const DateRangePicker = ({
   onExport,
   isLoading 
 }: DateRangePickerProps) => {
+  const { language } = useTranslation();
   const rangeLabels: Record<DateRange, string> = {
-    "7d": "7 ימים",
-    "30d": "30 יום",
-    "90d": "90 יום",
-    "custom": "מותאם אישית",
+    "7d": language === 'he' ? '7 ימים' : language === 'es' ? '7 días' : '7 days',
+    "30d": language === 'he' ? '30 יום' : language === 'es' ? '30 días' : '30 days',
+    "90d": language === 'he' ? '90 יום' : language === 'es' ? '90 días' : '90 days',
+    "custom": language === 'he' ? 'מותאם אישית' : language === 'es' ? 'Personalizado' : 'Custom',
   };
 
   return (
@@ -46,13 +48,13 @@ const DateRangePicker = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => onRangeChange("7d")}>
-            7 ימים אחרונים
+            {language === 'he' ? '7 ימים אחרונים' : language === 'es' ? 'Últimos 7 días' : 'Last 7 days'}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onRangeChange("30d")}>
-            30 יום אחרונים
+            {language === 'he' ? '30 יום אחרונים' : language === 'es' ? 'Últimos 30 días' : 'Last 30 days'}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => onRangeChange("90d")}>
-            90 יום אחרונים
+            {language === 'he' ? '90 יום אחרונים' : language === 'es' ? 'Últimos 90 días' : 'Last 90 days'}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

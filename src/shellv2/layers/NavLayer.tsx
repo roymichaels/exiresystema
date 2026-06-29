@@ -54,7 +54,7 @@ export default function NavLayer() {
     const isActive = s.path === location.pathname;
     return {
       key: s.id,
-      label: isHe ? s.labelHe : s.labelEn,
+      label: language === 'he' ? s.labelHe : language === 'es' ? s.labelEs : s.labelEn,
       icon: <Icon className="h-5 w-5" strokeWidth={1.5} />,
       active: isActive,
       energy,

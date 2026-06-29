@@ -59,7 +59,7 @@ const DEFAULT_SYSTEM_PROMPT = `אתה עוזר AI של AION - פלטפורמת �
 - אל תלחץ למכירה - הצע ערך`;
 
 const ChatAssistant = () => {
-  const { t, isRTL } = useTranslation();
+  const { t, language, isRTL } = useTranslation();
   const queryClient = useQueryClient();
   
   // Settings state
@@ -339,7 +339,7 @@ const ChatAssistant = () => {
                 <Textarea
                   value={greetingHe}
                   onChange={(e) => setGreetingHe(e.target.value)}
-                  placeholder="היי! אני העוזר של AION..."
+                  placeholder={language === 'he' ? 'היי! אני העוזר של AION...' : language === 'es' ? '¡Hola! Soy el asistente de AION...' : "Hi! I'm the AION assistant..."}
                   dir="rtl"
                 />
               </div>

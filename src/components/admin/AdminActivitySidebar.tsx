@@ -40,16 +40,16 @@ export function AdminActivitySidebar({ onNavigate }: AdminActivitySidebarProps) 
   });
 
   const statItems = [
-    { icon: Users, value: stats?.users || 0, label: isHe ? 'משתמשים' : 'Users', color: 'text-emerald-400' },
-    { icon: Bell, value: unreadCount, label: isHe ? 'התראות' : 'Alerts', color: 'text-amber-400' },
-    { icon: UserPlus, value: stats?.leads || 0, label: isHe ? 'לידים' : 'Leads', color: 'text-teal-400' },
-    { icon: ShoppingBag, value: stats?.orders || 0, label: isHe ? 'הזמנות' : 'Orders', color: 'text-indigo-400' },
+    { icon: Users, value: stats?.users || 0, label: language === 'he' ? 'משתמשים' : language === 'es' ? 'Usuarios' : 'Users', color: 'text-emerald-400' },
+    { icon: Bell, value: unreadCount, label: language === 'he' ? 'התראות' : language === 'es' ? 'Notificaciones' : 'Notifications', color: 'text-amber-400' },
+    { icon: UserPlus, value: stats?.leads || 0, label: language === 'he' ? 'לידים' : language === 'es' ? 'Clientes potenciales' : 'Leads', color: 'text-teal-400' },
+    { icon: ShoppingBag, value: stats?.orders || 0, label: language === 'he' ? 'הזמנות' : language === 'es' ? 'Pedidos' : 'Orders', color: 'text-indigo-400' },
   ];
 
   const quickActions = [
-    { icon: Users, label: isHe ? 'משתמשים' : 'Users', onClick: () => onNavigate?.('admin', 'users') },
-    { icon: Package, label: isHe ? 'מוצרים' : 'Products', onClick: () => onNavigate?.('content', 'products') },
-    { icon: BarChart3, label: isHe ? 'אנליטיקס' : 'Analytics', onClick: () => onNavigate?.('overview', 'analytics') },
+    { icon: Users, label: language === 'he' ? 'משתמשים' : language === 'es' ? 'Usuarios' : 'Users', onClick: () => onNavigate?.('admin', 'users') },
+    { icon: Package, label: language === 'he' ? 'מוצרים' : language === 'es' ? 'Productos' : 'Products', onClick: () => onNavigate?.('content', 'products') },
+    { icon: BarChart3, label: language === 'he' ? 'אנליטיקס' : language === 'es' ? 'Analíticas' : 'Analytics', onClick: () => onNavigate?.('overview', 'analytics') },
   ];
 
   return (
@@ -71,7 +71,7 @@ export function AdminActivitySidebar({ onNavigate }: AdminActivitySidebarProps) 
             ? "ltr:left-1/2 ltr:-translate-x-1/2 rtl:right-1/2 rtl:translate-x-1/2"
             : "ltr:right-2 rtl:left-2"
         )}
-        title={collapsed ? "Expand" : "Collapse"}
+        title={language === 'he' ? (collapsed ? 'הרחב' : 'כווץ') : language === 'es' ? (collapsed ? 'Expandir' : 'Colapsar') : collapsed ? 'Expand' : 'Collapse'}
       >
         {collapsed
           ? (isRTL ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />)
@@ -111,7 +111,7 @@ export function AdminActivitySidebar({ onNavigate }: AdminActivitySidebarProps) 
         <div className="flex flex-col h-full overflow-hidden p-3 pt-8">
           {/* Stats */}
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-            {isHe ? 'סטטיסטיקה' : 'Stats'}
+            {language === 'he' ? 'סטטיסטיקה' : language === 'es' ? 'Estadísticas' : 'Statistics'}
           </span>
           <div className="grid grid-cols-2 gap-1.5 mb-3">
             {statItems.map((m) => (
@@ -127,7 +127,7 @@ export function AdminActivitySidebar({ onNavigate }: AdminActivitySidebarProps) 
 
           {/* Quick Actions */}
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-            {isHe ? 'פעולות מהירות' : 'Quick Actions'}
+            {language === 'he' ? 'פעולות מהירות' : language === 'es' ? 'Acciones rápidas' : 'Quick Actions'}
           </span>
           <div className="grid grid-cols-3 gap-1.5 mb-3">
             {quickActions.map((a) => (
@@ -146,11 +146,11 @@ export function AdminActivitySidebar({ onNavigate }: AdminActivitySidebarProps) 
 
           {/* Recent Notifications */}
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-            {isHe ? 'התראות אחרונות' : 'Recent Alerts'}
+            {language === 'he' ? 'התראות אחרונות' : language === 'es' ? 'Notificaciones recientes' : 'Recent Notifications'}
           </span>
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             {notifications.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-2">{isHe ? 'אין התראות' : 'No alerts'}</p>
+              <p className="text-xs text-muted-foreground text-center py-2">{language === 'he' ? 'אין התראות' : language === 'es' ? 'Sin notificaciones' : 'No notifications'}</p>
             ) : (
               <div className="relative flex flex-col gap-0 w-full">
                 <div className="absolute top-0 bottom-0 w-[2px] bg-emerald-500/10 rounded-full ltr:left-[7px] rtl:right-[7px]" />

@@ -32,7 +32,7 @@ interface CreateThreadModalProps {
 }
 
 export default function CreateThreadModal({ open, onOpenChange, defaultPillar }: CreateThreadModalProps) {
-  const { t, language } = useTranslation();
+  const { t, language, l } = useTranslation();
   const isHe = language === 'he';
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -150,7 +150,7 @@ export default function CreateThreadModal({ open, onOpenChange, defaultPillar }:
                   )}
                 >
                   <span>{PILLAR_ICONS[domain.id]}</span>
-                  <span>{isHe ? domain.labelHe : domain.labelEn}</span>
+                  <span>{l(domain)}</span>
                 </button>
               ))}
             </div>

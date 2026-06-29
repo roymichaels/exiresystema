@@ -11,7 +11,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 const Content = () => {
   const [productDialogOpen, setProductDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const { t, isRTL } = useTranslation();
+  const { t, isRTL, language } = useTranslation();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-content-products"],

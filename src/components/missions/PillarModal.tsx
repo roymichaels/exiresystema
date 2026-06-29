@@ -35,6 +35,7 @@ interface PillarModalProps {
     id: string;
     labelHe: string;
     labelEn: string;
+    labelEs?: string;
     descriptionHe: string;
     description: string;
     color: string;
@@ -62,12 +63,12 @@ interface PillarModalProps {
 }
 
 export function PillarModal({ open, onOpenChange, hub, pillar, missions, milestonesByMission, isActive }: PillarModalProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { generateStrategy, isGenerating } = useStrategyPlans();
   const { selectedPillars } = usePillarAccess();
 
-  const label = isHe ? pillar.labelHe : pillar.labelEn;
+  const label = l(pillar);
   const desc = isHe ? pillar.descriptionHe : pillar.description;
   const Icon = pillar.icon;
 

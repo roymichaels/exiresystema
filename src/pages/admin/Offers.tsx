@@ -208,7 +208,7 @@ const Offers = () => {
       const { error } = await supabase.from("offers").insert([{
         ...rest,
         slug: newSlug,
-        title: `${offer.title} (עותק)`,
+        title: `${offer.title} (${language === 'he' ? 'עותק' : language === 'es' ? 'Copia' : 'Copy'})`,
         title_en: offer.title_en ? `${offer.title_en} (Copy)` : null,
         status: "draft",
       }]);
@@ -351,7 +351,7 @@ const Offers = () => {
                   <div className="flex items-center gap-2">
                     {offer.is_free ? (
                       <span className={cn("text-lg font-bold", colors.text)}>
-                        {language === "he" ? "חינם" : "Free"}
+                        {language === 'he' ? 'חינם' : language === 'es' ? 'Gratis' : 'Free'}
                       </span>
                     ) : (
                       <>
@@ -385,17 +385,17 @@ const Offers = () => {
                     )}
                     {offer.show_on_homepage && (
                       <Badge variant="outline" className="text-xs">
-                        {language === "he" ? "בעמוד הבית" : "Homepage"}
+                        {language === 'he' ? 'בעמוד הבית' : language === 'es' ? 'Página principal' : 'Homepage'}
                       </Badge>
                     )}
                     {offer.landing_page_enabled && offer.landing_page_route && (
                       <Badge variant="outline" className="text-xs">
-                        {language === "he" ? "דף נחיתה" : "Landing Page"}
+                        {language === 'he' ? 'דף נחיתה' : language === 'es' ? 'Página de aterrizaje' : 'Landing Page'}
                       </Badge>
                     )}
                     {offer.is_free && (
                       <Badge variant="outline" className="text-xs bg-amber-500/10 border-amber-500/30">
-                        🎁 {language === "he" ? "חינם" : "Free"}
+                        🎁 {language === 'he' ? 'חינם' : language === 'es' ? 'Gratis' : 'Free'}
                       </Badge>
                     )}
                   </div>
@@ -508,9 +508,9 @@ const Offers = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="draft">{language === "he" ? "טיוטה" : "Draft"}</SelectItem>
-                      <SelectItem value="active">{language === "he" ? "פעיל" : "Active"}</SelectItem>
-                      <SelectItem value="archived">{language === "he" ? "בארכיון" : "Archived"}</SelectItem>
+                      <SelectItem value="draft">{language === 'he' ? 'טיוטה' : language === 'es' ? 'Borrador' : 'Draft'}</SelectItem>
+                      <SelectItem value="active">{language === 'he' ? 'פעיל' : language === 'es' ? 'Activo' : 'Active'}</SelectItem>
+                      <SelectItem value="archived">{language === 'he' ? 'בארכיון' : language === 'es' ? 'Archivado' : 'Archived'}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -518,16 +518,16 @@ const Offers = () => {
 
               {/* Practitioner Selection */}
               <div className="space-y-2">
-                <Label>{language === "he" ? "מאמן" : "Practitioner"}</Label>
+                <Label>{language === 'he' ? 'מאמן' : language === 'es' ? 'Coach' : 'Practitioner'}</Label>
                 <Select
                   value={formData.practitioner_id || "none"}
                   onValueChange={(value) => setFormData({ ...formData, practitioner_id: value === "none" ? null : value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={language === "he" ? "בחר מאמן" : "Select practitioner"} />
+                    <SelectValue placeholder={language === 'he' ? 'בחר מאמן' : language === 'es' ? 'Seleccionar coach' : 'Select practitioner'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">{language === "he" ? "ללא מאמן" : "No practitioner"}</SelectItem>
+                    <SelectItem value="none">{language === 'he' ? 'ללא מאמן' : language === 'es' ? 'Sin coach' : 'No practitioner'}</SelectItem>
                     {practitioners?.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {language === "he" ? p.display_name : (p.display_name_en || p.display_name)}
@@ -614,7 +614,7 @@ const Offers = () => {
                         value={formData.original_price || ""}
                         onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) || null })}
                         dir="ltr"
-                        placeholder={language === "he" ? "למחיר מקורי (אופציונלי)" : "Original price (optional)"}
+                        placeholder={language === 'he' ? 'למחיר מקורי (אופציונלי)' : language === 'es' ? 'Precio original (opcional)' : 'Original price (optional)'}
                       />
                     </div>
                   </div>
@@ -653,7 +653,7 @@ const Offers = () => {
                   <Input
                     value={formData.badge_text || ""}
                     onChange={(e) => setFormData({ ...formData, badge_text: e.target.value })}
-                    placeholder="🎁 מתנה חינמית"
+                    placeholder={language === 'he' ? '🎁 מתנה חינמית' : language === 'es' ? '🎁 Regalo gratuito' : '🎁 Free Gift'}
                     dir="rtl"
                   />
                 </div>
@@ -682,14 +682,14 @@ const Offers = () => {
                     </Badge>
                   )}
                   <h3 className="text-lg font-bold">
-                    {language === "he" ? (formData.title || "כותרת ההצעה") : (formData.title_en || formData.title || "Offer Title")}
+                    {language === 'he' ? (formData.title || 'כותרת ההצעה') : language === 'es' ? (formData.title_en || formData.title || 'Título de la oferta') : (formData.title_en || formData.title || 'Offer Title')}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {language === "he" ? (formData.subtitle || "תיאור קצר") : (formData.subtitle_en || formData.subtitle || "Short description")}
+                    {language === 'he' ? (formData.subtitle || 'תיאור קצר') : language === 'es' ? (formData.subtitle_en || formData.subtitle || 'Descripción breve') : (formData.subtitle_en || formData.subtitle || 'Short description')}
                   </p>
                   <div className="mt-2">
                     <span className={cn("text-xl font-bold", getOfferColors(formData.brand_color).text)}>
-                      {formData.is_free ? (language === "he" ? "חינם" : "Free") : `₪${formData.price || 0}`}
+                      {formData.is_free ? (language === 'he' ? 'חינם' : language === 'es' ? 'Gratis' : 'Free') : `₪${formData.price || 0}`}
                     </span>
                   </div>
                 </div>
@@ -729,10 +729,10 @@ const Offers = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="checkout">{language === "he" ? "תשלום / רכישה" : "Checkout / Purchase"}</SelectItem>
-                    <SelectItem value="lead_form">{language === "he" ? "טופס לידים" : "Lead Form"}</SelectItem>
-                    <SelectItem value="form">{language === "he" ? "טופס מותאם" : "Custom Form"}</SelectItem>
-                    <SelectItem value="external_link">{language === "he" ? "קישור חיצוני" : "External Link"}</SelectItem>
+                    <SelectItem value="checkout">{language === 'he' ? 'תשלום / רכישה' : language === 'es' ? 'Pago / Compra' : 'Checkout / Purchase'}</SelectItem>
+                    <SelectItem value="lead_form">{language === 'he' ? 'טופס לידים' : language === 'es' ? 'Formulario de leads' : 'Lead Form'}</SelectItem>
+                    <SelectItem value="form">{language === 'he' ? 'טופס מותאם' : language === 'es' ? 'Formulario personalizado' : 'Custom Form'}</SelectItem>
+                    <SelectItem value="external_link">{language === 'he' ? 'קישור חיצוני' : language === 'es' ? 'Enlace externo' : 'External Link'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -743,7 +743,7 @@ const Offers = () => {
                   <Input
                     value={formData.cta_text || ""}
                     onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })}
-                    placeholder="הזמן עכשיו"
+                    placeholder={language === 'he' ? 'הזמן עכשיו' : language === 'es' ? 'Reserva ahora' : 'Order Now'}
                     dir="rtl"
                   />
                 </div>

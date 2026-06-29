@@ -16,20 +16,20 @@ import { PlanChatWizard } from '@/components/plan/PlanChatWizard';
 
 
 /* ── Pillar visuals ── */
-const PILLAR_VIS: Record<string, { emoji: string; color: string; bg: string; labelHe: string; labelEn: string }> = {
-  vitality:      { emoji: '❤️‍🔥', color: 'text-rose-400',    bg: 'bg-rose-500/15',    labelHe: 'חיוניות',       labelEn: 'Vitality' },
-  power:         { emoji: '⚡',    color: 'text-orange-400',  bg: 'bg-orange-500/15',  labelHe: 'כוח',           labelEn: 'Power' },
-  focus:         { emoji: '🧠',    color: 'text-sky-400',     bg: 'bg-sky-500/15',     labelHe: 'מיקוד',         labelEn: 'Focus' },
-  wealth:        { emoji: '💎',    color: 'text-emerald-400', bg: 'bg-emerald-500/15', labelHe: 'עושר',          labelEn: 'Wealth' },
-  consciousness: { emoji: '✨',   color: 'text-violet-400',  bg: 'bg-violet-500/15',  labelHe: 'תודעה',         labelEn: 'Consciousness' },
-  combat:        { emoji: '🥊',    color: 'text-red-400',     bg: 'bg-red-500/15',     labelHe: 'לחימה',         labelEn: 'Combat' },
-  expansion:     { emoji: '🌀',    color: 'text-indigo-400',  bg: 'bg-indigo-500/15',  labelHe: 'התרחבות',       labelEn: 'Expansion' },
-  influence:     { emoji: '📡',    color: 'text-amber-400',   bg: 'bg-amber-500/15',   labelHe: 'השפעה',         labelEn: 'Influence' },
-  relationships: { emoji: '🤝',    color: 'text-pink-400',    bg: 'bg-pink-500/15',    labelHe: 'מערכות יחסים', labelEn: 'Relationships' },
-  business:      { emoji: '🚀',    color: 'text-cyan-400',    bg: 'bg-cyan-500/15',    labelHe: 'עסקים',         labelEn: 'Business' },
-  projects:      { emoji: '🔧',    color: 'text-teal-400',    bg: 'bg-teal-500/15',    labelHe: 'פרויקטים',     labelEn: 'Projects' },
+const PILLAR_VIS: Record<string, { emoji: string; color: string; bg: string; labelHe: string; labelEn: string; labelEs: string }> = {
+  vitality:      { emoji: '❤️‍🔥', color: 'text-rose-400',    bg: 'bg-rose-500/15',    labelHe: 'חיוניות',       labelEn: 'Vitality',       labelEs: 'Vitalidad' },
+  power:         { emoji: '⚡',    color: 'text-orange-400',  bg: 'bg-orange-500/15',  labelHe: 'כוח',           labelEn: 'Power',         labelEs: 'Poder' },
+  focus:         { emoji: '🧠',    color: 'text-sky-400',     bg: 'bg-sky-500/15',     labelHe: 'מיקוד',         labelEn: 'Focus',         labelEs: 'Enfoque' },
+  wealth:        { emoji: '💎',    color: 'text-emerald-400', bg: 'bg-emerald-500/15', labelHe: 'עושר',          labelEn: 'Wealth',        labelEs: 'Riqueza' },
+  consciousness: { emoji: '✨',   color: 'text-violet-400',  bg: 'bg-violet-500/15',  labelHe: 'תודעה',         labelEn: 'Consciousness', labelEs: 'Conciencia' },
+  combat:        { emoji: '🥊',    color: 'text-red-400',     bg: 'bg-red-500/15',     labelHe: 'לחימה',         labelEn: 'Combat',        labelEs: 'Combate' },
+  expansion:     { emoji: '🌀',    color: 'text-indigo-400',  bg: 'bg-indigo-500/15',  labelHe: 'התרחבות',       labelEn: 'Expansion',     labelEs: 'Expansión' },
+  influence:     { emoji: '📡',    color: 'text-amber-400',   bg: 'bg-amber-500/15',   labelHe: 'השפעה',         labelEn: 'Influence',     labelEs: 'Influencia' },
+  relationships: { emoji: '🤝',    color: 'text-pink-400',    bg: 'bg-pink-500/15',    labelHe: 'מערכות יחסים', labelEn: 'Relationships', labelEs: 'Relaciones' },
+  business:      { emoji: '🚀',    color: 'text-cyan-400',    bg: 'bg-cyan-500/15',    labelHe: 'עסקים',         labelEn: 'Business',      labelEs: 'Negocios' },
+  projects:      { emoji: '🔧',    color: 'text-teal-400',    bg: 'bg-teal-500/15',    labelHe: 'פרויקטים',     labelEn: 'Projects',     labelEs: 'Proyectos' },
 };
-const DEFAULT_PILLAR = { emoji: '🎯', color: 'text-primary', bg: 'bg-primary/15', labelHe: 'כללי', labelEn: 'General' };
+const DEFAULT_PILLAR = { emoji: '🎯', color: 'text-primary', bg: 'bg-primary/15', labelHe: 'כללי', labelEn: 'General', labelEs: 'General' };
 
 
 /* ── Step-by-step guide templates per pillar ── */
@@ -144,7 +144,7 @@ function getMissionGuide(pillarKey: string, isHe: boolean, task?: TacticalAction
 }
 
 export function TodayOverviewTab() {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const phasePlan = useWeeklyTacticalPlan();
   const { days, isLoading } = phasePlan as any;
@@ -274,7 +274,7 @@ export function TodayOverviewTab() {
                   {todayActions.map((action, idx) => {
                     const pv = PILLAR_VIS[action.focusArea || ''] || DEFAULT_PILLAR;
                     const isDone = action.completed;
-                    const label = action.title || (isHe ? pv.labelHe : pv.labelEn);
+                    const label = action.title || l(pv);
 
                     return (
                       <button
@@ -318,7 +318,7 @@ export function TodayOverviewTab() {
                           "text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded",
                           activeTask.completed ? "text-emerald-400/70 bg-emerald-500/10" : `${activePillar.color} ${activePillar.bg}`
                         )}>
-                          {isHe ? activePillar.labelHe : activePillar.labelEn}
+                          {l(activePillar)}
                         </span>
                         <span className="text-[9px] font-black uppercase tracking-[0.12em] text-cyan-500/50">
                           {isHe ? `משימה ${activeIdx + 1}` : `Mission ${activeIdx + 1}`}

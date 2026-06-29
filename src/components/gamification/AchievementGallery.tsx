@@ -12,12 +12,12 @@ import { Trophy, Flame, Compass, Crown, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const CATEGORIES = [
-  { id: 'all' as const, labelEn: 'All', labelHe: 'הכל', icon: Trophy },
-  { id: 'session' as const, labelEn: 'Sessions', labelHe: 'סשנים', icon: Crown },
-  { id: 'streak' as const, labelEn: 'Rhythms', labelHe: 'מקצבים', icon: Flame },
-  { id: 'exploration' as const, labelEn: 'Explorer', labelHe: 'חקירה', icon: Compass },
-  { id: 'mastery' as const, labelEn: 'Mastery', labelHe: 'שליטה', icon: Crown },
-  { id: 'social' as const, labelEn: 'Social', labelHe: 'חברתי', icon: Users },
+  { id: 'all' as const, labelEn: 'All', labelHe: 'הכל', labelEs: 'Todo', icon: Trophy },
+  { id: 'session' as const, labelEn: 'Sessions', labelHe: 'סשנים', labelEs: 'Sesiones', icon: Crown },
+  { id: 'streak' as const, labelEn: 'Rhythms', labelHe: 'מקצבים', labelEs: 'Ritmos', icon: Flame },
+  { id: 'exploration' as const, labelEn: 'Explorer', labelHe: 'חקירה', labelEs: 'Exploración', icon: Compass },
+  { id: 'mastery' as const, labelEn: 'Mastery', labelHe: 'שליטה', labelEs: 'Maestría', icon: Crown },
+  { id: 'social' as const, labelEn: 'Social', labelHe: 'חברתי', labelEs: 'Social', icon: Users },
 ] as const;
 
 type CategoryFilter = typeof CATEGORIES[number]['id'];
@@ -84,7 +84,7 @@ export function AchievementGallery() {
               )}
             >
               <Icon className="w-3 h-3" />
-              {isHe ? cat.labelHe : cat.labelEn}
+              {language === 'he' ? cat.labelHe : language === 'es' ? cat.labelEs : cat.labelEn}
             </button>
           );
         })}

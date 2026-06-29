@@ -27,7 +27,7 @@ interface TodayExecutionSectionProps {
 }
 
 export function TodayExecutionSection({ hub }: TodayExecutionSectionProps) {
-  const { t, isRTL, language } = useTranslation();
+  const { t, isRTL, language, l } = useTranslation();
   const {
     queue, nextAction, schedule, tier,
     movementScore, bodyCovered, mindCovered, arenaCovered,
@@ -192,7 +192,7 @@ export function TodayExecutionSection({ hub }: TodayExecutionSectionProps) {
                   return (
                     <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted/60 border border-border/50 text-muted-foreground mb-1">
                       {Icon && <Icon className="h-3 w-3" />}
-                      {domain ? (isRTL ? domain.labelHe : domain.labelEn) : filteredNextAction.pillarId}
+                      {domain ? l(domain) : filteredNextAction.pillarId}
                     </span>
                   );
                 })()}

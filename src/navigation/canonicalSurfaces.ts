@@ -20,18 +20,19 @@ export interface CanonicalSurface {
   icon: LucideIcon;
   labelEn: string;
   labelHe: string;
+  labelEs: string;
 }
 
 export const CANONICAL_SURFACES: readonly CanonicalSurface[] = [
-  { id: 'home',      path: '/home',      icon: Home,           labelEn: 'Home',      labelHe: 'בית' },
-  { id: 'courses',   path: '/courses',   icon: GraduationCap,  labelEn: 'Courses',   labelHe: 'קורסים' },
-  { id: 'community', path: '/community', icon: Users,          labelEn: 'Community', labelHe: 'קהילה' },
-  { id: 'profile',   path: '/me',        icon: User,           labelEn: 'Profile',   labelHe: 'פרופיל' },
+  { id: 'home',      path: '/home',      icon: Home,           labelEn: 'Home',      labelHe: 'בית',      labelEs: 'Inicio' },
+  { id: 'courses',   path: '/courses',   icon: GraduationCap,  labelEn: 'Courses',   labelHe: 'קורסים',   labelEs: 'Cursos' },
+  { id: 'community', path: '/community', icon: Users,          labelEn: 'Community', labelHe: 'קהילה',    labelEs: 'Comunidad' },
+  { id: 'profile',   path: '/me',        icon: User,           labelEn: 'Profile',   labelHe: 'פרופיל',   labelEs: 'Perfil' },
 ] as const;
 
 /** Admin-only surface — appended to the nav by DesktopSideNav when the user is admin. */
 export const ADMIN_SURFACE: CanonicalSurface = {
-  id: 'admin', path: '/admin-hub', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול',
+  id: 'admin', path: '/admin-hub', icon: Shield, labelEn: 'Admin', labelHe: 'ניהול', labelEs: 'Admin',
 };
 
 export type CanonicalSurfaceId = CanonicalSurface['id'];

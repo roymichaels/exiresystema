@@ -12,11 +12,11 @@ import { cn } from '@/lib/utils';
 import type { Rarity } from '@/data/galleryOrbData';
 
 const FILTERS = [
-  { id: 'all' as const, labelEn: 'All', labelHe: 'הכל', icon: Package },
-  { id: 'legendary' as const, labelEn: 'Legendary', labelHe: 'אגדי', icon: Crown },
-  { id: 'epic' as const, labelEn: 'Epic', labelHe: 'אפי', icon: Gem },
-  { id: 'rare' as const, labelEn: 'Rare', labelHe: 'נדיר', icon: Sparkles },
-  { id: 'common' as const, labelEn: 'Common', labelHe: 'רגיל', icon: Star },
+  { id: 'all' as const, labelEn: 'All', labelHe: 'הכל', labelEs: 'Todo', icon: Package },
+  { id: 'legendary' as const, labelEn: 'Legendary', labelHe: 'אגדי', labelEs: 'Legendario', icon: Crown },
+  { id: 'epic' as const, labelEn: 'Epic', labelHe: 'אפי', labelEs: 'Épico', icon: Gem },
+  { id: 'rare' as const, labelEn: 'Rare', labelHe: 'נדיר', labelEs: 'Raro', icon: Sparkles },
+  { id: 'common' as const, labelEn: 'Common', labelHe: 'רגיל', labelEs: 'Común', icon: Star },
 ] as const;
 
 type FilterId = typeof FILTERS[number]['id'];
@@ -82,7 +82,7 @@ export function InventoryBag() {
               )}
             >
               <Icon className="w-3 h-3" />
-              {isHe ? f.labelHe : f.labelEn}
+              {language === 'he' ? f.labelHe : language === 'es' ? f.labelEs : f.labelEn}
             </button>
           );
         })}

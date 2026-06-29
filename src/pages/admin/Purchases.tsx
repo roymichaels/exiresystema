@@ -252,7 +252,7 @@ const Purchases = () => {
               filteredPurchases.map((purchase) => (
                 <TableRow key={purchase.id}>
                   <TableCell>
-                    {new Date(purchase.purchase_date).toLocaleDateString(language === 'he' ? "he-IL" : "en-US")}
+                    {new Date(purchase.purchase_date).toLocaleDateString(language === 'he' ? "he-IL" : language === 'es' ? "es-ES" : "en-US")}
                   </TableCell>
                   <TableCell>
                     {purchase.user_name || t('adminPurchases.unknown')}

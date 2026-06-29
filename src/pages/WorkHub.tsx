@@ -325,10 +325,10 @@ function WorkStats() {
   }, [sessions]);
 
   const cards = [
-    { labelHe: 'סה"כ בלוקים', labelEn: 'Total Blocks', value: stats.totalBlocks, icon: ListTodo, color: 'text-primary' },
-    { labelHe: 'דקות עבודה', labelEn: 'Work Minutes', value: stats.totalMinutes, icon: Clock, color: 'text-emerald-500' },
-    { labelHe: 'עבודה עמוקה', labelEn: 'Deep Work', value: `${stats.deepWorkMinutes}m`, icon: Brain, color: 'text-violet-500' },
-    { labelHe: '% עבודה עמוקה', labelEn: 'Deep %', value: `${stats.deepWorkPercent}%`, icon: Zap, color: 'text-amber-500' },
+    { labelHe: 'סה"כ בלוקים', labelEn: 'Total Blocks', labelEs: 'Bloques Totales', value: stats.totalBlocks, icon: ListTodo, color: 'text-primary' },
+    { labelHe: 'דקות עבודה', labelEn: 'Work Minutes', labelEs: 'Minutos de Trabajo', value: stats.totalMinutes, icon: Clock, color: 'text-emerald-500' },
+    { labelHe: 'עבודה עמוקה', labelEn: 'Deep Work', labelEs: 'Trabajo Profundo', value: `${stats.deepWorkMinutes}m`, icon: Brain, color: 'text-violet-500' },
+    { labelHe: '% עבודה עמוקה', labelEn: 'Deep %', labelEs: '% Profundo', value: `${stats.deepWorkPercent}%`, icon: Zap, color: 'text-amber-500' },
   ];
 
   return (
@@ -337,7 +337,7 @@ function WorkStats() {
         <div key={card.labelEn} className="p-4 rounded-xl border border-border bg-card text-center space-y-1">
           <card.icon className={cn("w-5 h-5 mx-auto", card.color)} />
           <p className="text-2xl font-bold">{card.value}</p>
-          <p className="text-xs text-muted-foreground">{isHe ? card.labelHe : card.labelEn}</p>
+          <p className="text-xs text-muted-foreground">{language === 'he' ? card.labelHe : language === 'es' ? card.labelEs : card.labelEn}</p>
         </div>
       ))}
     </div>
@@ -352,9 +352,9 @@ export default function WorkHub() {
   const [chatMode, setChatMode] = useState<'chat' | 'wizard' | null>(null);
 
   const tabs = [
-    { id: 'timer', labelHe: 'טיימר', labelEn: 'Timer', icon: Timer },
-    { id: 'log', labelHe: 'יומן', labelEn: 'Log', icon: Clock },
-    { id: 'stats', labelHe: 'קצב', labelEn: 'Rhythm', icon: BarChart3 },
+    { id: 'timer', labelHe: 'טיימר', labelEn: 'Timer', labelEs: 'Temporizador', icon: Timer },
+    { id: 'log', labelHe: 'יומן', labelEn: 'Log', labelEs: 'Registro', icon: Clock },
+    { id: 'stats', labelHe: 'קצב', labelEn: 'Rhythm', labelEs: 'Ritmo', icon: BarChart3 },
   ];
 
   return (
@@ -406,7 +406,7 @@ export default function WorkHub() {
                     )}
                   >
                     <Icon className="w-4 h-4" />
-                    {isHe ? tab.labelHe : tab.labelEn}
+                    {language === 'he' ? tab.labelHe : language === 'es' ? tab.labelEs : tab.labelEn}
                   </TabsTrigger>
                 );
               })}

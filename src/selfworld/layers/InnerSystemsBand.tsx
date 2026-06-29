@@ -10,7 +10,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useProfileModal } from '@/contexts/ProfileModalContext';
 
 export default function InnerSystemsBand() {
-  const { language } = useTranslation();
+  const { language, l } = useTranslation();
   const isHe = language === 'he';
   const navigate = useNavigate();
   const profileModal = useProfileModal();
@@ -37,7 +37,7 @@ export default function InnerSystemsBand() {
             <LayerCard
               key={world.id}
               icon={world.icon}
-              label={isHe ? world.labelHe : world.labelEn}
+              label={l(world)}
               hint={isHe ? world.hintHe : world.hintEn}
               locked={!navigable}
               onOpen={() => {

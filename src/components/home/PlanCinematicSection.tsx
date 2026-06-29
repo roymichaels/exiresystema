@@ -9,14 +9,14 @@ import { Dumbbell, Brain, TrendingUp, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PILLARS = [
-  { icon: Dumbbell, labelEn: 'Power', labelHe: 'כוח', color: 'text-red-400' },
-  { icon: Brain, labelEn: 'Mind', labelHe: 'מוח', color: 'text-indigo-400' },
-  { icon: TrendingUp, labelEn: 'Wealth', labelHe: 'עושר', color: 'text-emerald-400' },
-  { icon: Heart, labelEn: 'Soul', labelHe: 'נשמה', color: 'text-rose-400' },
+  { icon: Dumbbell, labelEn: 'Power', labelHe: 'כוח', labelEs: 'Poder', color: 'text-red-400' },
+  { icon: Brain, labelEn: 'Mind', labelHe: 'מוח', labelEs: 'Mente', color: 'text-indigo-400' },
+  { icon: TrendingUp, labelEn: 'Wealth', labelHe: 'עושר', labelEs: 'Riqueza', color: 'text-emerald-400' },
+  { icon: Heart, labelEn: 'Soul', labelHe: 'נשמה', labelEs: 'Alma', color: 'text-rose-400' },
 ];
 
 export default function PlanCinematicSection() {
-  const { isRTL } = useTranslation();
+  const { isRTL, l } = useTranslation();
 
   return (
     <section className="py-24 px-4 relative overflow-hidden">
@@ -116,7 +116,7 @@ export default function PlanCinematicSection() {
                     <Icon className={cn('h-6 w-6', p.color)} />
                   </motion.div>
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      {isRTL ? p.labelHe : p.labelEn}
+                      {l(p)}
                     </span>
                 </motion.div>
               );

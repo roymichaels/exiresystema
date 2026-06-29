@@ -17,8 +17,10 @@ export interface WorldAnchor {
   icon: LucideIcon;
   labelHe: string;
   labelEn: string;
+  labelEs: string;
   metaHe?: string;
   metaEn?: string;
+  metaEs?: string;
   hueHsl: string;
   /** Existing route to navigate to on tap. */
   to: string;
@@ -39,8 +41,10 @@ const SEED_ANCHORS: WorldAnchor[] = [
     icon: Users,
     labelHe: 'אנשים',
     labelEn: 'People',
+    labelEs: 'Personas',
     metaHe: 'קשרים פעילים',
     metaEn: 'Active connections',
+    metaEs: 'Conexiones activas',
     hueHsl: 'var(--aion-violet)',
     to: '/community',
     links: ['opportunities', 'environment'],
@@ -52,8 +56,10 @@ const SEED_ANCHORS: WorldAnchor[] = [
     icon: Sparkles,
     labelHe: 'הזדמנויות',
     labelEn: 'Opportunities',
+    labelEs: 'Oportunidades',
     metaHe: 'פוטנציאל פתוח',
     metaEn: 'Open potential',
+    metaEs: 'Potencial abierto',
     hueHsl: 'var(--aion-cyan)',
     to: '/coaches',
     links: ['practices'],
@@ -65,8 +71,10 @@ const SEED_ANCHORS: WorldAnchor[] = [
     icon: Compass,
     labelHe: 'מקומות',
     labelEn: 'Places',
+    labelEs: 'Lugares',
     metaHe: 'מיקומים חשובים',
     metaEn: 'Significant places',
+    metaEs: 'Lugares importantes',
     hueHsl: '160 70% 60%',
     to: '/learn',
     links: ['environment'],
@@ -78,8 +86,10 @@ const SEED_ANCHORS: WorldAnchor[] = [
     icon: GraduationCap,
     labelHe: 'תרגולים',
     labelEn: 'Practices',
+    labelEs: 'Prácticas',
     metaHe: 'תרגולי עתיד',
     metaEn: 'Future practices',
+    metaEs: 'Prácticas futuras',
     hueHsl: '24 88% 65%',
     to: '/learn',
     links: ['environment'],
@@ -91,8 +101,10 @@ const SEED_ANCHORS: WorldAnchor[] = [
     icon: MessageSquare,
     labelHe: 'סביבה',
     labelEn: 'Environment',
+    labelEs: 'Entorno',
     metaHe: 'אקלים חברתי יציב',
     metaEn: 'Stable social climate',
+    metaEs: 'Clima social estable',
     hueHsl: '188 95% 65%',
     to: '/community',
     links: [],

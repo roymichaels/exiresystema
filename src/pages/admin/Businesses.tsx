@@ -145,8 +145,8 @@ const Businesses = () => {
     <div className="space-y-6">
       <AdminPageHeader
         icon={Briefcase}
-        titleKey={isHebrew ? 'עסקים' : 'Businesses'}
-        subtitleKey={isHebrew ? 'ניהול מסעות עסקיים של משתמשים' : 'Manage user business journeys'}
+        titleKey={language === 'he' ? 'עסקים' : language === 'es' ? 'Negocios' : 'Businesses'}
+        subtitleKey={language === 'he' ? 'ניהול מסעות עסקיים של משתמשים' : language === 'es' ? 'Gestionar los viajes de negocios de los usuarios' : 'Manage user business journeys'}
       />
 
       {/* Stats Cards */}
@@ -154,7 +154,7 @@ const Businesses = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {isHebrew ? 'סה"כ עסקים' : 'Total Businesses'}
+              {language === 'he' ? 'סה"כ עסקים' : language === 'es' ? 'Total de negocios' : 'Total Businesses'}
             </CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -166,7 +166,7 @@ const Businesses = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {isHebrew ? 'בתהליך' : 'In Progress'}
+              {language === 'he' ? 'בתהליך' : language === 'es' ? 'En progreso' : 'In Progress'}
             </CardTitle>
             <Clock className="h-4 w-4 text-amber-500" />
           </CardHeader>
@@ -178,7 +178,7 @@ const Businesses = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {isHebrew ? 'הושלמו' : 'Completed'}
+{language === 'he' ? 'הושלמו' : language === 'es' ? 'Completados' : 'Completed'}
             </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-500" />
           </CardHeader>
@@ -190,7 +190,7 @@ const Businesses = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {isHebrew ? 'נוצרו היום' : 'Created Today'}
+              {language === 'he' ? 'נוצרו היום' : language === 'es' ? 'Creados hoy' : 'Created Today'}
             </CardTitle>
             <Calendar className="h-4 w-4 text-blue-500" />
           </CardHeader>
@@ -205,7 +205,7 @@ const Businesses = () => {
         <div className="relative flex-1">
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={isHebrew ? 'חיפוש לפי שם עסק או משתמש...' : 'Search by business or user name...'}
+            placeholder={language === 'he' ? 'חיפוש לפי שם עסק או משתמש...' : language === 'es' ? 'Buscar por nombre de negocio o usuario...' : 'Search by business or user name...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="ps-9"
@@ -213,12 +213,12 @@ const Businesses = () => {
         </div>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder={isHebrew ? 'סטטוס' : 'Status'} />
+            <SelectValue placeholder={language === 'he' ? 'סטטוס' : language === 'es' ? 'Estado' : 'Status'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{isHebrew ? 'הכל' : 'All'}</SelectItem>
-            <SelectItem value="in-progress">{isHebrew ? 'בתהליך' : 'In Progress'}</SelectItem>
-            <SelectItem value="completed">{isHebrew ? 'הושלמו' : 'Completed'}</SelectItem>
+            <SelectItem value="all">{language === 'he' ? 'הכל' : language === 'es' ? 'Todos' : 'All'}</SelectItem>
+            <SelectItem value="in-progress">{language === 'he' ? 'בתהליך' : language === 'es' ? 'En progreso' : 'In Progress'}</SelectItem>
+            <SelectItem value="completed">{language === 'he' ? 'הושלמו' : language === 'es' ? 'Completados' : 'Completed'}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -229,33 +229,33 @@ const Businesses = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{isHebrew ? 'שם העסק' : 'Business Name'}</TableHead>
-                <TableHead>{isHebrew ? 'משתמש' : 'User'}</TableHead>
-                <TableHead>{isHebrew ? 'התקדמות' : 'Progress'}</TableHead>
-                <TableHead>{isHebrew ? 'סטטוס' : 'Status'}</TableHead>
-                <TableHead>{isHebrew ? 'תעשייה' : 'Industry'}</TableHead>
-                <TableHead>{isHebrew ? 'נוצר' : 'Created'}</TableHead>
-                <TableHead>{isHebrew ? 'פעולות' : 'Actions'}</TableHead>
+                <TableHead>{language === 'he' ? 'שם העסק' : language === 'es' ? 'Nombre del negocio' : 'Business Name'}</TableHead>
+                <TableHead>{language === 'he' ? 'משתמש' : language === 'es' ? 'Usuario' : 'User'}</TableHead>
+                <TableHead>{language === 'he' ? 'התקדמות' : language === 'es' ? 'Progreso' : 'Progress'}</TableHead>
+                <TableHead>{language === 'he' ? 'סטטוס' : language === 'es' ? 'Estado' : 'Status'}</TableHead>
+                <TableHead>{language === 'he' ? 'תעשייה' : language === 'es' ? 'Industria' : 'Industry'}</TableHead>
+                <TableHead>{language === 'he' ? 'נוצר' : language === 'es' ? 'Creado' : 'Created'}</TableHead>
+                <TableHead>{language === 'he' ? 'פעולות' : language === 'es' ? 'Acciones' : 'Actions'}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    {isHebrew ? 'טוען...' : 'Loading...'}
+                    {language === 'he' ? 'טוען...' : language === 'es' ? 'Cargando...' : 'Loading...'}
                   </TableCell>
                 </TableRow>
               ) : filteredBusinesses.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    {isHebrew ? 'לא נמצאו עסקים' : 'No businesses found'}
+                    {language === 'he' ? 'לא נמצאו עסקים' : language === 'es' ? 'No se encontraron negocios' : 'No businesses found'}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredBusinesses.map((business) => (
                   <TableRow key={business.id}>
                     <TableCell className="font-medium">
-                      {business.business_name || (isHebrew ? 'ללא שם' : 'Unnamed')}
+                      {business.business_name || (language === 'he' ? 'ללא שם' : language === 'es' ? 'Sin nombre' : 'Unnamed')}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -272,8 +272,8 @@ const Businesses = () => {
                     <TableCell>
                       <Badge variant={business.journey_complete ? 'default' : 'secondary'}>
                         {business.journey_complete 
-                          ? (isHebrew ? 'הושלם' : 'Completed')
-                          : (isHebrew ? 'בתהליך' : 'In Progress')
+                          ? (language === 'he' ? 'הושלם' : language === 'es' ? 'Completado' : 'Completed')
+                          : (language === 'he' ? 'בתהליך' : language === 'es' ? 'En progreso' : 'In Progress')
                         }
                       </Badge>
                     </TableCell>
@@ -286,7 +286,7 @@ const Businesses = () => {
                         onClick={() => setSelectedBusiness(business)}
                       >
                         <Eye className="h-4 w-4 me-1" />
-                        {isHebrew ? 'צפה' : 'View'}
+                        {language === 'he' ? 'צפה' : language === 'es' ? 'Ver' : 'View'}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -303,7 +303,7 @@ const Businesses = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Briefcase className="h-5 w-5" />
-              {selectedBusiness?.business_name || (isHebrew ? 'פרטי מסע עסקי' : 'Business Journey Details')}
+              {selectedBusiness?.business_name || (language === 'he' ? 'פרטי מסע עסקי' : language === 'es' ? 'Detalles del viaje de negocios' : 'Business Journey Details')}
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pe-4">
@@ -312,15 +312,15 @@ const Businesses = () => {
                 {/* Meta info */}
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground border-b pb-4">
                   <div>
-                    <span className="font-medium">{isHebrew ? 'משתמש: ' : 'User: '}</span>
+                    <span className="font-medium">{language === 'he' ? 'משתמש: ' : language === 'es' ? 'Usuario: ' : 'User: '}</span>
                     {selectedBusiness.user_name || '-'}
                   </div>
                   <div>
-                    <span className="font-medium">{isHebrew ? 'התקדמות: ' : 'Progress: '}</span>
+                    <span className="font-medium">{language === 'he' ? 'התקדמות: ' : language === 'es' ? 'Progreso: ' : 'Progress: '}</span>
                     {selectedBusiness.current_step}/10
                   </div>
                   <div>
-                    <span className="font-medium">{isHebrew ? 'נוצר: ' : 'Created: '}</span>
+                    <span className="font-medium">{language === 'he' ? 'נוצר: ' : language === 'es' ? 'Creado: ' : 'Created: '}</span>
                     {format(new Date(selectedBusiness.created_at), 'dd/MM/yyyy HH:mm')}
                   </div>
                 </div>
@@ -329,7 +329,7 @@ const Businesses = () => {
                 {selectedBusiness.ai_summary && (
                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                     <h4 className="font-semibold text-sm text-primary mb-2">
-                      {isHebrew ? 'סיכום AI' : 'AI Summary'}
+                      {language === 'he' ? 'סיכום AI' : language === 'es' ? 'Resumen de IA' : 'AI Summary'}
                     </h4>
                     <p className="text-sm whitespace-pre-wrap">{selectedBusiness.ai_summary}</p>
                   </div>
@@ -337,16 +337,16 @@ const Businesses = () => {
 
                 {/* Steps Data */}
                 <div className="space-y-3">
-                  {renderStepData(isHebrew ? 'שלב 1: חזון' : 'Step 1: Vision', selectedBusiness.step_1_vision)}
-                  {renderStepData(isHebrew ? 'שלב 2: מודל עסקי' : 'Step 2: Business Model', selectedBusiness.step_2_business_model)}
-                  {renderStepData(isHebrew ? 'שלב 3: קהל יעד' : 'Step 3: Target Audience', selectedBusiness.step_3_target_audience)}
-                  {renderStepData(isHebrew ? 'שלב 4: הצעת ערך' : 'Step 4: Value Proposition', selectedBusiness.step_4_value_proposition)}
-                  {renderStepData(isHebrew ? 'שלב 5: אתגרים' : 'Step 5: Challenges', selectedBusiness.step_5_challenges)}
-                  {renderStepData(isHebrew ? 'שלב 6: משאבים' : 'Step 6: Resources', selectedBusiness.step_6_resources)}
-                  {renderStepData(isHebrew ? 'שלב 7: תוכנית פיננסית' : 'Step 7: Financial Plan', selectedBusiness.step_7_financial)}
-                  {renderStepData(isHebrew ? 'שלב 8: שיווק' : 'Step 8: Marketing', selectedBusiness.step_8_marketing)}
-                  {renderStepData(isHebrew ? 'שלב 9: תפעול' : 'Step 9: Operations', selectedBusiness.step_9_operations)}
-                  {renderStepData(isHebrew ? 'שלב 10: תוכנית פעולה' : 'Step 10: Action Plan', selectedBusiness.step_10_action_plan)}
+                  {renderStepData(language === 'he' ? 'שלב 1: חזון' : language === 'es' ? 'Paso 1: Visión' : 'Step 1: Vision', selectedBusiness.step_1_vision)}
+                  {renderStepData(language === 'he' ? 'שלב 2: מודל עסקי' : language === 'es' ? 'Paso 2: Modelo de negocio' : 'Step 2: Business Model', selectedBusiness.step_2_business_model)}
+                  {renderStepData(language === 'he' ? 'שלב 3: קהל יעד' : language === 'es' ? 'Paso 3: Público objetivo' : 'Step 3: Target Audience', selectedBusiness.step_3_target_audience)}
+                  {renderStepData(language === 'he' ? 'שלב 4: הצעת ערך' : language === 'es' ? 'Paso 4: Propuesta de valor' : 'Step 4: Value Proposition', selectedBusiness.step_4_value_proposition)}
+                  {renderStepData(language === 'he' ? 'שלב 5: אתגרים' : language === 'es' ? 'Paso 5: Desafíos' : 'Step 5: Challenges', selectedBusiness.step_5_challenges)}
+                  {renderStepData(language === 'he' ? 'שלב 6: משאבים' : language === 'es' ? 'Paso 6: Recursos' : 'Step 6: Resources', selectedBusiness.step_6_resources)}
+                  {renderStepData(language === 'he' ? 'שלב 7: תוכנית פיננסית' : language === 'es' ? 'Paso 7: Plan financiero' : 'Step 7: Financial Plan', selectedBusiness.step_7_financial)}
+                  {renderStepData(language === 'he' ? 'שלב 8: שיווק' : language === 'es' ? 'Paso 8: Marketing' : 'Step 8: Marketing', selectedBusiness.step_8_marketing)}
+                  {renderStepData(language === 'he' ? 'שלב 9: תפעול' : language === 'es' ? 'Paso 9: Operaciones' : 'Step 9: Operations', selectedBusiness.step_9_operations)}
+                  {renderStepData(language === 'he' ? 'שלב 10: תוכנית פעולה' : language === 'es' ? 'Paso 10: Plan de acción' : 'Step 10: Action Plan', selectedBusiness.step_10_action_plan)}
                 </div>
               </div>
             )}

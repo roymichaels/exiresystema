@@ -17,8 +17,10 @@ export interface GalleryOrb {
   id: string;
   nameEn: string;
   nameHe: string;
+  nameEs?: string;
   descEn: string;
   descHe: string;
+  descEs?: string;
   rarity: Rarity;
   traits: {
     material: MaterialType;
@@ -38,12 +40,12 @@ export const RARITY_COLORS: Record<Rarity, string> = {
   legendary: '45 90% 55%',
 };
 
-export const RARITY_LABELS: Record<Rarity, { en: string; he: string }> = {
-  common: { en: 'Common', he: 'נפוץ' },
-  uncommon: { en: 'Uncommon', he: 'לא שכיח' },
-  rare: { en: 'Rare', he: 'נדיר' },
-  epic: { en: 'Epic', he: 'אפי' },
-  legendary: { en: 'Legendary', he: 'אגדי' },
+export const RARITY_LABELS: Record<Rarity, { en: string; he: string; es: string }> = {
+  common: { en: 'Common', he: 'נפוץ', es: 'Común' },
+  uncommon: { en: 'Uncommon', he: 'לא שכיח', es: 'Poco Común' },
+  rare: { en: 'Rare', he: 'נדיר', es: 'Raro' },
+  epic: { en: 'Epic', he: 'אפי', es: 'Épico' },
+  legendary: { en: 'Legendary', he: 'אגדי', es: 'Legendario' },
 };
 
 // Helper to create profiles from hue-based specs
@@ -810,84 +812,85 @@ export interface TraitCategory {
   key: string;
   labelEn: string;
   labelHe: string;
-  options: { value: string; labelEn: string; labelHe: string }[];
+  labelEs: string;
+  options: { value: string; labelEn: string; labelHe: string; labelEs: string }[];
 }
 
 export const TRAIT_CATEGORIES: TraitCategory[] = [
   {
-    key: 'material', labelEn: 'Material', labelHe: 'חומר',
+    key: 'material', labelEn: 'Material', labelHe: 'חומר', labelEs: 'Material',
     options: [
-      { value: 'glass', labelEn: 'Glass', labelHe: 'זכוכית' },
-      { value: 'metal', labelEn: 'Metal', labelHe: 'מתכת' },
-      { value: 'iridescent', labelEn: 'Iridescent', labelHe: 'אופלסנט' },
-      { value: 'plasma', labelEn: 'Plasma', labelHe: 'פלזמה' },
-      { value: 'crystal', labelEn: 'Crystal', labelHe: 'קריסטל' },
-      { value: 'lava', labelEn: 'Lava', labelHe: 'לבה' },
-      { value: 'nebula', labelEn: 'Nebula', labelHe: 'ערפילית' },
-      { value: 'obsidian', labelEn: 'Obsidian', labelHe: 'אובסידיאן' },
-      { value: 'ice', labelEn: 'Ice', labelHe: 'קרח' },
-      { value: 'holographic', labelEn: 'Holographic', labelHe: 'הולוגרפי' },
-      { value: 'tiger', labelEn: 'Tiger', labelHe: 'טייגר' },
-      { value: 'ember', labelEn: 'Ember', labelHe: 'גחלת' },
-      { value: 'matte', labelEn: 'Matte', labelHe: 'מאט' },
-      { value: 'bone', labelEn: 'Bone', labelHe: 'עצם' },
-      { value: 'thorny', labelEn: 'Thorny', labelHe: 'קוצני' },
-      { value: 'void', labelEn: 'Void', labelHe: 'ריק' },
+      { value: 'glass', labelEn: 'Glass', labelHe: 'זכוכית', labelEs: 'Vidrio' },
+      { value: 'metal', labelEn: 'Metal', labelHe: 'מתכת', labelEs: 'Metal' },
+      { value: 'iridescent', labelEn: 'Iridescent', labelHe: 'אופלסנט', labelEs: 'Iridiscente' },
+      { value: 'plasma', labelEn: 'Plasma', labelHe: 'פלזמה', labelEs: 'Plasma' },
+      { value: 'crystal', labelEn: 'Crystal', labelHe: 'קריסטל', labelEs: 'Cristal' },
+      { value: 'lava', labelEn: 'Lava', labelHe: 'לבה', labelEs: 'Lava' },
+      { value: 'nebula', labelEn: 'Nebula', labelHe: 'ערפילית', labelEs: 'Nebulosa' },
+      { value: 'obsidian', labelEn: 'Obsidian', labelHe: 'אובסידיאן', labelEs: 'Obsidiana' },
+      { value: 'ice', labelEn: 'Ice', labelHe: 'קרח', labelEs: 'Hielo' },
+      { value: 'holographic', labelEn: 'Holographic', labelHe: 'הולוגרפי', labelEs: 'Holográfico' },
+      { value: 'tiger', labelEn: 'Tiger', labelHe: 'טייגר', labelEs: 'Tigre' },
+      { value: 'ember', labelEn: 'Ember', labelHe: 'גחלת', labelEs: 'Ascua' },
+      { value: 'matte', labelEn: 'Matte', labelHe: 'מאט', labelEs: 'Mate' },
+      { value: 'bone', labelEn: 'Bone', labelHe: 'עצם', labelEs: 'Hueso' },
+      { value: 'thorny', labelEn: 'Thorny', labelHe: 'קוצני', labelEs: 'Espinoso' },
+      { value: 'void', labelEn: 'Void', labelHe: 'ריק', labelEs: 'Vacío' },
     ],
   },
   {
-    key: 'pattern', labelEn: 'Pattern', labelHe: 'דפוס',
+    key: 'pattern', labelEn: 'Pattern', labelHe: 'דפוס', labelEs: 'Patrón',
     options: [
-      { value: 'voronoi', labelEn: 'Voronoi', labelHe: 'וורונוי' },
-      { value: 'cellular', labelEn: 'Cellular', labelHe: 'תאי' },
-      { value: 'fractal', labelEn: 'Fractal', labelHe: 'פרקטלי' },
-      { value: 'shards', labelEn: 'Shards', labelHe: 'רסיסים' },
-      { value: 'swirl', labelEn: 'Swirl', labelHe: 'מערבולת' },
-      { value: 'strata', labelEn: 'Strata', labelHe: 'שכבות' },
+      { value: 'voronoi', labelEn: 'Voronoi', labelHe: 'וורונוי', labelEs: 'Voronoi' },
+      { value: 'cellular', labelEn: 'Cellular', labelHe: 'תאי', labelEs: 'Celular' },
+      { value: 'fractal', labelEn: 'Fractal', labelHe: 'פרקטלי', labelEs: 'Fractal' },
+      { value: 'shards', labelEn: 'Shards', labelHe: 'רסיסים', labelEs: 'Fragmentos' },
+      { value: 'swirl', labelEn: 'Swirl', labelHe: 'מערבולת', labelEs: 'Remolino' },
+      { value: 'strata', labelEn: 'Strata', labelHe: 'שכבות', labelEs: 'Estratos' },
     ],
   },
   {
-    key: 'geometry', labelEn: 'Shape', labelHe: 'צורה',
+    key: 'geometry', labelEn: 'Shape', labelHe: 'צורה', labelEs: 'Forma',
     options: [
-      { value: 'sphere', labelEn: 'Sphere', labelHe: 'כדור' },
-      { value: 'dodeca', labelEn: 'Dodeca', labelHe: 'דודקהדרון' },
-      { value: 'icosa', labelEn: 'Icosa', labelHe: 'איקוסהדרון' },
-      { value: 'octa', labelEn: 'Octa', labelHe: 'אוקטהדרון' },
-      { value: 'torus', labelEn: 'Torus', labelHe: 'טורוס' },
-      { value: 'spiky', labelEn: 'Spiky', labelHe: 'קוצני' },
-      { value: 'tetra', labelEn: 'Tetra', labelHe: 'טטרהדרון' },
-      { value: 'cube', labelEn: 'Cube', labelHe: 'קוביה' },
-      { value: 'cone', labelEn: 'Cone', labelHe: 'חרוט' },
-      { value: 'cylinder', labelEn: 'Cylinder', labelHe: 'גליל' },
-      { value: 'capsule', labelEn: 'Capsule', labelHe: 'קפסולה' },
-      { value: 'knot', labelEn: 'Knot', labelHe: 'קשר' },
+      { value: 'sphere', labelEn: 'Sphere', labelHe: 'כדור', labelEs: 'Esfera' },
+      { value: 'dodeca', labelEn: 'Dodeca', labelHe: 'דודקהדרון', labelEs: 'Dodecaedro' },
+      { value: 'icosa', labelEn: 'Icosa', labelHe: 'איקוסהדרון', labelEs: 'Icosaedro' },
+      { value: 'octa', labelEn: 'Octa', labelHe: 'אוקטהדרון', labelEs: 'Octaedro' },
+      { value: 'torus', labelEn: 'Torus', labelHe: 'טורוס', labelEs: 'Toro' },
+      { value: 'spiky', labelEn: 'Spiky', labelHe: 'קוצני', labelEs: 'Espinoso' },
+      { value: 'tetra', labelEn: 'Tetra', labelHe: 'טטרהדרון', labelEs: 'Tetraedro' },
+      { value: 'cube', labelEn: 'Cube', labelHe: 'קוביה', labelEs: 'Cubo' },
+      { value: 'cone', labelEn: 'Cone', labelHe: 'חרוט', labelEs: 'Cono' },
+      { value: 'cylinder', labelEn: 'Cylinder', labelHe: 'גליל', labelEs: 'Cilindro' },
+      { value: 'capsule', labelEn: 'Capsule', labelHe: 'קפסולה', labelEs: 'Cápsula' },
+      { value: 'knot', labelEn: 'Knot', labelHe: 'קשר', labelEs: 'Nudo' },
     ],
   },
   {
-    key: 'glow', labelEn: 'Glow', labelHe: 'זוהר',
+    key: 'glow', labelEn: 'Glow', labelHe: 'זוהר', labelEs: 'Brillo',
     options: [
-      { value: 'none', labelEn: 'None', labelHe: 'ללא' },
-      { value: 'soft', labelEn: 'Soft', labelHe: 'רך' },
-      { value: 'medium', labelEn: 'Medium', labelHe: 'בינוני' },
-      { value: 'intense', labelEn: 'Intense', labelHe: 'אינטנסיבי' },
-      { value: 'cosmic', labelEn: 'Cosmic', labelHe: 'קוסמי' },
+      { value: 'none', labelEn: 'None', labelHe: 'ללא', labelEs: 'Ninguno' },
+      { value: 'soft', labelEn: 'Soft', labelHe: 'רך', labelEs: 'Suave' },
+      { value: 'medium', labelEn: 'Medium', labelHe: 'בינוני', labelEs: 'Medio' },
+      { value: 'intense', labelEn: 'Intense', labelHe: 'אינטנסיבי', labelEs: 'Intenso' },
+      { value: 'cosmic', labelEn: 'Cosmic', labelHe: 'קוסמי', labelEs: 'Cósmico' },
     ],
   },
   {
-    key: 'rarity', labelEn: 'Rarity', labelHe: 'נדירות',
+    key: 'rarity', labelEn: 'Rarity', labelHe: 'נדירות', labelEs: 'Rareza',
     options: [
-      { value: 'common', labelEn: 'Common', labelHe: 'נפוץ' },
-      { value: 'uncommon', labelEn: 'Uncommon', labelHe: 'לא שכיח' },
-      { value: 'rare', labelEn: 'Rare', labelHe: 'נדיר' },
-      { value: 'epic', labelEn: 'Epic', labelHe: 'אפי' },
-      { value: 'legendary', labelEn: 'Legendary', labelHe: 'אגדי' },
+      { value: 'common', labelEn: 'Common', labelHe: 'נפוץ', labelEs: 'Común' },
+      { value: 'uncommon', labelEn: 'Uncommon', labelHe: 'לא שכיח', labelEs: 'Poco Común' },
+      { value: 'rare', labelEn: 'Rare', labelHe: 'נדיר', labelEs: 'Raro' },
+      { value: 'epic', labelEn: 'Epic', labelHe: 'אפי', labelEs: 'Épico' },
+      { value: 'legendary', labelEn: 'Legendary', labelHe: 'אגדי', labelEs: 'Legendario' },
     ],
   },
   {
-    key: 'particles', labelEn: 'Particles', labelHe: 'חלקיקים',
+    key: 'particles', labelEn: 'Particles', labelHe: 'חלקיקים', labelEs: 'Partículas',
     options: [
-      { value: 'true', labelEn: 'Yes', labelHe: 'כן' },
-      { value: 'false', labelEn: 'No', labelHe: 'לא' },
+      { value: 'true', labelEn: 'Yes', labelHe: 'כן', labelEs: 'Sí' },
+      { value: 'false', labelEn: 'No', labelHe: 'לא', labelEs: 'No' },
     ],
   },
 ];

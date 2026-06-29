@@ -14,11 +14,11 @@ import { requireAdmin } from "../_shared/auth.ts";
 import { aiChatCompletion } from "../_shared/aiGateway.ts";
 
 const PRIMARY_MODEL =
-  Deno.env.get("EXIRE_ADVISOR_MODEL") || "nousresearch/hermes-3-llama-3.1-405b:free";
+  Deno.env.get("EXIRE_ADVISOR_MODEL") || "nvidia/nemotron-3-ultra-550b-a55b:free";
 const DEEP_MODEL =
-  Deno.env.get("EXIRE_ADVISOR_DEEP_MODEL") || "nousresearch/hermes-3-llama-3.1-405b:free";
+  Deno.env.get("EXIRE_ADVISOR_DEEP_MODEL") || "nvidia/nemotron-3-ultra-550b-a55b:free";
 const FALLBACK_MODEL =
-  Deno.env.get("EXIRE_ADVISOR_FALLBACK_MODEL") || "meta-llama/llama-3.3-70b-instruct:free";
+  Deno.env.get("EXIRE_ADVISOR_FALLBACK_MODEL") || "nvidia/nemotron-3-ultra-550b-a55b:free";
 
 function errJSON(
   code: string,

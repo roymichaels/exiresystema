@@ -111,7 +111,7 @@ export function HypnosisModal({ open, onOpenChange }: HypnosisModalProps) {
 
   // Rotating generating messages
   const [generatingMessageIndex, setGeneratingMessageIndex] = useState(0);
-  const GENERATING_MESSAGES = {
+  const GENERATING_MESSAGES: Record<string, string[]> = {
     he: [
       'מנתח את הפרופיל שלך...',
       'מתאים את הסשן אישית...',
@@ -124,7 +124,14 @@ export function HypnosisModal({ open, onOpenChange }: HypnosisModalProps) {
       'Creating the perfect experience...',
       'Almost ready...',
     ],
+    es: [
+      'Analizando tu perfil...',
+      'Personalizando tu sesión...',
+      'Creando la experiencia perfecta...',
+      'Casi listo...',
+    ],
   };
+  const messagesForLang = GENERATING_MESSAGES[language] ?? GENERATING_MESSAGES.en;
 
   const scheduleTimeout = useCallback((fn: () => void, delay: number) => {
     const id = setTimeout(() => {
@@ -160,7 +167,7 @@ export function HypnosisModal({ open, onOpenChange }: HypnosisModalProps) {
     }
     const interval = setInterval(() => {
       setGeneratingMessageIndex((prev) => 
-        (prev + 1) % GENERATING_MESSAGES[language as 'he' | 'en'].length
+        (prev + 1) % messagesForLang.length
       );
     }, 4000);
     return () => clearInterval(interval);
@@ -894,7 +901,7 @@ export function HypnosisModal({ open, onOpenChange }: HypnosisModalProps) {
                     exit={{ opacity: 0, y: -10 }}
                     className="text-lg font-medium"
                   >
-                    {GENERATING_MESSAGES[language as 'he' | 'en'][generatingMessageIndex]}
+                    {messagesForLang[generatingMessageIndex]}
                   </motion.p>
                 </AnimatePresence>
                 

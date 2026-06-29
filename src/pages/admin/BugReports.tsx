@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
-import { he, enUS } from 'date-fns/locale';
+import { he, enUS, es } from 'date-fns/locale';
 import {
   Bug,
   Monitor,
@@ -96,7 +96,7 @@ const BugReports = () => {
   const { t, isRTL, language } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const dateLocale = language === 'he' ? he : enUS;
+  const dateLocale = language === 'he' ? he : language === 'es' ? es : enUS;
 
   const [statusFilter, setStatusFilter] = useState<BugStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<BugPriority | 'all'>('all');
@@ -152,7 +152,7 @@ const BugReports = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bug-reports'] });
-      toast({ title: t('common.success'), description: 'Status updated' });
+      toast({ title: t('common.success'), description: language === 'he' ? 'הסטטוס עודכן' : language === 'es' ? 'Estado actualizado' : 'Status updated' });
       setSelectedReport(null);
     },
     onError: () => {
@@ -203,7 +203,7 @@ const BugReports = () => {
           <h1 className="text-2xl font-bold">{t('bugReport.adminTitle')}</h1>
         </div>
         <div className="text-sm text-muted-foreground">
-          {reports?.length || 0} {language === 'he' ? 'דיווחים' : 'reports'}
+          {reports?.length || 0} {language === 'he' ? 'דיווחים' : language === 'es' ? 'informes' : 'reports'}
         </div>
       </div>
 
@@ -223,7 +223,7 @@ const BugReports = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{language === 'he' ? 'הכל' : 'All'}</SelectItem>
+                <SelectItem value="all">{language === 'he' ? 'הכל' : language === 'es' ? 'Todos' : 'All'}</SelectItem>
                 <SelectItem value="new">{t('bugReport.statusNew')}</SelectItem>
                 <SelectItem value="in_progress">{t('bugReport.statusInProgress')}</SelectItem>
                 <SelectItem value="resolved">{t('bugReport.statusResolved')}</SelectItem>
@@ -240,7 +240,7 @@ const BugReports = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{language === 'he' ? 'הכל' : 'All'}</SelectItem>
+                <SelectItem value="all">{language === 'he' ? 'הכל' : language === 'es' ? 'Todos' : 'All'}</SelectItem>
                 <SelectItem value="low">{t('bugReport.priorityLow')}</SelectItem>
                 <SelectItem value="medium">{t('bugReport.priorityMedium')}</SelectItem>
                 <SelectItem value="high">{t('bugReport.priorityHigh')}</SelectItem>
@@ -259,7 +259,7 @@ const BugReports = () => {
       ) : reports?.length === 0 ? (
         <Card className="bg-card/50 backdrop-blur">
           <CardContent className="py-12 text-center text-muted-foreground">
-            {language === 'he' ? 'אין דיווחי באגים' : 'No bug reports found'}
+            {language === 'he' ? 'אין דיווחי באגים' : language === 'es' ? 'No se encontraron informes de errores' : 'No bug reports found'}
           </CardContent>
         </Card>
       ) : (
@@ -321,7 +321,7 @@ const BugReports = () => {
                           setAdminNotes(report.admin_notes || '');
                         }}
                       >
-                        {language === 'he' ? 'נהל' : 'Manage'}
+                        {language === 'he' ? 'נהל' : language === 'es' ? 'Gestionar' : 'Manage'}
                       </Button>
                       {isExpanded ? (
                         <ChevronUp className="h-5 w-5 text-muted-foreground" />
@@ -344,12 +344,12 @@ const BugReports = () => {
                         <div className="space-y-2">
                           <h4 className="text-sm font-medium">{t('bugReport.deviceInfo')}</h4>
                           <div className="text-xs text-muted-foreground space-y-1">
-                            <p><strong>Browser:</strong> {report.browser}</p>
-                            <p><strong>OS:</strong> {report.os}</p>
-                            <p><strong>Device:</strong> {report.device_type}</p>
-                            <p><strong>Screen:</strong> {report.screen_size}</p>
+                            <p><strong>{language === 'he' ? 'דפדפן:' : language === 'es' ? 'Navegador:' : 'Browser:'}</strong> {report.browser}</p>
+                            <p><strong>{language === 'he' ? 'מערכת הפעלה:' : language === 'es' ? 'Sistema operativo:' : 'OS:'}</strong> {report.os}</p>
+                            <p><strong>{language === 'he' ? 'מכשיר:' : language === 'es' ? 'Dispositivo:' : 'Device:'}</strong> {report.device_type}</p>
+                            <p><strong>{language === 'he' ? 'מסך:' : language === 'es' ? 'Pantalla:' : 'Screen:'}</strong> {report.screen_size}</p>
                             {report.contact_email && (
-                              <p><strong>Email:</strong> {report.contact_email}</p>
+                              <p><strong>{language === 'he' ? 'אימייל:' : language === 'es' ? 'Correo electrónico:' : 'Email:'}</strong> {report.contact_email}</p>
                             )}
                           </div>
                         </div>
@@ -364,7 +364,7 @@ const BugReports = () => {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                           >
-                            {language === 'he' ? 'צפה בצילום מסך' : 'View Screenshot'}
+                            {language === 'he' ? 'צפה בצילום מסך' : language === 'es' ? 'Ver captura de pantalla' : 'View Screenshot'}
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         </div>
@@ -373,7 +373,7 @@ const BugReports = () => {
                       {report.admin_notes && (
                         <div>
                           <h4 className="text-sm font-medium mb-2">
-                            {language === 'he' ? 'הערות אדמין' : 'Admin Notes'}
+                            {language === 'he' ? 'הערות אדמין' : language === 'es' ? 'Notas de administración' : 'Admin Notes'}
                           </h4>
                           <p className="text-sm text-muted-foreground">{report.admin_notes}</p>
                         </div>
@@ -391,7 +391,7 @@ const BugReports = () => {
       <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{language === 'he' ? 'ניהול דיווח' : 'Manage Report'}</DialogTitle>
+            <DialogTitle>{language === 'he' ? 'ניהול דיווח' : language === 'es' ? 'Gestionar informe' : 'Manage Report'}</DialogTitle>
             <DialogDescription>
               {selectedReport?.title}
             </DialogDescription>
@@ -426,7 +426,7 @@ const BugReports = () => {
 
             <div>
               <label className="text-sm font-medium">
-                {language === 'he' ? 'הערות אדמין' : 'Admin Notes'}
+                {language === 'he' ? 'הערות אדמין' : language === 'es' ? 'Notas de administración' : 'Admin Notes'}
               </label>
               <Textarea
                 value={adminNotes}

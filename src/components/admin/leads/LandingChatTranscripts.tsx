@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, MessageSquare, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Message {
   id: string;
@@ -30,12 +31,19 @@ interface SessionGroup {
   messages: Message[];
 }
 
-const sourceLabel: Record<string, string> = {
+const heSourceLabel: Record<string, string> = {
+  intake_chat: "צ׳אט קליטה",
+  aion_landing_chat: "צ׳אט נחיתה AION",
+};
+
+const enSourceLabel: Record<string, string> = {
   intake_chat: "Intake Chat",
   aion_landing_chat: "AION Landing Chat",
 };
 
 export const LandingChatTranscripts = () => {
+  const { language } = useTranslation();
+  const sourceLabel = language === 'he' ? heSourceLabel : enSourceLabel;
   const [rows, setRows] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -92,8 +100,9 @@ export const LandingChatTranscripts = () => {
       <Card className="glass-panel border-primary/20">
         <CardContent className="py-12 text-center text-muted-foreground">
           <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          No chat transcripts yet. They’ll appear here as soon as visitors
-          start a conversation on the homepage.
+          {language === 'he'
+            ? 'אין תמלילי צ\'אט עדיין. הם יופיעו כאן ברגע שמבקרים יתחילו שיחה בעמוד הבית.'
+            : "No chat transcripts yet. They'll appear here as soon as visitors start a conversation on the homepage."}
         </CardContent>
       </Card>
     );
@@ -103,7 +112,7 @@ export const LandingChatTranscripts = () => {
     <div className="grid md:grid-cols-[280px,1fr] gap-4">
       <Card className="glass-panel border-primary/20">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <CardTitle className="text-sm">Sessions ({sessions.length})</CardTitle>
+          <CardTitle className="text-sm">{language === 'he' ? 'שיחות' : 'Sessions'} ({sessions.length})</CardTitle>
           <Button size="icon" variant="ghost" onClick={fetchRows}>
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -133,7 +142,7 @@ export const LandingChatTranscripts = () => {
                         {s.session_id.slice(0, 8)}…
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-0.5">
-                        {s.messages.length} messages
+                        {s.messages.length} {language === 'he' ? 'הודעות' : 'messages'}
                       </div>
                     </button>
                   </li>

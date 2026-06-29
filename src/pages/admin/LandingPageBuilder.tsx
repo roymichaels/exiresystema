@@ -36,7 +36,7 @@ const LandingPageBuilder = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { isRTL } = useTranslation();
+  const { language, isRTL } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -160,7 +160,7 @@ const LandingPageBuilder = () => {
       queryClient.invalidateQueries({ queryKey: ['landing-pages'] });
       queryClient.invalidateQueries({ queryKey: ['landing-page-builder', id] });
       setHasChanges(false);
-      toast({ title: isRTL ? 'נשמר בהצלחה' : 'Saved successfully' });
+      toast({ title: language === 'he' ? 'נשמר בהצלחה' : language === 'es' ? 'Guardado exitosamente' : 'Saved successfully' });
       
       if (isNew && data?.id) {
         navigate(`/admin/landing-pages/edit/${data.id}`, { replace: true });
@@ -169,7 +169,7 @@ const LandingPageBuilder = () => {
     onError: (error) => {
       console.error('Save error:', error);
       toast({ 
-        title: isRTL ? 'שגיאה בשמירה' : 'Error saving',
+        title: language === 'he' ? 'שגיאה בשמירה' : language === 'es' ? 'Error al guardar' : 'Error saving',
         variant: 'destructive'
       });
     },
@@ -254,7 +254,7 @@ const LandingPageBuilder = () => {
       <div className="h-screen flex items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">{isRTL ? 'טוען...' : 'Loading...'}</p>
+          <p className="text-muted-foreground">{language === 'he' ? 'טוען...' : language === 'es' ? 'Cargando...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -271,14 +271,16 @@ const LandingPageBuilder = () => {
           className="gap-2 self-start mb-4"
         >
           <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-          {isRTL ? 'חזרה' : 'Back'}
+          {language === 'he' ? 'חזרה' : language === 'es' ? 'Atrás' : 'Back'}
         </Button>
         <div className="rounded-2xl border border-border/40 bg-card/50 p-5 space-y-3 text-center">
           <Settings className="w-8 h-8 mx-auto text-muted-foreground/60" />
-          <h2 className="text-base font-semibold">{isRTL ? 'בונה דף נחיתה' : 'Landing page builder'}</h2>
+          <h2 className="text-base font-semibold">{language === 'he' ? 'בונה דף נחיתה' : language === 'es' ? 'Constructor de páginas de aterrizaje' : 'Landing page builder'}</h2>
           <p className="text-[13px] text-muted-foreground leading-relaxed">
-            {isRTL
+            {language === 'he'
               ? 'העריכה המלאה מומלצת ממחשב. במובייל ניתן רק לצפות ולפתוח הגדרות.'
+              : language === 'es'
+              ? 'Se recomienda la edición completa desde un ordenador. En móvil solo puedes previsualizar o abrir ajustes.'
               : 'Full editing is recommended on desktop. On mobile you can only preview or open settings.'}
           </p>
           <div className="grid gap-2 pt-2">
@@ -289,7 +291,7 @@ const LandingPageBuilder = () => {
                 className="gap-2 justify-center"
               >
                 <Eye className="w-4 h-4" />
-                {isRTL ? 'תצוגה מקדימה' : 'Preview'}
+                {language === 'he' ? 'תצוגה מקדימה' : language === 'es' ? 'Vista previa' : 'Preview'}
               </Button>
             )}
             <Button
@@ -297,7 +299,7 @@ const LandingPageBuilder = () => {
               onClick={() => navigate('/admin/landing-pages')}
               className="gap-2 justify-center text-muted-foreground"
             >
-              {isRTL ? 'חזרה לרשימה' : 'Back to list'}
+              {language === 'he' ? 'חזרה לרשימה' : language === 'es' ? 'Volver a la lista' : 'Back to list'}
             </Button>
           </div>
         </div>
@@ -316,7 +318,7 @@ const LandingPageBuilder = () => {
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-            {isRTL ? 'חזרה' : 'Back'}
+            {language === 'he' ? 'חזרה' : language === 'es' ? 'Atrás' : 'Back'}
           </Button>
           
           <div className="h-6 w-px bg-border" />
@@ -324,8 +326,8 @@ const LandingPageBuilder = () => {
           <div>
             <h1 className="font-semibold text-sm">
               {isNew 
-                ? (isRTL ? 'דף נחיתה חדש' : 'New Landing Page')
-                : (pageData?.title_he || pageData?.title_en || pageData?.slug || (isRTL ? 'עריכת דף' : 'Edit Page'))
+                ? (language === 'he' ? 'דף נחיתה חדש' : language === 'es' ? 'Nueva página de aterrizaje' : 'New Landing Page')
+                : (pageData?.title_he || pageData?.title_en || pageData?.slug || (language === 'he' ? 'עריכת דף' : language === 'es' ? 'Editar página' : 'Edit Page'))
               }
             </h1>
             {!isNew && pageData?.slug && (
@@ -339,7 +341,7 @@ const LandingPageBuilder = () => {
         <div className="flex items-center gap-2">
           {hasChanges && (
             <span className="text-xs text-muted-foreground">
-              {isRTL ? 'שינויים לא נשמרו' : 'Unsaved changes'}
+              {language === 'he' ? 'שינויים לא נשמרו' : language === 'es' ? 'Cambios no guardados' : 'Unsaved changes'}
             </span>
           )}
           
@@ -350,7 +352,7 @@ const LandingPageBuilder = () => {
             className="gap-2"
           >
             <Settings className="w-4 h-4" />
-            {isRTL ? 'הגדרות' : 'Settings'}
+            {language === 'he' ? 'הגדרות' : language === 'es' ? 'Configuración' : 'Settings'}
           </Button>
 
           <Button
@@ -363,7 +365,7 @@ const LandingPageBuilder = () => {
             className="gap-2"
           >
             <Eye className="w-4 h-4" />
-            {isRTL ? 'תצוגה מקדימה' : 'Preview'}
+            {language === 'he' ? 'תצוגה מקדימה' : language === 'es' ? 'Vista previa' : 'Preview'}
           </Button>
 
           <Button
@@ -378,7 +380,7 @@ const LandingPageBuilder = () => {
             ) : (
               <Save className="w-4 h-4" />
             )}
-            {isRTL ? 'שמור' : 'Save'}
+            {language === 'he' ? 'שמור' : language === 'es' ? 'Guardar' : 'Save'}
           </Button>
 
           <Button
@@ -388,7 +390,7 @@ const LandingPageBuilder = () => {
             className="gap-2"
           >
             <Send className="w-4 h-4" />
-            {isRTL ? 'פרסם' : 'Publish'}
+            {language === 'he' ? 'פרסם' : language === 'es' ? 'Publicar' : 'Publish'}
           </Button>
         </div>
       </div>

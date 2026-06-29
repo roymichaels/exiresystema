@@ -65,7 +65,7 @@ interface MobileHeroGridProps {
 
 export function MobileHeroGrid({ planData }: MobileHeroGridProps) {
   const navigate = useNavigate();
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const { openHypnosis } = useAuroraActions();
   const isHe = language === 'he';
 
@@ -375,7 +375,7 @@ export function MobileHeroGrid({ planData }: MobileHeroGridProps) {
                                   <div className="flex items-center gap-1.5 mb-0.5">
                                     <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted/60 border border-border/40 text-muted-foreground">
                                       {DomainIcon && <DomainIcon className="h-2.5 w-2.5" />}
-                                      {isHe ? (domain?.labelHe || action.pillarId) : (domain?.labelEn || action.pillarId)}
+                                      {domain ? l(domain) : action.pillarId}
                                     </span>
                                   </div>
                                   <p className={cn(

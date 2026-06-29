@@ -58,8 +58,8 @@ export default function AnchorField({ parallax }: Props) {
             x={a.x}
             y={a.y}
             icon={<Icon className="h-5 w-5" strokeWidth={1.5} />}
-            label={isHe ? a.labelHe : a.labelEn}
-            meta={isHe ? a.metaHe : a.metaEn}
+            label={language === 'he' ? a.labelHe : language === 'es' ? a.labelEs : a.labelEn}
+            meta={language === 'he' ? a.metaHe : language === 'es' ? (a.metaEs ?? a.metaEn) : a.metaEn}
             hueHsl={a.hueHsl}
             delay={0.18 + i * 0.12}
             rtl={isRTL}

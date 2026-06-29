@@ -39,7 +39,7 @@ const PATH_META: Record<CareerPath, { icon: typeof Briefcase; titleHe: string; t
 };
 
 export default function CareerWizard({ careerPath, onComplete }: CareerWizardProps) {
-  const { language, isRTL } = useTranslation();
+  const { language, isRTL, l } = useTranslation();
   const isHe = language === 'he';
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -279,7 +279,7 @@ export default function CareerWizard({ careerPath, onComplete }: CareerWizardPro
                       >
                         <span className="text-xl">{opt.icon}</span>
                         <span className="text-sm font-semibold leading-tight">
-                          {isHe ? opt.labelHe : opt.labelEn}
+                          {l(opt)}
                         </span>
                       </motion.button>
                     );

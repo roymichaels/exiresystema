@@ -6,10 +6,10 @@ import { useSearchParams } from 'react-router-dom';
 import { Brain, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
-const CHIPS = ['לידים', 'כסף', 'פולואפים', 'משפך'];
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function AdvisorCard({ className }: { className?: string }) {
+  const { language } = useTranslation();
   const [, setParams] = useSearchParams();
   const open = (seed?: string) => {
     const p = new URLSearchParams();
@@ -33,15 +33,20 @@ export default function AdvisorCard({ className }: { className?: string }) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[14.5px] md:text-[15px] font-semibold leading-tight">המוח העסקי</h3>
+            <h3 className="text-[14.5px] md:text-[15px] font-semibold leading-tight">{language === 'he' ? 'המוח העסקי' : language === 'es' ? 'Asesor de negocios' : 'Business Advisor'}</h3>
             <span className="text-[10px] text-muted-foreground/80 rounded-full bg-muted/40 px-2 py-0.5">
-              קריאה-בלבד
+              {language === 'he' ? 'קריאה-בלבד' : language === 'es' ? 'Solo lectura' : 'Read-only'}
             </span>
           </div>
-          <p className="text-[12px] text-muted-foreground mt-0.5">שאל מה הדבר הבא בעסק</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">{language === 'he' ? 'שאל מה הדבר הבא בעסק' : language === 'es' ? 'Pregunta qué sigue en tu negocio' : 'Ask what\'s next in your business'}</p>
 
           <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {CHIPS.map((c) => (
+            {(language === 'he'
+              ? ['לידים', 'כסף', 'פולואפים', 'משפך']
+              : language === 'es'
+              ? ['Clientes potenciales', 'Dinero', 'Seguimientos', 'Embudo']
+              : ['Leads', 'Money', 'Follow-ups', 'Funnel']
+            ).map((c) => (
               <button
                 key={c}
                 type="button"
@@ -55,7 +60,7 @@ export default function AdvisorCard({ className }: { className?: string }) {
 
           <div className="mt-3">
             <Button size="sm" onClick={() => open()} className="rounded-xl">
-              שאל את המוח
+              {language === 'he' ? 'שאל את המוח' : language === 'es' ? 'Preguntar al asesor' : 'Ask the Advisor'}
               <ArrowLeft className="h-3.5 w-3.5 mr-1" />
             </Button>
           </div>

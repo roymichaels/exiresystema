@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AIField {
   type: string;
@@ -33,11 +34,11 @@ interface AIResult {
 }
 
 const QUICK_PICKS = [
-  { id: "lead", label: "טופס לידים" },
-  { id: "quiz", label: "שאלון/חידון" },
-  { id: "intake", label: "טופס שאלות פתיחה" },
-  { id: "feedback", label: "משוב" },
-  { id: "assessment", label: "אבחון" },
+  { id: "lead", labelHe: "טופס לידים", labelEn: "Lead Form", labelEs: "Formulario de Leads" },
+  { id: "quiz", labelHe: "שאלון/חידון", labelEn: "Quiz", labelEs: "Cuestionario" },
+  { id: "intake", labelHe: "טופס שאלות פתיחה", labelEn: "Intake Form", labelEs: "Formulario de Admisión" },
+  { id: "feedback", labelHe: "משוב", labelEn: "Feedback", labelEs: "Retroalimentación" },
+  { id: "assessment", labelHe: "אבחון", labelEn: "Assessment", labelEs: "Evaluación" },
 ];
 
 interface Props {
@@ -47,6 +48,7 @@ interface Props {
 }
 
 export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
+  const { language } = useTranslation();
   const [prompt, setPrompt] = useState("");
   const [intent, setIntent] = useState<string>("general");
   const [loading, setLoading] = useState(false);
@@ -68,7 +70,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      toast({ title: "נא לתאר איזה טופס לבנות", variant: "destructive" });
+      toast({ title: language === 'he' ? 'נא לתאר איזה טופס לבנות' : language === 'es' ? 'Describe qué formulario construir' : 'Please describe what form to build', variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -82,8 +84,8 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
     } catch (err) {
       console.error(err);
       toast({
-        title: "שגיאה ביצירת הטופס",
-        description: err instanceof Error ? err.message : "נסה שוב",
+        title: language === 'he' ? 'שגיאה ביצירת הטופס' : language === 'es' ? 'Error al crear el formulario' : 'Error creating form',
+        description: err instanceof Error ? err.message : language === 'he' ? 'נסה שוב' : language === 'es' ? 'Intenta de nuevo' : 'Try again',
         variant: "destructive",
       });
     } finally {
@@ -129,14 +131,14 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
         if (fieldsErr) throw fieldsErr;
       }
 
-      toast({ title: "הטופס נוצר בהצלחה!", description: `${result.fields.length} שדות נוספו` });
+      toast({ title: language === 'he' ? 'הטופס נוצר בהצלחה!' : language === 'es' ? '¡Formulario creado con éxito!' : 'Form created successfully!', description: language === 'he' ? `${result.fields.length} שדות נוספו` : language === 'es' ? `${result.fields.length} campos añadidos` : `${result.fields.length} fields added` });
       onCreated(formRow.id);
       close(false);
     } catch (err) {
       console.error(err);
       toast({
-        title: "שגיאה בשמירת הטופס",
-        description: err instanceof Error ? err.message : "נסה שוב",
+        title: language === 'he' ? 'שגיאה בשמירת הטופס' : language === 'es' ? 'Error al guardar el formulario' : 'Error saving form',
+        description: err instanceof Error ? err.message : language === 'he' ? 'נסה שוב' : language === 'es' ? 'Intenta de nuevo' : 'Try again',
         variant: "destructive",
       });
     } finally {
@@ -150,10 +152,10 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            יצירת טופס/שאלון עם AI
+            {language === 'he' ? 'יצירת טופס/שאלון עם AI' : language === 'es' ? 'Crear formulario/cuestionario con IA' : 'Create form/quiz with AI'}
           </DialogTitle>
           <DialogDescription>
-            תאר מה אתה רוצה — AION יבנה את כל השדות בשבילך
+            {language === 'he' ? 'תאר מה אתה רוצה — AION יבנה את כל השדות בשבילך' : language === 'es' ? 'Describe lo que quieres — AION construirá todos los campos por ti' : 'Describe what you want — AION will build all the fields for you'}
           </DialogDescription>
         </DialogHeader>
 
@@ -169,7 +171,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
                       className="cursor-pointer"
                       onClick={() => setIntent(q.id)}
                     >
-                      {q.label}
+                      {language === 'he' ? q.labelHe : language === 'es' ? q.labelEs : q.labelEn}
                     </Badge>
                   ))}
                 </div>
@@ -177,14 +179,14 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder='לדוגמה: "שאלון אבחון של 8 שאלות לבדוק את רמת הלחץ של מתאמן חדש, עם דירוגים 1-5 ושאלה פתוחה בסוף"'
+                  placeholder={language === 'he' ? 'לדוגמה: "שאלון אבחון של 8 שאלות לבדוק את רמת הלחץ של מתאמן חדש, עם דירוגים 1-5 ושאלה פתוחה בסוף"' : language === 'es' ? 'Ejemplo: "Cuestionario de diagnóstico de 8 preguntas para evaluar el nivel de estrés de un nuevo atleta, con calificaciones 1-5 y una pregunta abierta al final"' : 'Example: "An 8-question assessment to check the stress level of a new trainee, with ratings 1-5 and an open question at the end"'}
                   rows={8}
                   className="resize-none"
                   dir="rtl"
                 />
 
                 <div className="text-xs text-muted-foreground">
-                  טיפ: כתוב כמה שדות, איזה סוג שאלות, ולמי הטופס מיועד
+                  {language === 'he' ? 'טיפ: כתוב כמה שדות, איזה סוג שאלות, ולמי הטופס מיועד' : language === 'es' ? 'Consejo: escribe cuántos campos, qué tipo de preguntas y para quién es el formulario' : 'Tip: write how many fields, what type of questions, and who the form is for'}
                 </div>
               </>
             )}
@@ -194,7 +196,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
                 <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-2">
                   <div className="flex items-center gap-2 text-primary">
                     <CheckCircle2 className="h-4 w-4" />
-                    <span className="text-sm font-medium">תצוגה מקדימה</span>
+                    <span className="text-sm font-medium">{language === 'he' ? 'תצוגה מקדימה' : language === 'es' ? 'Vista Previa' : 'Preview'}</span>
                   </div>
                   <div className="text-lg font-bold">{result.title}</div>
                   {result.description && (
@@ -204,7 +206,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
 
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-muted-foreground">
-                    שדות ({result.fields.length})
+                    {language === 'he' ? `שדות (${result.fields.length})` : language === 'es' ? `Campos (${result.fields.length})` : `Fields (${result.fields.length})`}
                   </div>
                   {result.fields.map((f, i) => (
                     <div
@@ -237,7 +239,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
           {!result ? (
             <>
               <Button variant="outline" onClick={() => close(false)} disabled={loading}>
-                ביטול
+                {language === 'he' ? 'ביטול' : language === 'es' ? 'Cancelar' : 'Cancel'}
               </Button>
               <Button onClick={handleGenerate} disabled={loading} className="gap-2">
                 {loading ? (
@@ -245,21 +247,21 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
                 ) : (
                   <Wand2 className="h-4 w-4" />
                 )}
-                {loading ? "יוצר..." : "צור עם AI"}
+                {loading ? (language === 'he' ? 'יוצר...' : language === 'es' ? 'Creando...' : 'Creating...') : (language === 'he' ? 'צור עם AI' : language === 'es' ? 'Crear con IA' : 'Create with AI')}
               </Button>
             </>
           ) : (
             <>
               <Button variant="outline" onClick={() => setResult(null)} disabled={saving}>
-                שנה תיאור
+                {language === 'he' ? 'שנה תיאור' : language === 'es' ? 'Cambiar descripción' : 'Change description'}
               </Button>
               <Button onClick={handleGenerate} variant="outline" disabled={saving} className="gap-2">
                 <Wand2 className="h-4 w-4" />
-                צור מחדש
+                {language === 'he' ? 'צור מחדש' : language === 'es' ? 'Regenerar' : 'Regenerate'}
               </Button>
               <Button onClick={handleCreate} disabled={saving} className="gap-2">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                {saving ? "שומר..." : "צור את הטופס"}
+                {saving ? (language === 'he' ? 'שומר...' : language === 'es' ? 'Guardando...' : 'Saving...') : (language === 'he' ? 'צור את הטופס' : language === 'es' ? 'Crear formulario' : 'Create form')}
               </Button>
             </>
           )}
