@@ -12,12 +12,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Search, UsersRound, Phone, Mail, ChevronLeft } from 'lucide-react';
 import { useClients } from '@/hooks/useClients';
 import { MobileClientCard } from './MobileClientCard';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const STATUS_LABEL: Record<string, string> = {
-  active: 'פעיל',
-  paused: 'מושהה',
-  closed: 'סגור',
-};
+const STATUS_LABEL = (lang: string): Record<string, string> => ({
+  active: lang === 'he' ? 'פעיל' : lang === 'es' ? 'Activo' : 'Active',
+  paused: lang === 'he' ? 'מושהה' : lang === 'es' ? 'Pausado' : 'Paused',
+  closed: lang === 'he' ? 'סגור' : lang === 'es' ? 'Cerrado' : 'Closed',
+});
 const STATUS_COLOR: Record<string, string> = {
   active: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
   paused: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
@@ -26,6 +27,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default function XSystemClientsTab() {
   const navigate = useNavigate();
+  const { language } = useTranslation();
   const { data: clients = [], isLoading } = useClients();
   const [q, setQ] = useState('');
 
@@ -40,12 +42,14 @@ export default function XSystemClientsTab() {
     );
   }, [clients, q]);
 
+  const t = (he: string, en: string, es: string) => language === 'he' ? he : language === 'es' ? es : en;
+
   return (
     <div className="space-y-3 md:space-y-4">
       <div>
-        <h2 className="text-lg md:text-2xl font-bold">מתאמנים</h2>
+        <h2 className="text-lg md:text-2xl font-bold">{t('מתאמנים', 'Clients', 'Clientes')}</h2>
         <p className="hidden md:block text-sm text-muted-foreground">
-          לקוחות Exire פעילים בליווי. הוספה דרך המרה מליד.
+          {t('לקוחות Exire פעילים בליווי. הוספה דרך המרה מליד.', 'Active clients in Exire coaching. Added via lead conversion.', 'Clientes activos en coaching Exire. Agregados vía conversión de leads.')}
         </p>
       </div>
 
@@ -53,7 +57,7 @@ export default function XSystemClientsTab() {
       <div className="md:hidden relative">
         <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="חיפוש שם, טלפון, אימייל…"
+          placeholder={t('חיפוש שם, טלפון, אימייל…', 'Search name, phone, email…', 'Buscar nombre, teléfono, email…')}
           value={q}
           onChange={e => setQ(e.target.value)}
           className="pe-10 h-10 rounded-xl bg-card/60 border-border/40"
@@ -64,7 +68,7 @@ export default function XSystemClientsTab() {
           <div className="relative">
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="חיפוש לפי שם, טלפון או אימייל..."
+              placeholder={t('חיפוש לפי שם, טלפון או אימייל...', 'Search by name, phone or email...', 'Buscar por nombre, teléfono o email...')}
               value={q}
               onChange={e => setQ(e.target.value)}
               className="pe-10"
@@ -80,7 +84,7 @@ export default function XSystemClientsTab() {
         ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-border/30 bg-card/30 px-3 py-4 text-center space-y-2">
             <p className="text-[12.5px] text-muted-foreground">
-              {q ? 'אין תוצאות לחיפוש.' : 'אין מתאמנים פעילים כרגע.'}
+              {q ? t('אין תוצאות לחיפוש.', 'No search results.', 'Sin resultados de búsqueda.') : t('אין מתאמנים פעילים כרגע.', 'No active clients right now.', 'No hay clientes activos ahora.')}
             </p>
             {!q && (
               <button
@@ -88,7 +92,7 @@ export default function XSystemClientsTab() {
                 onClick={() => navigate('/admin-hub?tab=leads')}
                 className="text-[12px] font-medium text-primary hover:underline"
               >
-                ← פתח לידים
+                ← {t('פתח לידים', 'Open Leads', 'Abrir Leads')}
               </button>
             )}
           </div>
@@ -96,13 +100,13 @@ export default function XSystemClientsTab() {
         ) : (
           <div className="space-y-2">
             <div className="px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
-              {filtered.length} מתאמנים
+              {filtered.length} {t('מתאמנים', 'clients', 'clientes')}
             </div>
             {filtered.map(c => (
               <MobileClientCard
                 key={c.id}
                 client={c}
-                statusLabel={STATUS_LABEL[c.status] || c.status}
+                statusLabel={STATUS_LABEL(language)[c.status] || c.status}
                 statusColor={STATUS_COLOR[c.status] || ''}
                 onOpen={() => navigate(`/clients/${c.id}`)}
               />
@@ -113,7 +117,7 @@ export default function XSystemClientsTab() {
 
       <Card className="hidden md:block border-border/50">
         <CardHeader>
-          <CardTitle className="text-base">לקוחות ({filtered.length})</CardTitle>
+          <CardTitle className="text-base">{t('לקוחות', 'Clients', 'Clientes')} ({filtered.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -121,39 +125,25 @@ export default function XSystemClientsTab() {
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-16" />)}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-12">
-              <UsersRound className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground">
-                {q ? 'אין תוצאות לחיפוש.' : 'עדיין אין לקוחות. המר ליד ללקוח מתוך טאב "לידים".'}
+            <div className="text-center py-12 max-w-sm mx-auto">
+              <UsersRound className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
+              <p className="text-sm text-muted-foreground">
+                {q ? t('אין תוצאות לחיפוש.', 'No search results.', 'Sin resultados de búsqueda.') : t('עדיין אין לקוחות. המר ליד ללקוח מתוך טאב "לידים".', 'No clients yet. Convert a lead via the Leads tab.', 'Aún no hay clientes. Convierte un lead vía la pestaña Leads.')}
               </p>
             </div>
           ) : (
-
             <>
-              {/* Mobile list */}
-              <div className="md:hidden space-y-2">
-                {filtered.map(c => (
-                  <MobileClientCard
-                    key={c.id}
-                    client={c}
-                    statusLabel={STATUS_LABEL[c.status] || c.status}
-                    statusColor={STATUS_COLOR[c.status] || ''}
-                    onOpen={() => navigate(`/clients/${c.id}`)}
-                  />
-                ))}
-              </div>
-
               {/* Desktop list */}
-              <div className="hidden md:block space-y-2">
+              <div className="hidden md:block space-y-2 max-h-96 overflow-y-auto pr-1">
                 {filtered.map(c => (
                   <button
                     key={c.id}
                     onClick={() => navigate(`/clients/${c.id}`)}
-                    className="group w-full flex items-center justify-between p-4 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors text-start"
+                    className="group w-full flex items-center justify-between p-3.5 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors text-start"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                        <span className="text-sm font-bold text-primary">
+                      <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-primary">
                           {(c.full_name || '?').charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -178,7 +168,7 @@ export default function XSystemClientsTab() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <Badge variant="outline" className={STATUS_COLOR[c.status] || ''}>
-                        {STATUS_LABEL[c.status] || c.status}
+                        {STATUS_LABEL(language)[c.status] || c.status}
                       </Badge>
                       <ChevronLeft className="h-4 w-4 text-muted-foreground" />
                     </div>
