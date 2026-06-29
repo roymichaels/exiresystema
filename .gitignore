@@ -26,3 +26,18 @@ dist-ssr
 supabase/.temp
 .turbo/
 .env*.local
+
+# BIZOS Development Artifacts
+.hermes/
+reports/
+.log
+test_patch.txt
+
+# Generated documentation files
+*.json
+docs/_STATUS.json
+docs/_AUDIT*.json
+docs/_CLEANUP.json
+
+# BIZOS analysis scripts (to be reviewed)
+# Note: scripts/ai/ and .opencode/ agents are not ignored - evaluated individually
