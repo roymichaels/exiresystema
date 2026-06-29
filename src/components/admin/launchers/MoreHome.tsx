@@ -24,11 +24,11 @@ type Card = {
 };
 
 const PRIMARY: Card[] = [
-  { id: 'advisor',      titleHe: 'המוח העסקי',     titleEn: 'Advisor',        titleEs: 'Asesor',            subtitleHe: 'אסטרטגיה ופעולות להיום', subtitleEn: 'Strategy & daily actions',  subtitleEs: 'Estrategia y acciones diarias', icon: Brain },
-  { id: 'settings',     titleHe: 'הגדרות',         titleEn: 'Settings',       titleEs: 'Ajustes',           subtitleHe: 'כללי וחשבון',           subtitleEn: 'General & account',          subtitleEs: 'General y cuenta',            icon: Settings },
-  { id: 'analytics',    titleHe: 'אנליטיקס',       titleEn: 'Analytics',      titleEs: 'Analíticas',        subtitleHe: 'מספרים ומגמות',         subtitleEn: 'Numbers & trends',           subtitleEs: 'Números y tendencias',        icon: BarChart3 },
-  { id: 'integrations', titleHe: 'אינטגרציות',     titleEn: 'Integrations',   titleEs: 'Integraciones',     subtitleHe: 'WhatsApp, אימייל, תשלום', subtitleEn: 'WhatsApp, email, payments',  subtitleEs: 'WhatsApp, correo, pagos',     icon: Plug },
-  { id: 'users',        titleHe: 'משתמשים והרשאות',titleEn: 'Users & Roles',  titleEs: 'Usuarios y Roles',  subtitleHe: 'צוות והרשאות',          subtitleEn: 'Team & permissions',         subtitleEs: 'Equipo y permisos',           icon: UsersIcon },
+  { id: 'advisor', titleHe: 'המוח העסקי', titleEn: 'Business Brain', titleEs: 'Cerebro IA', subtitleHe: 'אסטרטגיה ותובנות', subtitleEn: 'AI strategy & insights', subtitleEs: 'Estrategia y perspectivas IA', icon: Brain },
+  { id: 'settings', titleHe: 'הגדרות', titleEn: 'Settings', titleEs: 'Ajustes', subtitleHe: 'חשבון ומערכת', subtitleEn: 'Account & system', subtitleEs: 'Cuenta y sistema', icon: Settings },
+  { id: 'analytics', titleHe: 'אנליטיקס', titleEn: 'Analytics', titleEs: 'Analíticas', subtitleHe: 'מגמות ותבניות', subtitleEn: 'Trends & metrics', subtitleEs: 'Tendencias y métricas', icon: BarChart3 },
+  { id: 'integrations', titleHe: 'אינטגרציות', titleEn: 'Integrations', titleEs: 'Integraciones', subtitleHe: 'WhatsApp ותשלום', subtitleEn: 'WhatsApp & payments', subtitleEs: 'WhatsApp y pagos', icon: Plug },
+  { id: 'users', titleHe: 'משתמשים', titleEn: 'Users', titleEs: 'Usuarios', subtitleHe: 'צוות והרשאות', subtitleEn: 'Team & roles', subtitleEs: 'Equipo y roles', icon: UsersIcon },
 ];
 
 const SECONDARY: Card[] = [

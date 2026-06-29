@@ -31,21 +31,32 @@ function Stat({
   label, value, hint, icon: Icon, tone = 'default',
 }: {
   label: string; value: React.ReactNode; hint?: string; icon: any;
-  tone?: 'default' | 'warn' | 'good';
+  tone?: 'default' | 'warn' | 'good' | 'info';
 }) {
-  const toneClass =
-    tone === 'warn' ? 'border-amber-500/30 bg-amber-500/5'
-    : tone === 'good' ? 'border-emerald-500/30 bg-emerald-500/5'
-    : 'border-border/50';
+  const TONE_STYLES: Record<string,string> = {
+    warn: 'border-amber-500/30 bg-amber-500/8',
+    good: 'border-emerald-500/30 bg-emerald-500/8',
+    info: 'border-cyan-500/30 bg-cyan-500/8',
+    default: 'border-border/40 bg-card/60',
+  };
+  const toneClass = TONE_STYLES[tone];
   return (
-    <Card className={toneClass}>
-      <CardContent className="p-3">
-        <div className="flex items-center gap-2.5">
-          <div className="rounded-md bg-muted p-2"><Icon className="h-4 w-4" /></div>
+    <Card className={cn(toneClass, 'transition-all hover:border-primary/40 hover:-translate-y-0.5')}>
+      <CardContent className="p-2.5 md:p-3">
+        <div className="flex items-center gap-2">
+          <div className={cn(
+            'rounded-md p-1.5',
+            tone === 'warn' ? 'bg-amber-500/15 text-amber-500' :
+            tone === 'good' ? 'bg-emerald-500/15 text-emerald-500' :
+            tone === 'info' ? 'bg-cyan-500/15 text-cyan-400' :
+            'bg-muted/50 text-muted-foreground/70',
+          )}>
+            <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] text-muted-foreground truncate">{label}</div>
-            <div className="text-lg font-semibold leading-tight">{value}</div>
-            {hint && <div className="text-[11px] text-muted-foreground">{hint}</div>}
+            <div className="text-[10px] md:text-[11px] text-muted-foreground truncate">{label}</div>
+            <div className="text-base md:text-lg font-semibold leading-tight">{value}</div>
+            {hint && <div className="text-[10px] text-muted-foreground/80 truncate">{hint}</div>}
           </div>
         </div>
       </CardContent>
