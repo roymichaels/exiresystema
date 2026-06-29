@@ -2,592 +2,817 @@
 
 ## Overview
 
-The BizOS Pipeline Agent Registry provides a **comprehensive catalog** of all analysis agents, tools, and their specific responsibilities within the BizOS development pipeline. This registry establishes **clear operational boundaries** and **quality standards** for platform evolution while protecting production systems.
+The BizOS Pipeline Agent Registry provides a **comprehensive catalog** of all analysis agents, tools, and their specific responsibilities within the BizOS continuous vision improvement pipeline. This registry establishes clear governance, safety protocols, and operational boundaries for all automated analysis activities while preserving Dean approval requirements for all production changes.
 
-**Purpose**: Define, document, and standardize all pipeline components for consistent execution and governance.
+## Agent Registry Structure
 
-**Scope**: Analysis-only and proposal-only operations. **No production code modifications** without explicit Dean approval.
+The BizOS pipeline comprises **12 specialized agents** organized into three functional categories:
 
-## Agent Classification
+### **Vision & Analysis Agents**
+- **Vision Alignment Agent** - Core strategic consistency validation
+- **Security & Privacy Agent** - Comprehensive risk assessment
+- **Performance / Lightweight Agent** - Optimization identification
+- **Regression Verification Agent** - Post-change validation
 
-### **Level 0: NEVER AUTO-APPROVE** 
+### **Quality Assurance Agents**
+- **UI Guidelines Agent** - Visual and interaction consistency
+- **i18n / Translation Agent** - Multi-language compliance
+- **System Integration Agent** - Internal system connectivity validation
+- **Missing Connections Agent** - Feature completeness verification
 
-**Critical Infrastructure Protection** - Changes that can **never** be auto-approved:
+### **AI & Context Agents**
+- **AI Systems Connectivity Agent** - AI feature validation and wiring
+- **Tenant Context Agent** - Business-specific context awareness
+- **Diff Risk Reviewer** - Pre-commit change impact analysis
+- **Proposal Review Board Agent** - Final recommendation validation
 
-#### 🔴 **High-Risk Agents**
-| Agent Name | Purpose | Risk Level | Auto-Approval | Scope |
-|------------|---------|------------|---------------|--------|
-| **System Infrastructure Guard** | Detects unauthorized access attempts | CRITICAL | ❌ NEVER | System boundaries validation |
-| **Production Logic Detector** | Identifies production business logic changes | HIGH | ❌ NEVER | Core functionality protection |
-| **Supabase Schema Monitor** | Monitors database structure modifications | HIGH | ❌ NEVER | Database protection |
-| **Auth/RLS Protector** | Guards authentication and row-level security policies | HIGH | ❌ NEVER | Security boundary enforcement |
-| **Edge Function Watcher** | Monitors serverless function changes | HIGH | ❌ NEVER | Production execution protection |
-| **OpenRouter Gateway Guard** | Protects AI model integration | HIGH | ❌ NEVER | API integration safety |
-| **Payment System Monitor** | Detects payment and subscription changes | HIGH | ❌ NEVER | Financial system protection |
-| **Production Business Logic Detector** | Identifies core functionality modifications | HIGH | ❌ NEVER | Core business protection |
-| **AION/MindOS/Web3 Protector** | Guards experimental system changes | HIGH | ❌ NEVER | Legacy/experimental system protection |
-| **Route Restructuring Monitor** | Detects major routing architecture changes | HIGH | ❌ NEVER | System structure protection |
-| **Source Folder/Package Renamer** | Monitors major codebase reorganization | HIGH | ❌ NEVER | Structural change protection |
+## Agent: Vision Alignment Agent
 
-### **Level 1: HUMAN APPROVAL REQUIRED**
+### Purpose
+Validates that all BizOS components align with platform strategy, ensuring no blind renaming of Exire to BizOS, correct platform-tenant distinctions, and proper business operating system vision adherence.
 
-**Significant Changes** - Requires manual Dean approval for safety:
+### Inputs
+- BizOS documentation (master context, north star, principles)
+- Repo source code (routes, components, modules)
+- UI implementation (headers, navigation, components)
+- Tickets and feature requests
 
-#### 🟡 **Medium-Risk Agents**
-| Agent Name | Purpose | Risk Level | Manual Approval Required | Scope |
-|------------|---------|------------|-------------------------|--------|
-| **UI Consistency Auditor** | Audits interface consistency across platforms | MEDIUM | ✅ YES | Visual design validation |
-| **Component Refactoring Validator** | Validates component structure changes | MEDIUM | ✅ YES | Architecture refactoring |
-| **Tenant Configuration Monitor** | Validates tenant-specific configurations | MEDIUM | ✅ YES | Configuration management |
-| **Advisor Behavior Inspector** | Analyzes advisor interaction patterns | MEDIUM | ✅ YES | AI behavior analysis |
-| **CRM/Client Logic Analyzer** | Analyzes customer relationship management | MEDIUM | ✅ YES | Business logic validation |
-| **Business Dashboard Validator** | Validates dashboard data presentation | MEDIUM | ✅ YES | Data visualization |
-| **Route Structure Checker** | Analyzes navigation structure changes | MEDIUM | ✅ YES | Route architecture |
+### Checks
+1. **Platform vs Tenant Classification**
+   - BizOS appears as platform (platform-level features)
+   - Exire appears as tenant zero (business workspace)
+   - No blind "Exire to BizOS rename" changes
 
-### **Level 2: PROPOSAL ONLY**
+2. **Strategy Alignment**
+   - AION/MindOS/Web3/FM assumptions in core platform (requires approval)
+   - Features fit business operating system vision
 
-**Low-Risk Changes** - Can be auto-proposed but require Dean approval for implementation:
+3. **Documentation Consistency**
+   - Platform/tenant terminology consistency
+   - Strategic document alignment
 
-#### 🟢 **Low-Risk Agents**
-| Agent Name | Purpose | Risk Level | Auto-Proposal | Manual Implementation |
-|------------|---------|------------|---------------|---------------------|
-| **Documentation Analyzer** | Analyzes documentation completeness and clarity | LOW | ✅ YES | ✅ YES |
-| **Ticket Quality Validator** | Validates ticket clarity and completeness | LOW | ✅ YES | ✅ YES |
-| **Terminology Cleaner** | Identifies terminology inconsistencies | LOW | ✅ YES | ✅ YES |
-| **Roadmap Analyzer** | Analyzes roadmap alignment and gaps | LOW | ✅ YES | ✅ YES |
-| **Architecture Proposal Generator** | Generates architectural recommendations | LOW | ✅ YES | ✅ YES |
+### Outputs
+- Vision alignment report
+- Contradictions identified
+- Stale documentation flags
+- Recommended tickets for clarification
 
-### **Level 3: FUTURE AUTO-APPROVE CANDIDATES**
+### Risk Level: MEDIUM
+- Strategic vision misalignment impacts core platform
+- Requires understanding of platform business model
 
-**Automatable Improvements** - Can be auto-approved after Dean validates pipeline:
+### Approval Mode: **REPORT ONLY**
+- All findings reported
+- Proposals require Dean approval
+- No automatic fixes
 
-#### 🤖 **Automatable Agents**
-| Agent Name | Purpose | Risk Level | Current Status | Future Status |
-|------------|---------|------------|----------------|----------------|
-| **Format Documentation Generator** | Auto-formats documentation to standards | LOW | ❌ CURRENTLY MANUAL | ✅ FUTURE AUTOMATION |
-| **Checklist Section Adder** | Adds missing checklist sections to tickets | LOW | ❌ CURRENTLY MANUAL | ✅ FUTURE AUTOMATION |
-| **Report Generator** | Automatically generates analysis reports | LOW | ❌ CURRENTLY MANUAL | ✅ FUTURE AUTOMATION |
-| **Timestamp Updater** | Updates report generation timestamps | LOW | ❌ CURRENTLY MANUAL | ✅ FUTURE AUTOMATION |
-| **Cross-Document Linker** | Adds internal documentation cross-links | LOW | ❌ CURRENTLY MANUAL | ✅ FUTURE AUTOMATION |
+### Never Auto-Fix Areas:
+- Platform/tenant renaming
+- Core business model changes
+- Strategic vision adjustments
 
-## Agent Registry Details
+---
 
-### **Vision Alignment Agent**
+## Agent: Security & Privacy Agent
 
-**Purpose**: Ensure alignment between platform vision and implementation
+### Purpose
+Comprehensive security assessment covering Supabase, auth, Edge Functions, OpenRouter gateway, payments, tenant data isolation, and all production business logic. Never auto-fix - always report for manual Dean review.
 
-**Input Sources**:
-- `docs/BIZOS_MASTER_CONTEXT.md` - Platform operating context
-- `docs/BIZOS_NORTH_STAR.md` - Product vision and principles
-- `docs/BIZOS_CURRENT_STATE_MAP.md` - Platform state assessment
-- `docs/BIZOS_PLATFORM_TENANT_BRAND_AUDIT.md` - Brand separation analysis
-- `tickets/*.md` - Implementation requirements
+### Inputs
+- All source code, configuration files
+- Supabase schema and RLS policies
+- Edge function implementations
+- OpenRouter gateway configurations
+- Payment processing logic
 
-**Checks Performed**:
-1. **Platform Identity Validation**
-   - BizOS is consistently identified as platform
-   - Exire Systema correctly labeled as tenant zero
-   - No blind "BizOS rename" of Exire references
-   - AION/MindOS/Web3 contexts not assumed inside core platform
+### Checks
+1. **Exposed Secrets**
+   - API keys in client-side code
+   - Database credentials
+   - Authentication tokens
+   - Service role exposures
 
-2. **Vision-Implementation Matching**
-   - Feature descriptions match platform purpose
-   - Architecture aligns with multi-tenant design
-   - Business primitives correctly classified as platform vs tenant
+2. **Auth/RLS Risks**
+   - Inadequate row-level security
+   - Missing access controls
+   - Session management vulnerabilities
 
-**Output Formats**:
-- `reports/vision-alignment/vision-alignment-report-TIMESTAMP.md`
-- JSON proposal format for integration systems
-- Priority classification (HIGH/MEDIUM/LOW impact)
+3. **Edge Function Security**
+   - Authentication and authorization
+   - Input validation and sanitization
+   - Error handling and logging
 
-**Classification**:
-- **Risk Level**: MEDIUM
-- **Manual Approval**: YES
-- **Auto-Proposal**: NO
-- **Scope**: Vision and strategic alignment analysis
+4. **Client/Server Boundaries**
+   - Server-side API key exposure
+   - Incorrect access controls
+   - Data leakage risks
 
-### **Security & Privacy Agent**
+5. **Business Logic Protection**
+   - Payments/subscription security
+   - Tenant data separation
+   - Admin access controls
 
-**Purpose**: Comprehensive security and privacy risk detection
+### Outputs
+- Security risk report
+- Exposed secrets identification
+- Missing security controls flags
+- remediation recommendations
 
-**Input Sources**:
-- Source code analysis (Secure scanning)
-- Configuration files (`.env`, `vite.config`, etc.)
-- Database schema and RLS policies
-- Edge function code analysis
-- OpenRouter integration verification
+### Risk Level: CRITICAL
+- Direct security vulnerabilities
+- Data breach potential
+- Production system compromise
 
-**Checks Performed**:
-1. **Secrets Exposure Detection**
-   - API keys in source code
-   - Database credentials exposure
-   - Authentication tokens in version control
+### Approval Mode: **REPORT ONLY**
+- All security findings reported immediately
+- Dean approval required for any changes
+- No automated security fixes
 
-2. **Authentication & Authorization**
-   - RLS policy analysis
-   - Role-based access control validation
-   - Session management security
+### Never Auto-Fix Areas:
+- Exposed API keys
+- Auth/RLS vulnerabilities
+- Edge Function security issues
+- Payment processing security
+- Tenant data separation logic
+- OpenRouter gateway security
 
-3. **External Service Security**
-   - OpenRouter API key protection
-   - External API integration security
-   - Payment system data protection
+---
 
-**Output Formats**:
-- `security-reports/security-scan-TIMESTAMP.md`
-- JSON vulnerability classification
-- Risk assessment (CRITICAL/MEDIUM/LOW)
-- Dean approval workflow integration
+## Agent: UI Guidelines Agent
 
-**Classification**:
-- **Risk Level**: HIGH
-- **Manual Approval**: YES
-- **Auto-Proposal**: NO
-- **Scope**: Security scanning and vulnerability analysis
+### Purpose
+Ensures UI consistency, mobile/desktop layout adherence, and premium business OS visual language throughout the platform while maintaining tenant-specific brand requirements.
 
-### **UI Guidelines Agent**
+### Inputs
+- React component code
+- CSS/styling implementations
+- Mobile and desktop view specifications
+- Hebrew RTL support requirements
+- Business OS design standards
 
-**Purpose**: Maintain UI consistency and quality standards
+### Checks
+1. **Header Management**
+   - One-header rule compliance
+   - No duplicate headers
+   - Consistent header hierarchy
+   - SEO-friendly header structure
 
-**Input Sources**:
-- Source code (components, pages, layouts)
-- Figma/Sketch design specifications (if available)
-- Component library documentation
-- User testing feedback
+2. **Layout Standards**
+   - Mobile-first responsiveness
+   - Desktop spacing consistency
+   - Touch target minimums (44px)
+   - Z-index organization
 
-**Checks Performed**:
-1. **Layout Consistency**
-   - Mobile vs desktop layout alignment
-   - Header, navigation, footer patterns
-   - Drawer and panel behavior consistency
+3. **Navigation Behavior**
+   - Bottom navigation implementation
+   - Drawer and chat widget behavior
+   - Exit navigation requirements
+   - Mobile navigation patterns
 
-2. **Visual Design Quality**
-   - Color scheme compliance (business OS palette)
-   - Typography standards adherence
-   - Spacing and alignment consistency
+4. **Visual Language**
+   - Premium business OS feeling
+   - Color scheme adherence
+   - Typography standards
+   - Icon usage consistency
 
-3. **Accessibility**
-   - Touch target minimums
-   - RTL (Hebrew) support validation
-   - Screen reader compatibility
-   - Keyboard navigation support
+5. **RTL/Hebrew Support**
+   - Proper RTL layout implementation
+   - Text direction handling
+   - Component RTL testing
+   - Hebrew-specific UI requirements
 
-4. **Premium Quality**
-   - Professional polish and finish
-   - Business OS visual language
-   - High-quality component implementations
+### Outputs
+- UI style guide updates
+- Design violation reports
+- Component improvement tickets
+- Screenshots for manual QA
+- Small UI refinement tickets
 
-**Output Formats**:
-- `ui-reports/ui-consistency-TIMESTAMP.md`
-- Priority-ordered ticket generation
-- Before/after comparison documentation
-- Manual QA recommendations
+### Risk Level: LOW
+- Visual consistency issues
+- Minor display problems
+- User experience improvements
 
-**Classification**:
-- **Risk Level**: MEDIUM
-- **Manual Approval**: YES
-- **Auto-Proposal**: NO
-- **Scope**: UI design and implementation validation
+### Approval Mode: **REPORT ONLY**
+- All UI issues documented
+- Dean approval for UI changes
+- Quality assurance tickets required
 
-### **i18n / Translation Agent**
+### Never Auto-Fix Areas:
+- Core navigation restructuring
+- Major visual redesign
+- Brand language changes
 
-**Purpose**: Ensure complete language support across all UI elements
+---
 
-**Input Sources**:
-- Source code string literals
-- Translation key verification
-- Locale configuration files
-- UI component documentation
+## Agent: i18n / Translation Agent
 
-**Checks Performed**:
-1. **Translation Coverage**
-   - Missing translation keys detection
-   - Hardcoded English/Hebrew/Spanish strings
-   - Default language fallback analysis
+### Purpose
+Ensures complete multi-language support (Hebrew, English, Spanish) for all UI changes while maintaining proper fallback mechanisms and avoiding hardcoded text.
 
-2. **Language-Specific Considerations**
-   - RTL vs LTR layout for Hebrew
-   - Right-to-left text alignment
-   - Bidirectional text support
-   - Language-specific character encoding
+### Inputs
+- All UI text changes
+- Translation key management
+- Component text props
+- Localization configuration
+- Language switching implementation
 
-3. **Cultural Adaptation**
-   - Brand term localization
-   - Context-appropriate translations
-   - Regional formatting standards
-   - Cultural sensitivity review
+### Checks
+1. **Translation Key Management**
+   - Missing translation keys
+   - Key naming conventions
+   - Fallback language implementation
+   - Translation completeness
 
-**Output Formats**:
-- `i18n-reports/translation-coverage-TIMESTAMP.md`
-- Missing key documentation
-- Translation status by component
-- Priority action items
+2. **Hardcoded Text Detection**
+   - Hebrew/English/Spanish hardcoded text
+   - Language-specific string literals
+   - Static text components
+   - Incomplete i18n implementation
 
-**Classification**:
-- **Risk Level**: LOW
-- **Manual Approval**: YES
-- **Auto-Proposal**: YES
-- **Scope**: Translation coverage and language support
+3. **RTL/LTR Behavior**
+   - Right-to-left language support
+   - Text direction handling
+   - Layout RTL compliance
+   - Component RTL testing
 
-### **System Integration Agent**
+4. **Brand Terms Classification**
+   - Platform vs tenant brand terminology
+   - Business-specific translations
+   - Proper naming conventions
+   - Brand consistency
 
-**Purpose**: Detect disconnected internal systems and missing connections
+5. **Translation Quality**
+   - Proper fallbacks
+   - Missing language support
+   - Translation accuracy
+   - Context-aware translations
 
-**Input Sources**:
-- System configuration files
-- API endpoint documentation
-- Database schema relationships
-- Business process flows
+### Outputs
+- Translation completeness report
+- Missing key identification
+- Hardcoded text warnings
+- i18n review tickets
+- Language support improvements
 
-**Checks Performed**:
-1. **Connection Validation**
-   - Settings affecting actual behavior
-   - Admin dashboard reflecting real state
-   - Tenant configuration impacting UI/advisor
-   - Language setting affecting UI display
+### Risk Level: MEDIUM
+- User experience degradation
+- Inconsistent international behavior
+- Navigation accessibility issues
 
-2. **System Dependencies**
-   - AI model settings integration
-   - User/business settings to dashboard
-   - Forms, buttons, actions connectivity
-   - State management consistency
+### Approval Mode: **REPORT ONLY**
+- All translation issues documented
+- Manual QA for i18n changes
+- Dean approval for language modifications
 
-**Output Formats**:
-- `integration-reports/integration-issues-TIMESTAMP.md`
-- Broken dependency documentation
+### Never Auto-Fix Areas:
+- Hardcoded UI text
+- Missing translation keys
+- Incomplete language support
+- Brand term classification changes
+---
+
+## Agent: System Integration Agent
+
+### Purpose
+Ensures all internal systems are properly connected and functional, validating that settings affect behavior, configurations propagate correctly, and business logic integrates seamlessly.
+
+### Inputs
+- System settings and configuration files
+- Component integration patterns
+- API endpoints and routes
+- User interface connections
+- Dashboard data sources
+
+### Checks
+1. **Settings to Behavior**
+   - System settings configuration
+   - Behavior implementation validation
+   - Configuration propagation
+   - Setting persistence
+
+2. **Tenant Configuration Integration**
+   - UI configuration effects
+   - Advisor configuration integration
+   - Content generation configuration
+   - Business type configuration
+
+3. **Dashboard Integration**
+   - Real data reflection
+   - Current state visualization
+   - Live updates and refresh
+   - Empty data state handling
+
+4. **Language Integration**
+   - UI language changes propagation
+   - System language settings
+   - Internationalization testing
+   - Regional compliance
+
+5. **AI Tool Integration**
+   - Model settings configuration
+   - AI tool behavior validation
+   - Context injection testing
+   - Performance optimization
+
+### Outputs
+- Disconnected system reports
+- Integration gap identification
+- Missing wiring documentation
 - Future integration tickets
-- Risk assessment for connectivity
+- System completeness validation
 
-**Classification**:
-- **Risk Level**: LOW
-- **Manual Approval**: YES
-- **Auto-Proposal**: YES
-- **Scope**: System connectivity and integration analysis
+### Risk Level: HIGH
+- System functionality depends on proper integration
+- Data consistency risks
+- Performance degradation
 
-### **AI Systems Connectivity Agent**
+### Approval Mode: **REPORT ONLY**
+- All integration issues documented
+- System connectivity validation
+- Dean approval for integration changes
 
-**Purpose**: Comprehensive AI feature connectivity verification
+### Never Auto-Fix Areas:
+- Core system wiring
+- Database relationships
+- API endpoint configuration
+- Business logic connections
+---
 
-**Input Sources**:
-- AI model configuration files
-- Advisor widget documentation
-- Business Brain/router implementations
-- AI service integrations
+## Agent: AI Systems Connectivity Agent
 
-**Checks Performed**:
-1. **AI Feature Inventory**
-   - AI Article Builder functionality
-   - AI content creation tools
-   - Business advisor interactions
-   - Model settings and configurations
+### Purpose
+Validates all AI-powered features, ensuring proper model configuration, tenant context injection, and system integration while preventing hardcoded AION/Exire/BizOS references.
 
-2. **Model Integration**
-   - Text generation model connections
-   - Image generation model integration
-   - Business context injection
-   - Tenant-specific context awareness
+### Inputs
+- AI article builder implementation
+- Advisor widget code
+- Business brain model router
+- Text generation model configuration
+- Image generation model settings
+- AI tool configurations
 
-**Output Formats**:
-- `ai-reports/ai-connectivity-analysis-TIMESTAMP.md`
-- AI feature inventory documentation
-- Missing model connections report
-- Tenant context requirements
+### Checks
+1. **AI Article Builder**
+   - Tenant context requirement
+   - Marketing reference correctness
+   - Hardcoded AION/Exire checks
+   - Content generation validation
 
-**Classification**:
-- **Risk Level**: LOW
-- **Manual Approval**: YES
-- **Auto-Proposal**: YES
-- **Scope**: AI system connectivity verification
+2. **Advisor Widget**
+   - AI model connection validation
+   - Tenant context injection
+   - Advisor personality configuration
+   - AI advisor responsiveness
 
-### **Tenant Context Agent**
+3. **Business Brain / Model Router**
+   - Text model connection
+   - Image model connection
+   - Tenant/business context injection
+   - Prompt source validation
 
-**Purpose**: Verify tenant-specific business context awareness
+4. **System Integration**
+   - Settings integration
+   - Language support validation
+   - Model settings application
+   - AI tool configuration
 
-**Input Sources**:
+### Outputs
+- AI feature inventory
+- Broken AI wiring identification
+- Missing text/image model reports
+- Missing tenant context detection
+- Recommended wiring tickets
+- Hardcoded reference warnings
+
+### Risk Level: HIGH
+- AI functionality core to platform
+- Tenant context awareness critical
+- Model integration failures
+
+### Approval Mode: **REPORT ONLY**
+- All AI connectivity issues documented
+- Dean approval for AI changes
+- Manual validation required
+
+### Never Auto-Fix Areas:
+- AI model configuration
+- Tenant context injection
+- AI tool wiring
+- Hardcoded business references
+
+---
+
+## Agent: Tenant Context Agent
+
+### Purpose
+Ensures every business-aware feature correctly identifies and respects the current tenant/workspace context, preventing hardcoded Exire/AION references where BizOS platform should be used.
+
+### Inputs
+- All component and route implementations
 - Tenant configuration files
-- Business-specific implementations
-- Advisor memory and context systems
-- Language and cultural settings
-
-**Checks Performed**:
-1. **Business Context Validation**
-   - Business name, type, industry identification
-   - Language and cultural preferences
-   - Advisor personality and communication style
-   - Current workspace context preservation
+- Business context objects
+- Language and region settings
+- Advisor personality configurations
+n
+### Checks
+1. **Tenant Context Detection**
+   - tenantId usage in components
+   - businessName presence validation
+   - businessType configuration
+   - brand voice identification
 
 2. **Context Injection**
-   - TenantId and businessName propagation
-   - Business service/offer catalog
-   - Brand voice and identity maintenance
-   - Current workspace context awareness
+   - tenantId injection in API calls
+   - businessName propagation
+   - businessType application
+   - context validation checks
 
-**Output Formats**:
-- `tenant-reports/tenant-context-analysis-TIMESTAMP.md`
-- Missing context documentation
-- Hardcoded Exire/AION identification issues
+3. **Hardcoded Reference Detection**
+   - Hardcoded Exire workspace references
+   - Hardcoded AION/MindOS references
+   - Exire-specific business logic
+   - Missing tenant configuration
 
-**Classification**:
-- **Risk Level**: LOW
-- **Manual Approval**: YES
-- **Auto-Proposal**: YES
-- **Scope**: Tenant business context validation
+4. **Context Configuration**
+   - language settings validation
+   - advisor personality requirements
+   - offers/services validation
+   - target audience specification
 
-### **Missing Connections Agent**
+### Outputs
+- Missing tenant context reports
+- Hardcoded reference warnings
+- tenant config requirements
+- business-specific implementation tickets
+- context injection validation
 
-**Purpose**: Identify unlinked or disconnected features
+### Risk Level: HIGH
+- Tenant feature isolation critical
+- Data leakage risks
+- business logic contamination
 
-**Input Sources**:
-- Route definitions vs component implementations
-- Button actions and corresponding handlers
-- Form submissions and backend processing
-- Dashboard data sources and API connections
+### Approval Mode: **REPORT ONLY**
+- All context issues documented
+- Dean approval for tenant changes
+- Manual review required
 
-**Checks Performed**:
-1. **Component Reachability**
-   - Components not reachable from routes
-   - Dead buttons and links
-   - Unconnected form submissions
+### Never Auto-Fix Areas:
+- Core tenant identification
+- business-specific logic
+- tenant configuration changes
+- context injection mechanisms
+---
 
-2. **Data Flow Validation**
-   - Settings not affecting application behavior
-   - Dashboard cards with static/fake data
-   - Hooks without usage
-   - Unused translation keys
+## Agent: Missing Connections Agent
 
-**Output Formats**:
-- `connectivity-reports/missing-connections-TIMESTAMP.md`
-- Unreachable component documentation
-- Feature wiring requirements
-- Risk level assessment (HIGH/MEDIUM/LOW)
+### Purpose
+Identifies features that exist but are not reachable from routes or accessible through the user interface, ensuring complete functionality and user experience.
 
-**Classification**:
-- **Risk Level**: MEDIUM
-- **Manual Approval**: YES
-- **Auto-Proposal**: YES
-- **Scope**: Feature connectivity verification
+### Inputs
+- Component dependency analysis
+- Route configuration files
+- Button and action implementations
+- Form and submission logic
+- Dashboard and data integration
 
-### **Performance / Lightweight Agent**
+### Checks
+1. **Route Connectivity**
+   - Components reachable from routes
+   - Navigation accessibility
+   - Route component mapping
+   - Access control validation
 
-**Purpose**: Identify optimization opportunities
+2. **Interactive Element Validation**
+   - Dead buttons detection
+   - Non-functional forms
+   - Missing submit actions
+   - Incomplete user flows
 
-**Input Sources**:
-- Dependency analysis
-- Component usage patterns
-- Import/export dependencies
-- Bundle analysis (if available)
+3. **Data Integration**
+   - Settings consumption
+   - dashboard data sources
+   - Real-time data updates
+   - Data persistence validation
 
-**Checks Performed**:
-1. **Unused Content**
-   - Heavy components not being used
+4. **Hook Usage**
+   - Used hooks validation
+   - Unused component detection
+   - Dependency analysis
+   - Bundle optimization
+
+5. **Dashboard Component Validation**
+   - Fake/static data detection
+   - Real data integration
+   - Current state reflection
+   - Data accuracy validation
+
+6. **AI Function Wiring**
+   - AI call integration
+   - Prompt injection validation
+   - Response handling
+   - Error integration
+
+### Outputs
+- Missing connection reports
+- Feature wiring tickets
+- Component accessibility validation
+- User flow improvements
+- Performance optimization opportunities
+
+### Risk Level: MEDIUM
+- User experience gaps
+- Feature availability issues
+- Incomplete functionality
+
+### Approval Mode: **REPORT ONLY**
+- All connection issues documented
+- Feature completeness validation
+- Dean approval for connectivity changes
+
+### Never Auto-Fix Areas:
+- Core route configuration
+- Component accessibility
+- Dashboard data integration
+- User flow additions
+---
+
+## Agent: Performance / Lightweight Agent
+
+### Purpose
+Identifies opportunities to make the application lighter and simpler while maintaining functionality, focusing on optimization and unnecessary code removal.
+
+### Inputs
+- Component usage analysis
+- Import statements and dependencies
+- JavaScript bundle size indicators
+- Load time performance metrics
+- Network resource consumption
+
+### Checks
+1. **Component Optimization**
+   - Unused heavy components
    - Duplicate component implementations
-   - Unused imports in code files
+   - Unused imports and dependencies
+   - Component complexity analysis
 
-2. **Legacy & Experimental**
-   - Legacy modules in core shell
-   - AION/Web3 dependencies in main bundle
-   - Unnecessary framework dependencies
+2. **Module Loading**
+   - Legacy modules loaded in core shell
+   - Unnecessary early loading
+   - Bundle size optimization opportunities
+   - Lazy loading identification
 
-3. **Optimization Opportunities**
-   - Lazy loading potential
-   - Route-based code splitting
-   - Bundle size reduction strategies
+3. **Bundle Management**
+   - Code splitting opportunities
+   - Module loading patterns
+   - Resource consumption analysis
+   - Performance impact assessment
 
-**Output Formats**:
-- `performance-reports/lightweight-analysis-TIMESTAMP.md`
-- Unused component documentation
-- Optimization recommendations
-- Risk level for each change (LOW/MEDIUM/HIGH)
+4. **AION/Web3 Loading**
+   - Early Web3 integration check
+   - AION module loading timing
+   - Performance impact of legacy systems
+   - Optimization recommendations
 
-**Classification**:
-- **Risk Level**: LOW
-- **Manual Approval**: YES
-- **Auto-Proposal**: YES
-- **Scope**: Performance optimization analysis
+### Outputs
+- Lightweight improvement proposals
+- Risk level assessment
+- Safe cleanup tickets
+- Performance optimization opportunities
+- Bundle size reduction strategies
 
-### **Regression Verification Agent**
+### Risk Level: LOW
+- Optimization improvements
+- Performance enhancement
+- Bundle size reduction
 
-**Purpose**: Automated post-change verification
+### Approval Mode: **REPORT ONLY**
+- All optimization opportunities documented
+- Risk assessment for changes
+- Dean approval for performance modifications
 
-**Input Sources**:
-- Git diff analysis
-- System state before changes
-- Test coverage reports
-- Browser validation results
+### Never Auto-Fix Areas:
+- Core functionality
+- User interface components
+- Essential business logic
+---
 
-**Checks Performed**:
-1. **System Health**
-   - Development server startup verification
-   - Route accessibility testing
-   - Mobile/desktop responsive design
-   - i18n functionality validation
-   - Advisor widget functionality
+## Agent: Regression Verification Agent
 
-2. **Console & Error Analysis**
-   - Console error detection
-   - Vite overlay verification
-   - JavaScript exception tracking
-   - Network request errors
+### Purpose
+Runs comprehensive checks after changes to ensure all core functionality remains intact, covering development server, application loading, responsive design, and i18n support.
 
-**Output Formats**:
-- `regression-reports/post-deployment-verification-TIMESTAMP.md`
-- Pre-change vs post-change comparison
-- Failed test documentation
-- Remediation recommendations
+### Inputs
+- Application code changes
+- Configuration modifications
+- Route updates
+- Component dependencies
+- Integration changes
 
-**Classification**:
-- **Risk Level**: LOW
-- **Manual Approval**: YES
-- - **Auto-Proposal**: YES
-- **Scope**: Post-deployment system validation
+### Checks
+1. **Development Environment**
+   - Dev server boots successfully
+   - No critical startup errors
+   - Environment configuration
+   - Dependency validation
 
-### **Diff Risk Reviewer**
+2. **Application Loading**
+   - Core route loads correctly
+   - Components render properly
+   - Initial data loading
+   - Error handling validation
 
-**Purpose**: Review and classify git diff changes
+3. **Responsive Design**
+   - Mobile width smoke test
+   - Desktop width validation
+   - Layout consistency
+   - Component alignment
 
-**Input Sources**:
-- Git diff analysis
-- Change classification
-- Risk assessment
+4. **Internationalization**
+   - i18n smoke test
+   - Translation loading
+   - RTL/LTR validation
+   - Locale support
 
-**Checks Performed**:
-1. **Change Classification**
-   - Source code modifications
+5. **Advisor Integration**
+   - Advisor widget smoke test
+   - AI advisor functionality
+   - Context injection validation
+   - Advisor response handling
+
+### Outputs
+- Post-change verification report
+- Functional integrity validation
+- Performance smoke test results
+- Internationalization validation
+- Advisor integration status
+
+### Risk Level: MEDIUM
+- Change impact assessment
+- Functional regression detection
+- User experience validation
+
+### Approval Mode: **REPORT ONLY**
+- All regression checks documented
+- Change impact analysis
+- Dean approval for changes requiring validation
+
+### Never Auto-Fix Areas:
+- Core application loading
+- User interface functionality
+- Internationalization integration
+---
+
+## Agent: Diff Risk Reviewer
+
+### Purpose
+Analyzes current git diff before any commit to identify source code changes, configuration modifications, risky files, and potential deployment impacts.
+
+### Inputs
+- Git diff data
+- Staged file changes
+- Commit history
+- File classifications
+
+### Checks
+1. **Source File Changes**
+   - Source files modified
    - Configuration changes
    - Documentation updates
-   - Generated file changes
-   - Temporary file modifications
+   - Generated files consideration
 
 2. **Risk Assessment**
-   - High-risk areas: auth, Edge Functions, payments, RLS, Supabase
-   - Medium-risk areas: components, UI, tenant config, advisor behavior
-   - Low-risk areas: docs, formatting, generated files
+   - Risky areas changed
+   - Deleted files impact
+   - Generated files staged
+   - Reports/temp files presence
 
-**Output Formats**:
-- `review-reports/diff-risk-analysis-TIMESTAMP.md`
-- Safe commit recommendation (YES/NO)
-- Files requiring unstaging
+3. **File Classification**
+   - Production source files changed
+   - Configuration modifications
+   - Documentation updates
+   - Generated/report files
+
+### Outputs
+- Safe to commit assessment
+- Files to unstage recommendations
 - Files needing Dean review
+- Risk categorization
+- Change impact analysis
 
-**Classification**:
-- **Risk Level**: MEDIUM
-- **Manual Approval**: YES
-- **Auto-Proposal**: NO
-- **Scope**: Git diff analysis and risk classification
+### Risk Level: CRITICAL
+- Production deployment risk
+- File system integrity
+- Code quality control
 
-### **Proposal Review Board Agent**
+### Approval Mode: **REPORT ONLY**
+- All risk assessments documented
+- Manual review for risky changes
+- Dean approval for high-risk files
 
-**Purpose**: Consolidate analyzer outputs into Dean-approved proposals
+### Never Auto-Fix Areas:
+- Source file modifications
+- Configuration changes
+- Deployment-impacting changes
+---
 
-**Input Sources**:
-- All analyzer outputs
-- Generated reports and tickets
-- Risk classifications
-- Approval requirements
+## Agent: Proposal Review Board Agent
 
-**Output Formats**:
-- `proposal-board/bizos-improvement-proposals-TIMESTAMP.md`
-- Structured proposal format with:
-  - Proposal ID
-  - Title and description
-  - Problem and impact analysis
-  - Affected files and systems
-  - Platform/tenant classification
-  - Risk level assessment
-  - Files not to touch
-  - Acceptance criteria
-  - Manual QA checklist
-  - Recommended executor (Hermes/OpenCode/manual)
-  - Approval requirements
+### Purpose
+Collects all analyzer outputs and transforms them into structured proposals that Dean can review, approve, or reject for implementation.
 
-**Classification**:
-- **Risk Level**: MEDIUM
-- **Manual Approval**: YES
-- **Auto-Proposal**: NO
-- **Scope**: Proposal consolidation and approval workflow
+### Inputs
+- All analyzer reports and findings
+- Risk assessments from multiple agents
+- Change impact analysis
+- Implementation recommendations
 
-## Pipeline Integration Summary
+### Proposal Requirements
+Each proposal must include:
 
-### **Agent Execution Flow**
-1. **Initialization**: Load BizOS_MASTER_CONTEXT.md for operational boundaries
-2. **Scope Assessment**: Determine if changes are Track A (Platform) or Track B (UI/App)
-3. **Safety Validation**: Confirm all safety protocols before execution
-4. **Sequential Processing**: Execute agents in priority order
-5. **Output Generation**: Create standardized reports for each agent
-6. **Consolidation**: Aggregate outputs into unified proposal
-7. **Dean Review**: Present consolidated proposals for approval
+1. **Proposal ID**
+   - Unique identifier
+   - Sequential number
+   - Category classification
 
-### **Agent Execution Order**
-1. **Vision Alignment Agent** (HIGH priority)
-2. **Security & Privacy Agent** (CRITICAL priority)
-3. **UI Guidelines Agent** (MEDIUM priority)
-4. **i18n/Translation Agent** (LOW priority)
-5. **System Integration Agent** (LOW priority)
-6. **AI Systems Connectivity Agent** (LOW priority)
-7. **Tenant Context Agent** (LOW priority)
-8. **Missing Connections Agent** (MEDIUM priority)
-9. **Performance/Lightweight Agent** (LOW priority)
-10. **Regression Verification Agent** (LOW priority)
-11. **Diff Risk Reviewer** (MEDIUM priority)
-12. **Proposal Review Board Agent** (HIGH priority)
+2. **Title**
+   - Clear problem statement
+   - Impact description
+   - Action recommendation
 
-### **Output Hierarchy**
-- **Level 1**: Individual analyzer reports (component outputs)
-- **Level 2**: Consolidated analysis summaries
-- **Level 3**: Unified improvement proposals
-- **Level 4**: Dean approval workflow documentation
+3. **Problem**
+   - Issue identification
+   - Business impact
+   - Risk assessment
 
-### **Governance Compliance**
-- **Analyzer-Only Default**: Focus on inspection and classification
-- **One-Scope-at-a-Time**: Limited, focused changes only
-- **Manual Validation**: Required for critical changes
-- **Dean Approval**: Required for all commits and pushes
-- **Git Rollback**: Primary change management approach
+4. **Why It Matters**
+   - Strategic importance
+   - User experience impact
+   - Platform alignment
 
-## Future Enhancements
+5. **Affected Files**
+   - Complete file list
+   - Change scope
+   - Implementation details
 
-### **Planned Agent Additions**
-1. **Compliance Monitoring Agent** - Regulatory requirement tracking
-2. **Cost Analysis Agent** - Performance and resource optimization
-3. **User Experience Agent** - Usability and interaction design validation
-4. **Infrastructure Monitoring Agent** - System health and performance monitoring
-5. **Automated Fix Executor** - Safe, approved change implementation
+6. **Systems Affected**
+   - Application systems impacted
+   - Component connections
+   - Integration requirements
 
-### **Automation Roadmap**
-1. **Phase 1**: Manual proposal generation and review
-2. **Phase 2**: Semi-automated ticket creation and prioritization
-3. **Phase 3**: Automated implementation for Level 3 proposals
-4. **Phase 4**: Full pipeline automation with real-time monitoring
+7. **Platform/Tenant Classification**
+   - Platform-level change
+   - Tenant-specific modification
+   - Both impact assessment
 
-### **Quality Assurance Framework**
-1. **Validation Requirements**
-   - File existence verification (`test -f`)
-   - Git status and diff verification
-   - Application functionality validation
-   - Type and format compliance
-   - Safety protocol adherence
+8. **Risk Level**
+   - Threat assessment
+   - Impact severity
+   - Dependency complexity
 
-2. **Risk-Based Approach**
-   - Level 0: Never auto-approve (strict protection)
-   - Level 1: Manual approval required (medium risk)
-   - Level 2: Proposal-only (low risk)
-   - Level 3: Future automation (safe, routine tasks)
+9. **Files Not to Touch**
+   - Protected paths list
+   - Safety boundaries
+   - Exclusion criteria
 
-## Conclusion
+10. **Acceptance Criteria**
+    - Success conditions
+    - Verification steps
+    - Quality requirements
 
-The BizOS Pipeline Agent Registry establishes a **comprehensive framework** for safe, controlled platform improvement while protecting critical systems and maintaining operational boundaries.
+11. **Manual QA Checklist**
+    - Testing procedures
+    - Validation requirements
+    - Quality gates
 
-**Core Principles**:
-1. **Analyzer-First Approach**: Inspection and classification before changes
-2. **Safety-First Protocol**: Protective boundaries around production systems
-3. **Human Oversight**: Manual approval for all significant changes
-4. **Gradual Automation**: Progressive introduction of automated capabilities
-5. **Clear Documentation**: Comprehensive documentation for all processes
+12. **Recommended Executor**
+    - Hermes agent
+    - OpenCode execution
+    - Manual implementation
 
-**This registry ensures that all BizOS improvements are**
+13. **Approval Required**
+    - Yes/No classification
+    - Dean approval level
+    - Risk justification
 
-✅ **Safety-compliant**
-✅ **Well-documented**
-✅ **Proposal-only**
-✅ **Dean-approved**
-✅ **Controlled and graded**
+### Outputs
+- Structured proposal documentation
+- Prioritized change recommendations
+- Dean approval workflow
+- Implementation tracking
+- Quality assurance requirements
+
+### Risk Level: MEDIUM
+- Change implementation risk
+- Approval process complexity
+- Implementation tracking
+
+### Approval Mode: **REPORT ONLY**
+- All proposals structured
+- Dean review and approval
+- Implementation tracking
+
+### Never Auto-Fix Areas:
+- Source code modifications
+- Production changes
+- Strategic business logic
