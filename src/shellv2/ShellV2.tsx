@@ -6,7 +6,9 @@
  *   BackgroundLayer  z=10   — orb canvas + bg-background paint
  *   ChatLayer        z=20   — conversation + inline artifacts
  *   ComposerLayer    z=30   — input + composer actions
+ *   NavLayer         z=32   — anchors bloom ABOVE composer
  *   ChromeLayer      z=40   — minimal top bar
+ *   FloatingChat     z=50   — floating chat widget
  *   OverlayLayer     z=55–80 — unified overlay manager
  *   BlockingLayer    z=90   — critical gates only
  *
@@ -23,6 +25,7 @@ import OverlayLayer from './layers/OverlayLayer';
 import BlockingLayer from './layers/BlockingLayer';
 import NavLayer from './layers/NavLayer';
 import RealmTransitionLayer from './layers/RealmTransitionLayer';
+import FloatingAdvisorWidget from '@/components/admin/advisor/AdvisorWidget';
 import { ChamberIdleProvider } from './hooks/useChamberIdle';
 import StrategyApprovalCard from '@/components/aurora/StrategyApprovalCard';
 import { CosmosLayer, HazeLayer } from '@/universe';
@@ -60,6 +63,8 @@ export default function ShellV2({ children }: ShellV2Props) {
         {/* ComposerLayer intentionally not mounted — the only chat surface
             is the global floating AION widget (InteractiveAIONHost). */}
         <ChromeLayer />
+        {/* Floating chat widget — positioned at bottom-right */}
+        <FloatingAdvisorWidget />
         <OverlayLayer />
         <BlockingLayer />
         <StrategyApprovalCard />

@@ -1,95 +1,76 @@
-# Evolve
+# BizOS Platform Documentation
 
-Evolve is the platform. `MindOS` is the AI coaching and execution layer inside it.
+## Overview
 
-## Current Status
+**BizOS** is the **AI Business Operating System for all businesses**. This repository contains the **BizOS platform foundation** with **Exire Systema** as the first tenant.
 
-This repository is in a staged architecture transition:
+### What BizOS IS
+- **AI Business Operating System**: Platform for infinite businesses
+- **Multi-Tenant Architecture**: Supports diverse business types
+- **Business Primitives**: Reusable business components  
+- **Contextual AI Advisors**: Intelligent business assistance
 
-- Production app behavior is already aligned around `Evolve` + `MindOS`
-- Main protected navigation is now:
-  - `Free Market` -> `/fm`
-  - `MindOS` -> `/mindos/*`
-  - `Community` -> `/community`
-  - `Study` -> `/learn`
-- Legacy routes such as `/aurora`, `/play`, and `/work` are preserved as redirects; `/aurora` now resolves into the AION chat experience
-- OpenClaw-style agent runtime is already live through Vercel `/api/*`
-- The repo is now bootstrapped as a workspace monorepo, but the live app source still physically lives in root `src/` and `supabase/`
+### What BizOS IS NOT
+- Not just a coaching platform
+- Not e-commerce only
+- Not notes or knowledge management
+- Not generic CRM
 
-## Workspace Shape
+### Current Implementation
+- **Exire Systema**: First and current live tenant
+- **Legacy Architecture**: Being migrated to BizOS platform
+- **Migration Status**: This repository is transitioning from Exire-specific implementation to generic BizOS platform with infinite tenant support.
 
-```text
-.
-|- apps/
-|  `- evolve/           # active Vite package used by root workspace build
-|- backend/
-|  |- openclaw/         # agent configs, tool stubs, future service boundary
-|  `- supabase/         # target home for Supabase assets (bootstrap docs only for now)
-|- design/              # reserved for design assets and brand material
-|- management/          # architecture and operational source of truth
-|- api/                 # current Vercel serverless routes
-|- src/                 # current live React application source
-`- supabase/            # current live Supabase project files
-```
+## Getting Started
 
-## Product Structure
+### For BizOS Platform Users
+1. **Understand BizOS**: Platform for all businesses
+2. **Multi-Tenant Awareness**: Exire Systema is one tenant among many
+3. **Platform Features**: Use business primitives for any business type
+4. **Configuration**: Customize platform for business-specific needs
+5. **Extensions**: Build custom workflows using platform primitives
+6. **Integration**: Connect to external systems through platform APIs
+7. **Training**: Configure AI advisors with business-specific knowledge
 
-### Platform tabs
+### For Platform Developers
+1. **Platform-First Design**: Design generic primitives for all businesses
+2. **Tenant Isolation**: Separate platform from tenant implementations
+3. **Component Reuse**: Create reusable BizOS business primitives
+4. **Safety First**: Use analyzer-first development approach
+5. **Clear Boundaries**: Document platform vs. tenant responsibilities
 
-- `Free Market` -> marketplace, wallet, earning surfaces
-- `MindOS` -> coaching hub with:
-  - `chat`
-  - `tactics`
-  - `strategy`
-  - `work`
-  - `journal`
-- `Community` -> social feed, stories, profiles
-- `Study` -> courses and learning
+## Development Approach
 
-### Identity stack
+### Current Reality
+- **Repository**: Exire legacy architecture being migrated
+- **Documentation**: Gradually transitioning to BizOS terminology
+- **Interfaces**: May still reference Exire where appropriate
 
-```text
-DNA -> AION -> MindOS Layer -> Avatar
-```
+### BizOS Migration Strategy
+1. **Phase 1**: Extract platform primitives and safety protocols
+2. **Phase 2**: Update documentation to BizOS terminology
+3. **Phase 3**: Separate platform vs. tenant branding
+4. **Phase 4**: Establish tenant configuration systems
+5. **Phase 5**: Create generic business primitives
+6. **Phase 6**: Connect Advisor to business context
+7. **Phase 7**: Archive or isolate legacy/experimental systems
+8. **Phase 8**: Prepare multi-tenant SaaS structure
 
-- `DNA` is the canonical identity computation layer
-- `AION` is the future-self presence and visual identity abstraction
-- `MindOS Layer` is the unified OpenClaw-powered intelligence surface
-- `Avatar` is the user's 3D body/customization layer
+## Resources
 
-## Runtime Architecture
+### Documentation
+- **BizOS Platform Model**: Technical architecture
+- **BizOS Tenant Model**: Multi-tenant architecture  
+- **BizOS Vision**: Platform strategy and philosophy
+- **Hermes Pipeline**: Development workflow
+- **Analyzer Registry**: Available analysis tools
 
-### Frontend
+### Development Tools
+- **Enhanced Dev Repair Loop**: Safe auto-repair capabilities
+- **Analyzer Scripts**: Comprehensive system analysis tools
+- **Safety Protocols**: Robust governance for all changes
 
-- React 18
-- Vite
-- TypeScript
-- React Router
-- Tailwind + shadcn/ui
-- React Query
-- Context providers
-- Three.js / React Three Fiber
-
-### Backend / services
-
-- Supabase for auth, DB, storage, and legacy edge functions
-- Vercel `/api` routes for the current MindOS agent runtime
-- OpenRouter for model access
-- Web3Auth for wallet bootstrap
-- Stripe, ElevenLabs, Resend, push infrastructure
-
-## OpenClaw Status
-
-The repo already contains the first practical cut of the OpenClaw migration:
-
-- agent runtime in `api/`
-- config loader in `src/lib/openclaw.ts`
-- shared agent tools in `src/lib/tools/`
-- backend-aligned agent configs in `backend/openclaw/agents/`
-
-The next step is moving from "runtime works" to "backend boundary is fully normalized."
-
-## Development
+### Development
 
 Install from the workspace root:
 

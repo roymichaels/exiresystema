@@ -21,7 +21,6 @@ import CanonicalAionModel from '@/components/orb/CanonicalAionModel';
 import { UserNotificationBell } from '@/components/UserNotificationBell';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import AdvisorWidget from '@/components/admin/advisor/AdvisorWidget';
 
 export default function ShellV2Header() {
   const overlay = useOverlay();
@@ -77,7 +76,7 @@ export default function ShellV2Header() {
             </button>
 
             <div className="flex items-center gap-1">
-              {user ? <><AdvisorWidget /><UserNotificationBell /></> : null}
+              {user ? <UserNotificationBell /> : null}
             </div>
           </div>
         </header>

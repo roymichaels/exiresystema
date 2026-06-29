@@ -1,80 +1,61 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { VitePWA } from "vite-plugin-pwa";
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    
-    VitePWA({
-      registerType: "autoUpdate",
-      workbox: {
-        navigateFallbackDenylist: [/^\/~oauth/],
-        skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-      },
-      manifest: {
-        name: "AION - מערכת ההפעלה לחיים שלך",
-        short_name: "AION",
-        description: "משחק החיים האמיתי. AI + היפנוזה + גיימיפיקציה = Level Up Your Life",
-        theme_color: "#a855f7",
-        background_color: "#0a0a0f",
-        display: "standalone",
-        orientation: "portrait",
-        dir: "rtl",
-        lang: "he",
-        start_url: "/",
-        icons: [
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any"
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any"
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "maskable"
-          },
-          {
-            src: "/aurora-icon.svg",
-            sizes: "any",
-            type: "image/svg+xml",
-            purpose: "any"
-          }
-        ]
-      }
-    })
-  ].filter(Boolean),
+export default defineConfig({
+  plugins: [VitePWA({
+    registerType: "autoUpdate",
+    workbox: {
+      skipWaiting: true,
+      clientsClaim: true,
+      cleanupOutdatedCaches: true,
+    },
+    manifest: {
+      name: "AION - Sistema Operativo para Transformar tu Vida",
+      short_name: "AION",
+      description: "El verdadero juego de la vida. IA + Hipnosis + Gamificación = Level Up Your Life",
+      theme_color: "#a855f7",
+      background_color: "#0a0a0f",
+      display: "standalone",
+      orientation: "portrait",
+      dir: "ltr",
+      lang: "es",
+      start_url: "/",
+      icons: [
+        {
+          src: "/pwa-192x192.png",
+          sizes: "192x192",
+          type: "image/png",
+          purpose: "any"
+        },
+        {
+          src: "/pwa-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "any"
+        },
+        {
+          src: "/pwa-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "maskable"
+        }
+      ]
+    }
+  })].filter(Boolean),
+
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      buffer: "buffer",
-    },
+      "@": path.resolve(__dirname, "./src")
+    }
   },
+
+  optimizeDeps: {
+    include: [],
+  },
+
   build: {
-    cssCodeSplit: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-        },
-      },
-    },
+    outDir: "dist",
+    sourcemap: false,
   },
-}));
+});

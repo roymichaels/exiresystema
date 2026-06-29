@@ -172,7 +172,7 @@ export const he = {
     noScheduledSessions: "אין פגישות מתוכננות",
     continueWhereYouLeft: "המשך מאיפה שהפסקת",
     communityActivity: "פעילות בקהילה",
-    todaysFocus: {
+    todayFocus: {
       title: "המיקוד של היום",
       daysLeft: "{days} ימים נותרו",
       viewPlan: "צפה בתוכנית",
