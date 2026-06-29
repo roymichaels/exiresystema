@@ -206,7 +206,6 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
           </button>
         </div>
         <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-[calc(100%-3rem)] min-h-0 overflow-hidden p-3 md:p-4 gap-0 shadow-sm">
-          {renderHeader()}
           {!hasMessages && renderCommandCards()}
           {renderConversation()}
           {renderComposer()}
@@ -218,15 +217,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
 
   return (
     <div className="flex flex-col h-full min-h-0 gap-0" dir="rtl">
-      {renderHeader()}
-      {!hasMessages && renderCommandCards()}
-      {renderConversation()}
-      {renderComposer()}
-    </div>
-  );
-
-  function renderHeader() {
-    return (
+      {/* Header for widget mode */}
       <div className="shrink-0 pb-1">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-primary/10 p-1.5 md:p-2 shrink-0">
@@ -257,8 +248,11 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
           </div>
         )}
       </div>
-    );
-  }
+      {!hasMessages && renderCommandCards()}
+      {renderConversation()}
+      {renderComposer()}
+    </div>
+  );
 
   function renderCommandCards() {
     return (

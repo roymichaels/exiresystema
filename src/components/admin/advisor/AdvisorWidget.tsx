@@ -59,29 +59,15 @@ const FloatingAdvisorWidget = () => {
           className={cn(
             "fixed z-[9999] flex flex-col overflow-hidden",
             isMobile
-              ? "inset-0 border-0 rounded-none" // Full-screen overlay on mobile
-              : "top-[88px] right-4 bottom-6 w-[384px] max-h-[calc(100dvh-112px)] rounded-2xl border border-border/40" // Desktop drawer
+              ? "inset-0 border-0 rounded-none"
+              : "top-[88px] right-4 bottom-6 w-[384px] max-h-[calc(100dvh-112px)] rounded-2xl border border-border/40"
           )}
-          style={{ backgroundColor: 'hsl(var(--background))', minHeight: '100dvh' }}
+          style={{ backgroundColor: 'hsl(var(--background))', minHeight: isMobile ? '100dvh' : undefined }}
         >
-          {/* Close button only (no English header) */}
-          <div className="px-4 py-3 flex items-center justify-end flex-shrink-0">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-muted/50 rounded-lg transition-colors"
-              aria-label="Close Advisor"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          
-          {/* Chat Panel - uses existing Hebrew header from AdvisorPanel */}
-          <div className="flex-1 overflow-hidden" style={{ backgroundColor: 'hsl(var(--background))' }}>
-            <AdvisorPanel 
-              variant="widget"
-              onClose={() => setIsOpen(false)}
-            />
-          </div>
+          <AdvisorPanel 
+            variant="widget"
+            onClose={() => setIsOpen(false)}
+          />
         </div>
       )}
     </>
