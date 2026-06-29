@@ -108,7 +108,7 @@ export default function ExireDashboard() {
   const { revenue, leads, clients, sessions, actions } = data;
 
   return (
-    <div className="space-y-5 w-full max-w-full overflow-x-hidden">
+    <div className="space-y-5 w-full max-w-6xl mx-auto overflow-x-hidden">
 
       {/* ============================ MOBILE ============================ */}
       <MobileAdminScreen>
