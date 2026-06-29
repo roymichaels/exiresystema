@@ -93,7 +93,7 @@ export const ADMIN_TABS: AdminTabConfig[] = [
     id: 'leads',
     labelHe: 'לידים',
     labelEn: 'Leads',
-    labelEs: 'Lidere',
+    labelEs: 'Leads',
     icon: Users,
     subTabs: [
       { id: 'crm', labelHe: 'CRM', labelEn: 'CRM', labelEs: 'CRM', component: Leads },

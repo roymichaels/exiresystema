@@ -35,10 +35,10 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
 
   return (
     <main
-      className="relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y px-3 sm:px-4"
+      className="relative flex min-h-0 w-full max-w-[1280px] flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y mx-auto px-3 sm:px-4 md:px-6 lg:px-8"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.25rem)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6rem)',
       }}
     >
       {/* Mobile sub-tab back pill (hidden on Advisor — AdvisorPanel has its own back button) */}

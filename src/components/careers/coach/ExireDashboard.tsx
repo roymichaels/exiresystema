@@ -108,7 +108,7 @@ export default function ExireDashboard() {
   const { revenue, leads, clients, sessions, actions } = data;
 
   return (
-    <div className="space-y-5 w-full max-w-6xl mx-auto overflow-x-hidden">
+    <div className="space-y-4 w-full max-w-[1120px] mx-auto overflow-x-hidden">
 
       {/* ============================ MOBILE ============================ */}
       <MobileAdminScreen>
@@ -296,9 +296,15 @@ export default function ExireDashboard() {
       <section className="hidden md:block">
         <AdvisorCard className="mb-3" />
 
-        {/* All metrics — collapsed by default to keep Today focused */}
-        <details className="group rounded-2xl border border-border/40 bg-card/30 [&_summary::-webkit-details-marker]:hidden">
-          <summary className="cursor-pointer list-none px-4 py-3 text-[13px] font-medium flex items-center justify-between min-h-[44px]">
+        {/* Hero metric strip */}
+<div className="grid grid-cols-3 gap-2 mb-4">
+           <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={(fmt(revenue.todayCents, revenue.currency))} icon={TrendingUp} tone="good" />
+           <Stat label={language === 'he' ? 'לידים פתוחים' : language === 'es' ? 'Leads abiertos' : 'Open leads'} value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
+           <Stat label={language === 'he' ? 'פולואפים' : language === 'es' ? 'Seguimientos' : 'Follow-ups'} value={actions.overdueFollowups} icon={ClipboardCheck} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
+         </div>
+
+         <details className="group rounded-2xl border border-border/40 bg-card/30 [&_summary::-webkit-details-marker]:hidden">
+           <summary className="cursor-pointer list-none px-4 py-3 text-[13px] font-medium flex items-center justify-between min-h-[44px]">
             <span className="text-muted-foreground">
               {language === 'he' ? 'כל המדדים · הכנסות, לידים, לקוחות, סשנים' : language === 'es' ? 'Todas las métricas · Ingresos, leads, clientes, sesiones' : 'All metrics · Revenue, leads, clients, sessions'}
             </span>

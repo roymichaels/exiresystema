@@ -19,7 +19,7 @@ export default function AdvisorCard({ className }: { className?: string }) {
     setParams(p, { replace: true });
   };
 
-  return (
+return (
     <section
       className={cn(
         'rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/[0.08] to-primary/[0.02]',
@@ -38,28 +38,27 @@ export default function AdvisorCard({ className }: { className?: string }) {
               {language === 'he' ? 'קריאה-בלבד' : language === 'es' ? 'Solo lectura' : 'Read-only'}
             </span>
           </div>
-          <p className="text-[12px] text-muted-foreground mt-0.5">{language === 'he' ? 'שאל מה הדבר הבא בעסק' : language === 'es' ? 'Pregunta qué sigue en tu negocio' : 'Ask what\'s next in your business'}</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">{language === 'he' ? 'אסטרטגיה ופעולות להיום' : language === 'es' ? 'Estrategia y acciones hoy' : 'Strategy and actions today'}</p>
 
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
+          <div className="mt-2 flex flex-wrap gap-1">
             {(language === 'he'
               ? ['לידים', 'כסף', 'משפך']
               : language === 'es'
-              ? ['Leads', 'Dinero', 'Embudo']
-              : ['Leads', 'Money', 'Funnel']
+                ? ['Leads', 'Dinero', 'Embudo']
+                : ['Leads', 'Money', 'Funnel']
             ).map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => open(c)}
-                className="text-[11.5px] rounded-full border border-border/50 bg-card/70 px-2.5 py-1 hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                className="text-[11px] rounded-full border border-border/50 bg-card/70 px-2 py-0.5 hover:border-primary/40 hover:bg-primary/5 transition-colors"
               >
                 {c}
               </button>
             ))}
           </div>
 
-
-          <div className="mt-3">
+          <div className="mt-2.5">
             <Button size="sm" onClick={() => open()} className="rounded-xl">
               {language === 'he' ? 'שאל את המוח' : language === 'es' ? 'Preguntar al asesor' : 'Ask the Advisor'}
               <ArrowLeft className="h-3.5 w-3.5 mr-1" />

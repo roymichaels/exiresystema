@@ -33,7 +33,7 @@ const FloatingAdvisorWidget = () => {
         <button
           onClick={() => setIsOpen(true)}
           className={cn(
-            "fixed z-[94] bottom-[calc(88px+1rem)] right-4 rounded-full",
+            "fixed z-[61] bottom-[calc(72px+1rem)] right-4 rounded-full",
             "shadow-lg hover:shadow-xl",
             "bg-primary text-primary-foreground",
             "flex items-center justify-center",
@@ -51,11 +51,11 @@ const FloatingAdvisorWidget = () => {
       {isOpen && (
         <div 
           className={cn(
-            "fixed z-[94] flex flex-col overflow-hidden",
+            "fixed z-[61] flex flex-col overflow-hidden",
             "bg-card/95 backdrop-blur-xl",
             "border border-border/50 shadow-2xl",
             isMobile
-              ? "inset-x-3 bottom-[calc(88px+1rem)] max-w-[420px] h-[72dvh] max-h-[680px] rounded-t-2xl"
+              ? "inset-x-3 bottom-[calc(72px+1rem)] max-w-[420px] h-[72dvh] max-h-[680px] rounded-t-2xl"
               : "bottom-28 right-4 w-[380px] max-w-[400px] h-[560px] max-h-[640px] rounded-2xl"
           )}
         >
