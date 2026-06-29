@@ -78,12 +78,21 @@ export default function XSystemClientsTab() {
         {isLoading ? (
           <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-border/30 bg-card/30 py-8 text-center">
-            <UsersRound className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
-            <p className="text-[13px] text-muted-foreground">
-              {q ? 'אין תוצאות לחיפוש.' : 'עדיין אין מתאמנים. המר ליד מתוך "לידים".'}
+          <div className="rounded-xl border border-border/30 bg-card/30 px-3 py-4 text-center space-y-2">
+            <p className="text-[12.5px] text-muted-foreground">
+              {q ? 'אין תוצאות לחיפוש.' : 'אין מתאמנים פעילים כרגע.'}
             </p>
+            {!q && (
+              <button
+                type="button"
+                onClick={() => navigate('/admin-hub?tab=leads')}
+                className="text-[12px] font-medium text-primary hover:underline"
+              >
+                ← פתח לידים
+              </button>
+            )}
           </div>
+
         ) : (
           <div className="space-y-2">
             <div className="px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
