@@ -1,5 +1,4 @@
 # Exire AI Development Base Layer
-# Exire AI Development Base Layer
 ## Agent Guidelines
 
 **Exire is an existing production application, not a prototype.** This is a well-established application with active users and business logic. Treat every change as impacting live systems.
@@ -57,7 +56,7 @@ This ensures all Hermes and OpenCode agents operate within the **BizOS operating
 
 ### Platform vs Tenant Distinction
 - **BizOS**: AI Business Operating System platform for all businesses
-- **Exire Systema**: First and current live tenant within BizOS (Dean\'s own business)
+- **Exire Systema**: First and current live tenant within BizOS (Dean's own business)
 - **Platform**: Generic infrastructure, shared services, business primitives
 - **Tenant**: Business-specific implementations within the platform
 
