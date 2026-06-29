@@ -295,47 +295,59 @@ export default function ExireDashboard() {
       {/* ============================ DESKTOP =========================== */}
       <section className="hidden md:block">
         <AdvisorCard className="mb-3" />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{language === 'he' ? 'הכנסות' : language === 'es' ? 'Ingresos' : 'Revenue'}</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
-          <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
-          <Stat label={language === 'he' ? 'החודש' : language === 'es' ? 'Este mes' : 'This month'} value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
-          <Stat label={language === 'he' ? 'ממתין' : language === 'es' ? 'Pendiente' : 'Pending'} value={fmt(revenue.pendingCents, revenue.currency)} hint={`${revenue.pendingClientCount} ${language === 'he' ? 'לקוחות' : language === 'es' ? 'clientes' : 'clients'}`} icon={Clock} tone="warn" />
-          <Stat label={language === 'he' ? 'תשלומים שולמו' : language === 'es' ? 'Pagos realizados' : 'Payments paid'} value={revenue.paidCount} icon={CreditCard} />
-          <Stat label={language === 'he' ? 'לקוחות בחוב' : language === 'es' ? 'Clientes en deuda' : 'Clients in debt'} value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
-        </div>
+
+        {/* All metrics — collapsed by default to keep Today focused */}
+        <details className="group rounded-2xl border border-border/40 bg-card/30 [&_summary::-webkit-details-marker]:hidden">
+          <summary className="cursor-pointer list-none px-4 py-3 text-[13px] font-medium flex items-center justify-between min-h-[44px]">
+            <span className="text-muted-foreground">
+              {language === 'he' ? 'כל המדדים · הכנסות, לידים, לקוחות, סשנים' : language === 'es' ? 'Todas las métricas · Ingresos, leads, clientes, sesiones' : 'All metrics · Revenue, leads, clients, sessions'}
+            </span>
+            <ChevronLeft className="h-4 w-4 opacity-60 transition-transform group-open:-rotate-90" />
+          </summary>
+          <div className="px-3 pb-3 space-y-3">
+            <div>
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'הכנסות' : language === 'es' ? 'Ingresos' : 'Revenue'}</h4>
+              <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
+                <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
+                <Stat label={language === 'he' ? 'החודש' : language === 'es' ? 'Este mes' : 'This month'} value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
+                <Stat label={language === 'he' ? 'ממתין' : language === 'es' ? 'Pendiente' : 'Pending'} value={fmt(revenue.pendingCents, revenue.currency)} hint={`${revenue.pendingClientCount} ${language === 'he' ? 'לקוחות' : language === 'es' ? 'clientes' : 'clients'}`} icon={Clock} tone="warn" />
+                <Stat label={language === 'he' ? 'תשלומים שולמו' : language === 'es' ? 'Pagos realizados' : 'Payments paid'} value={revenue.paidCount} icon={CreditCard} />
+                <Stat label={language === 'he' ? 'לקוחות בחוב' : language === 'es' ? 'Clientes en deuda' : 'Clients in debt'} value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
+              </div>
+            </div>
+            <div>
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'לידים' : language === 'es' ? 'Leads' : 'Leads'}</h4>
+              <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
+                <Stat label={language === 'he' ? 'חדשים' : language === 'es' ? 'Nuevos' : 'New'} value={leads.new} icon={Users} />
+                <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={leads.active} icon={Users} />
+                <Stat label={language === 'he' ? 'ממתינים לפולואפ' : language === 'es' ? 'Pendientes de seguimiento' : 'Pending follow-up'} value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
+                <Stat label={language === 'he' ? 'הומרו' : language === 'es' ? 'Convertidos' : 'Converted'} value={leads.converted} icon={Users} tone="good" />
+                <Stat label={language === 'he' ? 'חזרו 🔁' : language === 'es' ? 'Regresaron 🔁' : 'Returned 🔁'} value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} />
+                <Stat label={language === 'he' ? 'סה״כ' : language === 'es' ? 'Total' : 'Total'} value={leads.total} icon={Users} />
+              </div>
+            </div>
+            <div>
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'לקוחות' : language === 'es' ? 'Clientes' : 'Clients'}</h4>
+              <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
+                <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={clients.active} icon={Users} />
+                <Stat label={language === 'he' ? 'חדשים החודש' : language === 'es' ? 'Nuevos este mes' : 'New this month'} value={clients.newThisMonth} icon={Users} tone="good" />
+                <Stat label={language === 'he' ? 'עם סשן הבא' : language === 'es' ? 'Con próxima sesión' : 'With next session'} value={clients.withUpcomingSession} icon={Calendar} />
+                <Stat label={language === 'he' ? 'ללא סשן הבא' : language === 'es' ? 'Sin próxima sesión' : 'Without next session'} value={clients.withoutNextSession} icon={AlertCircle} tone={clients.withoutNextSession > 0 ? 'warn' : 'default'} />
+              </div>
+            </div>
+            <div>
+              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions'}</h4>
+              <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
+                <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={sessions.today} icon={Calendar} tone={sessions.today > 0 ? 'good' : 'default'} />
+                <Stat label={language === 'he' ? 'עתידיים' : language === 'es' ? 'Futuras' : 'Upcoming'} value={sessions.upcoming} icon={Calendar} />
+                <Stat label={language === 'he' ? 'הושלמו החודש' : language === 'es' ? 'Completadas este mes' : 'Completed this month'} value={sessions.completedThisMonth} icon={Calendar} tone="good" />
+                <Stat label={language === 'he' ? 'בוטלו/לא הופיע' : language === 'es' ? 'Canceladas/No show' : 'Cancelled/No show'} value={sessions.cancelledThisMonth} icon={AlertCircle} tone={sessions.cancelledThisMonth > 0 ? 'warn' : 'default'} />
+              </div>
+            </div>
+          </div>
+        </details>
       </section>
 
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{language === 'he' ? 'לידים' : language === 'es' ? 'Leads' : 'Leads'}</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
-          <Stat label={language === 'he' ? 'חדשים' : language === 'es' ? 'Nuevos' : 'New'} value={leads.new} icon={Users} />
-          <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={leads.active} icon={Users} />
-          <Stat label={language === 'he' ? 'ממתינים לפולואפ' : language === 'es' ? 'Pendientes de seguimiento' : 'Pending follow-up'} value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
-          <Stat label={language === 'he' ? 'הומרו' : language === 'es' ? 'Convertidos' : 'Converted'} value={leads.converted} icon={Users} tone="good" />
-          <Stat label={language === 'he' ? 'חזרו 🔁' : language === 'es' ? 'Regresaron 🔁' : 'Returned 🔁'} value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} hint={language === 'he' ? 'הגשה כפולה — דורש מענה אישי' : language === 'es' ? 'Envío duplicado — requiere atención personal' : 'Duplicate — requires personal attention'} />
-          <Stat label={language === 'he' ? 'סה״כ' : language === 'es' ? 'Total' : 'Total'} value={leads.total} icon={Users} />
-        </div>
-      </section>
-
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{language === 'he' ? 'לקוחות' : language === 'es' ? 'Clientes' : 'Clients'}</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={clients.active} icon={Users} />
-          <Stat label={language === 'he' ? 'חדשים החודש' : language === 'es' ? 'Nuevos este mes' : 'New this month'} value={clients.newThisMonth} icon={Users} tone="good" />
-          <Stat label={language === 'he' ? 'עם סשן הבא' : language === 'es' ? 'Con próxima sesión' : 'With next session'} value={clients.withUpcomingSession} icon={Calendar} />
-          <Stat label={language === 'he' ? 'ללא סשן הבא' : language === 'es' ? 'Sin próxima sesión' : 'Without next session'} value={clients.withoutNextSession} icon={AlertCircle} tone={clients.withoutNextSession > 0 ? 'warn' : 'default'} />
-        </div>
-      </section>
-
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions'}</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={sessions.today} icon={Calendar} tone={sessions.today > 0 ? 'good' : 'default'} />
-          <Stat label={language === 'he' ? 'עתידיים' : language === 'es' ? 'Futuras' : 'Upcoming'} value={sessions.upcoming} icon={Calendar} />
-          <Stat label={language === 'he' ? 'הושלמו החודש' : language === 'es' ? 'Completadas este mes' : 'Completed this month'} value={sessions.completedThisMonth} icon={Calendar} tone="good" />
-          <Stat label={language === 'he' ? 'בוטלו/לא הופיע' : language === 'es' ? 'Canceladas/No show' : 'Cancelled/No show'} value={sessions.cancelledThisMonth} icon={AlertCircle} tone={sessions.cancelledThisMonth > 0 ? 'warn' : 'default'} />
-        </div>
-      </section>
 
       <section className="hidden md:block">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{language === 'he' ? 'תור פעולות להיום' : language === 'es' ? 'Acciones para hoy' : 'Actions for today'}</h3>
