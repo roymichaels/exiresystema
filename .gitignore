@@ -41,3 +41,15 @@ docs/_CLEANUP.json
 
 # BIZOS analysis scripts (to be reviewed)
 # Note: scripts/ai/ and .opencode/ agents are not ignored - evaluated individually
+
+# Local one-off BizOS analysis helpers (temporary analysis scripts)
+analyze_legacy_experimental.py
+final-status-check.py
+repo-structure-scan.py
+run-analyzers-route.py
+verify_files.py
+vite-env.d.ts
+
+# Note: scripts/ai/ contains reusable analyzers and should be committed
+# Note: .opencode/agents/ contains reusable agent definitions and should be committed
+# Note: docs/*.md contains essential BizOS documentation and should be committed
