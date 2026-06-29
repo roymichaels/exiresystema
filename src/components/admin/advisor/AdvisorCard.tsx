@@ -42,10 +42,10 @@ export default function AdvisorCard({ className }: { className?: string }) {
 
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {(language === 'he'
-              ? ['לידים', 'כסף', 'פולואפים', 'משפך']
+              ? ['לידים', 'כסף', 'משפך']
               : language === 'es'
-              ? ['Clientes potenciales', 'Dinero', 'Seguimientos', 'Embudo']
-              : ['Leads', 'Money', 'Follow-ups', 'Funnel']
+              ? ['Leads', 'Dinero', 'Embudo']
+              : ['Leads', 'Money', 'Funnel']
             ).map((c) => (
               <button
                 key={c}
@@ -57,6 +57,7 @@ export default function AdvisorCard({ className }: { className?: string }) {
               </button>
             ))}
           </div>
+
 
           <div className="mt-3">
             <Button size="sm" onClick={() => open()} className="rounded-xl">
