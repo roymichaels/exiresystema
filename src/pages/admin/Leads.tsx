@@ -3,6 +3,7 @@ import { MessageSquare, Users } from "lucide-react";
 import LeadsCRM from "@/components/crm/LeadsCRM";
 import LandingChatTranscripts from "@/components/admin/leads/LandingChatTranscripts";
 import { useTranslation } from "@/hooks/useTranslation";
+import { PageHeader } from "@/components/admin/design-system";
 
 const Leads = () => {
   const { language } = useTranslation();
@@ -10,7 +11,12 @@ const Leads = () => {
   const t = (he: string, en: string, es: string) => language === 'he' ? he : language === 'es' ? es : en;
 
   return (
-    <div className="space-y-4 max-w-5xl mx-auto">
+    <div className="space-y-4 lg:space-y-6">
+      <PageHeader
+        title={t('לידים', 'Leads', 'Leads')}
+        subtitle={t('נהל לידים, מעקב והמרות', 'Manage leads, follow-ups and conversions', 'Administrar leads, seguimientos y conversiones')}
+      />
+
       <Tabs defaultValue="crm">
         <TabsList className="glass-panel">
           <TabsTrigger value="crm" className="gap-2">

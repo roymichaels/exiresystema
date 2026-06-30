@@ -1,6 +1,10 @@
 /**
  * @tab Admin
- * @purpose Unified admin control center — single bottom nav, no top nav row.
+ * @purpose Unified admin control center.
+ *
+ * Layout is provided by AdminPanelShell:
+ *   - desktop: left sidebar + centered content
+ *   - mobile: global header + bottom nav
  */
 
 import { Suspense, useMemo } from 'react';
@@ -8,6 +12,7 @@ import { PageSkeleton } from '@/components/ui/skeleton';
 import { ADMIN_TABS } from '@/domain/admin';
 import { AdminMobileBottomNav } from '@/components/admin/AdminMobileBottomNav';
 import { AdminMobileSubNav } from '@/components/admin/AdminMobileSubNav';
+import { AdminPanelShell } from '@/components/admin/AdminPanelShell';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,12 +39,10 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
   }, [currentTabConfig, currentSubTab]);
 
   return (
-    <main
-      className="relative flex min-h-0 w-full max-w-[1280px] flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y mx-auto px-3 sm:px-4 md:px-6 lg:px-8"
-      style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.25rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6rem)',
-      }}
+    <AdminPanelShell
+      activeTab={activeTab}
+      activeSubTab={currentSubTab}
+      onTabChange={onTabChange || (() => {})}
     >
       {/* Mobile sub-tab back pill (hidden on Advisor — AdvisorPanel has its own back button) */}
       {!(activeTab === 'more' && currentSubTab === 'advisor') && (
@@ -83,8 +86,8 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
         </Suspense>
       </ErrorBoundary>
 
-      {/* Bottom navigation — single primary nav for all screen sizes */}
+      {/* Bottom navigation — mobile only */}
       <AdminMobileBottomNav activeTab={activeTab} onTabChange={onTabChange} />
-    </main>
+    </AdminPanelShell>
   );
 }

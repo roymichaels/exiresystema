@@ -31,6 +31,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/admin/design-system";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database['public']['Enums']['app_role'];
@@ -257,47 +258,37 @@ const Users = () => {
 
   return (
     <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Compact Header */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <UsersIcon className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold">{t('adminUsers.pageTitle')}</h1>
-            <p className="text-sm text-muted-foreground">
-              {filteredUsers.length} {language === 'he' ? 'משתמשים' : language === 'es' ? 'usuarios' : 'users'}
-            </p>
-          </div>
-        </div>
-        
-        {/* Actions */}
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefreshUsers}
-            disabled={refreshing}
-            className="gap-1.5"
-          >
-            {refreshing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
-            )}
-            {language === 'he' ? 'רענון אורבים + תוכניות' : language === 'es' ? 'Actualizar Orbs + Planes' : 'Refresh Orbs + Plans'}
-          </Button>
-          
-          {/* Search */}
-          <div className="relative flex-1 sm:w-64">
-            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-2.5 h-4 w-4 text-muted-foreground`} />
-            <Input
-              placeholder={t('adminUsers.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={cn("h-9", isRTL ? 'pr-9' : 'pl-9')}
-            />
-          </div>
+      <PageHeader
+        title={t('adminUsers.pageTitle')}
+        subtitle={`${filteredUsers.length} ${language === 'he' ? 'משתמשים' : language === 'es' ? 'usuarios' : 'users'}`}
+        icon={UsersIcon}
+      />
+
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefreshUsers}
+          disabled={refreshing}
+          className="gap-1.5"
+        >
+          {refreshing ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          {language === 'he' ? 'רענון אורבים + תוכניות' : language === 'es' ? 'Actualizar Orbs + Planes' : 'Refresh Orbs + Plans'}
+        </Button>
+
+        {/* Search */}
+        <div className="relative flex-1 sm:w-64">
+          <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-2.5 h-4 w-4 text-muted-foreground`} />
+          <Input
+            placeholder={t('adminUsers.searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={cn("h-9", isRTL ? 'pr-9' : 'pl-9')}
+          />
         </div>
       </div>
 

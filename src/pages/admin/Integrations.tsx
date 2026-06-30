@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import IntegrationCard from '@/components/admin/integrations/IntegrationCard';
 import { useTranslation } from '@/hooks/useTranslation';
+import { PageHeader } from '@/components/admin/design-system';
 import {
   useCoachIntegrations, useSaveCoachIntegrations, useIntegrationStatus,
 } from '@/hooks/useCoachIntegrations';
@@ -70,20 +71,20 @@ const Integrations = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/15 flex items-center justify-center">
-            <Plug className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">{language === 'he' ? 'אינטגרציות' : language === 'es' ? 'Integraciones' : 'Integrations'}</h2>
-            <p className="text-sm text-muted-foreground">
-              {language === 'he' ? 'חבר את הכלים שהעסק שלך רץ עליהם.' : language === 'es' ? 'Conecta las herramientas con las que funciona tu negocio de coaching.' : 'Connect the tools your coaching business runs on.'}
-            </p>
-          </div>
-        </div>
-        <Button size="sm" variant="outline" onClick={() => refetch()}>{language === 'he' ? 'רענן סטטוס' : language === 'es' ? 'Actualizar estado' : 'Refresh status'}</Button>
-      </div>
+      <PageHeader
+        title={language === 'he' ? 'אינטגרציות' : language === 'es' ? 'Integraciones' : 'Integrations'}
+        subtitle={language === 'he' ? 'חבר את הכלים שהעסק שלך רץ עליהם.' : language === 'es' ? 'Conecta las herramientas con las que funciona tu negocio de coaching.' : 'Connect the tools your coaching business runs on.'}
+        icon={Plug}
+        actions={
+          <button
+            type="button"
+            className="text-sm font-medium text-primary hover:underline"
+            onClick={() => refetch()}
+          >
+            {language === 'he' ? 'רענן סטטוס' : language === 'es' ? 'Actualizar estado' : 'Refresh status'}
+          </button>
+        }
+      />
 
       <div className="grid md:grid-cols-2 gap-4">
         <IntegrationCard

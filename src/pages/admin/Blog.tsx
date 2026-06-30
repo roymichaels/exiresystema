@@ -46,7 +46,16 @@ export default function AdminBlog() {
   const generateMutation = useMutation({
     mutationFn: async (promptText: string) => {
       const { data, error } = await supabase.functions.invoke('generate-blog-article', {
-        body: { prompt: promptText, language: 'both', generateImage: true },
+        body: {
+          prompt: promptText,
+          language: 'both',
+          generateImage: true,
+          tenantId: 'exire-systema',
+          businessName: 'Exire Systema',
+          businessType: 'Personal Development Platform',
+          brandVoice: 'Empowering and authentic',
+          targetAudience: 'Individuals seeking personal growth and transformation'
+        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);

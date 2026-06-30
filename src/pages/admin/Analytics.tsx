@@ -37,6 +37,7 @@ import DateRangePicker, { DateRange } from "@/components/admin/analytics/DateRan
 import { useTranslation } from "@/hooks/useTranslation";
 import { getCurrencySymbol } from "@/lib/currency";
 import { toast } from "sonner";
+import { PageHeader } from "@/components/admin/design-system";
 
 interface AnalyticsStats {
   totalEnrollments: number;
@@ -304,19 +305,19 @@ const Analytics = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">{t('adminAnalytics.pageTitle')}</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">{t('adminAnalytics.pageSubtitle')}</p>
-        </div>
-        <DateRangePicker
-          selectedRange={dateRange}
-          onRangeChange={setDateRange}
-          onRefresh={handleRefresh}
-          onExport={handleExport}
-          isLoading={loading}
-        />
-      </div>
+      <PageHeader
+        title={t('adminAnalytics.pageTitle')}
+        subtitle={t('adminAnalytics.pageSubtitle')}
+        actions={
+          <DateRangePicker
+            selectedRange={dateRange}
+            onRangeChange={setDateRange}
+            onRefresh={handleRefresh}
+            onExport={handleExport}
+            isLoading={loading}
+          />
+        }
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

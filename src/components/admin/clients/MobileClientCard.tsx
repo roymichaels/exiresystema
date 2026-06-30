@@ -55,7 +55,7 @@ export const MobileClientCard = ({ client, statusLabel, statusColor, onOpen }: P
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h4 className="font-semibold text-[15px] leading-tight truncate">
+            <h4 className="font-semibold text-[15px] leading-tight truncate" dir="auto">
               {client.full_name || '—'}
             </h4>
             <Badge variant="outline" className={`${statusColor} text-[10px] px-2 py-0.5 shrink-0`}>

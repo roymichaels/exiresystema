@@ -6,11 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X } from "lucide-react";
+import { Loader2, Save, Upload, X, Settings } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { z } from "zod";
 import { handleError } from "@/lib/errorHandling";
 import { SignupGateCard } from "@/components/admin/SignupGateCard";
+import { PageHeader } from "@/components/admin/design-system";
 
 const settingsSchema = z.object({
   calendly_link: z.string().url("קישור Calendly לא חוקי").or(z.literal("")),
@@ -365,10 +366,11 @@ const Settings = () => {
 
   return (
     <div className="space-y-6 pb-8">
-      <div>
-        <h1 className="text-4xl font-black cyber-glow mb-2">הגדרות</h1>
-        <p className="text-muted-foreground">נהל את הגדרות האתר והתוכן</p>
-      </div>
+      <PageHeader
+        title="הגדרות"
+        subtitle="נהל את הגדרות האתר והתוכן"
+        icon={Settings}
+      />
 
       <div className="space-y-6">
         {/* Signup gate */}

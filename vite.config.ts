@@ -9,6 +9,7 @@ export default defineConfig({
       skipWaiting: true,
       clientsClaim: true,
       cleanupOutdatedCaches: true,
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
     },
     manifest: {
       name: "AION - Sistema Operativo para Transformar tu Vida",

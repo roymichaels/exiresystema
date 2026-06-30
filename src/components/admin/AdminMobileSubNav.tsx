@@ -37,7 +37,7 @@ export function AdminMobileSubNav({ activeTab, activeSubTab, onTabChange }: Prop
 
   if (launcherSubId) {
     return (
-      <div className="md:hidden -mx-1 px-1">
+      <div className="lg:hidden -mx-1 px-1">
         <button
           type="button"
           onClick={() => onTabChange?.(activeTab, launcherSubId)}
@@ -56,7 +56,7 @@ export function AdminMobileSubNav({ activeTab, activeSubTab, onTabChange }: Prop
   }
 
   return (
-    <div className="md:hidden -mx-1 px-1 overflow-x-auto">
+    <div className="lg:hidden -mx-1 px-1 overflow-x-auto">
       <div className="flex gap-1.5 pb-1 min-w-max">
         {tab.subTabs.map((sub) => {
           const isActive = sub.id === activeSub.id;

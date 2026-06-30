@@ -179,7 +179,7 @@ export function MobileListItem({
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-[14px] font-medium truncate">{title}</span>
+          <span className="text-[14px] font-medium truncate" dir="auto">{title}</span>
           {meta && <span className="text-[11px] text-muted-foreground shrink-0">{meta}</span>}
         </div>
         {subtitle && (
@@ -210,23 +210,25 @@ export function MobileMetricSummary({ hero, metrics, className }: MobileMetricSu
   return (
     <section
       className={cn(
-        'rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-4 space-y-3',
+        'rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-3 space-y-2',
         className,
       )}
     >
       {hero && (
-        <div>
-          <div className="text-[11px] text-muted-foreground">{hero.label}</div>
-          <div className="text-[28px] font-bold leading-tight">{hero.value}</div>
-          {hero.hint && (
-            <div className="text-[11px] text-muted-foreground mt-0.5">{hero.hint}</div>
-          )}
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[11px] text-muted-foreground">{hero.label}</div>
+            <div className="text-[22px] font-bold leading-tight">{hero.value}</div>
+            {hero.hint && (
+              <div className="text-[10px] text-muted-foreground mt-0.5">{hero.hint}</div>
+            )}
+          </div>
         </div>
       )}
       {metrics.length > 0 && (
         <div
           className={cn(
-            'grid gap-2 pt-3 border-t border-border/40',
+            'grid gap-2 pt-2 border-t border-border/40',
             metrics.length === 2 ? 'grid-cols-2'
             : metrics.length === 3 ? 'grid-cols-3'
             : 'grid-cols-4',
@@ -237,7 +239,7 @@ export function MobileMetricSummary({ hero, metrics, className }: MobileMetricSu
               : m.tone === 'warn' ? 'text-amber-500' : '';
             return (
               <div key={m.label} className="text-center min-w-0">
-                <div className={cn('text-base font-semibold leading-tight', tone)}>{m.value}</div>
+                <div className={cn('text-sm font-semibold leading-tight', tone)}>{m.value}</div>
                 <div className="text-[10px] text-muted-foreground truncate mt-0.5">{m.label}</div>
               </div>
             );

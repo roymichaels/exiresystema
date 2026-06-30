@@ -9,10 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, UsersRound, Phone, Mail, ChevronLeft } from 'lucide-react';
+import { Search, UsersRound, Phone, Mail, ChevronLeft, Plus } from 'lucide-react';
 import { useClients } from '@/hooks/useClients';
 import { MobileClientCard } from './MobileClientCard';
 import { useTranslation } from '@/hooks/useTranslation';
+import { PageHeader, SectionHeader, EmptyState, DataList, DataRow } from '@/components/admin/design-system';
 
 const STATUS_LABEL = (lang: string): Record<string, string> => ({
   active: lang === 'he' ? 'פעיל' : lang === 'es' ? 'Activo' : 'Active',
@@ -45,16 +46,14 @@ export default function XSystemClientsTab() {
   const t = (he: string, en: string, es: string) => language === 'he' ? he : language === 'es' ? es : en;
 
   return (
-    <div className="space-y-3 md:space-y-4">
-      <div>
-        <h2 className="text-lg md:text-2xl font-bold">{t('מתאמנים', 'Clients', 'Clientes')}</h2>
-        <p className="hidden md:block text-sm text-muted-foreground">
-          {t('לקוחות Exire פעילים בליווי. הוספה דרך המרה מליד.', 'Active clients in Exire coaching. Added via lead conversion.', 'Clientes activos en coaching Exire. Agregados vía conversión de leads.')}
-        </p>
-      </div>
+    <div className="space-y-4 lg:space-y-6">
+      <PageHeader
+        title={t('מתאמנים', 'Clients', 'Clientes')}
+        subtitle={t('לקוחות Exire פעילים בליווי', 'Active clients in Exire coaching', 'Clientes activos en coaching Exire')}
+      />
 
       {/* Search — compact on mobile, card on desktop */}
-      <div className="md:hidden relative">
+      <div className="lg:hidden relative">
         <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t('חיפוש שם, טלפון, אימייל…', 'Search name, phone, email…', 'Buscar nombre, teléfono, email…')}
@@ -63,7 +62,7 @@ export default function XSystemClientsTab() {
           className="pe-10 h-10 rounded-xl bg-card/60 border-border/40"
         />
       </div>
-      <Card className="hidden md:block border-border/50">
+      <Card className="hidden lg:block border-border/50">
         <CardContent className="pt-6">
           <div className="relative">
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -78,25 +77,16 @@ export default function XSystemClientsTab() {
       </Card>
 
       {/* Mobile list (outside card chrome) */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         {isLoading ? (
           <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-border/30 bg-card/30 px-3 py-4 text-center space-y-2">
-            <p className="text-[12.5px] text-muted-foreground">
-              {q ? t('אין תוצאות לחיפוש.', 'No search results.', 'Sin resultados de búsqueda.') : t('אין מתאמנים פעילים כרגע.', 'No active clients right now.', 'No hay clientes activos ahora.')}
-            </p>
-            {!q && (
-              <button
-                type="button"
-                onClick={() => navigate('/admin-hub?tab=leads')}
-                className="text-[12px] font-medium text-primary hover:underline"
-              >
-                ← {t('פתח לידים', 'Open Leads', 'Abrir Leads')}
-              </button>
-            )}
-          </div>
-
+          <EmptyState
+            icon={UsersRound}
+            title={q ? t('אין תוצאות', 'No results', 'Sin resultados') : t('אין מתאמנים', 'No clients', 'No hay clientes')}
+            description={q ? undefined : t('המר ליד ללקוח מתוך טאב "לידים".', 'Convert a lead via the Leads tab.', 'Convierte un lead vía la pestaña Leads.')}
+            action={!q ? { label: t('פתח לידים', 'Open Leads', 'Abrir Leads'), onClick: () => navigate('/admin-hub?tab=leads') } : undefined}
+          />
         ) : (
           <div className="space-y-2">
             <div className="px-1 text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -115,70 +105,61 @@ export default function XSystemClientsTab() {
         )}
       </div>
 
-      <Card className="hidden md:block border-border/50">
-        <CardHeader>
-          <CardTitle className="text-base">{t('לקוחות', 'Clients', 'Clientes')} ({filtered.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              {[1, 2, 3].map(i => <Skeleton key={i} className="h-16" />)}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="text-center py-12 max-w-sm mx-auto">
-              <UsersRound className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
-              <p className="text-sm text-muted-foreground">
-                {q ? t('אין תוצאות לחיפוש.', 'No search results.', 'Sin resultados de búsqueda.') : t('עדיין אין לקוחות. המר ליד ללקוח מתוך טאב "לידים".', 'No clients yet. Convert a lead via the Leads tab.', 'Aún no hay clientes. Convierte un lead vía la pestaña Leads.')}
-              </p>
-            </div>
+      {/* Desktop list */}
+      <div className="hidden lg:block">
+        <SectionHeader
+          title={t('רשימת לקוחות', 'Client list', 'Lista de clientes')}
+          subtitle={`${filtered.length} ${t('לקוחות', 'clients', 'clientes')}`}
+        />
+        <DataList loading={isLoading}>
+          {filtered.length === 0 ? (
+            <EmptyState
+              icon={UsersRound}
+              title={q ? t('אין תוצאות', 'No results', 'Sin resultados') : t('אין מתאמנים', 'No clients', 'No hay clientes')}
+              description={q ? undefined : t('המר ליד ללקוח מתוך טאב "לידים".', 'Convert a lead via the Leads tab.', 'Convierte un lead vía la pestaña Leads.')}
+              action={!q ? { label: t('פתח לידים', 'Open Leads', 'Abrir Leads'), onClick: () => navigate('/admin-hub?tab=leads') } : undefined}
+            />
           ) : (
-            <>
-              {/* Desktop list */}
-              <div className="hidden md:block space-y-2 max-h-96 overflow-y-auto pr-1">
-                {filtered.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => navigate(`/clients/${c.id}`)}
-                    className="group w-full flex items-center justify-between p-3.5 rounded-xl border border-border/40 hover:border-primary/40 hover:bg-muted/30 transition-colors text-start"
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-primary">
-                          {(c.full_name || '?').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-medium text-sm break-words">{c.full_name}</h4>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
-                          {c.phone && (
-                            <span dir="ltr" className="flex items-center gap-1">
-                              <Phone className="h-3 w-3" />{c.phone}
-                            </span>
-                          )}
-                          {c.email && (
-                            <span className="flex items-center gap-1">
-                              <Mail className="h-3 w-3" />{c.email}
-                            </span>
-                          )}
-                          <span>{format(new Date(c.created_at), 'dd MMM yyyy')}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Badge variant="outline" className={STATUS_COLOR[c.status] || ''}>
-                        {STATUS_LABEL(language)[c.status] || c.status}
-                      </Badge>
-                      <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </>
+            filtered.map(c => (
+              <DataRow
+                key={c.id}
+                onClick={() => navigate(`/clients/${c.id}`)}
+                leading={
+                  <div className="h-9 w-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                    <span className="text-xs font-bold text-primary">
+                      {(c.full_name || '?').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                }
+                title={<span dir="auto">{c.full_name}</span>}
+                subtitle={
+                  <span className="flex items-center gap-3 flex-wrap">
+                    {c.phone && (
+                      <span dir="ltr" className="flex items-center gap-1">
+                        <Phone className="h-3 w-3" />{c.phone}
+                      </span>
+                    )}
+                    {c.email && (
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-3 w-3" />{c.email}
+                      </span>
+                    )}
+                    <span>{format(new Date(c.created_at), 'dd MMM yyyy')}</span>
+                  </span>
+                }
+                trailing={
+                  <>
+                    <Badge variant="outline" className={STATUS_COLOR[c.status] || ''}>
+                      {STATUS_LABEL(language)[c.status] || c.status}
+                    </Badge>
+                    <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+                  </>
+                }
+              />
+            ))
           )}
-        </CardContent>
-      </Card>
+        </DataList>
+      </div>
     </div>
   );
 }

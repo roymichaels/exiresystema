@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { useExireDashboard } from '@/hooks/xsystem/dashboard';
 import { useOnboardingInsights } from '@/hooks/xsystem/onboardingInsights';
 import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
@@ -20,11 +21,13 @@ import { useExireFormMetrics } from '@/hooks/xsystem/leadFormSync';
 import { useResubmittedLeads } from '@/hooks/xsystem/resubmittedLeads';
 import { useLeads } from '@/hooks/useLeads';
 import ExireLaunchChecklist from './ExireLaunchChecklist';
-import AdvisorCard from '@/components/admin/advisor/AdvisorCard';
 import {
   MobileAdminScreen, MobileAdminHeader, MobileMetricSummary,
   MobileSectionCard, MobileListItem, MobileEmptyState,
 } from '@/components/admin/mobile';
+import {
+  PageHeader, SectionHeader, MetricCard, DataList, DataRow, PanelCard,
+} from '@/components/admin/design-system';
 import { useTranslation } from '@/hooks/useTranslation';
 
 function Stat({
@@ -68,14 +71,14 @@ function Stat({
 function MobileCollapsible({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   return (
     <>
-      <details open={defaultOpen} className="md:hidden group rounded-2xl border border-border/50 bg-card/40 [&_summary::-webkit-details-marker]:hidden">
+      <details open={defaultOpen} className="lg:hidden group rounded-2xl border border-border/50 bg-card/40 [&_summary::-webkit-details-marker]:hidden">
         <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium flex items-center justify-between">
           <span className="truncate">{title}</span>
           <ChevronLeft className="h-4 w-4 opacity-60 shrink-0 transition-transform group-open:-rotate-90" />
         </summary>
         <div className="px-3 pb-3">{children}</div>
       </details>
-      <section className="hidden md:block">
+      <section className="hidden lg:block">
         <h2 className="text-lg font-semibold mb-2">{title}</h2>
         {children}
       </section>
@@ -157,7 +160,7 @@ export default function ExireDashboard() {
                     <div key={l.id} className="px-3.5 py-2.5 active:bg-muted/40 transition-colors">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <div className="text-[14px] font-medium truncate">{l.name}</div>
+                          <div className="text-[14px] font-medium truncate" dir="auto">{l.name}</div>
                           <div className="text-[11px] text-muted-foreground mt-0.5">
                             {fmtSource(l.source)}
                             <span className="mx-1">·</span>
@@ -193,10 +196,7 @@ export default function ExireDashboard() {
           );
         })()}
 
-        {/* 3. Exire Advisor — quick access to the business brain */}
-        <AdvisorCard />
-
-        {/* 4. Compact status row */}
+        {/* 3. Compact status row */}
         <div className="flex gap-2">
           {[
             { label: language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions', value: sessions.upcoming, icon: Calendar },
@@ -264,252 +264,194 @@ export default function ExireDashboard() {
             </div>
           </MobileSectionCard>
         )}
-
-        {/* All metrics — folded deeper */}
-        <details className="group rounded-2xl border border-border/40 bg-card/40 [&_summary::-webkit-details-marker]:hidden">
-          <summary className="cursor-pointer list-none px-4 py-3 text-[13px] font-medium flex items-center justify-between min-h-[44px]">
-            <span>{language === 'he' ? 'כל המדדים · הכנסות, לידים, לקוחות, סשנים' : language === 'es' ? 'Todas las métricas · Ingresos, leads, clientes, sesiones' : 'All metrics · Revenue, leads, clients, sessions'}</span>
-            <ChevronLeft className="h-4 w-4 opacity-60 transition-transform group-open:-rotate-90" />
-          </summary>
-          <div className="px-3 pb-3 space-y-3">
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'הכנסות' : language === 'es' ? 'Ingresos' : 'Revenue'}</h4>
-              <div className="grid gap-2 grid-cols-2">
-                <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
-                <Stat label={language === 'he' ? 'החודש' : language === 'es' ? 'Este mes' : 'This month'} value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
-                <Stat label={language === 'he' ? 'ממתין' : language === 'es' ? 'Pendiente' : 'Pending'} value={fmt(revenue.pendingCents, revenue.currency)} icon={Clock} tone="warn" />
-                <Stat label={language === 'he' ? 'לקוחות בחוב' : language === 'es' ? 'Clientes en deuda' : 'Clients in debt'} value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'לידים' : language === 'es' ? 'Leads' : 'Leads'}</h4>
-              <div className="grid gap-2 grid-cols-2">
-                <Stat label={language === 'he' ? 'חדשים' : language === 'es' ? 'Nuevos' : 'New'} value={leads.new} icon={Users} />
-                <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={leads.active} icon={Users} />
-                <Stat label={language === 'he' ? 'הומרו' : language === 'es' ? 'Convertidos' : 'Converted'} value={leads.converted} icon={Users} tone="good" />
-                <Stat label={language === 'he' ? 'חזרו 🔁' : language === 'es' ? 'Regresaron 🔁' : 'Returned 🔁'} value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} />
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'לקוחות וסשנים' : language === 'es' ? 'Clientes y sesiones' : 'Clients & Sessions'}</h4>
-              <div className="grid gap-2 grid-cols-2">
-                <Stat label={language === 'he' ? 'לקוחות פעילים' : language === 'es' ? 'Clientes activos' : 'Active clients'} value={clients.active} icon={Users} />
-                <Stat label={language === 'he' ? 'חדשים החודש' : language === 'es' ? 'Nuevos este mes' : 'New this month'} value={clients.newThisMonth} icon={Users} tone="good" />
-                <Stat label={language === 'he' ? 'סשנים עתידיים' : language === 'es' ? 'Sesiones futuras' : 'Upcoming sessions'} value={sessions.upcoming} icon={Calendar} />
-                <Stat label={language === 'he' ? 'הושלמו החודש' : language === 'es' ? 'Completadas este mes' : 'Completed this month'} value={sessions.completedThisMonth} icon={Calendar} tone="good" />
-              </div>
-            </div>
-          </div>
-        </details>
       </MobileAdminScreen>
 
       {/* ============================ DESKTOP =========================== */}
-      <section className="hidden md:block">
-        <AdvisorCard className="mb-3" />
+      <section className="hidden lg:block space-y-4">
+        <PageHeader
+          title={language === 'he' ? 'בוקר טוב, Exire 👋' : language === 'es' ? 'Buenos días, Exire 👋' : 'Good morning, Exire 👋'}
+          subtitle={language === 'he' ? 'סקירת יום, לידים ומשימות פתוחות' : language === 'es' ? 'Resumen del día, leads y tareas abiertas' : 'Daily overview, leads and open tasks'}
+        />
 
-        {/* Hero metric strip */}
-<div className="grid grid-cols-3 gap-2 mb-4">
-           <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={(fmt(revenue.todayCents, revenue.currency))} icon={TrendingUp} tone="good" />
-           <Stat label={language === 'he' ? 'לידים פתוחים' : language === 'es' ? 'Leads abiertos' : 'Open leads'} value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
-           <Stat label={language === 'he' ? 'פולואפים' : language === 'es' ? 'Seguimientos' : 'Follow-ups'} value={actions.overdueFollowups} icon={ClipboardCheck} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
-         </div>
-
-         <details className="group rounded-2xl border border-border/40 bg-card/30 [&_summary::-webkit-details-marker]:hidden">
-           <summary className="cursor-pointer list-none px-4 py-3 text-[13px] font-medium flex items-center justify-between min-h-[44px]">
-            <span className="text-muted-foreground">
-              {language === 'he' ? 'כל המדדים · הכנסות, לידים, לקוחות, סשנים' : language === 'es' ? 'Todas las métricas · Ingresos, leads, clientes, sesiones' : 'All metrics · Revenue, leads, clients, sessions'}
-            </span>
-            <ChevronLeft className="h-4 w-4 opacity-60 transition-transform group-open:-rotate-90" />
-          </summary>
-          <div className="px-3 pb-3 space-y-3">
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'הכנסות' : language === 'es' ? 'Ingresos' : 'Revenue'}</h4>
-              <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
-                <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
-                <Stat label={language === 'he' ? 'החודש' : language === 'es' ? 'Este mes' : 'This month'} value={fmt(revenue.monthCents, revenue.currency)} icon={CreditCard} tone="good" />
-                <Stat label={language === 'he' ? 'ממתין' : language === 'es' ? 'Pendiente' : 'Pending'} value={fmt(revenue.pendingCents, revenue.currency)} hint={`${revenue.pendingClientCount} ${language === 'he' ? 'לקוחות' : language === 'es' ? 'clientes' : 'clients'}`} icon={Clock} tone="warn" />
-                <Stat label={language === 'he' ? 'תשלומים שולמו' : language === 'es' ? 'Pagos realizados' : 'Payments paid'} value={revenue.paidCount} icon={CreditCard} />
-                <Stat label={language === 'he' ? 'לקוחות בחוב' : language === 'es' ? 'Clientes en deuda' : 'Clients in debt'} value={revenue.pendingClientCount} icon={AlertCircle} tone={revenue.pendingClientCount > 0 ? 'warn' : 'default'} />
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'לידים' : language === 'es' ? 'Leads' : 'Leads'}</h4>
-              <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
-                <Stat label={language === 'he' ? 'חדשים' : language === 'es' ? 'Nuevos' : 'New'} value={leads.new} icon={Users} />
-                <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={leads.active} icon={Users} />
-                <Stat label={language === 'he' ? 'ממתינים לפולואפ' : language === 'es' ? 'Pendientes de seguimiento' : 'Pending follow-up'} value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
-                <Stat label={language === 'he' ? 'הומרו' : language === 'es' ? 'Convertidos' : 'Converted'} value={leads.converted} icon={Users} tone="good" />
-                <Stat label={language === 'he' ? 'חזרו 🔁' : language === 'es' ? 'Regresaron 🔁' : 'Returned 🔁'} value={resub?.total ?? 0} icon={AlertCircle} tone={(resub?.total ?? 0) > 0 ? 'warn' : 'default'} />
-                <Stat label={language === 'he' ? 'סה״כ' : language === 'es' ? 'Total' : 'Total'} value={leads.total} icon={Users} />
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'לקוחות' : language === 'es' ? 'Clientes' : 'Clients'}</h4>
-              <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-                <Stat label={language === 'he' ? 'פעילים' : language === 'es' ? 'Activos' : 'Active'} value={clients.active} icon={Users} />
-                <Stat label={language === 'he' ? 'חדשים החודש' : language === 'es' ? 'Nuevos este mes' : 'New this month'} value={clients.newThisMonth} icon={Users} tone="good" />
-                <Stat label={language === 'he' ? 'עם סשן הבא' : language === 'es' ? 'Con próxima sesión' : 'With next session'} value={clients.withUpcomingSession} icon={Calendar} />
-                <Stat label={language === 'he' ? 'ללא סשן הבא' : language === 'es' ? 'Sin próxima sesión' : 'Without next session'} value={clients.withoutNextSession} icon={AlertCircle} tone={clients.withoutNextSession > 0 ? 'warn' : 'default'} />
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions'}</h4>
-              <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-                <Stat label={language === 'he' ? 'היום' : language === 'es' ? 'Hoy' : 'Today'} value={sessions.today} icon={Calendar} tone={sessions.today > 0 ? 'good' : 'default'} />
-                <Stat label={language === 'he' ? 'עתידיים' : language === 'es' ? 'Futuras' : 'Upcoming'} value={sessions.upcoming} icon={Calendar} />
-                <Stat label={language === 'he' ? 'הושלמו החודש' : language === 'es' ? 'Completadas este mes' : 'Completed this month'} value={sessions.completedThisMonth} icon={Calendar} tone="good" />
-                <Stat label={language === 'he' ? 'בוטלו/לא הופיע' : language === 'es' ? 'Canceladas/No show' : 'Cancelled/No show'} value={sessions.cancelledThisMonth} icon={AlertCircle} tone={sessions.cancelledThisMonth > 0 ? 'warn' : 'default'} />
-              </div>
-            </div>
+        {/* Metrics row */}
+        <section>
+          <SectionHeader
+            title={language === 'he' ? 'מדדי היום' : language === 'es' ? 'Métricas de hoy' : 'Today metrics'}
+          />
+          <div className="grid gap-2 lg:gap-3 grid-cols-2 lg:grid-cols-5">
+            <MetricCard label={language === 'he' ? 'הכנסות היום' : language === 'es' ? 'Ingresos hoy' : 'Revenue'} value={fmt(revenue.todayCents, revenue.currency)} icon={TrendingUp} tone="good" />
+            <MetricCard label={language === 'he' ? 'לידים פתוחים' : language === 'es' ? 'Leads abiertos' : 'Open leads'} value={leads.needFollowup} icon={AlertCircle} tone={leads.needFollowup > 0 ? 'warn' : 'default'} />
+            <MetricCard label={language === 'he' ? 'פולואפים לעשות' : language === 'es' ? 'Seguimientos pendientes' : 'Follow-ups due'} value={actions.overdueFollowups} icon={ClipboardCheck} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
+            <MetricCard label={language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions'} value={sessions.today} icon={Calendar} />
+            <MetricCard label={language === 'he' ? 'באיחור' : language === 'es' ? 'Vencidos' : 'Overdue'} value={actions.overdueFollowups} icon={Clock} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
           </div>
-        </details>
-      </section>
+        </section>
 
+        {/* Urgent actions + operational row */}
+        <section className="grid gap-3 lg:grid-cols-3">
+          <PanelCard
+            title={language === 'he' ? 'פעולות דחופות' : language === 'es' ? 'Acciones urgentes' : 'Urgent actions'}
+            className="lg:col-span-2"
+          >
+            <div className="grid gap-2 grid-cols-2 sm:grid-cols-4">
+              <MetricCard label={language === 'he' ? 'פולואפים באיחור' : language === 'es' ? 'Seguimientos vencidos' : 'Overdue follow-ups'} value={actions.overdueFollowups} icon={AlertCircle} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
+              <MetricCard label={language === 'he' ? 'פולואפים להיום' : language === 'es' ? 'Seguimientos para hoy' : 'Due today'} value={actions.followupsDueToday} icon={FileText} />
+              <MetricCard label={language === 'he' ? 'תשלומים ממתינים' : language === 'es' ? 'Pagos pendientes' : 'Pending payments'} value={actions.pendingPayments} icon={CreditCard} tone={actions.pendingPayments > 0 ? 'warn' : 'default'} />
+              <MetricCard label={language === 'he' ? 'צ׳ק-אינים' : language === 'es' ? 'Check-ins' : 'Check-ins'} value={actions.pendingCheckins} icon={ClipboardCheck} tone={actions.pendingCheckins > 0 ? 'warn' : 'default'} />
+            </div>
+          </PanelCard>
 
-      <section className="hidden md:block">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{language === 'he' ? 'תור פעולות להיום' : language === 'es' ? 'Acciones para hoy' : 'Actions for today'}</h3>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4 mb-3">
-          <Stat label={language === 'he' ? 'פולואפים באיחור' : language === 'es' ? 'Seguimientos vencidos' : 'Overdue follow-ups'} value={actions.overdueFollowups} icon={AlertCircle} tone={actions.overdueFollowups > 0 ? 'warn' : 'default'} />
-          <Stat label={language === 'he' ? 'פולואפים להיום' : language === 'es' ? 'Seguimientos para hoy' : 'Follow-ups due today'} value={actions.followupsDueToday} icon={FileText} />
-          <Stat label={language === 'he' ? 'תשלומים ממתינים' : language === 'es' ? 'Pagos pendientes' : 'Pending payments'} value={actions.pendingPayments} icon={CreditCard} tone={actions.pendingPayments > 0 ? 'warn' : 'default'} />
-          <Stat label={language === 'he' ? 'צ׳ק-אינים ממתינים' : language === 'es' ? 'Check-ins pendientes' : 'Pending check-ins'} value={actions.pendingCheckins} icon={ClipboardCheck} tone={actions.pendingCheckins > 0 ? 'warn' : 'default'} />
-        </div>
+          <PanelCard
+            title={language === 'he' ? 'סיכום מהיר' : language === 'es' ? 'Resumen rápido' : 'Quick summary'}
+          >
+            <div className="grid gap-2 grid-cols-3">
+              {[
+                { label: language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions', value: sessions.upcoming, icon: Calendar },
+                { label: language === 'he' ? 'פולואפים' : language === 'es' ? 'Seguimientos' : 'Follow-ups', value: actions.overdueFollowups, icon: ClipboardCheck, warn: actions.overdueFollowups > 0 },
+                { label: language === 'he' ? 'תשלומים' : language === 'es' ? 'Pagos' : 'Payments', value: actions.pendingPayments, icon: CreditCard, warn: actions.pendingPayments > 0 },
+              ].map(s => (
+                <div
+                  key={s.label}
+                  className="flex flex-col items-center justify-center rounded-lg border border-border/40 bg-card/40 px-2 py-2 text-center"
+                >
+                  <s.icon className={`h-3.5 w-3.5 mb-1 ${s.warn ? 'text-amber-500' : 'text-muted-foreground/60'}`} strokeWidth={1.5} />
+                  <div className={`text-sm font-semibold leading-tight ${s.warn ? 'text-amber-500' : ''}`}>{s.value}</div>
+                  <div className="text-[9px] text-muted-foreground truncate w-full">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </PanelCard>
+        </section>
 
-        {/* Compact operational row — always visible */}
-        <div className="flex gap-2 mb-3">
-          {[
-            { label: language === 'he' ? 'סשנים' : language === 'es' ? 'Sesiones' : 'Sessions', value: sessions.upcoming, icon: Calendar },
-            { label: language === 'he' ? 'פולואפים' : language === 'es' ? 'Seguimientos' : 'Follow-ups', value: actions.overdueFollowups, icon: ClipboardCheck, warn: actions.overdueFollowups > 0 },
-            { label: language === 'he' ? 'תשלומים' : language === 'es' ? 'Pagos' : 'Payments', value: actions.pendingPayments, icon: CreditCard, warn: actions.pendingPayments > 0 },
-          ].map(s => (
-            <div
-              key={s.label}
-              className="flex-1 rounded-2xl border border-border/40 bg-card/60 px-3 py-2.5 text-center"
+        {/* Detailed lists — only when items exist */}
+        <section className="hidden lg:grid gap-3 lg:grid-cols-2">
+          {sessions.upcomingList.length > 0 && (
+            <PanelCard
+              title={`${language === 'he' ? 'סשנים קרובים' : language === 'es' ? 'Próximas sesiones' : 'Upcoming sessions'} (${sessions.upcomingList.length})`}
+              flush
             >
-              <s.icon className={`h-4 w-4 mx-auto mb-1 ${s.warn ? 'text-amber-500' : 'text-muted-foreground/60'}`} strokeWidth={1.5} />
-              <div className={`text-base font-semibold leading-tight ${s.warn ? 'text-amber-500' : ''}`}>{s.value}</div>
-              <div className="text-[9px] text-muted-foreground truncate mt-0.5">{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Detailed cards — only when items exist */}
-        {sessions.upcomingList.length > 0 && (
-          <div className="grid gap-3 md:grid-cols-2 mb-3">
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'סשנים קרובים' : language === 'es' ? 'Próximas sesiones' : 'Upcoming sessions'} ({sessions.upcomingList.length})</CardTitle></CardHeader>
-              <CardContent className="space-y-1.5 pt-0">
+              <DataList>
                 {sessions.upcomingList.map((s) => (
-                  <button
+                  <DataRow
                     key={s.id}
+                    title={new Date(s.scheduled_at).toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' })}
+                    subtitle={language === 'he' ? 'פתח כרטיס לקוח' : language === 'es' ? 'Abrir tarjeta de cliente' : 'Open client card'}
+                    trailing={<ChevronLeft className="h-4 w-4 text-muted-foreground/60" />}
                     onClick={() => navigate(`/clients/${s.client_id}`)}
-                    className="w-full flex items-center justify-between text-sm hover:bg-muted/50 rounded px-2 py-1.5 transition"
-                  >
-                    <span>{new Date(s.scheduled_at).toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' })}</span>
-                    <ChevronLeft className="h-3 w-3 text-muted-foreground" />
-                  </button>
+                    compact
+                  />
                 ))}
-              </CardContent>
-            </Card>
-          </div>
-        )}
+              </DataList>
+            </PanelCard>
+          )}
 
-        {actions.overdueFollowupList.length > 0 && (
-          <div className="grid gap-3 md:grid-cols-2 mb-3">
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'פולואפים באיחור' : language === 'es' ? 'Seguimientos vencidos' : 'Overdue follow-ups'} ({actions.overdueFollowups})</CardTitle></CardHeader>
-              <CardContent className="space-y-1.5 pt-0">
+          {actions.overdueFollowupList.length > 0 && (
+            <PanelCard
+              title={`${language === 'he' ? 'פולואפים באיחור' : language === 'es' ? 'Seguimientos vencidos' : 'Overdue follow-ups'} (${actions.overdueFollowups})`}
+              flush
+            >
+              <DataList>
                 {actions.overdueFollowupList.map((f) => (
-                  <button
+                  <DataRow
                     key={f.id}
+                    title={f.title}
+                    meta={f.due_at ? new Date(f.due_at).toLocaleDateString(locale) : undefined}
+                    trailing={<ChevronLeft className="h-4 w-4 text-muted-foreground/60" />}
                     onClick={() => f.client_id && navigate(`/clients/${f.client_id}`)}
-                    className="w-full text-right flex items-center justify-between gap-2 text-sm hover:bg-muted/50 rounded px-2 py-1.5 transition"
-                  >
-                    <span className="truncate flex-1">{f.title}</span>
-                    <Badge variant="outline" className="text-[10px]">
-                      {f.due_at ? new Date(f.due_at).toLocaleDateString(locale) : '—'}
-                    </Badge>
-                  </button>
+                    compact
+                  />
                 ))}
-              </CardContent>
-            </Card>
-          </div>
-        )}
+              </DataList>
+            </PanelCard>
+          )}
 
-        {actions.pendingPaymentList.length > 0 && (
-          <div className="grid gap-3 md:grid-cols-2 mb-3">
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'תשלומים ממתינים' : language === 'es' ? 'Pagos pendientes' : 'Pending payments'} ({actions.pendingPayments})</CardTitle></CardHeader>
-              <CardContent className="space-y-1.5 pt-0">
+          {actions.pendingPaymentList.length > 0 && (
+            <PanelCard
+              title={`${language === 'he' ? 'תשלומים ממתינים' : language === 'es' ? 'Pagos pendientes' : 'Pending payments'} (${actions.pendingPayments})`}
+              flush
+            >
+              <DataList>
                 {actions.pendingPaymentList.map((p) => (
-                  <button
+                  <DataRow
                     key={p.id}
+                    title={fmt(p.amount_cents, p.currency)}
+                    meta={p.due_at ? `${language === 'he' ? 'יעד' : language === 'es' ? 'Fecha' : 'Due'} ${new Date(p.due_at).toLocaleDateString(locale)}` : '—'}
+                    trailing={<ChevronLeft className="h-4 w-4 text-muted-foreground/60" />}
                     onClick={() => navigate(`/clients/${p.client_id}`)}
-                    className="w-full flex items-center justify-between text-sm hover:bg-muted/50 rounded px-2 py-1.5 transition"
-                  >
-                    <span>{fmt(p.amount_cents, p.currency)}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {p.due_at ? `${language === 'he' ? 'יעד' : language === 'es' ? 'Fecha' : 'Due'} ${new Date(p.due_at).toLocaleDateString(locale)}` : '—'}
-                    </span>
-                  </button>
+                    compact
+                  />
                 ))}
-              </CardContent>
-            </Card>
-          </div>
-        )}
+              </DataList>
+            </PanelCard>
+          )}
+        </section>
       </section>
 
       {insights && (
-        <MobileCollapsible title={`Onboarding · ${language === 'he' ? 'משימות פתוחות' : language === 'es' ? 'Tareas abiertas' : 'Open tasks'}`}>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'לידים בהמתנה למענה' : language === 'es' ? 'Leads esperando respuesta' : 'Leads awaiting reply'}</CardTitle></CardHeader>
-              <CardContent className="space-y-1 pt-0">
-                {insights.leadsAwaitingReply.length === 0
-                  ? <p className="text-xs text-muted-foreground">{language === 'he' ? 'אין לידים פתוחים.' : language === 'es' ? 'No hay leads abiertos.' : 'No open leads.'}</p>
-                  : insights.leadsAwaitingReply.map((l) => (
-                    <button key={l.id} onClick={() => navigate('/admin?tab=coach&sub=leads')}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">
-                      {l.name} <span className="text-xs text-muted-foreground">· {new Date(l.created_at).toLocaleDateString(locale)}</span>
-                    </button>
-                  ))}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'לקוחות ללא סשן ראשון' : language === 'es' ? 'Clientes sin primera sesión' : 'Clients without first session'}</CardTitle></CardHeader>
-              <CardContent className="space-y-1 pt-0">
-                {insights.clientsWithoutSession.length === 0
-                  ? <p className="text-xs text-muted-foreground">{language === 'he' ? 'כולם תוזמנו.' : language === 'es' ? 'Todos programados.' : 'All scheduled.'}</p>
-                  : insights.clientsWithoutSession.map((c) => (
-                    <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">{c.full_name}</button>
-                  ))}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'לקוחות ללא טופס קבלה' : language === 'es' ? 'Clientes sin formulario de admisión' : 'Clients without intake form'}</CardTitle></CardHeader>
-              <CardContent className="space-y-1 pt-0">
-                {insights.clientsWithoutIntake.length === 0
-                  ? <p className="text-xs text-muted-foreground">{language === 'he' ? 'כל הטפסים מצורפים.' : language === 'es' ? 'Todos los formularios adjuntos.' : 'All forms attached.'}</p>
-                  : insights.clientsWithoutIntake.map((c) => (
-                    <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">{c.full_name}</button>
-                  ))}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="py-3"><CardTitle className="text-sm">{language === 'he' ? 'לקוחות ללא תשלום' : language === 'es' ? 'Clientes sin pago' : 'Clients without payment'}</CardTitle></CardHeader>
-              <CardContent className="space-y-1 pt-0">
-                {insights.clientsWithoutPayment.length === 0
-                  ? <p className="text-xs text-muted-foreground">{language === 'he' ? 'כולם שילמו.' : language === 'es' ? 'Todos pagaron.' : 'All paid.'}</p>
-                  : insights.clientsWithoutPayment.map((c) => (
-                    <button key={c.client_id} onClick={() => navigate(`/clients/${c.client_id}`)}
-                      className="w-full text-right text-sm hover:bg-muted/50 rounded px-2 py-1 truncate">{c.full_name}</button>
-                  ))}
-              </CardContent>
-            </Card>
+        <section>
+          <SectionHeader
+            title={`Onboarding · ${language === 'he' ? 'משימות פתוחות' : language === 'es' ? 'Tareas abiertas' : 'Open tasks'}`}
+          />
+          <div className="grid gap-3 md:grid-cols-2">
+            <PanelCard title={language === 'he' ? 'לידים בהמתנה למענה' : language === 'es' ? 'Leads esperando respuesta' : 'Leads awaiting reply'} flush>
+              <DataList>
+                {insights.leadsAwaitingReply.length === 0 ? (
+                  <div className="px-4 py-3 text-xs text-muted-foreground">{language === 'he' ? 'אין לידים פתוחים.' : language === 'es' ? 'No hay leads abiertos.' : 'No open leads.'}</div>
+                ) : insights.leadsAwaitingReply.map((l) => (
+                  <DataRow
+                    key={l.id}
+                    title={<span dir="auto">{l.name}</span>}
+                    meta={new Date(l.created_at).toLocaleDateString(locale)}
+                    onClick={() => navigate('/admin?tab=coach&sub=leads')}
+                    compact
+                  />
+                ))}
+              </DataList>
+            </PanelCard>
+            <PanelCard title={language === 'he' ? 'לקוחות ללא סשן ראשון' : language === 'es' ? 'Clientes sin primera sesión' : 'Clients without first session'} flush>
+              <DataList>
+                {insights.clientsWithoutSession.length === 0 ? (
+                  <div className="px-4 py-3 text-xs text-muted-foreground">{language === 'he' ? 'כולם תוזמנו.' : language === 'es' ? 'Todos programados.' : 'All scheduled.'}</div>
+                ) : insights.clientsWithoutSession.map((c) => (
+                  <DataRow
+                    key={c.client_id}
+                    title={<span dir="auto">{c.full_name}</span>}
+                    onClick={() => navigate(`/clients/${c.client_id}`)}
+                    compact
+                  />
+                ))}
+              </DataList>
+            </PanelCard>
+            <PanelCard title={language === 'he' ? 'לקוחות ללא טופס קבלה' : language === 'es' ? 'Clientes sin formulario de admisión' : 'Clients without intake form'} flush>
+              <DataList>
+                {insights.clientsWithoutIntake.length === 0 ? (
+                  <div className="px-4 py-3 text-xs text-muted-foreground">{language === 'he' ? 'כל הטפסים מצורפים.' : language === 'es' ? 'Todos los formularios adjuntos.' : 'All forms attached.'}</div>
+                ) : insights.clientsWithoutIntake.map((c) => (
+                  <DataRow
+                    key={c.client_id}
+                    title={<span dir="auto">{c.full_name}</span>}
+                    onClick={() => navigate(`/clients/${c.client_id}`)}
+                    compact
+                  />
+                ))}
+              </DataList>
+            </PanelCard>
+            <PanelCard title={language === 'he' ? 'לקוחות ללא תשלום' : language === 'es' ? 'Clientes sin pago' : 'Clients without payment'} flush>
+              <DataList>
+                {insights.clientsWithoutPayment.length === 0 ? (
+                  <div className="px-4 py-3 text-xs text-muted-foreground">{language === 'he' ? 'כולם שילמו.' : language === 'es' ? 'Todos pagaron.' : 'All paid.'}</div>
+                ) : insights.clientsWithoutPayment.map((c) => (
+                  <DataRow
+                    key={c.client_id}
+                    title={<span dir="auto">{c.full_name}</span>}
+                    onClick={() => navigate(`/clients/${c.client_id}`)}
+                    compact
+                  />
+                ))}
+              </DataList>
+            </PanelCard>
           </div>
-        </MobileCollapsible>
+        </section>
       )}
 
       {funnel && (
