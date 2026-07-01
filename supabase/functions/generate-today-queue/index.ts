@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { corsHeaders, isCorsPreFlight, handleCorsPreFlight } from "../_shared/cors.ts";
+import { requireAuth } from "../_shared/auth.ts";
 
 /**
  * generate-today-queue v3
@@ -144,13 +145,12 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body = await req.json();
-    const { user_id, language = "he", mode } = body;
+    const { language = "he", mode } = body;
 
-    if (!user_id) {
-      return new Response(JSON.stringify({ error: "user_id required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // Require JWT — derive user_id from token, ignore any body-supplied value
+    const auth = await requireAuth(req);
+    if (auth instanceof Response) return auth;
+    const user_id = auth.userId;
 
     // ── MODE: execution_steps ────────────────────────────
     if (mode === "execution_steps") {
