@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuthModalInternal } from "@/contexts/AuthModalContext";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -27,15 +27,12 @@ export default function CloudAuthModal() {
     setError(null);
     void trackEvent("login_start", "auth", "google");
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
       });
-      if (result.error) throw result.error;
-      if (!result.redirected) {
-        void trackEvent("login_success", "auth", "google");
-        toast({ title: isRTL ? "התחברתם" : "Signed in" });
-        completeAuthFlow();
-      }
+      if (oauthError) throw oauthError;
+      // Browser will redirect to Google; nothing else to do here.
     } catch (err: any) {
       void trackEvent("login_failed", "auth", "google", { message: err?.message });
       failAuthFlow(err?.message || (isRTL ? "ההתחברות עם Google נכשלה" : "Google sign-in failed"));
