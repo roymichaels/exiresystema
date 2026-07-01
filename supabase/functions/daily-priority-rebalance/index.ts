@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { corsHeaders, handleCorsPreFlight } from "../_shared/cors.ts";
+import { optionalAuth } from "../_shared/auth.ts";
 
 /**
  * daily-priority-rebalance
@@ -22,12 +23,28 @@ serve(async (req) => {
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Get target user_id from body, or rebalance ALL users (for cron)
+    // Auth: allow service role (cron / server) OR authenticated user (self-only).
+    const authHeader = req.headers.get('Authorization') || '';
+    const bearer = authHeader.replace('Bearer ', '');
+    const isServiceRole = bearer && bearer === serviceKey;
+    const auth = isServiceRole ? null : await optionalAuth(req);
+    if (!isServiceRole && !auth) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Determine target user_id:
+    //  - service role: may pass any user_id in body, or null = all users (cron)
+    //  - authenticated user: forced to their own id
     let targetUserId: string | null = null;
     try {
       const body = await req.json();
       targetUserId = body.user_id || null;
     } catch { /* no body = cron mode */ }
+    if (!isServiceRole) {
+      targetUserId = auth!.userId;
+    }
 
     // Get users who have open action items
     let userQuery = supabase

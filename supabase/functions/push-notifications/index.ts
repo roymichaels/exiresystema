@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireAdmin } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -454,6 +455,10 @@ serve(async (req) => {
       }
 
       case 'send': {
+        // Only admins or the platform (service role via cron) may broadcast pushes.
+        const adminCheck = await requireAdmin(req);
+        if (adminCheck instanceof Response) return adminCheck;
+
         const { user_id, title, body, url, icon } = params;
 
         if (!user_id || !title || !body) {

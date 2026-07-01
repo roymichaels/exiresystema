@@ -12014,12 +12014,44 @@ export type Database = {
         }
       }
       get_practitioner_by_domain: {
-        Args: { domain_input: string }
-        Returns: string
+        Args: { p_domain: string }
+        Returns: {
+          brand_color: string
+          brand_color_secondary: string
+          custom_domain: string
+          default_language: string
+          domain_verified: boolean
+          enable_community: boolean
+          enable_courses: boolean
+          enable_products: boolean
+          enable_services: boolean
+          favicon_url: string
+          hero_heading_en: string
+          hero_heading_he: string
+          hero_image_url: string
+          hero_subheading_en: string
+          hero_subheading_he: string
+          logo_url: string
+          meta_description: string
+          meta_title: string
+          og_image_url: string
+          practitioner_id: string
+          subdomain: string
+          timezone: string
+        }[]
       }
       get_practitioner_id_for_user: {
         Args: { user_uuid: string }
         Returns: string
+      }
+      get_public_form_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          description: string
+          id: string
+          settings: Json
+          title: string
+        }[]
       }
       get_skill_gains_today: {
         Args: { p_tz?: string; p_user_id: string }
