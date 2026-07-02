@@ -1,20 +1,18 @@
 /**
- * Send WhatsApp via Twilio connector gateway.
- * Returns 400 with kind=not_connected when the Twilio connector isn't linked,
- * so the client can fall back to wa.me deep link.
+ * Send WhatsApp via Twilio REST API directly (no Lovable gateway).
+ * Requires: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN.
+ * Sender number: coach_integrations.twilio_whatsapp_from (E.164, no "whatsapp:" prefix).
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
-
-const GATEWAY_URL = 'https://connector-gateway.lovable.dev/twilio';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
-    if (!LOVABLE_API_KEY || !TWILIO_API_KEY) {
+    const ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+    const AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+    if (!ACCOUNT_SID || !AUTH_TOKEN) {
       return new Response(JSON.stringify({ error: 'WhatsApp integration not connected', kind: 'not_connected' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -31,14 +29,13 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { Authorization: authHeader } } },
     );
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claims } = await supabase.auth.getClaims(token);
-    if (!claims?.claims) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const userId = claims.claims.sub;
+    const userId = user.id;
 
     const { data: isAdmin } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
     const { data: isPract } = await supabase.rpc('has_role', { _user_id: userId, _role: 'practitioner' });
@@ -73,15 +70,18 @@ Deno.serve(async (req) => {
       Body: body,
     });
 
-    const resp = await fetch(`${GATEWAY_URL}/Messages.json`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': TWILIO_API_KEY,
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const basicAuth = btoa(`${ACCOUNT_SID}:${AUTH_TOKEN}`);
+    const resp = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT_SID}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${basicAuth}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params,
       },
-      body: params,
-    });
+    );
     const result = await resp.json();
     if (!resp.ok) {
       return new Response(JSON.stringify({ error: 'Twilio error', details: result }), {
