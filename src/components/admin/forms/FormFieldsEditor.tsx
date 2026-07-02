@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "@/hooks/use-toast";
 import {
   Sheet,
@@ -56,14 +57,18 @@ const FormFieldsEditor = ({ formId, onClose }: FormFieldsEditorProps) => {
   const [editingField, setEditingField] = useState<FormField | null>(null);
   const [isAddingField, setIsAddingField] = useState(false);
   const queryClient = useQueryClient();
+  const { currentTenant } = useTenant();
 
   const { data: form } = useQuery({
-    queryKey: ["custom-form", formId],
+    queryKey: ["custom-form", formId, currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return null;
       const { data, error } = await supabase
         .from("custom_forms")
         .select("*")
         .eq("id", formId)
+        .eq("tenant_id", currentTenant.id)
         .single();
       if (error) throw error;
       return data;

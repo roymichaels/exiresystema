@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -57,6 +58,7 @@ const FormDialog = ({
   formId,
   onSuccess,
 }: FormDialogProps) => {
+  const { currentTenant } = useTenant();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,18 +72,19 @@ const FormDialog = ({
   });
 
   const { data: existingForm } = useQuery({
-    queryKey: ["custom-form", formId],
+    queryKey: ["custom-form", formId, currentTenant?.id],
     queryFn: async () => {
-      if (!formId) return null;
+      if (!formId || !currentTenant?.id) return null;
       const { data, error } = await supabase
         .from("custom_forms")
         .select("*")
         .eq("id", formId)
+        .eq("tenant_id", currentTenant.id)
         .single();
       if (error) throw error;
       return data;
     },
-    enabled: !!formId,
+    enabled: !!formId && !!currentTenant?.id,
   });
 
   useEffect(() => {
@@ -111,6 +114,7 @@ const FormDialog = ({
 
   const onSubmit = async (values: FormValues) => {
     try {
+      if (!currentTenant?.id) throw new Error("No tenant context");
       const { data: user } = await supabase.auth.getUser();
       
       const formData = {
@@ -129,13 +133,15 @@ const FormDialog = ({
         const { error } = await supabase
           .from("custom_forms")
           .update(formData)
-          .eq("id", formId);
+          .eq("id", formId)
+          .eq("tenant_id", currentTenant.id);
         if (error) throw error;
         toast({ title: "הטופס עודכן בהצלחה!" });
       } else {
         const { error } = await supabase.from("custom_forms").insert({
           ...formData,
           created_by: user.user?.id,
+          tenant_id: currentTenant.id,
         });
         if (error) throw error;
         toast({ title: "הטופס נוצר בהצלחה!" });

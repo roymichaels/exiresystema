@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Loader2, Wand2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -49,6 +50,7 @@ interface Props {
 
 export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
   const { language } = useTranslation();
+  const { currentTenant } = useTenant();
   const [prompt, setPrompt] = useState("");
   const [intent, setIntent] = useState<string>("general");
   const [loading, setLoading] = useState(false);
@@ -97,6 +99,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
     if (!result) return;
     setSaving(true);
     try {
+      if (!currentTenant?.id) throw new Error("No tenant context");
       const { data: userData } = await supabase.auth.getUser();
       const { data: formRow, error: formErr } = await supabase
         .from("custom_forms")
@@ -111,6 +114,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
             intro_subtitle: result.intro_subtitle,
           },
           created_by: userData.user?.id,
+          tenant_id: currentTenant.id,
         })
         .select("id")
         .single();

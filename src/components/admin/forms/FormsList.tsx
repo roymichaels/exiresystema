@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,7 @@ const FormsList = ({
   onRefresh,
 }: FormsListProps) => {
   const { language } = useTranslation();
+  const { currentTenant } = useTenant();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyLink = async (token: string, formId: string) => {
@@ -67,11 +69,13 @@ const FormsList = ({
   };
 
   const toggleStatus = async (formId: string, currentStatus: string) => {
+    if (!currentTenant?.id) return;
     const newStatus = currentStatus === "published" ? "draft" : "published";
     const { error } = await supabase
       .from("custom_forms")
       .update({ status: newStatus })
-      .eq("id", formId);
+      .eq("id", formId)
+      .eq("tenant_id", currentTenant.id);
 
     if (error) {
       toast({ title: language === 'he' ? 'שגיאה בעדכון סטטוס' : language === 'es' ? 'Error al actualizar estado' : 'Error updating status', variant: "destructive" });
@@ -86,10 +90,12 @@ const FormsList = ({
   const deleteForm = async (formId: string) => {
     if (!confirm(language === 'he' ? 'האם למחוק את הטופס? כל התשובות יימחקו גם כן.' : language === 'es' ? '¿Eliminar el formulario? Todas las respuestas también se eliminarán.' : 'Delete the form? All submissions will also be deleted.')) return;
 
+    if (!currentTenant?.id) return;
     const { error } = await supabase
       .from("custom_forms")
       .delete()
-      .eq("id", formId);
+      .eq("id", formId)
+      .eq("tenant_id", currentTenant.id);
 
     if (error) {
       toast({ title: language === 'he' ? 'שגיאה במחיקה' : language === 'es' ? 'Error al eliminar' : 'Error deleting', variant: "destructive" });

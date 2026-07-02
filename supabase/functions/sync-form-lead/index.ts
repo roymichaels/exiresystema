@@ -33,6 +33,7 @@ type Submission = {
   metadata: Record<string, unknown> | null;
   lead_id: string | null;
   synced_to_lead_at: string | null;
+  tenant_id: string | null;
 };
 
 type FormField = {
@@ -95,6 +96,7 @@ async function syncOne(
   formTitle: string,
   fields: FormField[],
   mapping: Mapping,
+  tenantId: string | null,
 ): Promise<{ leadId: string; created: boolean }> {
   // Already synced via column
   if (submission.lead_id) {
@@ -154,6 +156,7 @@ async function syncOne(
       source: mapping.source_key,
       status: "new",
       tags: mapping.tags,
+      tenant_id: tenantId,
       pain_category: mapped.pain_category ?? null,
       desired_outcome: mapped.desired_outcome ?? null,
       prior_attempts: mapped.prior_attempts ?? null,
@@ -204,6 +207,7 @@ async function syncOne(
           .join("\n") || null;
       await admin.from("xsystem_followups").insert({
         practitioner_id: mapping.practitioner_id,
+        tenant_id: tenantId,
         client_id: null,
         lead_id: leadId,
         title: "לחזור לליד מטופס Exire",
@@ -303,7 +307,7 @@ serve(async (req) => {
     if (submissionId) {
       const { data, error } = await admin
         .from("form_submissions")
-        .select("id, form_id, responses, email, metadata, lead_id, synced_to_lead_at")
+        .select("id, form_id, responses, email, metadata, lead_id, synced_to_lead_at, tenant_id")
         .eq("id", submissionId)
         .maybeSingle();
       if (error) throw error;
@@ -311,7 +315,7 @@ serve(async (req) => {
     } else if (formId) {
       const { data, error } = await admin
         .from("form_submissions")
-        .select("id, form_id, responses, email, metadata, lead_id, synced_to_lead_at")
+        .select("id, form_id, responses, email, metadata, lead_id, synced_to_lead_at, tenant_id")
         .eq("form_id", formId)
         .is("lead_id", null)
         .order("submitted_at", { ascending: true })
@@ -335,7 +339,7 @@ serve(async (req) => {
     const formIds = Array.from(new Set(submissions.map((s) => s.form_id)));
     const { data: formsData } = await admin
       .from("custom_forms")
-      .select("id, title")
+      .select("id, title, tenant_id")
       .in("id", formIds);
     const { data: mappingsData } = await admin
       .from("xsystem_lead_form_mappings")
@@ -349,6 +353,9 @@ serve(async (req) => {
 
     const formTitleMap = new Map<string, string>(
       ((formsData || []) as Array<{ id: string; title: string }>).map((f) => [f.id, f.title]),
+    );
+    const formTenantMap = new Map<string, string | null>(
+      ((formsData || []) as Array<{ id: string; tenant_id: string | null }>).map((f) => [f.id, f.tenant_id]),
     );
     const mappingMap = new Map<string, Mapping>(
       ((mappingsData || []) as Mapping[]).map((m) => [m.form_id, m]),
@@ -379,6 +386,7 @@ serve(async (req) => {
           formTitleMap.get(sub.form_id) || "טופס",
           fieldsByForm.get(sub.form_id) || [],
           mapping,
+          sub.tenant_id ?? formTenantMap.get(sub.form_id) ?? null,
         );
         processed++;
         if (r.created) created++;

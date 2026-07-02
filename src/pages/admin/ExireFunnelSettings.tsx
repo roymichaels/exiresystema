@@ -26,15 +26,20 @@ import {
 import { useExireFunnelMetrics } from '@/hooks/xsystem/exireFunnel';
 import { useLeadFormMappings } from '@/hooks/xsystem/leadFormSync';
 import { supabase } from '@/integrations/supabase/client';
+import { useTenant } from '@/contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
 
 function useAvailableForms() {
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['exire_funnel_forms'],
+    queryKey: ['exire_funnel_forms', currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from('custom_forms')
         .select('id,title,status')
+        .eq('tenant_id', currentTenant.id)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return (data || []) as Array<{ id: string; title: string; status: string | null }>;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +16,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 const Forms = () => {
   const { language } = useTranslation();
+  const { currentTenant } = useTenant();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isAIWizardOpen, setIsAIWizardOpen] = useState(false);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
@@ -22,11 +24,14 @@ const Forms = () => {
   const [submissionsFormId, setSubmissionsFormId] = useState<string | null>(null);
 
   const { data: forms, refetch } = useQuery({
-    queryKey: ["custom-forms"],
+    queryKey: ["custom-forms", currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from("custom_forms")
         .select("*")
+        .eq("tenant_id", currentTenant.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -34,11 +39,14 @@ const Forms = () => {
   });
 
   const { data: submissions = [] } = useQuery({
-    queryKey: ["all-form-submissions-count"],
+    queryKey: ["all-form-submissions-count", currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from("form_submissions")
-        .select("id, status");
+        .select("id, status")
+        .eq("tenant_id", currentTenant.id);
       if (error) throw error;
       return data;
     },

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -85,13 +86,17 @@ const AllFormSubmissions = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedAnalysis, setSelectedAnalysis] = useState<FormAnalysis | null>(null);
   const [selectedSubmission, setSelectedSubmission] = useState<FormSubmission | null>(null);
+  const { currentTenant } = useTenant();
 
   const { data: forms = [] } = useQuery({
-    queryKey: ["custom-forms"],
+    queryKey: ["custom-forms", currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from("custom_forms")
         .select("id, title")
+        .eq("tenant_id", currentTenant.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as Form[];
@@ -111,11 +116,14 @@ const AllFormSubmissions = () => {
   });
 
   const { data: submissions = [], isLoading, refetch } = useQuery({
-    queryKey: ["all-form-submissions"],
+    queryKey: ["all-form-submissions", currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from("form_submissions")
         .select("*")
+        .eq("tenant_id", currentTenant.id)
         .order("submitted_at", { ascending: false });
       if (error) throw error;
       return data as FormSubmission[];
@@ -141,10 +149,12 @@ const AllFormSubmissions = () => {
 
   const markProcessedMutation = useMutation({
     mutationFn: async (submissionId: string) => {
+      if (!currentTenant?.id) throw new Error("No tenant context");
       const { error } = await supabase
         .from("form_submissions")
         .update({ status: "processed" })
-        .eq("id", submissionId);
+        .eq("id", submissionId)
+        .eq("tenant_id", currentTenant.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -155,10 +165,12 @@ const AllFormSubmissions = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (submissionId: string) => {
+      if (!currentTenant?.id) throw new Error("No tenant context");
       const { error } = await supabase
         .from("form_submissions")
         .delete()
-        .eq("id", submissionId);
+        .eq("id", submissionId)
+        .eq("tenant_id", currentTenant.id);
       if (error) throw error;
     },
     onSuccess: () => {

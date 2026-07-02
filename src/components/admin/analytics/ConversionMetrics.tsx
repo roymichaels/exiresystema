@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTenant } from "@/contexts/TenantContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, MousePointerClick, TrendingUp, Clock, ArrowRight, Eye, FileEdit, CheckCircle, UserPlus } from "lucide-react";
@@ -9,6 +10,8 @@ import { format, subDays, startOfDay, endOfDay } from "date-fns";
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const ConversionMetrics = () => {
+  const { currentTenant } = useTenant();
+
   // Fetch visitor sessions
   const { data: sessions = [] } = useQuery({
     queryKey: ["visitor-sessions"],
@@ -50,11 +53,14 @@ const ConversionMetrics = () => {
 
   // Real leads from DB (SSOT) — last 30 days
   const { data: leadRows = [] } = useQuery({
-    queryKey: ["analytics-leads"],
+    queryKey: ["analytics-leads", currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from("leads")
         .select("id, source, created_at")
+        .eq("tenant_id", currentTenant.id)
         .gte("created_at", subDays(new Date(), 30).toISOString());
       if (error) throw error;
       return data || [];

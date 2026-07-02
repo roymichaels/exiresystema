@@ -3865,6 +3865,7 @@ export type Database = {
           id: string
           settings: Json | null
           status: string
+          tenant_id: string | null
           title: string
           updated_at: string
         }
@@ -3876,6 +3877,7 @@ export type Database = {
           id?: string
           settings?: Json | null
           status?: string
+          tenant_id?: string | null
           title: string
           updated_at?: string
         }
@@ -3887,6 +3889,7 @@ export type Database = {
           id?: string
           settings?: Json | null
           status?: string
+          tenant_id?: string | null
           title?: string
           updated_at?: string
         }

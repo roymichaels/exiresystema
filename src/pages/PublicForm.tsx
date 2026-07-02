@@ -34,6 +34,7 @@ interface CustomForm {
   description: string | null;
   status: string;
   settings: any;
+  tenant_id: string | null;
 }
 
 export default function PublicForm() {
@@ -58,7 +59,7 @@ export default function PublicForm() {
       setLoading(true);
       const { data: formData, error } = await supabase
         .from("custom_forms")
-        .select("id, title, description, status, settings")
+        .select("id, title, description, status, settings, tenant_id")
         .eq("access_token", token)
         .eq("status", "published")
         .maybeSingle();
@@ -113,12 +114,16 @@ export default function PublicForm() {
 
     const { data: { user } } = await supabase.auth.getUser();
 
+    // Tenant is derived from the form record itself — never from the local
+    // (admin) tenant context. Legacy forms without tenant_id insert null,
+    // matching prior behavior, and get picked up by backfill.
     const { data: inserted, error } = await supabase.from("form_submissions").insert({
       form_id: form.id,
       responses: payload,
       email: email || null,
       user_id: user?.id || null,
       status: "new",
+      tenant_id: form.tenant_id ?? null,
     }).select("id").maybeSingle();
 
     setSubmitting(false);
