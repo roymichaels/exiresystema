@@ -1,19 +1,41 @@
 /**
- * Create a Google Calendar event + Meet link via the connector gateway.
+ * Create a Google Calendar event + Meet link via Google Calendar API directly.
+ * Uses an admin-owned OAuth refresh token (no Lovable gateway).
+ * Requires secrets: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN.
  * Updates the linked lead to status='scheduled' and logs activity.
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
-const GATEWAY_URL = 'https://connector-gateway.lovable.dev/google_calendar/calendar/v3';
+async function getGoogleAccessToken(): Promise<string> {
+  const clientId = Deno.env.get('GOOGLE_CLIENT_ID');
+  const clientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET');
+  const refreshToken = Deno.env.get('GOOGLE_REFRESH_TOKEN');
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error('Google Calendar not connected: missing GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REFRESH_TOKEN');
+  }
+  const resp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token',
+    }),
+  });
+  const json = await resp.json();
+  if (!resp.ok || !json.access_token) {
+    throw new Error(`Google token exchange failed: ${JSON.stringify(json)}`);
+  }
+  return json.access_token as string;
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const GCAL_API_KEY = Deno.env.get('GOOGLE_CALENDAR_API_KEY');
-    if (!LOVABLE_API_KEY || !GCAL_API_KEY) {
+    if (!Deno.env.get('GOOGLE_REFRESH_TOKEN')) {
       return new Response(JSON.stringify({ error: 'Calendar integration not connected', kind: 'not_connected' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -28,11 +50,11 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { Authorization: authHeader } } },
     );
-    const { data: claims } = await supabase.auth.getClaims(authHeader.replace('Bearer ', ''));
-    if (!claims?.claims) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
     }
-    const userId = claims.claims.sub;
+    const userId = user.id;
     const { data: isAdmin } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
     const { data: isPract } = await supabase.rpc('has_role', { _user_id: userId, _role: 'practitioner' });
     if (!isAdmin && !isPract) {
@@ -68,12 +90,12 @@ Deno.serve(async (req) => {
       },
     };
 
-    const url = `${GATEWAY_URL}/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=all`;
+    const accessToken = await getGoogleAccessToken();
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=all`;
     const resp = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': GCAL_API_KEY,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(eventBody),

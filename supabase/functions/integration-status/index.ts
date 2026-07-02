@@ -6,10 +6,10 @@ Deno.serve(async (req) => {
   }
 
   const status = {
-    email:    Deno.env.get('RESEND_API_KEY')          ? 'connected' : 'not_connected',
-    whatsapp: Deno.env.get('TWILIO_API_KEY')          ? 'connected' : 'not_connected',
-    calendar: Deno.env.get('GOOGLE_CALENDAR_API_KEY') ? 'connected' : 'not_connected',
-    stripe:   Deno.env.get('STRIPE_SECRET_KEY')       ? 'connected' : 'not_connected',
+    email:    Deno.env.get('RESEND_API_KEY')                                                    ? 'connected' : 'not_connected',
+    whatsapp: (Deno.env.get('TWILIO_ACCOUNT_SID') && Deno.env.get('TWILIO_AUTH_TOKEN'))         ? 'connected' : 'not_connected',
+    calendar: (Deno.env.get('GOOGLE_CLIENT_ID') && Deno.env.get('GOOGLE_CLIENT_SECRET') && Deno.env.get('GOOGLE_REFRESH_TOKEN')) ? 'connected' : 'not_connected',
+    stripe:   Deno.env.get('STRIPE_SECRET_KEY')                                                 ? 'connected' : 'not_connected',
   };
 
   return new Response(JSON.stringify(status), {
