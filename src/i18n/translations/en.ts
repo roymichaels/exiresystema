@@ -174,7 +174,7 @@ export const en: TranslationKeys = {
     noScheduledSessions: "No scheduled sessions",
     continueWhereYouLeft: "Continue where you left off",
     communityActivity: "Community Activity",
-    todaysFocus: {
+    todayFocus: {
       title: "Today's Focus",
       daysLeft: "{days} days left",
       viewPlan: "View Plan",

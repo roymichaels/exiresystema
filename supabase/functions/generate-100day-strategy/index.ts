@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { corsHeaders, isCorsPreFlight, handleCorsPreFlight } from "../_shared/cors.ts";
+import { requireAuth, requireAdmin } from "../_shared/auth.ts";
 import { validateHubReadiness } from "../_shared/assessment-quality.ts";
 
 const CORE_PILLAR_IDS = ['consciousness', 'presence', 'power', 'vitality', 'focus', 'combat', 'expansion'];
@@ -746,25 +747,27 @@ serve(async (req) => {
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     const body = await req.json();
-    const { user_id, hub, force_regenerate, selected_pillars, single_pillar, skip_quality_gate, mode } = body;
+    const { hub, force_regenerate, selected_pillars, single_pillar, skip_quality_gate, mode } = body;
 
-    if (!user_id) {
-      return new Response(JSON.stringify({ error: "user_id required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // Require JWT — derive user_id from token, ignore any body-supplied value
+    const auth = await requireAuth(req);
+    if (auth instanceof Response) return auth;
+    const user_id = auth.userId;
 
-    // === PURGE MODE: delete strategy + downstream artifacts, no regeneration ===
+    // === PURGE MODE: admin-only destructive operation ===
     if (mode === 'purge') {
+      const adminCheck = await requireAdmin(req);
+      if (adminCheck instanceof Response) return adminCheck;
+      const purgeTarget = body.user_id || user_id;
       const { data: activePlans } = await supabaseClient
         .from('life_plans').select('id')
-        .eq('user_id', user_id).eq('status', 'active');
+        .eq('user_id', purgeTarget).eq('status', 'active');
       const ids = (activePlans || []).map((p: any) => p.id);
       if (ids.length > 0) {
         await supabaseClient.from('plan_missions').delete().in('plan_id', ids);
-        await supabaseClient.from('action_items').delete().eq('user_id', user_id).in('plan_id', ids);
+        await supabaseClient.from('action_items').delete().eq('user_id', purgeTarget).in('plan_id', ids);
         await supabaseClient.from('life_plan_milestones').delete().in('plan_id', ids);
-        await supabaseClient.from('skills').delete().eq('user_id', user_id).in('life_plan_id', ids);
+        await supabaseClient.from('skills').delete().eq('user_id', purgeTarget).in('life_plan_id', ids);
         await supabaseClient.from('life_plans').update({ status: 'archived' }).in('id', ids);
       }
       return new Response(JSON.stringify({ purged: true, count: ids.length }), {

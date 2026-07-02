@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, Settings } from "lucide-react";
+import { Loader2, Save, Upload, X, Settings as SettingsIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { z } from "zod";
 import { handleError } from "@/lib/errorHandling";
@@ -369,7 +369,7 @@ const Settings = () => {
       <PageHeader
         title="הגדרות"
         subtitle="נהל את הגדרות האתר והתוכן"
-        icon={Settings}
+        icon={SettingsIcon}
       />
 
       <div className="space-y-6">
