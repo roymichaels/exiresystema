@@ -15,6 +15,8 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ADMIN_TABS } from '@/domain/admin';
+import { useTenant } from '@/contexts/TenantContext';
+import { TENANTS, TENANT_SLUGS } from '@/config/tenants';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { AssistantOrb } from '@/components/admin/AssistantOrb';
@@ -84,6 +86,7 @@ export interface AdminPanelShellProps {
 export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange }: AdminPanelShellProps) {
   const { language } = useTranslation();
   const { user } = useAuth();
+  const { currentTenant, currentTenantSlug, setTenant } = useTenant();
 
   const tTab = (tab: typeof ADMIN_TABS[number]) =>
     language === 'he' ? tab.labelHe : language === 'es' ? tab.labelEs : tab.labelEn;
@@ -92,8 +95,8 @@ export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange
     onTabChange(tabId, subId);
   };
 
-  const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'EX';
-  const userEmail = user?.email || 'Exire Systema';
+  const userInitials = user?.email?.slice(0, 2).toUpperCase() || currentTenant.brand.slice(0, 2).toUpperCase();
+  const userEmail = user?.email || currentTenant.brand;
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,20 +107,36 @@ export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange
       >
         <div className="flex h-full flex-col border-r border-border/40 bg-[#0c0c12]/90 backdrop-blur-xl">
           {/* Brand */}
-          <div className="px-5 pt-6 pb-4">
+          <div className="px-5 pt-6 pb-4 space-y-3">
             <button
               type="button"
               onClick={() => go('today', 'exire-today')}
               className="flex items-center gap-2.5 text-foreground hover:opacity-80 transition-opacity"
             >
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-primary/20">
-                EX
+                {currentTenant.brand.slice(0, 2).toUpperCase()}
               </div>
               <div className="text-left">
-                <div className="text-[13px] font-bold leading-tight">Exire Systema</div>
+                <div className="text-[13px] font-bold leading-tight">{currentTenant.brand}</div>
                 <div className="text-[10px] text-muted-foreground leading-tight">BizOS</div>
               </div>
             </button>
+
+            {/* Internal tenant switcher */}
+            <label className="block">
+              <span className="sr-only">Workspace</span>
+              <select
+                value={currentTenantSlug}
+                onChange={(e) => setTenant(e.target.value as typeof currentTenantSlug)}
+                className="w-full rounded-lg border border-border/40 bg-background/60 px-2.5 py-1.5 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary/50"
+              >
+                {TENANT_SLUGS.map((slug) => (
+                  <option key={slug} value={slug}>
+                    {TENANTS[slug].name}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           {/* Primary nav */}

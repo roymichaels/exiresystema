@@ -29,6 +29,7 @@ import {
   PageHeader, SectionHeader, MetricCard, DataList, DataRow, PanelCard,
 } from '@/components/admin/design-system';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useTenant } from '@/contexts/TenantContext';
 
 function Stat({
   label, value, hint, icon: Icon, tone = 'default',
@@ -88,6 +89,7 @@ function MobileCollapsible({ title, defaultOpen = false, children }: { title: st
 
 export default function ExireDashboard() {
   const { language } = useTranslation();
+  const { currentTenant } = useTenant();
   const navigate = useNavigate();
   const { data, isLoading } = useExireDashboard();
   const { data: insights } = useOnboardingInsights();
@@ -269,7 +271,7 @@ export default function ExireDashboard() {
       {/* ============================ DESKTOP =========================== */}
       <section className="hidden lg:block space-y-4">
         <PageHeader
-          title={language === 'he' ? 'בוקר טוב, Exire 👋' : language === 'es' ? 'Buenos días, Exire 👋' : 'Good morning, Exire 👋'}
+          title={language === 'he' ? `בוקר טוב, ${currentTenant.brand} 👋` : language === 'es' ? `Buenos días, ${currentTenant.brand} 👋` : `Good morning, ${currentTenant.brand} 👋`}
           subtitle={language === 'he' ? 'סקירת יום, לידים ומשימות פתוחות' : language === 'es' ? 'Resumen del día, leads y tareas abiertas' : 'Daily overview, leads and open tasks'}
         />
 

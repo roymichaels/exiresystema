@@ -13,6 +13,8 @@ import { ADMIN_TABS } from '@/domain/admin';
 import { AdminMobileBottomNav } from '@/components/admin/AdminMobileBottomNav';
 import { AdminMobileSubNav } from '@/components/admin/AdminMobileSubNav';
 import { AdminPanelShell } from '@/components/admin/AdminPanelShell';
+import { useTenant } from '@/contexts/TenantContext';
+import PhysioPlaceholder from '@/components/admin/PhysioPlaceholder';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +27,7 @@ interface AdminHubProps {
 }
 
 export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChange }: AdminHubProps) {
+  const { currentTenantSlug } = useTenant();
 
   const currentTabConfig = useMemo(
     () => ADMIN_TABS.find(t => t.id === activeTab) || ADMIN_TABS[0],
@@ -82,7 +85,11 @@ export default function AdminHub({ activeTab = 'today', activeSubTab, onTabChang
         }
       >
         <Suspense fallback={<PageSkeleton />}>
-          {ActiveSubComponent && <ActiveSubComponent />}
+          {currentTenantSlug === 'physiotherapy' ? (
+            <PhysioPlaceholder />
+          ) : (
+            ActiveSubComponent && <ActiveSubComponent />
+          )}
         </Suspense>
       </ErrorBoundary>
 

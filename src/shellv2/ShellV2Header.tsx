@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import { Info, Menu } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useOverlay } from '@/shell/overlay/OverlayController';
+import { useTenant } from '@/contexts/TenantContext';
 import { zStyle } from './zindex';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { openInteractiveAION } from '@/components/aion/InteractiveAIONHost';
@@ -26,9 +27,10 @@ export default function ShellV2Header() {
   const overlay = useOverlay();
   const { language, isRTL } = useTranslation();
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   const { pathname } = useLocation();
   const [brandOpen, setBrandOpen] = useState(false);
-  const brand = 'Exire Systema';
+  const brand = currentTenant.brand;
   const isHe = language === 'he';
 
   const isAdminContext = useMemo(
@@ -72,7 +74,7 @@ export default function ShellV2Header() {
               className="select-none px-2 py-1.5 text-[15px] md:text-[16px] font-semibold tracking-[0.22em] text-foreground active:scale-[0.97] transition"
               aria-label={isHe ? 'אודות' : 'About'}
             >
-              EXIRE SYSTEMA
+              {brand.toUpperCase()}
             </button>
 
             <div className="flex items-center gap-1">
@@ -90,18 +92,18 @@ export default function ShellV2Header() {
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
             <SheetHeader className={isRTL ? 'text-right' : 'text-left'}>
               <div className="flex items-center gap-2">
-                <CanonicalAionModel size={32} ariaLabel="Exire Systema" />
+                <CanonicalAionModel size={32} ariaLabel={brand} />
                 <SheetTitle className="text-lg">{brand}</SheetTitle>
               </div>
               <SheetDescription className="text-foreground/70">
                 {isHe
-                  ? 'מערכת ההפעלה של המאמן — לידים, מתאמנים, סטודיו.'
-                  : 'The operator OS — leads, clients, studio.'}
+                  ? 'מערכת ההפעלה של העסק — לידים, לקוחות ותפעול.'
+                  : 'The business operating system — leads, clients, and operations.'}
               </SheetDescription>
             </SheetHeader>
             <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.04] px-3 py-2.5 text-xs text-foreground/60">
               <Info className="h-4 w-4 shrink-0" />
-              <span>{isHe ? 'Exire Systema · קונסולה תפעולית' : 'Exire Systema · operator console'}</span>
+              <span>{isHe ? `${brand} · קונסולה תפעולית` : `${brand} · operator console`}</span>
             </div>
           </SheetContent>
         </Sheet>
@@ -129,19 +131,19 @@ export default function ShellV2Header() {
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
         <SheetHeader className={isRTL ? 'text-right' : 'text-left'}>
           <div className="flex items-center gap-2">
-            <CanonicalAionModel size={32} ariaLabel="Exire Systema" />
-            <SheetTitle className="text-lg">{brand}</SheetTitle>
-          </div>
-          <SheetDescription className="text-foreground/70">
-            {isHe
-              ? 'הקורסים, הקהילה והמסע שלך — במקום אחד.'
-              : 'Your courses, community, and journey — in one place.'}
-          </SheetDescription>
-        </SheetHeader>
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.04] px-3 py-2.5 text-xs text-foreground/60">
-          <Info className="h-4 w-4 shrink-0" />
-          <span>{isHe ? 'Exire Systema · אקוסיסטם של מאמן' : 'Exire Systema · coach ecosystem'}</span>
-        </div>
+              <CanonicalAionModel size={32} ariaLabel={brand} />
+                <SheetTitle className="text-lg">{brand}</SheetTitle>
+              </div>
+              <SheetDescription className="text-foreground/70">
+                {isHe
+                  ? 'הקורסים, הקהילה והמסע שלך — במקום אחד.'
+                  : 'Your courses, community, and journey — in one place.'}
+              </SheetDescription>
+            </SheetHeader>
+            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.04] px-3 py-2.5 text-xs text-foreground/60">
+              <Info className="h-4 w-4 shrink-0" />
+              <span>{isHe ? `${brand} · אקוסיסטם של מאמן` : `${brand} · coach ecosystem`}</span>
+            </div>
       </SheetContent>
     </Sheet>
 
