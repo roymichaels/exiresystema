@@ -294,7 +294,7 @@ export function getAllModels(): ModelConfig[] {
 export function getModelsByCapability(capability: keyof ModelCapabilities): ModelConfig[] {
   return Object.values(MODELS).filter((model) => {
     const cap = model.capabilities[capability];
-    return typeof cap === "boolean" ? cap : cap > 0;
+    return typeof cap === "boolean" ? cap : typeof cap === "number" ? cap > 0 : false;
   });
 }
 

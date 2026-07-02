@@ -36,7 +36,7 @@ interface DrawerItem {
   icon: LucideIcon;
   labelEn: string;
   labelHe: string;
-  labelEs: string;
+  labelEs?: string;
   onSelect: () => void | Promise<void>;
 }
 

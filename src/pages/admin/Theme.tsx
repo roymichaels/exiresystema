@@ -224,10 +224,10 @@ const Theme = () => {
                             )}
                           </div>
                           <h3 className="font-semibold">
-                            {language === 'he' ? preset.name : language === 'es' ? (preset.name_es || preset.name_en || preset.name) : (preset.name_en || preset.name)}
+                            {language === 'he' ? preset.name : language === 'es' ? ((preset as any).name_es || preset.name_en || preset.name) : (preset.name_en || preset.name)}
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            {language === 'he' ? preset.description : language === 'es' ? (preset.description_es || preset.description_en || preset.description) : (preset.description_en || preset.description)}
+                            {language === 'he' ? preset.description : language === 'es' ? ((preset as any).description_es || preset.description_en || preset.description) : (preset.description_en || preset.description)}
                           </p>
                         </CardContent>
                       </Card>

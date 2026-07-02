@@ -26,7 +26,7 @@ import {
 } from '@/data/galleryOrbData';
 
 export default function OrbGalleryPage() {
-  const { isRTL } = useTranslation();
+  const { isRTL, l, language } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const isHe = isRTL;
