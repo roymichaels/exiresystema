@@ -2324,7 +2324,6 @@ export type Database = {
           risk_flags: Json
           status: string
           tags: string[]
-          tenant_id: string
           updated_at: string
           user_id: string | null
           whatsapp: string | null
@@ -2346,7 +2345,6 @@ export type Database = {
           risk_flags?: Json
           status?: string
           tags?: string[]
-          tenant_id: string
           updated_at?: string
           user_id?: string | null
           whatsapp?: string | null
@@ -2368,7 +2366,6 @@ export type Database = {
           risk_flags?: Json
           status?: string
           tags?: string[]
-          tenant_id?: string
           updated_at?: string
           user_id?: string | null
           whatsapp?: string | null
@@ -2379,13 +2376,6 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "clients_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -9358,81 +9348,6 @@ export type Database = {
           role_en?: string | null
           updated_at?: string | null
           updated_by?: string | null
-        }
-        Relationships: []
-      }
-      tenant_memberships: {
-        Row: {
-          created_at: string
-          id: string
-          role: string
-          tenant_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role?: string
-          tenant_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: string
-          tenant_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tenant_memberships_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tenant_memberships_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tenants: {
-        Row: {
-          brand: string
-          created_at: string
-          features: Json
-          id: string
-          locale: string
-          name: string
-          settings: Json
-          slug: string
-          updated_at: string
-        }
-        Insert: {
-          brand: string
-          created_at?: string
-          features?: Json
-          id: string
-          locale?: string
-          name: string
-          settings?: Json
-          slug: string
-          updated_at?: string
-        }
-        Update: {
-          brand?: string
-          created_at?: string
-          features?: Json
-          id?: string
-          locale?: string
-          name?: string
-          settings?: Json
-          slug?: string
-          updated_at?: string
         }
         Relationships: []
       }
