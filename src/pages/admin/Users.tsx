@@ -402,7 +402,7 @@ const Users = () => {
                             {language === 'he' ? 'ניהול תפקידים' : language === 'es' ? 'Gestionar Roles' : 'Manage Roles'}
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          {AVAILABLE_ROLES.map(({ role, label, labelHe, icon: Icon, color }) => {
+                          {AVAILABLE_ROLES.map(({ role, label, labelHe, labelEs, icon: Icon, color }: any) => {
                             const hasRole = userRoles.includes(role);
                             const isUpdating = updatingRole === `${user.id}-${role}`;
                             
