@@ -7,6 +7,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTenant } from '@/contexts/TenantContext';
 
 const LANDING_SOURCES = ['homepage', 'exire_landing', 'exire_form', 'exire_instagram_form'];
 
@@ -19,13 +20,17 @@ export type ResubmittedLead = {
 };
 
 export function useResubmittedLeads() {
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['exire', 'resubmittedLeads'],
+    queryKey: ['exire', 'resubmittedLeads', currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { data, error } = await supabase
         .from('leads')
         .select('id, name, source, metadata, tags, updated_at')
         .in('source', LANDING_SOURCES)
+        .eq('tenant_id', currentTenant.id)
         .order('updated_at', { ascending: false })
         .limit(200);
       if (error) throw error;

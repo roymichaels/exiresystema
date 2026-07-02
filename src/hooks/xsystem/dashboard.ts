@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 function startOfDay(d = new Date()) {
   const x = new Date(d); x.setHours(0, 0, 0, 0); return x;
@@ -55,11 +56,14 @@ export interface XSysDashboardData {
 
 export function useExireDashboard() {
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['xsystem', 'dashboard', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['xsystem', 'dashboard', user?.id, currentTenant?.id],
+    enabled: !!user?.id && !!currentTenant?.id,
     queryFn: async (): Promise<XSysDashboardData> => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const pid = user!.id;
+      const tid = currentTenant.id;
       const todayStart = startOfDay().toISOString();
       const tomorrowStart = startOfDay(new Date(Date.now() + 86400000)).toISOString();
       const monthStart = startOfMonth().toISOString();
@@ -69,23 +73,29 @@ export function useExireDashboard() {
       const [paymentsRes, leadsRes, clientsRes, sessionsRes, followupsRes, checkinsRes] = await Promise.all([
         supabase.from('xsystem_payments' as any)
           .select('amount_cents,currency,status,paid_at,due_at,client_id')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('leads')
           .select('id,status,created_at,contacted_at')
+          .eq('tenant_id', tid)
           .order('created_at', { ascending: false })
           .limit(500),
         supabase.from('clients' as any)
           .select('id,status,created_at')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('xsystem_sessions' as any)
           .select('id,client_id,scheduled_at,status')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('xsystem_followups' as any)
           .select('id,client_id,lead_id,title,due_at,status,priority')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('xsystem_checkins' as any)
           .select('id,payload')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
       ]);
 
       const payments = (paymentsRes.data || []) as any[];

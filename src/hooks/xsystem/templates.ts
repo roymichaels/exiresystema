@@ -4,6 +4,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { toast } from '@/hooks/use-toast';
 
 export type MsgChannel = 'whatsapp' | 'email' | 'internal';
@@ -32,14 +33,18 @@ export function useXSystemMessageTemplates(opts?: {
   channel?: MsgChannel; category?: MsgCategory; includeArchived?: boolean;
 }) {
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   const channel = opts?.channel;
   const category = opts?.category;
   const includeArchived = !!opts?.includeArchived;
   return useQuery({
-    queryKey: ['xsystem', 'msg_templates', user?.id, channel, category, includeArchived],
-    enabled: !!user?.id,
+    queryKey: ['xsystem', 'msg_templates', user?.id, currentTenant?.id, channel, category, includeArchived],
+    enabled: !!user?.id && !!currentTenant?.id,
     queryFn: async () => {
-      let q = supabase.from(TABLE as any).select('*').eq('practitioner_id', user!.id);
+      if (!currentTenant?.id) throw new Error('No tenant context');
+      let q = supabase.from(TABLE as any).select('*')
+        .eq('practitioner_id', user!.id)
+        .eq('tenant_id', currentTenant.id);
       if (channel) q = q.eq('channel', channel);
       if (category) q = q.eq('category', category);
       if (!includeArchived) q = q.eq('is_archived', false);
@@ -53,12 +58,14 @@ export function useXSystemMessageTemplates(opts?: {
 export function useCreateXSystemMessageTemplate() {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async (input: Partial<XSysMessageTemplate> & { name: string; body: string; channel: MsgChannel; category: MsgCategory }) => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { data, error } = await supabase
         .from(TABLE as any)
-        .insert({ ...input, practitioner_id: user.id, variables: input.variables ?? [] } as any)
+        .insert({ ...input, practitioner_id: user.id, tenant_id: currentTenant.id, variables: input.variables ?? [] } as any)
         .select('*').single();
       if (error) throw error;
       return data as unknown as XSysMessageTemplate;
@@ -73,10 +80,15 @@ export function useCreateXSystemMessageTemplate() {
 
 export function useUpdateXSystemMessageTemplate() {
   const qc = useQueryClient();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<XSysMessageTemplate> }) => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { data, error } = await supabase
-        .from(TABLE as any).update(updates as any).eq('id', id).select('*').single();
+        .from(TABLE as any).update(updates as any)
+        .eq('id', id)
+        .eq('tenant_id', currentTenant.id)
+        .select('*').single();
       if (error) throw error;
       return data as unknown as XSysMessageTemplate;
     },

@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { useTenant } from '@/contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
 import {
   Collapsible,
@@ -74,6 +75,7 @@ const AdminSidebar = ({ isMobile = false, onNavigate }: AdminSidebarProps) => {
   const { language, t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentTenant } = useTenant();
   const isHebrew = language === 'he';
 
   // Fetch unread notifications count
@@ -90,12 +92,15 @@ const AdminSidebar = ({ isMobile = false, onNavigate }: AdminSidebarProps) => {
 
   // Fetch new leads count
   const { data: newLeadsCount = 0 } = useQuery({
-    queryKey: ['admin-new-leads'],
+    queryKey: ['admin-new-leads', currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async () => {
+      if (!currentTenant?.id) return 0;
       const { count } = await supabase
         .from('leads')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'new');
+        .eq('status', 'new')
+        .eq('tenant_id', currentTenant.id);
       return count || 0;
     },
   });

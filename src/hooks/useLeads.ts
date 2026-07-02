@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
 export type LeadSource = 'intake_chat' | 'landing_page' | 'exit_intent' | 'manual' | 'affiliate' | string;
@@ -33,12 +34,16 @@ export interface Lead {
 }
 
 export const useLeads = () => {
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['leads', 'unified'],
+    queryKey: ['leads', 'unified', currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async (): Promise<Lead[]> => {
+      if (!currentTenant?.id) return [];
       const { data, error } = await supabase
         .from('leads')
         .select('*')
+        .eq('tenant_id', currentTenant.id)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return (data || []) as unknown as Lead[];
@@ -66,13 +71,15 @@ const invalidate = (qc: ReturnType<typeof useQueryClient>) => {
 
 export const useUpdateLead = () => {
   const qc = useQueryClient();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Pick<Lead, 'status' | 'notes' | 'tags' | 'contacted_at'>> }) => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const patch: Record<string, unknown> = { ...updates };
       if (updates.status && updates.status !== 'new' && !('contacted_at' in updates)) {
         patch.contacted_at = new Date().toISOString();
       }
-      const { error } = await supabase.from('leads').update(patch as never).eq('id', id);
+      const { error } = await supabase.from('leads').update(patch as never).eq('id', id).eq('tenant_id', currentTenant.id);
       if (error) throw error;
     },
     onSuccess: () => { invalidate(qc); toast.success('עודכן'); },
@@ -82,9 +89,11 @@ export const useUpdateLead = () => {
 
 export const useDeleteLead = () => {
   const qc = useQueryClient();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('leads').delete().eq('id', id);
+      if (!currentTenant?.id) throw new Error('No tenant context');
+      const { error } = await supabase.from('leads').delete().eq('id', id).eq('tenant_id', currentTenant.id);
       if (error) throw error;
     },
     onSuccess: () => { invalidate(qc); toast.success('נמחק'); },
@@ -94,9 +103,11 @@ export const useDeleteLead = () => {
 
 export const useAddLead = () => {
   const qc = useQueryClient();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async (lead: { name: string; phone?: string | null; email?: string | null; notes?: string; source?: LeadSource }) => {
       if (!lead.phone && !lead.email) throw new Error('צריך טלפון או אימייל');
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { data, error } = await supabase
         .from('leads')
         .insert({
@@ -106,6 +117,7 @@ export const useAddLead = () => {
           notes: lead.notes || null,
           source: lead.source || 'manual',
           status: 'new',
+          tenant_id: currentTenant.id,
         })
         .select()
         .single();

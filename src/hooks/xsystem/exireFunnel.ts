@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 export interface ExireFunnelMetrics {
   leadsToday: number;
@@ -21,10 +22,13 @@ export interface ExireFunnelMetrics {
 
 export function useExireFunnelMetrics() {
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['xsystem', 'exire_funnel', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['xsystem', 'exire_funnel', user?.id, currentTenant?.id],
+    enabled: !!user?.id && !!currentTenant?.id,
     queryFn: async (): Promise<ExireFunnelMetrics> => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
+      const tid = currentTenant.id;
       const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
       const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0);
 
@@ -32,11 +36,13 @@ export function useExireFunnelMetrics() {
         supabase.from('leads')
           .select('id,name,phone,status,pain_category,desired_outcome,created_at,contacted_at')
           .eq('source', 'exire_landing')
+          .eq('tenant_id', tid)
           .order('created_at', { ascending: false })
           .limit(500),
         supabase.from('xsystem_followups' as any)
           .select('lead_id')
-          .not('lead_id', 'is', null),
+          .not('lead_id', 'is', null)
+          .eq('tenant_id', tid),
       ]);
 
       const leads = (leadsRes.data || []) as any[];

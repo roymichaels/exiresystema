@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 export interface OnboardingTask {
   client_id: string;
@@ -28,28 +29,36 @@ export interface OnboardingInsights {
 
 export function useOnboardingInsights() {
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['xsystem', 'onboarding_insights', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['xsystem', 'onboarding_insights', user?.id, currentTenant?.id],
+    enabled: !!user?.id && !!currentTenant?.id,
     queryFn: async (): Promise<OnboardingInsights> => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const pid = user!.id;
+      const tid = currentTenant.id;
 
       const [clientsRes, sessionsRes, paymentsRes, submissionsRes, leadsRes] = await Promise.all([
         supabase.from('clients' as any)
           .select('id,full_name,created_at')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('xsystem_sessions' as any)
           .select('client_id')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('xsystem_payments' as any)
           .select('client_id')
-          .eq('practitioner_id', pid),
+          .eq('practitioner_id', pid)
+          .eq('tenant_id', tid),
         supabase.from('form_submissions' as any)
           .select('client_id')
-          .not('client_id', 'is', null),
+          .not('client_id', 'is', null)
+          .eq('tenant_id', tid),
         supabase.from('leads')
           .select('id,name,phone,status,contacted_at,created_at')
           .in('status', ['new', 'contacted'])
+          .eq('tenant_id', tid)
           .order('created_at', { ascending: false })
           .limit(200),
       ]);

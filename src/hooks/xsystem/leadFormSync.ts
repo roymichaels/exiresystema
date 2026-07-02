@@ -7,6 +7,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { toast } from '@/hooks/use-toast';
 
 export interface LeadFormMapping {
@@ -33,9 +34,12 @@ export interface PublishedFormRef {
 }
 
 export function usePublishedFormsWithCounts() {
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['xsystem', 'lead_forms', 'published_with_counts'],
+    queryKey: ['xsystem', 'lead_forms', 'published_with_counts', currentTenant?.id],
+    enabled: !!currentTenant?.id,
     queryFn: async (): Promise<PublishedFormRef[]> => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { data: forms, error } = await supabase
         .from('custom_forms')
         .select('id,title,status,access_token,created_at')
@@ -51,7 +55,8 @@ export function usePublishedFormsWithCounts() {
       const { data: subs } = await supabase
         .from('form_submissions')
         .select('form_id, lead_id')
-        .in('form_id', ids);
+        .in('form_id', ids)
+        .eq('tenant_id', currentTenant.id);
 
       const total = new Map<string, number>();
       const synced = new Map<string, number>();
@@ -71,14 +76,17 @@ export function usePublishedFormsWithCounts() {
 
 export function useLeadFormMappings() {
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['xsystem', 'lead_form_mappings', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['xsystem', 'lead_form_mappings', user?.id, currentTenant?.id],
+    enabled: !!user?.id && !!currentTenant?.id,
     queryFn: async (): Promise<LeadFormMapping[]> => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { data, error } = await supabase
         .from('xsystem_lead_form_mappings' as never)
         .select('*')
-        .eq('practitioner_id', user!.id);
+        .eq('practitioner_id', user!.id)
+        .eq('tenant_id', currentTenant.id);
       if (error) throw error;
       return (data || []) as unknown as LeadFormMapping[];
     },
@@ -88,11 +96,14 @@ export function useLeadFormMappings() {
 export function useUpsertLeadFormMapping() {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async (input: Partial<LeadFormMapping> & { form_id: string }) => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const payload: Record<string, unknown> = {
         practitioner_id: user.id,
+        tenant_id: currentTenant.id,
         form_id: input.form_id,
         source_key: input.source_key ?? 'exire_form',
         is_active: input.is_active ?? true,
@@ -120,12 +131,15 @@ export function useUpsertLeadFormMapping() {
 
 export function useDeleteLeadFormMapping() {
   const qc = useQueryClient();
+  const { currentTenant } = useTenant();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
       const { error } = await supabase
         .from('xsystem_lead_form_mappings' as never)
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('tenant_id', currentTenant.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -190,15 +204,19 @@ export interface ExireFormMetrics {
 
 export function useExireFormMetrics() {
   const { user } = useAuth();
+  const { currentTenant } = useTenant();
   return useQuery({
-    queryKey: ['xsystem', 'exire_form_metrics', user?.id],
-    enabled: !!user?.id,
+    queryKey: ['xsystem', 'exire_form_metrics', user?.id, currentTenant?.id],
+    enabled: !!user?.id && !!currentTenant?.id,
     queryFn: async (): Promise<ExireFormMetrics> => {
+      if (!currentTenant?.id) throw new Error('No tenant context');
+      const tid = currentTenant.id;
       const { data: maps } = await supabase
         .from('xsystem_lead_form_mappings' as never)
         .select('form_id, source_key')
         .eq('practitioner_id', user!.id)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .eq('tenant_id', tid);
       const list = (maps || []) as Array<{ form_id: string; source_key: string }>;
       const formIds = list.map((m) => m.form_id);
       const sourceKeys = Array.from(new Set(list.map((m) => m.source_key)));
@@ -215,10 +233,12 @@ export function useExireFormMetrics() {
       const [subsRes, leadsRes] = await Promise.all([
         supabase.from('form_submissions')
           .select('id, form_id, lead_id', { count: 'exact' })
-          .in('form_id', formIds),
+          .in('form_id', formIds)
+          .eq('tenant_id', tid),
         supabase.from('leads')
           .select('id,name,phone,source,created_at,contacted_at,pain_category,desired_outcome,metadata,status')
           .in('source', sourceKeys.length ? sourceKeys : ['exire_form'])
+          .eq('tenant_id', tid)
           .order('created_at', { ascending: false })
           .limit(200),
       ]);
