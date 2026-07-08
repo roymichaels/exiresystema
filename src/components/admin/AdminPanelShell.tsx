@@ -99,7 +99,7 @@ export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange
   const userEmail = user?.email || currentTenant.brand;
 
   return (
-    <div className="h-full min-h-screen w-full overflow-y-auto overscroll-contain bg-background">
+    <div className="flex-1 min-h-0 h-full w-full overflow-y-auto overscroll-contain bg-background" style={{ WebkitOverflowScrolling: 'touch' as const }}>
       {/* Desktop sidebar */}
       <aside
         className="hidden lg:flex fixed left-0 top-0 z-40 h-screen flex-col"
