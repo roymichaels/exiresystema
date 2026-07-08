@@ -117,14 +117,19 @@ export default function PublicForm() {
     // Tenant is derived from the form record itself — never from the local
     // (admin) tenant context. Legacy forms without tenant_id insert null,
     // matching prior behavior, and get picked up by backfill.
-    const { data: inserted, error } = await supabase.from("form_submissions").insert({
+    const submissionId = (typeof crypto !== "undefined" && "randomUUID" in crypto)
+      ? crypto.randomUUID()
+      : undefined;
+
+    const { error } = await supabase.from("form_submissions").insert({
+      ...(submissionId ? { id: submissionId } : {}),
       form_id: form.id,
       responses: payload,
       email: email || null,
       user_id: user?.id || null,
       status: "new",
       tenant_id: form.tenant_id ?? null,
-    }).select("id").maybeSingle();
+    });
 
     setSubmitting(false);
 
@@ -134,9 +139,9 @@ export default function PublicForm() {
     }
 
     // Phase 2K — fire-and-forget CRM sync. Never blocks the public form.
-    if (inserted?.id) {
+    if (submissionId) {
       const { triggerFormSubmissionSync } = await import("@/hooks/xsystem/leadFormSync");
-      triggerFormSubmissionSync(inserted.id);
+      triggerFormSubmissionSync(submissionId);
     }
 
     setSubmitted(true);
