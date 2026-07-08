@@ -203,11 +203,12 @@ export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange
 
       {/* Main content */}
       <main
-        className="min-h-screen w-full lg:pl-[210px]"
+        className="w-full lg:pl-[210px]"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0px)',
         }}
       >
+
         <div className="mx-auto w-full max-w-[1200px] px-4 pt-4 pb-20 lg:px-6 lg:pt-5 lg:pb-6">
           {children}
         </div>
