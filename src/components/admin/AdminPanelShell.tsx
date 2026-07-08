@@ -99,7 +99,7 @@ export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange
   const userEmail = user?.email || currentTenant.brand;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-full min-h-screen w-full overflow-y-auto overscroll-contain bg-background">
       {/* Desktop sidebar */}
       <aside
         className="hidden lg:flex fixed left-0 top-0 z-40 h-screen flex-col"
@@ -203,11 +203,12 @@ export function AdminPanelShell({ children, activeTab, activeSubTab, onTabChange
 
       {/* Main content */}
       <main
-        className="min-h-screen w-full lg:pl-[210px]"
+        className="w-full lg:pl-[210px]"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0px)',
         }}
       >
+
         <div className="mx-auto w-full max-w-[1200px] px-4 pt-4 pb-20 lg:px-6 lg:pt-5 lg:pb-6">
           {children}
         </div>
