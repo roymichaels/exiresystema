@@ -3865,6 +3865,7 @@ export type Database = {
           id: string
           settings: Json | null
           status: string
+          tenant_id: string | null
           title: string
           updated_at: string
         }
@@ -3876,6 +3877,7 @@ export type Database = {
           id?: string
           settings?: Json | null
           status?: string
+          tenant_id?: string | null
           title: string
           updated_at?: string
         }
@@ -3887,6 +3889,7 @@ export type Database = {
           id?: string
           settings?: Json | null
           status?: string
+          tenant_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -5260,6 +5263,7 @@ export type Database = {
           status: string
           submitted_at: string
           synced_to_lead_at: string | null
+          tenant_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -5274,6 +5278,7 @@ export type Database = {
           status?: string
           submitted_at?: string
           synced_to_lead_at?: string | null
+          tenant_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -5288,6 +5293,7 @@ export type Database = {
           status?: string
           submitted_at?: string
           synced_to_lead_at?: string | null
+          tenant_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -6248,6 +6254,7 @@ export type Database = {
           source: string
           status: string
           tags: string[] | null
+          tenant_id: string | null
           transformation_vision: string | null
           updated_at: string
         }
@@ -6275,6 +6282,7 @@ export type Database = {
           source?: string
           status?: string
           tags?: string[] | null
+          tenant_id?: string | null
           transformation_vision?: string | null
           updated_at?: string
         }
@@ -6302,6 +6310,7 @@ export type Database = {
           source?: string
           status?: string
           tags?: string[] | null
+          tenant_id?: string | null
           transformation_vision?: string | null
           updated_at?: string
         }
