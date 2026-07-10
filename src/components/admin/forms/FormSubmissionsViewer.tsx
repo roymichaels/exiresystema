@@ -60,7 +60,8 @@ interface FormAnalysis {
 
 interface FormSubmissionsViewerProps {
   formId: string;
-  onClose: () => void;
+  onClose?: () => void;
+  inline?: boolean;
 }
 
 // Parse long form labels for better display
