@@ -86,6 +86,7 @@ const parseLabel = (label: string): { title: string; context: string | null } =>
 const FormSubmissionsViewer = ({
   formId,
   onClose,
+  inline = false,
 }: FormSubmissionsViewerProps) => {
   const [expandedSubmissions, setExpandedSubmissions] = useState<Set<string>>(new Set());
   const [selectedAnalysis, setSelectedAnalysis] = useState<FormAnalysis | null>(null);
