@@ -547,10 +547,10 @@ const FormSubmissionsViewer = ({
               })}
             </div>
           )}
-        </ScrollArea>
-      </SheetContent>
+      </ScrollArea>
 
       {/* AI Analysis Dialog */}
+
       <Dialog open={!!selectedAnalysis} onOpenChange={(open) => !open && setSelectedAnalysis(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-background text-gray-900 dark:text-foreground">
           <DialogHeader>
