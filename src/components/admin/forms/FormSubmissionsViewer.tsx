@@ -633,8 +633,24 @@ const FormSubmissionsViewer = ({
           )}
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  if (inline) {
+    return <div className="space-y-4">{body}</div>;
+  }
+
+  return (
+    <Sheet open={true} onOpenChange={(open) => !open && onClose?.()}>
+      <SheetContent side="left" className="w-full sm:max-w-3xl">
+        <SheetHeader>
+          <SheetTitle>תשובות - {form?.title}</SheetTitle>
+        </SheetHeader>
+        <div className="mt-4">{body}</div>
+      </SheetContent>
     </Sheet>
   );
 };
+
 
 export default FormSubmissionsViewer;
