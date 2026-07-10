@@ -42,6 +42,7 @@ interface FormsListProps {
   onEditFields: (formId: string) => void;
   onViewSubmissions: (formId: string) => void;
   onRefresh: () => void;
+  submissionCounts?: Record<string, { total: number; newCount: number }>;
 }
 
 const FormsList = ({
@@ -50,6 +51,7 @@ const FormsList = ({
   onEditFields,
   onViewSubmissions,
   onRefresh,
+  submissionCounts = {},
 }: FormsListProps) => {
   const { language } = useTranslation();
   const { currentTenant } = useTenant();
