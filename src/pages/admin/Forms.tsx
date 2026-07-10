@@ -76,6 +76,19 @@ const Forms = () => {
     processed: submissions.filter((s) => s.status === "processed").length,
   };
 
+  const submissionCounts = useMemo(() => {
+    const map: Record<string, { total: number; newCount: number }> = {};
+    for (const s of submissions) {
+      const key = (s as any).form_id as string;
+      if (!key) continue;
+      if (!map[key]) map[key] = { total: 0, newCount: 0 };
+      map[key].total += 1;
+      if (s.status === "new") map[key].newCount += 1;
+    }
+    return map;
+  }, [submissions]);
+
+
   const selectedForm = useMemo(
     () => forms?.find((f) => f.id === selectedFormId) || null,
     [forms, selectedFormId]
