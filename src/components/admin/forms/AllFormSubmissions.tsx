@@ -382,159 +382,163 @@ const AllFormSubmissions = () => {
               <p className="text-muted-foreground">לא נמצאו תשובות התואמות את החיפוש</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {filteredSubmissions.map((submission) => {
-                const hasAnalysis = !!getAnalysisForSubmission(submission.id);
-                const submitterName = getNameFromSubmission(submission);
-
+            <Accordion
+              type="multiple"
+              defaultValue={Array.from(new Set(filteredSubmissions.map(s => s.form_id)))}
+              className="space-y-2"
+            >
+              {Array.from(
+                filteredSubmissions.reduce((map, sub) => {
+                  const list = map.get(sub.form_id) || [];
+                  list.push(sub);
+                  map.set(sub.form_id, list);
+                  return map;
+                }, new Map<string, FormSubmission[]>())
+              ).map(([formId, formSubs]) => {
+                const newCount = formSubs.filter(s => s.status === "new").length;
                 return (
-                  <div
-                    key={submission.id}
-                    className={cn(
-                      "flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-lg border transition-all hover:bg-muted/50",
-                      submission.status === "new" 
-                        ? "border-blue-300 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/5" 
-                        : "border-border"
-                    )}
+                  <AccordionItem
+                    key={formId}
+                    value={formId}
+                    className="border border-border rounded-lg overflow-hidden bg-muted/20"
                   >
-                    {/* Info Section */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        {submitterName && (
-                          <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-[200px]">
-                            {submitterName}
-                          </span>
-                        )}
-                        <span className="text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-none">
-                          {getFormName(submission.form_id)}
+                    <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-muted/40">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <FileText className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="text-sm font-semibold truncate text-start">
+                          {getFormName(formId)}
                         </span>
-                        {getStatusBadge(submission.status)}
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground">
-                        {submission.email && (
-                          <span className="flex items-center gap-1 truncate">
-                            <Mail className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate">{submission.email}</span>
-                          </span>
+                        <Badge variant="outline" className="text-xs flex-shrink-0">
+                          {formSubs.length}
+                        </Badge>
+                        {newCount > 0 && (
+                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs flex-shrink-0">
+                            {newCount} חדש
+                          </Badge>
                         )}
-                        <span className="text-[10px] sm:text-xs">
-                          {format(new Date(submission.submitted_at), "dd/MM/yyyy HH:mm", { locale: he })}
-                        </span>
                       </div>
-                    </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-2 pb-2">
+                      <div className="space-y-2">
+                        {formSubs.map((submission) => {
+                          const hasAnalysis = !!getAnalysisForSubmission(submission.id);
+                          const submitterName = getNameFromSubmission(submission);
 
-                    {/* Actions */}
-                    <TooltipProvider delayDuration={300}>
-                      <div className="flex items-center gap-1 self-end sm:self-auto border-t sm:border-t-0 pt-2 sm:pt-0 mt-1 sm:mt-0 w-full sm:w-auto justify-end">
-                        {/* View Answers */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => setSelectedSubmission(submission)}
+                          return (
+                            <div
+                              key={submission.id}
+                              className={cn(
+                                "flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-lg border transition-all hover:bg-muted/50",
+                                submission.status === "new"
+                                  ? "border-blue-300 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/5"
+                                  : "border-border"
+                              )}
                             >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>צפה בתשובות</TooltipContent>
-                        </Tooltip>
+                              {/* Info Section */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  {submitterName && (
+                                    <span className="text-sm font-semibold text-foreground truncate max-w-[160px] sm:max-w-[240px]">
+                                      {submitterName}
+                                    </span>
+                                  )}
+                                  {getStatusBadge(submission.status)}
+                                </div>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground">
+                                  {submission.email && (
+                                    <span className="flex items-center gap-1 truncate">
+                                      <Mail className="h-3 w-3 flex-shrink-0" />
+                                      <span className="truncate">{submission.email}</span>
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] sm:text-xs">
+                                    {format(new Date(submission.submitted_at), "dd/MM/yyyy HH:mm", { locale: he })}
+                                  </span>
+                                </div>
+                              </div>
 
-                        {/* Mark as Processed */}
-                        {submission.status !== "processed" && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-green-400 hover:text-green-300 hover:bg-green-500/10"
-                                onClick={() => markProcessedMutation.mutate(submission.id)}
-                              >
-                                <CheckCircle2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>סמן כטופל</TooltipContent>
-                          </Tooltip>
-                        )}
+                              {/* Actions */}
+                              <TooltipProvider delayDuration={300}>
+                                <div className="flex items-center gap-1 self-end sm:self-auto border-t sm:border-t-0 pt-2 sm:pt-0 mt-1 sm:mt-0 w-full sm:w-auto justify-end">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedSubmission(submission)}>
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>צפה בתשובות</TooltipContent>
+                                  </Tooltip>
 
-                        {/* Download PDF */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleDownloadPDF(submission)}
-                            >
-                              <FileText className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>הורד PDF</TooltipContent>
-                        </Tooltip>
+                                  {submission.status !== "processed" && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-green-400 hover:text-green-300 hover:bg-green-500/10" onClick={() => markProcessedMutation.mutate(submission.id)}>
+                                          <CheckCircle2 className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>סמן כטופל</TooltipContent>
+                                    </Tooltip>
+                                  )}
 
-                        {/* Copy Q&A */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleCopyQA(submission)}
-                            >
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>העתק שאלות ותשובות</TooltipContent>
-                        </Tooltip>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownloadPDF(submission)}>
+                                        <FileText className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>הורד PDF</TooltipContent>
+                                  </Tooltip>
 
-                        {/* AI Analysis */}
-                        {hasAnalysis && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
-                                onClick={() => {
-                                  const analysis = getAnalysisForSubmission(submission.id);
-                                  if (analysis) setSelectedAnalysis(analysis);
-                                }}
-                              >
-                                <Brain className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>ניתוח AI</TooltipContent>
-                          </Tooltip>
-                        )}
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleCopyQA(submission)}>
+                                        <Copy className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>העתק שאלות ותשובות</TooltipContent>
+                                  </Tooltip>
 
-                        {/* Delete */}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={() => {
-                                if (confirm("למחוק את התשובה?")) {
-                                  deleteMutation.mutate(submission.id);
-                                }
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>מחק</TooltipContent>
-                        </Tooltip>
+                                  {hasAnalysis && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10" onClick={() => {
+                                          const analysis = getAnalysisForSubmission(submission.id);
+                                          if (analysis) setSelectedAnalysis(analysis);
+                                        }}>
+                                          <Brain className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>ניתוח AI</TooltipContent>
+                                    </Tooltip>
+                                  )}
+
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => {
+                                        if (confirm("למחוק את התשובה?")) {
+                                          deleteMutation.mutate(submission.id);
+                                        }
+                                      }}>
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>מחק</TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </TooltipProvider>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </TooltipProvider>
-                  </div>
+                    </AccordionContent>
+                  </AccordionItem>
                 );
               })}
-            </div>
+            </Accordion>
           )}
         </CardContent>
       </Card>
+
 
       {/* Answers Dialog */}
       <Dialog open={!!selectedSubmission} onOpenChange={(open) => !open && setSelectedSubmission(null)}>
