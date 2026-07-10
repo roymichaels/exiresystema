@@ -42,6 +42,7 @@ interface FormsListProps {
   onEditFields: (formId: string) => void;
   onViewSubmissions: (formId: string) => void;
   onRefresh: () => void;
+  submissionCounts?: Record<string, { total: number; newCount: number }>;
 }
 
 const FormsList = ({
@@ -50,6 +51,7 @@ const FormsList = ({
   onEditFields,
   onViewSubmissions,
   onRefresh,
+  submissionCounts = {},
 }: FormsListProps) => {
   const { language } = useTranslation();
   const { currentTenant } = useTenant();
@@ -140,72 +142,87 @@ const FormsList = ({
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {forms.map((form) => (
-        <Card key={form.id} className="glass-panel border-white/10 hover:border-primary/30 transition-colors overflow-hidden">
+      {forms.map((form) => {
+        const counts = submissionCounts[form.id] || { total: 0, newCount: 0 };
+        return (
+        <Card
+          key={form.id}
+          className="glass-panel border-white/10 hover:border-primary/40 transition-colors overflow-hidden cursor-pointer group"
+          onClick={() => onViewSubmissions(form.id)}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between gap-2">
               <div className="space-y-1 flex-1 min-w-0 overflow-hidden">
-                <CardTitle className="text-lg line-clamp-2 break-words">{form.title}</CardTitle>
+                <CardTitle className="text-lg line-clamp-2 break-words group-hover:text-primary transition-colors">{form.title}</CardTitle>
                 {form.description && (
                   <p className="text-sm text-muted-foreground line-clamp-2 break-words">
                     {form.description}
                   </p>
                 )}
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="shrink-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onEdit(form.id)}>
-                    <Edit className="h-4 w-4 ml-2" />
-                    {language === 'he' ? 'ערוך פרטים' : language === 'es' ? 'Editar detalles' : 'Edit details'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onEditFields(form.id)}>
-                    <FileEdit className="h-4 w-4 ml-2" />
-                    {language === 'he' ? 'ערוך שדות' : language === 'es' ? 'Editar campos' : 'Edit fields'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onViewSubmissions(form.id)}>
-                    <Inbox className="h-4 w-4 ml-2" />
-                    {language === 'he' ? 'צפה בתשובות' : language === 'es' ? 'Ver respuestas' : 'View submissions'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => toggleStatus(form.id, form.status)}
-                  >
-                    {form.status === "published" ? (
-                      <>
-                        <Lock className="h-4 w-4 ml-2" />
-                        {language === 'he' ? 'הסתר טופס' : language === 'es' ? 'Ocultar formulario' : 'Hide form'}
-                      </>
-                    ) : (
-                      <>
-                        <Globe className="h-4 w-4 ml-2" />
-                        {language === 'he' ? 'פרסם טופס' : language === 'es' ? 'Publicar formulario' : 'Publish form'}
-                      </>
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => deleteForm(form.id)}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4 ml-2" />
-                    {language === 'he' ? 'מחק' : language === 'es' ? 'Eliminar' : 'Delete'}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div onClick={(e) => e.stopPropagation()}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="shrink-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onEdit(form.id)}>
+                      <Edit className="h-4 w-4 ml-2" />
+                      {language === 'he' ? 'ערוך פרטים' : language === 'es' ? 'Editar detalles' : 'Edit details'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEditFields(form.id)}>
+                      <FileEdit className="h-4 w-4 ml-2" />
+                      {language === 'he' ? 'ערוך שדות' : language === 'es' ? 'Editar campos' : 'Edit fields'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => toggleStatus(form.id, form.status)}
+                    >
+                      {form.status === "published" ? (
+                        <>
+                          <Lock className="h-4 w-4 ml-2" />
+                          {language === 'he' ? 'הסתר טופס' : language === 'es' ? 'Ocultar formulario' : 'Hide form'}
+                        </>
+                      ) : (
+                        <>
+                          <Globe className="h-4 w-4 ml-2" />
+                          {language === 'he' ? 'פרסם טופס' : language === 'es' ? 'Publicar formulario' : 'Publish form'}
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => deleteForm(form.id)}
+                      className="text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 ml-2" />
+                      {language === 'he' ? 'מחק' : language === 'es' ? 'Eliminar' : 'Delete'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              {getStatusBadge(form.status)}
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                {getStatusBadge(form.status)}
+                <Badge variant="outline" className="gap-1">
+                  <Inbox className="h-3 w-3" />
+                  {counts.total} {language === 'he' ? 'תשובות' : language === 'es' ? 'respuestas' : 'submissions'}
+                </Badge>
+                {counts.newCount > 0 && (
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                    {counts.newCount} {language === 'he' ? 'חדשות' : 'new'}
+                  </Badge>
+                )}
+              </div>
               <span className="text-xs text-muted-foreground">
                 {format(new Date(form.created_at), "dd/MM/yyyy", { locale: language === 'he' ? he : language === 'es' ? es : undefined })}
               </span>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
               <Button
                 variant="outline"
                 size="sm"
@@ -233,9 +250,11 @@ const FormsList = ({
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 };
 
 export default FormsList;
+
