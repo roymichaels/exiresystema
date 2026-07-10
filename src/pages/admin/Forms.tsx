@@ -425,6 +425,7 @@ const Forms = () => {
         onEditFields={setFieldEditorFormId}
         onViewSubmissions={setSelectedFormId}
         onRefresh={refetch}
+        submissionCounts={submissionCounts}
       />
 
       <FormDialog
