@@ -33,7 +33,7 @@ import { generateFormPDF } from "@/lib/pdfGenerator";
 interface FormSubmission {
   id: string;
   form_id: string;
-  responses: Record<string, string | string[]>;
+  responses: Record<string, unknown>;
   metadata: Record<string, unknown>;
   submitted_at: string;
   status: string;
@@ -81,6 +81,23 @@ const parseLabel = (label: string): { title: string; context: string | null } =>
   }
   
   return { title: label, context: null };
+};
+
+const formatResponseValue = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => formatResponseValue(item))
+      .filter(Boolean)
+      .join(", ");
+  }
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
 };
 
 const FormSubmissionsViewer = ({
@@ -221,8 +238,7 @@ const FormSubmissionsViewer = ({
       });
       const values = fields.map((f) => {
         const val = sub.responses[f.id];
-        if (Array.isArray(val)) return val.join(", ");
-        return val || "";
+        return formatResponseValue(val);
       });
       return [date, sub.email || "", ...values];
     });
@@ -275,12 +291,10 @@ const FormSubmissionsViewer = ({
   const getPreviewText = (submission: FormSubmission) => {
     // Get first non-empty response for preview
     const firstResponse = Object.entries(submission.responses).find(([_, value]) => {
-      if (Array.isArray(value)) return value.length > 0;
-      return value && value.trim().length > 0;
+      return formatResponseValue(value).trim().length > 0;
     });
     if (!firstResponse) return "אין תשובות";
-    const value = firstResponse[1];
-    const text = Array.isArray(value) ? value.join(", ") : value;
+    const text = formatResponseValue(firstResponse[1]);
     return text.length > 60 ? text.slice(0, 60) + "..." : text;
   };
 
@@ -404,7 +418,7 @@ const FormSubmissionsViewer = ({
                             {fields.map((field, index) => {
                               const value = submission.responses[field.id];
                               const { title, context } = parseLabel(field.label);
-                              const displayValue = Array.isArray(value) ? value.join(", ") : value;
+                              const displayValue = formatResponseValue(value);
 
                               return (
                                 <div 
@@ -467,7 +481,7 @@ const FormSubmissionsViewer = ({
                                   e.stopPropagation();
                                   const formResponses = fields.map(field => ({
                                     question: field.label,
-                                    answer: submission.responses[field.id] || "",
+                                     answer: formatResponseValue(submission.responses[field.id]),
                                   }));
                                   await generateFormPDF(
                                     form?.title || "טופס",
@@ -490,7 +504,7 @@ const FormSubmissionsViewer = ({
                                   const text = fields
                                     .map((field, i) => {
                                       const v = submission.responses[field.id];
-                                      const a = Array.isArray(v) ? v.join(", ") : (v || "—");
+                                      const a = formatResponseValue(v) || "—";
                                       return `${i + 1}. ${field.label}\n${a}`;
                                     })
                                     .join("\n\n");
