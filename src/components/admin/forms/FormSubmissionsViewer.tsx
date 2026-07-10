@@ -284,30 +284,30 @@ const FormSubmissionsViewer = ({
     return text.length > 60 ? text.slice(0, 60) + "..." : text;
   };
 
-  return (
-    <Sheet open={true} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent side="left" className="w-full sm:max-w-3xl">
-        <SheetHeader>
-          <div className="flex items-center justify-between">
-            <SheetTitle className="flex items-center gap-2">
-              תשובות - {form?.title}
-              <Badge variant="outline" className="text-xs">
-                {submissions.length}
-              </Badge>
-            </SheetTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={exportToCSV}
-              disabled={submissions.length === 0}
-            >
-              <Download className="h-4 w-4 ml-2" />
-              ייצוא CSV
-            </Button>
-          </div>
-        </SheetHeader>
+  const body = (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          {!inline && (
+            <h2 className="text-lg font-semibold">תשובות - {form?.title}</h2>
+          )}
+          <Badge variant="outline" className="text-xs">
+            {submissions.length} תשובות
+          </Badge>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={exportToCSV}
+          disabled={submissions.length === 0}
+        >
+          <Download className="h-4 w-4 ml-2" />
+          ייצוא CSV
+        </Button>
+      </div>
 
-        <ScrollArea className="mt-6 h-[calc(100vh-120px)]">
+      <ScrollArea className={inline ? "" : "mt-6 h-[calc(100vh-120px)]"}>
+
           {submissions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
