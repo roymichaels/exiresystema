@@ -561,7 +561,7 @@ const FormSubmissionsViewer = ({
               })}
             </div>
           )}
-      </ScrollArea>
+      </div>
 
       {/* AI Analysis Dialog */}
 
