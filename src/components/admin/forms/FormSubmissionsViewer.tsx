@@ -320,9 +320,8 @@ const FormSubmissionsViewer = ({
         </Button>
       </div>
 
-      <ScrollArea className={inline ? "" : "mt-6 h-[calc(100vh-120px)]"}>
-
-          {submissions.length === 0 ? (
+      {(() => {
+        const listContent = submissions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">אין תשובות עדיין</h3>
@@ -331,7 +330,7 @@ const FormSubmissionsViewer = ({
               </p>
             </div>
           ) : (
-            <div className="space-y-3 pl-4">
+            <div className="space-y-3 w-full min-w-0">
               {submissions.map((submission) => {
                 const isExpanded = expandedSubmissions.has(submission.id);
                 const responseCount = Object.keys(submission.responses).length;
