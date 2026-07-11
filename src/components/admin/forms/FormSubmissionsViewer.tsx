@@ -320,7 +320,7 @@ const FormSubmissionsViewer = ({
         </Button>
       </div>
 
-      <ScrollArea className={inline ? "" : "mt-6 h-[calc(100vh-120px)]"}>
+      <div className={cn("w-full min-w-0", inline ? "" : "mt-6 h-[calc(100vh-120px)] overflow-y-auto")}>
 
           {submissions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -331,7 +331,7 @@ const FormSubmissionsViewer = ({
               </p>
             </div>
           ) : (
-            <div className="space-y-3 pl-4">
+            <div className="space-y-3 w-full min-w-0">
               {submissions.map((submission) => {
                 const isExpanded = expandedSubmissions.has(submission.id);
                 const responseCount = Object.keys(submission.responses).length;
@@ -561,7 +561,7 @@ const FormSubmissionsViewer = ({
               })}
             </div>
           )}
-      </ScrollArea>
+      </div>
 
       {/* AI Analysis Dialog */}
 
