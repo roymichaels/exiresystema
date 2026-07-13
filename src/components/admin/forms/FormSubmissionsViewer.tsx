@@ -225,6 +225,25 @@ const FormSubmissionsViewer = ({
     },
   });
 
+  const deleteAllMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentTenant?.id) throw new Error("No tenant context");
+      const { error } = await supabase
+        .from("form_submissions")
+        .delete()
+        .eq("form_id", formId)
+        .eq("tenant_id", currentTenant.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "כל התשובות נמחקו" });
+      refetch();
+    },
+    onError: () => {
+      toast({ title: "שגיאה במחיקת התשובות", variant: "destructive" });
+    },
+  });
+
   const exportToCSV = () => {
     if (submissions.length === 0) {
       toast({ title: "אין תשובות לייצוא" });
