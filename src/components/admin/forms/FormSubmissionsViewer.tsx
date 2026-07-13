@@ -389,77 +389,81 @@ const FormSubmissionsViewer = ({
                         : "border-border",
                       isExpanded && "ring-1 ring-primary/30"
                     )}>
-                      <CollapsibleTrigger asChild>
-                        <CardHeader className="pb-2 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                {getStatusBadge(submission.status)}
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Calendar className="h-3 w-3" />
-                                  {format(new Date(submission.submitted_at), "dd/MM/yyyy", { locale: he })}
-                                </div>
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Clock className="h-3 w-3" />
-                                  {format(new Date(submission.submitted_at), "HH:mm", { locale: he })}
-                                </div>
-                              </div>
-                              
-                              {/* Email display */}
-                              {submission.email ? (
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Mail className="h-4 w-4 text-primary" />
-                                  <span className="text-sm font-medium">{submission.email}</span>
-                                  {submission.user_id && (
-                                    <Badge variant="outline" className="text-xs gap-1">
-                                      <User className="h-3 w-3" />
-                                      משתמש רשום
-                                    </Badge>
+                      <CardHeader className="pb-2 rounded-t-lg">
+                        <div className="flex items-center justify-between gap-2">
+                          <CollapsibleTrigger asChild>
+                            <div className="flex-1 min-w-0 cursor-pointer hover:bg-white/5 transition-colors rounded-lg p-2 -ms-2">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    {getStatusBadge(submission.status)}
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Calendar className="h-3 w-3" />
+                                      {format(new Date(submission.submitted_at), "dd/MM/yyyy", { locale: he })}
+                                    </div>
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Clock className="h-3 w-3" />
+                                      {format(new Date(submission.submitted_at), "HH:mm", { locale: he })}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Email display */}
+                                  {submission.email ? (
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Mail className="h-4 w-4 text-primary" />
+                                      <span className="text-sm font-medium">{submission.email}</span>
+                                      {submission.user_id && (
+                                        <Badge variant="outline" className="text-xs gap-1">
+                                          <User className="h-3 w-3" />
+                                          משתמש רשום
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+                                      <Mail className="h-4 w-4" />
+                                      <span className="text-sm">ללא אימייל</span>
+                                    </div>
+                                  )}
+
+                                  {/* Preview when collapsed */}
+                                  {!isExpanded && (
+                                    <p className="text-sm text-muted-foreground truncate">
+                                      {getPreviewText(submission)}
+                                    </p>
                                   )}
                                 </div>
-                              ) : (
-                                <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                                  <Mail className="h-4 w-4" />
-                                  <span className="text-sm">ללא אימייל</span>
+
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <span className="text-xs text-muted-foreground">
+                                    {responseCount} תשובות
+                                  </span>
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                                  )}
                                 </div>
-                              )}
-
-                              {/* Preview when collapsed */}
-                              {!isExpanded && (
-                                <p className="text-sm text-muted-foreground truncate">
-                                  {getPreviewText(submission)}
-                                </p>
-                              )}
+                              </div>
                             </div>
+                          </CollapsibleTrigger>
 
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                aria-label="מחק תשובה"
-                                disabled={deleteMutation.isPending}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (confirm("למחוק תשובה זו? פעולה זו לא ניתנת לביטול.")) {
-                                    deleteMutation.mutate(submission.id);
-                                  }
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                              <span className="text-xs text-muted-foreground">
-                                {responseCount} תשובות
-                              </span>
-                              {isExpanded ? (
-                                <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                              ) : (
-                                <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                              )}
-                            </div>
-                          </div>
-                        </CardHeader>
-                      </CollapsibleTrigger>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                            aria-label="מחק תשובה"
+                            disabled={deleteMutation.isPending}
+                            onClick={() => {
+                              if (confirm("למחוק תשובה זו? פעולה זו לא ניתנת לביטול.")) {
+                                deleteMutation.mutate(submission.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
 
                       <CollapsibleContent>
                         <CardContent className="pt-0 space-y-4">
