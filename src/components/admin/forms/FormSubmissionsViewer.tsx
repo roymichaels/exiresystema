@@ -328,15 +328,31 @@ const FormSubmissionsViewer = ({
             {submissions.length} תשובות
           </Badge>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={exportToCSV}
-          disabled={submissions.length === 0}
-        >
-          <Download className="h-4 w-4 ml-2" />
-          ייצוא CSV
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportToCSV}
+            disabled={submissions.length === 0}
+          >
+            <Download className="h-4 w-4 ml-2" />
+            ייצוא CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={submissions.length === 0 || deleteAllMutation.isPending}
+            onClick={() => {
+              if (confirm(`למחוק את כל ${submissions.length} התשובות של הטופס? פעולה זו לא ניתנת לביטול.`)) {
+                deleteAllMutation.mutate();
+              }
+            }}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+          >
+            <Trash2 className="h-4 w-4 ml-2" />
+            מחק את כל התשובות
+          </Button>
+        </div>
       </div>
 
       <div className={cn("w-full min-w-0", inline ? "" : "mt-6 h-[calc(100vh-120px)] overflow-y-auto")}>
