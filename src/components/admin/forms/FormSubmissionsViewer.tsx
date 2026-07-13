@@ -432,7 +432,22 @@ const FormSubmissionsViewer = ({
                               )}
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                aria-label="מחק תשובה"
+                                disabled={deleteMutation.isPending}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm("למחוק תשובה זו? פעולה זו לא ניתנת לביטול.")) {
+                                    deleteMutation.mutate(submission.id);
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                               <span className="text-xs text-muted-foreground">
                                 {responseCount} תשובות
                               </span>
