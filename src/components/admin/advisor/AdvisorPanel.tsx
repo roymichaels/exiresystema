@@ -28,7 +28,7 @@ import {
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
-type AdvisorModelKey = 'uncensored' | 'smart_mini' | 'smart_advanced';
+type AdvisorModelKey = 'uncensored' | 'smart_mini' | 'smart_advanced' | 'custom';
 
 const ADVISOR_MODEL_OPTIONS: Array<{
   key: AdvisorModelKey;
@@ -62,9 +62,19 @@ const ADVISOR_MODEL_OPTIONS: Array<{
       es: 'Sin restricciones, filtrado mínimo',
     },
   },
+  {
+    key: 'custom',
+    label: { he: 'מותאם אישית', en: 'Custom', es: 'Personalizado' },
+    description: {
+      he: 'הזן מזהה מודל של OpenRouter',
+      en: 'Enter any OpenRouter model id',
+      es: 'Introduce un ID de OpenRouter',
+    },
+  },
 ];
 
 const ADVISOR_MODEL_STORAGE_KEY = 'exire.advisor.model';
+const ADVISOR_CUSTOM_MODEL_STORAGE_KEY = 'exire.advisor.customModel';
 const DEFAULT_ADVISOR_MODEL: AdvisorModelKey = 'smart_mini';
 
 function loadStoredModel(): AdvisorModelKey {
@@ -76,6 +86,13 @@ function loadStoredModel(): AdvisorModelKey {
     }
   } catch { /* ignore */ }
   return DEFAULT_ADVISOR_MODEL;
+}
+
+function loadStoredCustomModel(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    return window.localStorage.getItem(ADVISOR_CUSTOM_MODEL_STORAGE_KEY) || '';
+  } catch { return ''; }
 }
 
 const RATE_LIMIT_MSG = (lang: string) =>
