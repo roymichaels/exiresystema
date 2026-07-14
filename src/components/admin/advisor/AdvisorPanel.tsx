@@ -15,6 +15,7 @@ import { Brain, Send, Loader2, Sparkles, Lightbulb, ArrowLeft, X } from 'lucide-
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +29,7 @@ import {
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
-type AdvisorModelKey = 'uncensored' | 'smart_mini' | 'smart_advanced';
+type AdvisorModelKey = 'uncensored' | 'smart_mini' | 'smart_advanced' | 'custom';
 
 const ADVISOR_MODEL_OPTIONS: Array<{
   key: AdvisorModelKey;
@@ -62,9 +63,19 @@ const ADVISOR_MODEL_OPTIONS: Array<{
       es: 'Sin restricciones, filtrado mínimo',
     },
   },
+  {
+    key: 'custom',
+    label: { he: 'מותאם אישית', en: 'Custom', es: 'Personalizado' },
+    description: {
+      he: 'הזן מזהה מודל של OpenRouter',
+      en: 'Enter any OpenRouter model id',
+      es: 'Introduce un ID de OpenRouter',
+    },
+  },
 ];
 
 const ADVISOR_MODEL_STORAGE_KEY = 'exire.advisor.model';
+const ADVISOR_CUSTOM_MODEL_STORAGE_KEY = 'exire.advisor.customModel';
 const DEFAULT_ADVISOR_MODEL: AdvisorModelKey = 'smart_mini';
 
 function loadStoredModel(): AdvisorModelKey {
@@ -76,6 +87,13 @@ function loadStoredModel(): AdvisorModelKey {
     }
   } catch { /* ignore */ }
   return DEFAULT_ADVISOR_MODEL;
+}
+
+function loadStoredCustomModel(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    return window.localStorage.getItem(ADVISOR_CUSTOM_MODEL_STORAGE_KEY) || '';
+  } catch { return ''; }
 }
 
 const RATE_LIMIT_MSG = (lang: string) =>
@@ -185,6 +203,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
   const [error, setError] = useState<string | null>(null);
   const [rateLimited, setRateLimited] = useState(false);
   const [modelKey, setModelKey] = useState<AdvisorModelKey>(() => loadStoredModel());
+  const [customModel, setCustomModel] = useState<string>(() => loadStoredCustomModel());
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -193,6 +212,9 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
   useEffect(() => {
     try { window.localStorage.setItem(ADVISOR_MODEL_STORAGE_KEY, modelKey); } catch { /* ignore */ }
   }, [modelKey]);
+  useEffect(() => {
+    try { window.localStorage.setItem(ADVISOR_CUSTOM_MODEL_STORAGE_KEY, customModel); } catch { /* ignore */ }
+  }, [customModel]);
 
   const activeTab = searchParams.get('tab') || 'today';
   const surfacePrompt = SURFACE_PROMPTS(language)[activeTab] || (language === 'he'
@@ -215,7 +237,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
     let isRateLimit = false;
     try {
       const { data, error: fnErr } = await supabase.functions.invoke('exire-advisor', {
-        body: { messages: next, model: modelKey },
+        body: { messages: next, model: modelKey, customModel: modelKey === 'custom' ? customModel.trim() : undefined },
       });
       if (fnErr) {
         const { status, body } = await readResponseBody((fnErr as any).context);
@@ -290,6 +312,17 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
             </div>
           )}
         </div>
+        {isAdmin && modelKey === 'custom' && (
+          <div className="shrink-0 pb-2">
+            <Input
+              value={customModel}
+              onChange={(e) => setCustomModel(e.target.value)}
+              placeholder="vendor/model (e.g. anthropic/claude-3.5-sonnet)"
+              className="h-9 text-[12px] rounded-lg"
+              dir="ltr"
+            />
+          </div>
+        )}
         <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-[calc(100%-3rem)] min-h-0 overflow-hidden p-3 md:p-4 gap-0 shadow-sm">
           {!hasMessages && renderCommandCards()}
           {renderConversation()}
@@ -351,6 +384,17 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
         {showRateNote && (
           <div className="mt-1.5 text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 rounded-lg px-2.5 py-1">
             {RATE_LIMIT_NOTE(language)}
+          </div>
+        )}
+        {isAdmin && modelKey === 'custom' && (
+          <div className="mt-1.5">
+            <Input
+              value={customModel}
+              onChange={(e) => setCustomModel(e.target.value)}
+              placeholder="vendor/model (e.g. anthropic/claude-3.5-sonnet)"
+              className="h-8 text-[11.5px] rounded-lg"
+              dir="ltr"
+            />
           </div>
         )}
       </div>
