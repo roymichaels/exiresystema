@@ -214,12 +214,14 @@ Deno.serve(async (req) => {
     );
   }
 
-  let body: { messages?: Array<{ role: string; content: string }> } = {};
+  let body: { messages?: Array<{ role: string; content: string }>; model?: string } = {};
   try { body = await req.json(); } catch (_) { /* empty */ }
   const messages = Array.isArray(body.messages) ? body.messages : [];
   if (!messages.length) {
     return errJSON("BAD_REQUEST", "messages חסר", "לא נשלחו הודעות.", 400);
   }
+  const requestedKey = typeof body.model === "string" ? body.model : DEFAULT_MODEL_KEY;
+  const PRIMARY_MODEL = MODEL_ALLOWLIST[requestedKey] || MODEL_ALLOWLIST[DEFAULT_MODEL_KEY];
 
   let context: any;
   try {
