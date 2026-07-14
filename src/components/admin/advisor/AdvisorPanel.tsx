@@ -17,8 +17,66 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
+
+type AdvisorModelKey = 'uncensored' | 'smart_mini' | 'smart_advanced';
+
+const ADVISOR_MODEL_OPTIONS: Array<{
+  key: AdvisorModelKey;
+  label: Record<'he' | 'en' | 'es', string>;
+  description: Record<'he' | 'en' | 'es', string>;
+}> = [
+  {
+    key: 'smart_mini',
+    label: { he: 'חכם מיני', en: 'Smart Mini', es: 'Smart Mini' },
+    description: {
+      he: 'מהיר וחסכוני לשיחות יומיומיות',
+      en: 'Fast, efficient everyday model',
+      es: 'Rápido y eficiente para el día a día',
+    },
+  },
+  {
+    key: 'smart_advanced',
+    label: { he: 'חכם מתקדם', en: 'Smart Advanced', es: 'Smart Advanced' },
+    description: {
+      he: 'החזק ביותר לאסטרטגיה וניתוח מעמיק',
+      en: 'Most powerful for strategy & analysis',
+      es: 'Máximo poder para estrategia y análisis',
+    },
+  },
+  {
+    key: 'uncensored',
+    label: { he: 'ללא מגבלות', en: 'Uncensored', es: 'Sin censura' },
+    description: {
+      he: 'מודל חופשי עם סינון מינימלי',
+      en: 'Unrestricted, minimal filtering',
+      es: 'Sin restricciones, filtrado mínimo',
+    },
+  },
+];
+
+const ADVISOR_MODEL_STORAGE_KEY = 'exire.advisor.model';
+const DEFAULT_ADVISOR_MODEL: AdvisorModelKey = 'smart_mini';
+
+function loadStoredModel(): AdvisorModelKey {
+  if (typeof window === 'undefined') return DEFAULT_ADVISOR_MODEL;
+  try {
+    const stored = window.localStorage.getItem(ADVISOR_MODEL_STORAGE_KEY);
+    if (stored && ADVISOR_MODEL_OPTIONS.some((o) => o.key === stored)) {
+      return stored as AdvisorModelKey;
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_ADVISOR_MODEL;
+}
 
 const RATE_LIMIT_MSG = (lang: string) =>
   lang === 'he'
@@ -119,17 +177,22 @@ interface AdvisorPanelProps {
 export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPanelProps) {
   const navigate = useNavigate();
   const { language } = useTranslation();
+  const { isAdmin } = useAuth();
   const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rateLimited, setRateLimited] = useState(false);
+  const [modelKey, setModelKey] = useState<AdvisorModelKey>(() => loadStoredModel());
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+  useEffect(() => {
+    try { window.localStorage.setItem(ADVISOR_MODEL_STORAGE_KEY, modelKey); } catch { /* ignore */ }
+  }, [modelKey]);
 
   const activeTab = searchParams.get('tab') || 'today';
   const surfacePrompt = SURFACE_PROMPTS(language)[activeTab] || (language === 'he'
@@ -152,7 +215,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
     let isRateLimit = false;
     try {
       const { data, error: fnErr } = await supabase.functions.invoke('exire-advisor', {
-        body: { messages: next },
+        body: { messages: next, model: modelKey },
       });
       if (fnErr) {
         const { status, body } = await readResponseBody((fnErr as any).context);
@@ -195,7 +258,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
     return (
       <div className="w-full max-w-[1100px] mx-auto h-full min-h-0 px-1 md:px-2" dir="rtl">
         {/* One compact back chip — visible on mobile & desktop */}
-        <div className="shrink-0 pb-2">
+        <div className="shrink-0 pb-2 flex items-center gap-2">
           <button
             type="button"
             onClick={handleBack}
@@ -204,6 +267,28 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
             <ArrowLeft className="h-4 w-4" />
             {language === 'he' ? 'חזרה ל"עוד"' : language === 'es' ? 'Volver a Más' : 'Back to More'}
           </button>
+          {isAdmin && (
+            <div className="ms-auto">
+              <Select value={modelKey} onValueChange={(v) => setModelKey(v as AdvisorModelKey)}>
+                <SelectTrigger className="h-9 w-[160px] text-[12px] rounded-full" aria-label="AI model">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {ADVISOR_MODEL_OPTIONS.map((opt) => {
+                    const lang = (['he', 'en', 'es'].includes(language) ? language : 'en') as 'he' | 'en' | 'es';
+                    return (
+                      <SelectItem key={opt.key} value={opt.key} className="text-[12px]">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{opt.label[lang]}</span>
+                          <span className="text-[10.5px] text-muted-foreground">{opt.description[lang]}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
         <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-[calc(100%-3rem)] min-h-0 overflow-hidden p-3 md:p-4 gap-0 shadow-sm">
           {!hasMessages && renderCommandCards()}
@@ -231,6 +316,28 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
               {language === 'he' ? 'אסטרטגיה, סדר עדיפויות' : language === 'es' ? 'Estrategia, prioridades' : 'Strategy, priorities'}
             </p>
           </div>
+          {isAdmin && (
+            <div className="shrink-0">
+              <Select value={modelKey} onValueChange={(v) => setModelKey(v as AdvisorModelKey)}>
+                <SelectTrigger className="h-8 w-[130px] md:w-[150px] text-[11.5px] rounded-lg" aria-label="AI model">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {ADVISOR_MODEL_OPTIONS.map((opt) => {
+                    const lang = (['he', 'en', 'es'].includes(language) ? language : 'en') as 'he' | 'en' | 'es';
+                    return (
+                      <SelectItem key={opt.key} value={opt.key} className="text-[12px]">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{opt.label[lang]}</span>
+                          <span className="text-[10.5px] text-muted-foreground">{opt.description[lang]}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {onClose && variant === 'widget' && (
             <button
               type="button"
