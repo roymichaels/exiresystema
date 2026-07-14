@@ -258,7 +258,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
     return (
       <div className="w-full max-w-[1100px] mx-auto h-full min-h-0 px-1 md:px-2" dir="rtl">
         {/* One compact back chip — visible on mobile & desktop */}
-        <div className="shrink-0 pb-2">
+        <div className="shrink-0 pb-2 flex items-center gap-2">
           <button
             type="button"
             onClick={handleBack}
@@ -267,6 +267,28 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
             <ArrowLeft className="h-4 w-4" />
             {language === 'he' ? 'חזרה ל"עוד"' : language === 'es' ? 'Volver a Más' : 'Back to More'}
           </button>
+          {isAdmin && (
+            <div className="ms-auto">
+              <Select value={modelKey} onValueChange={(v) => setModelKey(v as AdvisorModelKey)}>
+                <SelectTrigger className="h-9 w-[160px] text-[12px] rounded-full" aria-label="AI model">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {ADVISOR_MODEL_OPTIONS.map((opt) => {
+                    const lang = (['he', 'en', 'es'].includes(language) ? language : 'en') as 'he' | 'en' | 'es';
+                    return (
+                      <SelectItem key={opt.key} value={opt.key} className="text-[12px]">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{opt.label[lang]}</span>
+                          <span className="text-[10.5px] text-muted-foreground">{opt.description[lang]}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
         <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-[calc(100%-3rem)] min-h-0 overflow-hidden p-3 md:p-4 gap-0 shadow-sm">
           {!hasMessages && renderCommandCards()}
