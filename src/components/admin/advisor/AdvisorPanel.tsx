@@ -17,8 +17,66 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
+
+type AdvisorModelKey = 'uncensored' | 'smart_mini' | 'smart_advanced';
+
+const ADVISOR_MODEL_OPTIONS: Array<{
+  key: AdvisorModelKey;
+  label: Record<'he' | 'en' | 'es', string>;
+  description: Record<'he' | 'en' | 'es', string>;
+}> = [
+  {
+    key: 'smart_mini',
+    label: { he: 'חכם מיני', en: 'Smart Mini', es: 'Smart Mini' },
+    description: {
+      he: 'מהיר וחסכוני לשיחות יומיומיות',
+      en: 'Fast, efficient everyday model',
+      es: 'Rápido y eficiente para el día a día',
+    },
+  },
+  {
+    key: 'smart_advanced',
+    label: { he: 'חכם מתקדם', en: 'Smart Advanced', es: 'Smart Advanced' },
+    description: {
+      he: 'החזק ביותר לאסטרטגיה וניתוח מעמיק',
+      en: 'Most powerful for strategy & analysis',
+      es: 'Máximo poder para estrategia y análisis',
+    },
+  },
+  {
+    key: 'uncensored',
+    label: { he: 'ללא מגבלות', en: 'Uncensored', es: 'Sin censura' },
+    description: {
+      he: 'מודל חופשי עם סינון מינימלי',
+      en: 'Unrestricted, minimal filtering',
+      es: 'Sin restricciones, filtrado mínimo',
+    },
+  },
+];
+
+const ADVISOR_MODEL_STORAGE_KEY = 'exire.advisor.model';
+const DEFAULT_ADVISOR_MODEL: AdvisorModelKey = 'smart_mini';
+
+function loadStoredModel(): AdvisorModelKey {
+  if (typeof window === 'undefined') return DEFAULT_ADVISOR_MODEL;
+  try {
+    const stored = window.localStorage.getItem(ADVISOR_MODEL_STORAGE_KEY);
+    if (stored && ADVISOR_MODEL_OPTIONS.some((o) => o.key === stored)) {
+      return stored as AdvisorModelKey;
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_ADVISOR_MODEL;
+}
 
 const RATE_LIMIT_MSG = (lang: string) =>
   lang === 'he'
