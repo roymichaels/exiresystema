@@ -294,6 +294,28 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
               {language === 'he' ? 'אסטרטגיה, סדר עדיפויות' : language === 'es' ? 'Estrategia, prioridades' : 'Strategy, priorities'}
             </p>
           </div>
+          {isAdmin && (
+            <div className="shrink-0">
+              <Select value={modelKey} onValueChange={(v) => setModelKey(v as AdvisorModelKey)}>
+                <SelectTrigger className="h-8 w-[130px] md:w-[150px] text-[11.5px] rounded-lg" aria-label="AI model">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {ADVISOR_MODEL_OPTIONS.map((opt) => {
+                    const lang = (['he', 'en', 'es'].includes(language) ? language : 'en') as 'he' | 'en' | 'es';
+                    return (
+                      <SelectItem key={opt.key} value={opt.key} className="text-[12px]">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{opt.label[lang]}</span>
+                          <span className="text-[10.5px] text-muted-foreground">{opt.description[lang]}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {onClose && variant === 'widget' && (
             <button
               type="button"
