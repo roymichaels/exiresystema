@@ -359,5 +359,5 @@ Deno.serve(async (req) => {
   }
 });
 
-// Keep DEEP_MODEL referenced so it's not pruned (used in upcoming deep mode).
-export const __exire_models = { PRIMARY_MODEL, DEEP_MODEL, FALLBACK_MODEL };
+// Keep constants referenced so they're not pruned by the bundler.
+export const __exire_models = { MODEL_ALLOWLIST, DEEP_MODEL, FALLBACK_MODEL };
