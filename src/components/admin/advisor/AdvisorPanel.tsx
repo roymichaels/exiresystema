@@ -312,6 +312,17 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
             </div>
           )}
         </div>
+        {isAdmin && modelKey === 'custom' && (
+          <div className="shrink-0 pb-2">
+            <Input
+              value={customModel}
+              onChange={(e) => setCustomModel(e.target.value)}
+              placeholder="vendor/model (e.g. anthropic/claude-3.5-sonnet)"
+              className="h-9 text-[12px] rounded-lg"
+              dir="ltr"
+            />
+          </div>
+        )}
         <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm flex flex-col h-[calc(100%-3rem)] min-h-0 overflow-hidden p-3 md:p-4 gap-0 shadow-sm">
           {!hasMessages && renderCommandCards()}
           {renderConversation()}
