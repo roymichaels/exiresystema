@@ -215,7 +215,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
     let isRateLimit = false;
     try {
       const { data, error: fnErr } = await supabase.functions.invoke('exire-advisor', {
-        body: { messages: next },
+        body: { messages: next, model: modelKey },
       });
       if (fnErr) {
         const { status, body } = await readResponseBody((fnErr as any).context);
