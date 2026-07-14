@@ -177,17 +177,22 @@ interface AdvisorPanelProps {
 export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPanelProps) {
   const navigate = useNavigate();
   const { language } = useTranslation();
+  const { isAdmin } = useAuth();
   const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rateLimited, setRateLimited] = useState(false);
+  const [modelKey, setModelKey] = useState<AdvisorModelKey>(() => loadStoredModel());
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+  useEffect(() => {
+    try { window.localStorage.setItem(ADVISOR_MODEL_STORAGE_KEY, modelKey); } catch { /* ignore */ }
+  }, [modelKey]);
 
   const activeTab = searchParams.get('tab') || 'today';
   const surfacePrompt = SURFACE_PROMPTS(language)[activeTab] || (language === 'he'
