@@ -13,12 +13,16 @@ import { corsHeaders, handleCorsPreFlight } from "../_shared/cors.ts";
 import { requireAdmin } from "../_shared/auth.ts";
 import { aiChatCompletion } from "../_shared/aiGateway.ts";
 
-const PRIMARY_MODEL =
-  Deno.env.get("EXIRE_ADVISOR_MODEL") || "nvidia/nemotron-3-ultra-550b-a55b:free";
-const DEEP_MODEL =
-  Deno.env.get("EXIRE_ADVISOR_DEEP_MODEL") || "nvidia/nemotron-3-ultra-550b-a55b:free";
-const FALLBACK_MODEL =
-  Deno.env.get("EXIRE_ADVISOR_FALLBACK_MODEL") || "nvidia/nemotron-3-ultra-550b-a55b:free";
+// Allowlist of admin-selectable models. The client sends one of these keys;
+// the server maps it to the exact OpenRouter model id.
+const MODEL_ALLOWLIST: Record<string, string> = {
+  uncensored: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+  smart_mini: "deepseek/deepseek-v4-flash",
+  smart_advanced: "qwen/qwen3.7-max",
+};
+const DEFAULT_MODEL_KEY = "smart_mini";
+const FALLBACK_MODEL = "deepseek/deepseek-v4-flash";
+const DEEP_MODEL = MODEL_ALLOWLIST.smart_advanced;
 
 function errJSON(
   code: string,
