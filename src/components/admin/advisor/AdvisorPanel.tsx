@@ -202,6 +202,7 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
   const [error, setError] = useState<string | null>(null);
   const [rateLimited, setRateLimited] = useState(false);
   const [modelKey, setModelKey] = useState<AdvisorModelKey>(() => loadStoredModel());
+  const [customModel, setCustomModel] = useState<string>(() => loadStoredCustomModel());
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -210,6 +211,9 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
   useEffect(() => {
     try { window.localStorage.setItem(ADVISOR_MODEL_STORAGE_KEY, modelKey); } catch { /* ignore */ }
   }, [modelKey]);
+  useEffect(() => {
+    try { window.localStorage.setItem(ADVISOR_CUSTOM_MODEL_STORAGE_KEY, customModel); } catch { /* ignore */ }
+  }, [customModel]);
 
   const activeTab = searchParams.get('tab') || 'today';
   const surfacePrompt = SURFACE_PROMPTS(language)[activeTab] || (language === 'he'
