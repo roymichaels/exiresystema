@@ -386,6 +386,17 @@ export default function AdvisorPanel({ variant = 'widget', onClose }: AdvisorPan
             {RATE_LIMIT_NOTE(language)}
           </div>
         )}
+        {isAdmin && modelKey === 'custom' && (
+          <div className="mt-1.5">
+            <Input
+              value={customModel}
+              onChange={(e) => setCustomModel(e.target.value)}
+              placeholder="vendor/model (e.g. anthropic/claude-3.5-sonnet)"
+              className="h-8 text-[11.5px] rounded-lg"
+              dir="ltr"
+            />
+          </div>
+        )}
       </div>
       {!hasMessages && renderCommandCards()}
       {renderConversation()}
