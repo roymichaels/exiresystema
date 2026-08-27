@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface AIField {
@@ -163,7 +163,10 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 -mx-6 px-6">
+        <div
+          className="flex-1 -mx-6 px-6 overflow-y-auto overscroll-contain"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           <div className="space-y-4 pb-2">
             {!result && (
               <>
@@ -237,7 +240,7 @@ export default function AIFormWizard({ open, onOpenChange, onCreated }: Props) {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="flex gap-2 justify-end pt-3 border-t">
           {!result ? (
