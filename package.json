@@ -90,7 +90,7 @@
     "react-hook-form": "^7.61.1",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.9",
-    "react-router-dom": "^7.13.0",
+    "react-router-dom": "^7.18.2",
     "react-swipeable": "^7.0.2",
     "recharts": "^2.15.4",
     "shiki": "^4.1.0",
