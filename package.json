@@ -80,7 +80,7 @@
     "jspdf": "^4.0.0",
     "lucide-react": "^1.16.0",
     "motion": "^12.39.0",
-    "nanoid": "^5.1.11",
+    "nanoid": "^5.1.16",
     "next-themes": "^0.3.0",
     "openai": "^6.32.0",
     "process": "^0.11.10",
